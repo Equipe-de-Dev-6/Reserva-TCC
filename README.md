@@ -1,114 +1,88 @@
-# 🏫 Reserva SENAI - O Fim das Planilhas Infinitas
+# Reserva SENAI
 
-> *Porque a direção merecia um dia de paz... e os professores também! 😎*
+Sistema de gerenciamento, organização e reserva de salas, laboratórios e equipamentos.
 
-## ✨ A Grande Missão
+## Visão Geral
 
-Você conhece aquele colega que precisa mandar mensagem no WhatsApp, ligar, mandar e-mail e ainda assim não consegue saber se a sala de aula está disponível? Pois é! **Chegou o Reserva SENAI** para acabar com esse caos digital!
+O Reserva SENAI é uma plataforma digital desenvolvida para modernizar o processo de agendamento de recursos na instituição. O sistema substitui o controle manual por meio de planilhas, oferecendo uma solução centralizada, automatizada e acessível para diretores, professores e demais usuários.
 
-Desenvolvemos um sistema que transforma o inferno das **planilhas feitas à mão** em uma plataforma moderna, ágil e (pasmem!) **automatizada**. 🎉
+## Objetivo Geral
 
-## 🎯 Objetivos (Ou: "O Que Queremos Conquistar")
+Desenvolver um sistema web para gerenciar, organizar e realizar a reserva de salas, laboratórios e equipamentos do SENAI, centralizando informações, automatizando o agendamento e proporcionando maior eficiência, organização e agilidade.
 
-### Objetivo Geral 🚀
-Criar um sistema web que gerencia salas, laboratórios e equipamentos do SENAI, fazendo as tarefas chatas dos humanos e deixando a direção com tempo livre para... bem, qualquer coisa que não seja planilha!
+## Objetivos Específicos
 
-### Objetivos Específicos (A Receita Secreta) 🧪
+- Desenvolver sistema de reserva automático para salas, laboratórios e equipamentos
+- Centralizar informações de disponibilidade em uma única plataforma
+- Automatizar o processo de agendamento
+- Consultar disponibilidade de recursos em tempo real
+- Facilitar o gerenciamento de reservas pela direção
+- Disponibilizar histórico de reservas e utilização
+- Registrar e acompanhar solicitações de manutenção
+- Reduzir conflitos de agendamento e otimizar a utilização de infraestrutura
 
-- ✅ Reserva automática de salas, laboratórios e equipamentos (adeus, planilhas!)
-- ✅ Uma plataforma centralizada que funciona de verdade
-- ✅ Agendamento automatizado (máquina no lugar do trabalho manual)
-- ✅ Consulta de disponibilidade em tempo real (tipo magia, mas com código)
-- ✅ Histórico de reservas para quem quer recordar os bons tempos
-- ✅ Registro de manutenção de equipamentos (não é milagre, mas é próximo)
-- ✅ Adeus, conflitos de agendamento! 👋
-- ✅ Infraestrutura otimizada (mais coisas, menos caos)
+## Justificativa
 
-## 🤔 Por Que Isso Era Necessário?
+Atualmente, o controle de recursos é realizado manualmente por meio de planilhas gerenciadas pela direção. Este processo demanda:
 
-### O Problema (A Cena do Crime) 🕵️
+- Tempo constante de atualização e manutenção
+- Centralização de informações em uma única pessoa
+- Dificuldade na consulta de disponibilidade por usuários
+- Processamento lento de solicitações
+- Risco de conflitos de agendamento
 
-```
-┌─────────────────────────────────────────┐
-│  ANTES (O Caos)                         │
-├─────────────────────────────────────────┤
-│ 📊 Planilhas feitas à mão                │
-│ ⏰ Atualização manual constante          │
-│ 🙋 Diretor virou o Google Agenda        │
-│ 📞 "Oi, posso usar a sala?"             │
-│    "Um momento, deixa eu verificar..."  │
-│ 😫 Conflitos de agendamento             │
-│ 🐢 Processo lento (como uma tartaruga)  │
-└─────────────────────────────────────────┘
-```
+O Reserva SENAI resolve estes problemas através da digitalização e automatização do processo, otimizando a gestão de infraestrutura e reduzindo a carga administrativa.
 
-### A Solução (O Herói Chega) 🦸
+## Escopo
 
-```
-┌─────────────────────────────────────────┐
-│  DEPOIS (O Paraíso Digital)             │
-├─────────────────────────────────────────┤
-│ 🖥️ Sistema web moderno e inteligente     │
-│ ⚡ Tudo automatizado (máquinas trabalham)│
-│ 👨‍💼 Diretor pode finalmente descansar    │
-│ 🔍 "A sala está disponível? Clica aqui"│
-│ ✨ Sem conflitos, sem drama             │
-│ 🚀 Rápido, eficiente e preciso          │
-└─────────────────────────────────────────┘
-```
+### Funcionalidades Implementadas
 
-## 📋 O Que Este Sistema Faz (E Não Faz!)
+- Gerenciamento de cadastro de salas, laboratórios e equipamentos
+- Reserva de salas e equipamentos
+- Consulta de disponibilidade em tempo real
+- Histórico de reservas e utilização
+- Cancelamento e edição de reservas
+- Registro de solicitações de manutenção
+- Controle de acesso por perfil (direção e professores)
+- Agenda centralizada de recursos
 
-### ✅ A Gente Faz:
-- 🏢 Gerenciar cadastro de salas, laboratórios e equipamentos
-- 📅 Reservar salas e equipamentos com facilidade
-- 👀 Mostrar disponibilidade em tempo real
-- 📊 Manter histórico de quem usou o quê e quando
-- 🔄 Cancelar e editar reservas (humanos erram mesmo)
-- 🔧 Registrar solicitações de manutenção
-- 🔐 Controlar quem acessa o quê (direção vs professores)
-- 📍 Agenda centralizada de todos os recursos
+### Fora do Escopo
 
-### ❌ A Gente NÃO Faz:
-- 🚪 Controlar quem entra e sai das salas (não somos segurança)
-- 🔨 Consertar equipamentos (só registra, promete?)
-- 🔗 Integrar com outros sistemas do SENAI (primeira versão, tá?)
-- 📚 Gerenciar notas, frequência ou matérias (não somos Seduc)
-- 💰 Controlar patrimônio da instituição (escopo minimalista)
-- 📧 Enviar notificações por e-mail ou SMS (ainda não, paciência!)
+- Controle de entrada e saída física de pessoas
+- Execução de manutenção de equipamentos
+- Integração com sistemas externos do SENAI
+- Gerenciamento de notas, frequência ou conteúdos acadêmicos
+- Controle de patrimônio além do necessário para reservas
+- Notificações automáticas por e-mail ou SMS (versões futuras)
 
-## 🏗️ Estrutura do Projeto
+## Estrutura do Projeto
 
 ```
 reserva-senai/
-├── 📁 frontend/          # A cara bonita do sistema
-├── 📁 backend/           # O cérebro que faz tudo funcionar
-├── 📁 database/          # Onde os dados vivem
-├── 📁 docs/              # Documentação (pra não ficar perdido)
-└── 📄 README.md          # Você está aqui! 👋
+├── frontend/          # Interface do usuário
+├── backend/           # Lógica de negócio
+├── database/          # Estrutura de dados
+├── docs/              # Documentação
+└── README.md          # Este arquivo
 ```
 
-## 🛠️ Tech Stack (O Que Alimenta Essa Criatura)
+## Tecnologias
 
-*Ainda sendo definido, mas prepare-se para:*
-- Backend moderno e responsivo
-- Banco de dados robusto
-- Frontend que não dói nos olhos
-- Deploy rápido e seguro
+A definir conforme progresso do projeto.
 
-## 🚀 Como Começar
+## Instalação
 
 ### Pré-requisitos
-- Um computador (recomendado)
-- Café ☕ (altamente recomendado)
-- Curiosidade (obrigatório)
 
-### Instalação
+- [Node.js](https://nodejs.org/) ou [Python](https://www.python.org/)
+- Git
+- Navegador moderno
+
+### Setup
+
 ```bash
 # Clone o repositório
 git clone https://github.com/seu-usuario/reserva-senai.git
-
-# Entre na pasta
 cd reserva-senai
 
 # Instale as dependências
@@ -116,82 +90,59 @@ npm install
 # ou
 pip install -r requirements.txt
 
-# Rode o projeto
+# Inicie o servidor
 npm start
 # ou
 python manage.py runserver
 ```
 
-*Instruções detalhadas em breve!*
+Instruções detalhadas disponíveis na [documentação](docs/).
 
-## 👥 Quem Pode Usar?
+## Perfis de Usuário
 
-| Grupo | Superpoderes |
-|-------|--------------|
-| 👨‍💼 **Direção** | Vê tudo, controla tudo, aprova tudo |
-| 👨‍🏫 **Professores** | Reserva, consulta, cancela (com limite) |
-| 🧑‍🎓 **Outros Usuários** | Consulta disponibilidade e reserva |
+| Perfil | Permissões |
+|--------|-----------|
+| **Direção** | Gerenciar recursos, visualizar relatórios, aprovar manutenção |
+| **Professores** | Reservar recursos, consultar disponibilidade, editar próprias reservas |
+| **Usuários** | Consultar disponibilidade, realizar reservas |
 
-## 📊 Fluxo Principal
+## Fluxo de Reserva
 
-```
-Professor ──> Acessa Sistema ──> Consulta Disponibilidade ──> Faz Reserva
-                                                                    │
-                                                                    ↓
-                                                    Sistema Confirma ✅
-                                                         │
-                                                         ↓
-                                                   Tudo Registrado! 📝
-```
+1. Usuário acessa o sistema
+2. Consulta disponibilidade do recurso desejado
+3. Realiza a reserva
+4. Sistema confirma a reserva
+5. Registro é armazenado e pode ser consultado posteriormente
 
-## 🎊 Benefícios (Por Que Você Deveria Amar Este Projeto)
+## Benefícios
 
-| Benefício | Descrição |
-|-----------|-----------|
-| ⏱️ **Mais Rápido** | Sem esperar resposta da direção |
-| 📈 **Mais Eficiente** | Menos tempo em planilhas = mais tempo com alunos |
-| 🎯 **Menos Erros** | Sistema não erra (ou erra bem menos) |
-| 😊 **Felicidade** | Diretor descansa, professor respira |
-| 🌱 **Escalável** | Cresce com a instituição |
+- **Rapidez**: Consulta instantânea de disponibilidade
+- **Eficiência**: Redução de trabalho administrativo manual
+- **Confiabilidade**: Eliminação de conflitos de agendamento
+- **Rastreabilidade**: Histórico completo de utilização de recursos
+- **Escalabilidade**: Suporta crescimento da instituição
 
-## 🤝 Contribuições
+## Contribuindo
 
-Você quer ajudar a transformar esse projeto em lenda? Fantástico!
+Para contribuir com o projeto:
 
-1. Faça um Fork deste repositório
-2. Crie uma branch para sua feature (`git checkout -b feature/MinhaFeature`)
-3. Commit suas mudanças (`git commit -m 'Add some MinhaFeature'`)
-4. Push para a branch (`git push origin feature/MinhaFeature`)
+1. Faça um Fork do repositório
+2. Crie uma branch para sua feature (`git checkout -b feature/sua-feature`)
+3. Commit suas mudanças (`git commit -m 'Adiciona sua feature'`)
+4. Push para a branch (`git push origin feature/sua-feature`)
 5. Abra um Pull Request
-6. Receba aplausos virtuais 👏👏👏
 
-## 📧 Contato e Suporte
+## Suporte
 
-Tem dúvidas? Bugs? Ideias brilhantes?
-- 📬 Email: [seu-email@senai.com](mailto:seu-email@senai.com)
-- 💬 Discord: [Link do servidor](https://discord.gg/seu-servidor)
-- 🐦 Twitter: [@ReservaSENAI](https://twitter.com)
+Para dúvidas, bugs ou sugestões:
 
-## 📝 Licença
+- Email: [seu-email@senai.com](mailto:seu-email@senai.com)
+- Issues: [GitHub Issues](https://github.com/seu-usuario/reserva-senai/issues)
 
-Este projeto está sob a licença [MIT](LICENSE). Use, modifique, distribua à vontade!
+## Licença
 
-## 🎬 Créditos
+Este projeto está licenciado sob a [MIT License](LICENSE).
 
-Desenvolvido com ❤️, ☕ e muita criatividade pela equipe SENAI.
+## Autores
 
----
-
-## 🌟 Gostou? Deixe uma Star! ⭐
-
-Se este projeto salvou seu dia (ou pode salvar), deixe uma estrelinha para nos motivar! 😊
-
----
-
-<div align="center">
-
-### Feito com 💙 por quem cansou de planilhas
-
-**"Reserva SENAI: Quando a tecnologia finalmente resolve o problema que ninguém pediu pra existir"**
-
-</div>
+Desenvolvido pela equipe SENAI.
