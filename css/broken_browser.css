@@ -1,0 +1,89 @@
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@200..800&family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap');
+
+:root {
+
+    /* Cores principais */
+    --cor-principal: #FF0000;
+    --cor-hover: #CC0000;
+    --cor-ativa: #990000;
+    --cor-clara: #FF3333;
+
+    /* Cores de fundo e texto */
+    --cor-fundo: #F3F3F3;
+    --cor-texto: #111111;
+    --cor-secundaria: #666666;
+
+    /* Bordas e efeitos */
+    --cor-borda: #DDDDDD;
+    --sombra: 0 4px 12px rgba(0, 0, 0, 0.15);
+    --border-radius: 8px;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    text-decoration: none;
+    font-family: 'Montserrat', sans-serif;
+}
+
+body {
+    background-color: var(--cor-fundo);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+}
+
+/* =========================
+   LINK ESTILIZADO COMO BOTÃO
+========================= */
+
+a {
+    display: block; /* Garante que a tag <a> aceite largura, padding e margens corretamente */
+    text-align: center;
+    
+    width: 100%;
+
+    padding: 14px 16px;
+
+    border: none;
+    border-radius: var(--border-radius);
+
+    background-color: var(--cor-texto);
+    color: var(--cor-fundo);
+
+    font-size: 14px;
+    font-weight: 300;
+
+    cursor: pointer;
+
+    transition:
+        background-color 0.3s ease,
+        transform 0.2s ease;
+
+    margin-top: 8px;
+}
+
+a:hover {
+    background-color: var(--cor-hover);
+}
+
+a:active {
+    background-color: var(--cor-ativa);
+
+    transform: scale(0.98);
+}
+
+.container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 40px;
+}
+
+.container img {
+    width: 100px;
+    height: auto;
+}
