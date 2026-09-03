@@ -261,12 +261,11 @@ button[type="submit"]:active {
     gap: 8px;
 
     text-align: center;
-
-    margin-top: 15px;
+    margin: 10px 0 30px 0;
 }
 
 .links p {
-    font-size: 13px;
+    font-size: 16px;
 
     font-weight: 600;
 
