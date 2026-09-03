@@ -11,7 +11,7 @@
     <!-- Bootstrap Icons -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 
-    <link rel="stylesheet" href="/css/login.css">
+    <link rel="stylesheet" href="/css/cadastro.css">
 
     <title>SENAI - Gestão de Salas e Equipamentos</title>
 
@@ -22,7 +22,7 @@
     <div class="container">
 
         <div class="logo">
-                
+
             <img src="/assets/img/Logo senai.png">
 
         </div>
@@ -33,7 +33,7 @@
 
             <h2>Gestão de salas e equipamentos</h2>
 
-            <form action="/templates/paginainicialprofessor.html">
+            <form>
 
                 <!-- Nome -->
                 <div class="input-container">
@@ -53,23 +53,25 @@
                     <input type="password" placeholder="Senha...">
                 </div>
 
-                <button type="button" onclick="window.location.href='/templates/paginainicialprofessor.html'">Entrar</button>
+                <!-- Confirme sua senha -->
+                <div class="input-container">
+                    <i class="bi bi-lock"></i>
+                    <input type="password" placeholder="Confirme sua senha...">
+                </div>
+
+                <button type="submit">Criar Conta</button>
 
             </form>
+
+            <div class="divider">ou</div>
 
             <div class="links">
 
                 <p>
-                    <a href="#">Não possui conta? Cadastre-se</a>
-                </p>
-
-                <p>
-                    <a href="#">Esqueci minha senha</a>
+                    <a href="#">Já possui conta? Faça o login</a>
                 </p>
 
             </div>
-
-            <div class="divider">ou</div>
 
             <button class="google-btn">
                 <p>...</p>
