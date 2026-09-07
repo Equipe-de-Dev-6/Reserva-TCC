@@ -185,6 +185,9 @@ a {
   display: flex;
   align-items: center;
   gap: 12px;
+  position: relative;
+  cursor: pointer;
+  user-select: none;
 }
 
 .avatar {
@@ -210,6 +213,48 @@ a {
 .user-info .role {
   font-size: 12px;
   color: var(--text-gray);
+}
+
+.user-dropdown {
+  display: none;
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  background-color: var(--white);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  width: 180px;
+  padding: 6px 0;
+  z-index: 1000;
+}
+
+.user-dropdown.active {
+  display: block;
+}
+
+.dropdown-item {
+  display: block;
+  padding: 8px 16px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-dark);
+  transition: background-color 0.2s;
+}
+
+.dropdown-item:hover {
+  background-color: var(--bg-color);
+}
+
+.dropdown-item.logout {
+  color: var(--senai-red);
+  font-weight: 600;
+}
+
+.dropdown-divider {
+  height: 1px;
+  background-color: var(--border-color);
+  margin: 6px 0;
 }
 
 .quick-actions-section {
