@@ -52,7 +52,6 @@ img {
   position: relative;
 }
 
-/* ============ SIDEBAR ============ */
 .sidebar {
   width: 250px;
   height: 100vh;
@@ -165,7 +164,6 @@ img {
   flex-shrink: 0;
 }
 
-/* ============ MAIN CONTENT ============ */
 .main-content {
   flex: 1;
   height: 100vh;
@@ -317,7 +315,6 @@ img {
   margin: 6px 0;
 }
 
-/* ============ QUICK ACTIONS TITLE ============ */
 .quick-actions-section {
   margin-bottom: 24px;
 }
@@ -328,14 +325,12 @@ img {
   margin-bottom: 16px;
 }
 
-/* ============ BOOKING LAYOUT ============ */
 .booking-layout {
   display: grid;
   grid-template-columns: 300px 1fr 64px;
   gap: 24px;
 }
 
-/* --- Categoria selecionada --- */
 .category-card {
   background-color: var(--white);
   border: 1px solid var(--border-color);
@@ -373,7 +368,6 @@ img {
   line-height: 1.35;
 }
 
-/* --- Lista de salas --- */
 .rooms-list {
   display: flex;
   flex-direction: column;
@@ -463,7 +457,6 @@ img {
   color: var(--yellow-text);
 }
 
-/* --- Indicador de etapas --- */
 .step-indicator {
   display: flex;
   flex-direction: column;
@@ -498,11 +491,6 @@ img {
   background-color: var(--border-color);
 }
 
-/* =====================================================
-   RESPONSIVO
-   ===================================================== */
-
-/* ---------- Tablets (≤ 1024px) ---------- */
 @media (max-width: 1024px) {
   .search-container {
     width: 220px;
@@ -531,7 +519,6 @@ img {
   }
 }
 
-/* ---------- Tablets pequenos / celular grande (≤ 860px) ---------- */
 @media (max-width: 860px) {
   body, html {
     height: auto;
@@ -548,7 +535,6 @@ img {
     overflow: visible;
   }
 
-  /* Sidebar vira menu lateral deslizante */
   .sidebar {
     position: fixed;
     left: 0;
@@ -570,8 +556,6 @@ img {
     display: none;
   }
 
-  /* Layout de reserva empilha: categoria em cima, salas embaixo,
-     indicador de etapas vira uma barra horizontal no topo da lista */
   .booking-layout {
     grid-template-columns: 1fr;
     grid-template-areas:
@@ -617,7 +601,6 @@ img {
   }
 }
 
-/* ---------- Celulares (≤ 600px) ---------- */
 @media (max-width: 600px) {
   .main-content {
     padding: 0 16px 16px;
@@ -674,7 +657,6 @@ img {
   }
 }
 
-/* ---------- Celulares muito pequenos (≤ 380px) ---------- */
 @media (max-width: 380px) {
   .sidebar {
     width: 220px;
