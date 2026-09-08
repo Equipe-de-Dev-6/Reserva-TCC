@@ -331,8 +331,9 @@ img {
 /* ============ BOOKING LAYOUT ============ */
 .booking-layout {
   display: grid;
-  grid-template-columns: 300px 1fr 64px;
+  grid-template-columns: 300px 1fr 80px;
   gap: 24px;
+  align-items: start;
 }
 
 /* --- Categoria selecionada --- */
@@ -468,8 +469,12 @@ img {
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: flex-start;
   gap: 0;
-  padding-top: 4px;
+  padding-top: 0;
+  height: fit-content;
+  position: sticky;
+  top: 12px;
 }
 
 .step {
@@ -517,7 +522,7 @@ img {
   }
 
   .booking-layout {
-    grid-template-columns: 240px 1fr 56px;
+    grid-template-columns: 240px 1fr 70px;
     gap: 16px;
   }
 
