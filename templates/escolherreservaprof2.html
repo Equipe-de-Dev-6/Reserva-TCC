@@ -3,10 +3,10 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Reservar - Gestão de salas e equipamentos</title>
+  <title>Reservar Salas - Gestão de salas e equipamentos</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://www.flaticon.com/flaticon.css">
-  <link rel="stylesheet" href="/css/reservar_tela_prof.css">
+  <link rel="stylesheet" href="/css/escolherreservaprof.css">
 </head>
 <body>
   <div class="app-container">
@@ -14,7 +14,7 @@
     <aside class="sidebar">
       <div class="sidebar-top">
         
-        <a href="/templates/reservar_tela_prof.html" class="logo">
+        <a href="/templates/paginainicialprofessor.html" class="logo">
           <img src="/assets/img/Logo senai.png" alt=""> </a>
         
         <nav class="nav-menu">
@@ -22,7 +22,7 @@
         <img src="/assets/icons/home.png" alt="" width="20" height="20">Início</a> </nav>
 
           <a href="/templates/reservar_tela_prof.html" class="nav-item active">
-        <img src="/assets/icons/restaurant.png" alt="" width="20" height="20">Reservar</a> </nav>
+        <img src="/assets/icons/restaurant.png" alt="" width="20" height="20">Reservas</a> </nav>
 
           <a href="/templates/.html" class="nav-item">
         <img src="/assets/icons/history.png" alt="" width="20" height="20">Histórico</a> </nav>
@@ -52,7 +52,6 @@
         </nav>
 
     </aside>
-
     <main class="main-content">
       
       <header class="header">
@@ -99,40 +98,91 @@
 
       <section class="quick-actions-section">
         <h2>O que você deseja reservar hoje?</h2>
-        
-        <div class="cards-grid-large">
-          
-          <div class="large-action-card">
-            <div class="card-text-top">
-              <h3>Salas de aula, reuniões e treinamentos</h3>
-              <p>Escolha espaços para aulas, reuniões e atividades de treinamento.</p>
+
+        <div class="booking-layout">
+
+          <div class="category-card">
+            <div class="category-icon">
+              <img src="/assets/icons/computer.png" alt="Salas">
             </div>
-            <div class="card-large-icon">
-              <img src="/assets/icons/classroom.png" alt="Salas"> 
-            </div>
-            <a href="/templates/escolherreservaprof.html" class="btn-ver-opcoes">Ver opções &rarr;</a>
+            <h3>Laboratórios de informatica, automação, mecânica e outros</h3>
           </div>
 
-          <div class="large-action-card">
-            <div class="card-text-top">
-              <h3>Laboratórios de informática, automação, mecânica e outros</h3>
-              <p>Acesse laboratórios com equipamentos especializados para práticas e projetos.</p>
-            </div>
-            <div class="card-large-icon">
-              <img src="/assets/icons/computer.png" alt="Laboratórios">
-            </div>
-            <a href="/templates/escolherreservaprof2.html" class="btn-ver-opcoes">Ver opções &rarr;</a>
+          <div class="rooms-list">
+
+            <a href="#" class="room-card searchable">
+              <div class="room-left">
+                <div class="room-thumb">
+                  <img src="/assets/icons/image.png" alt="Sala" width="20" height="20">
+                </div>
+                <div class="room-info">
+                  <h4>Laboratório de automação - C07</h4>
+                  <p>16 lugares</p>
+                </div>
+              </div>
+              <span class="status-badge status-available">Disponível</span>
+            </a>
+
+            <a href="#" class="room-card searchable selected">
+              <div class="room-left">
+                <div class="room-thumb">
+                  <img src="/assets/icons/image.png" alt="Sala" width="20" height="20">
+                </div>
+                <div class="room-info">
+                  <h4>Laboratório de informática - C08</h4>
+                  <p>16 lugares</p>
+                </div>
+              </div>
+              <span class="status-badge status-denied">Negado</span>
+            </a>
+
+            <a href="#" class="room-card searchable">
+              <div class="room-left">
+                <div class="room-thumb">
+                  <img src="/assets/icons/image.png" alt="Sala" width="20" height="20">
+                </div>
+                <div class="room-info">
+                  <h4>Laboratório de mecânica - C09</h4>
+                  <p>16 lugares</p>
+                </div>
+              </div>
+              <span class="status-badge status-waiting">Aguardando</span>
+            </a>
+
+            <a href="#" class="room-card searchable">
+              <div class="room-left">
+                <div class="room-thumb">
+                  <img src="/assets/icons/image.png" alt="Sala" width="20" height="20">
+                </div>
+                <div class="room-info">
+                  <h4>Laboratório de informática - C10</h4>
+                  <p>16 lugares</p>
+                </div>
+              </div>
+              <span class="status-badge status-available">Disponível</span>
+            </a>
+
+            <a href="#" class="room-card searchable">
+              <div class="room-left">
+                <div class="room-thumb">
+                  <img src="/assets/icons/image.png" alt="Sala" width="20" height="20">
+                </div>
+                <div class="room-info">
+                  <h4>Laboratório de mecânica - C11</h4>
+                  <p>16 lugares</p>
+                </div>
+              </div>
+              <span class="status-badge status-waiting">Aguardando</span>
+            </a>
+
           </div>
 
-          <div class="large-action-card">
-            <div class="card-text-top">
-              <h3>Gabinetes de notebooks e equipamentos móveis</h3>
-              <p>Reserve gabinetes e equipamentos para atividades móveis e em campo.</p>
-            </div>
-            <div class="card-large-icon">
-              <img src="/assets/icons/shopping-cart.png" alt="Gabinetes">
-            </div>
-            <a href="#" class="btn-ver-opcoes">Ver opções &rarr;</a>
+          <div class="step-indicator">
+            <div class="step active">01</div>
+            <div class="step-line"></div>
+            <div class="step">02</div>
+            <div class="step-line"></div>
+            <div class="step">03</div>
           </div>
 
         </div>
@@ -143,16 +193,14 @@
 
   <script>
     document.addEventListener('DOMContentLoaded', () => {
-      
+
       const userProfile = document.getElementById('userProfile');
       const userDropdown = document.getElementById('userDropdown');
 
       if (userProfile && userDropdown) {
         userProfile.addEventListener('click', (e) => {
-          e.stopPropagation(); 
-          
+          e.stopPropagation();
           if (userDropdown.contains(e.target)) return;
-          
           userDropdown.classList.toggle('active');
         });
 
@@ -164,29 +212,27 @@
       }
 
       const searchInput = document.getElementById('search-input');
-      const cards = document.querySelectorAll('.large-action-card');
+      const itemsToSearch = document.querySelectorAll('.searchable');
 
       if (searchInput) {
         searchInput.addEventListener('input', (e) => {
           const searchTerm = e.target.value.toLowerCase().trim();
 
-          cards.forEach(card => {
-            const titleElement = card.querySelector('h3');
-            const descElement = card.querySelector('p');
-            
-            if (titleElement && descElement) {
-              const title = titleElement.textContent.toLowerCase();
-              const description = descElement.textContent.toLowerCase();
-
-              if (title.includes(searchTerm) || description.includes(searchTerm)) {
-                card.style.display = 'flex'; 
-              } else {
-                card.style.display = 'none'; 
-              }
-            }
+          itemsToSearch.forEach(item => {
+            const text = item.textContent.toLowerCase();
+            item.style.display = text.includes(searchTerm) ? '' : 'none';
           });
         });
       }
+
+      const roomCards = document.querySelectorAll('.room-card');
+      roomCards.forEach(card => {
+        card.addEventListener('click', (e) => {
+          e.preventDefault();
+          roomCards.forEach(c => c.classList.remove('selected'));
+          card.classList.add('selected');
+        });
+      });
 
       const menuToggle = document.getElementById('menuToggle');
       const sidebar = document.querySelector('.sidebar');
@@ -203,7 +249,8 @@
           sidebarOverlay.classList.remove('active');
         });
       }
-      
+
     });
   </script>
 </body>
+</html>
