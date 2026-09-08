@@ -6,7 +6,7 @@
   <title>Reservar Salas - Gestão de salas e equipamentos</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://www.flaticon.com/flaticon.css">
-  <link rel="stylesheet" href="/css/escolherreservaprof2.css">
+  <link rel="stylesheet" href="/css/escolherreservaprof3.css">
 </head>
 <body>
   <div class="app-container">
@@ -110,7 +110,7 @@
 
           <div class="rooms-list">
 
-            <a href="#" class="room-card searchable">
+            <a href="/templates/escolherreservaprof3.html" class="room-card searchable">
               <div class="room-left">
                 <div class="room-thumb">
                   <img src="/assets/icons/image.png" alt="Sala" width="20" height="20">
@@ -123,7 +123,7 @@
               <span class="status-badge status-available">Disponível</span>
             </a>
 
-            <a href="#" class="room-card searchable selected">
+            <a href="/templates/escolherreservaprof3.html" class="room-card searchable selected">
               <div class="room-left">
                 <div class="room-thumb">
                   <img src="/assets/icons/image.png" alt="Sala" width="20" height="20">
@@ -136,7 +136,7 @@
               <span class="status-badge status-denied">Negado</span>
             </a>
 
-            <a href="#" class="room-card searchable">
+            <a href="/templates/escolherreservaprof3.html" class="room-card searchable">
               <div class="room-left">
                 <div class="room-thumb">
                   <img src="/assets/icons/image.png" alt="Sala" width="20" height="20">
@@ -149,7 +149,7 @@
               <span class="status-badge status-waiting">Aguardando</span>
             </a>
 
-            <a href="#" class="room-card searchable">
+            <a href="/templates/escolherreservaprof3.html" class="room-card searchable">
               <div class="room-left">
                 <div class="room-thumb">
                   <img src="/assets/icons/image.png" alt="Sala" width="20" height="20">
@@ -162,7 +162,7 @@
               <span class="status-badge status-available">Disponível</span>
             </a>
 
-            <a href="#" class="room-card searchable">
+            <a href="/templates/escolherreservaprof3.html" class="room-card searchable">
               <div class="room-left">
                 <div class="room-thumb">
                   <img src="/assets/icons/image.png" alt="Sala" width="20" height="20">
@@ -180,7 +180,7 @@
           <div class="step-indicator">
             <div class="step active">01</div>
             <div class="step-line"></div>
-            <div class="step active">02</div>
+            <div class="step">02</div>
             <div class="step-line"></div>
             <div class="step">03</div>
           </div>
@@ -231,6 +231,11 @@
           e.preventDefault();
           roomCards.forEach(c => c.classList.remove('selected'));
           card.classList.add('selected');
+          
+          // Redirecionar para passo 2 após 300ms
+          setTimeout(() => {
+            window.location.href = '/templates/passo2reservaprof.html';
+          }, 300);
         });
       });
 

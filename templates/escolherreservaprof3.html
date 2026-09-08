@@ -194,6 +194,7 @@
   <script>
     document.addEventListener('DOMContentLoaded', () => {
 
+      // --- Menu de Perfil ---
       const userProfile = document.getElementById('userProfile');
       const userDropdown = document.getElementById('userDropdown');
 
@@ -211,6 +212,7 @@
         });
       }
 
+      // --- Barra de pesquisa ---
       const searchInput = document.getElementById('search-input');
       const itemsToSearch = document.querySelectorAll('.searchable');
 
@@ -225,15 +227,31 @@
         });
       }
 
+      // Ao clicar em uma sala, guarda qual foi escolhida e segue para o Passo 02.
+      // Salas "Negado" não avançam para o próximo passo.
       const roomCards = document.querySelectorAll('.room-card');
       roomCards.forEach(card => {
         card.addEventListener('click', (e) => {
-          e.preventDefault();
+          if (card.dataset.status === 'negado') {
+            e.preventDefault();
+            return;
+          }
+
           roomCards.forEach(c => c.classList.remove('selected'));
           card.classList.add('selected');
+
+          // Guarda a sala escolhida para uso no Passo 02, se necessário.
+          sessionStorage.setItem('salaSelecionada', card.dataset.sala || '');
+
+          // Redireciona após 300ms
+          e.preventDefault();
+          setTimeout(() => {
+            window.location.href = '/templates/passo2reservaprof.html';
+          }, 300);
         });
       });
 
+      // --- Menu mobile (hambúrguer) ---
       const menuToggle = document.getElementById('menuToggle');
       const sidebar = document.querySelector('.sidebar');
       const sidebarOverlay = document.getElementById('sidebarOverlay');
