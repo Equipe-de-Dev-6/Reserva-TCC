@@ -474,6 +474,12 @@ img {
     flex-wrap: wrap;
   }
 
+  .header-actions {
+    width: 100%;
+    justify-content: flex-end;
+    margin-top: 12px;
+  }
+
   .greeting h1 {
     font-size: 20px;
   }
@@ -522,5 +528,9 @@ img {
 
   .greeting h1 {
     font-size: 18px;
+  }
+
+  .user-dropdown {
+    width: 160px;
   }
 }
