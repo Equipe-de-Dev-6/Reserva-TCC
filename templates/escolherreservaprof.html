@@ -102,7 +102,6 @@
 
         <div class="booking-layout">
 
-          <!-- Categoria selecionada -->
           <div class="category-card">
             <div class="category-icon">
               <img src="/assets/icons/classroom.png" alt="Salas">
@@ -110,10 +109,9 @@
             <h3>Salas de aula, reuniões e treinamentos</h3>
           </div>
 
-          <!-- Lista de salas -->
           <div class="rooms-list">
 
-            <a href="#" class="room-card searchable">
+            <a href="/templates/passo2reservaprof.html" class="room-card searchable" data-sala="Sala de aula - A01" data-status="disponivel">
               <div class="room-left">
                 <div class="room-thumb">
                   <img src="/assets/icons/image.png" alt="Sala" width="20" height="20">
@@ -126,7 +124,7 @@
               <span class="status-badge status-available">Disponível</span>
             </a>
 
-            <a href="#" class="room-card searchable selected">
+            <a href="/templates/passo2reservaprof.html" class="room-card searchable" data-sala="Sala de aula - A02" data-status="negado">
               <div class="room-left">
                 <div class="room-thumb">
                   <img src="/assets/icons/image.png" alt="Sala" width="20" height="20">
@@ -139,7 +137,7 @@
               <span class="status-badge status-denied">Negado</span>
             </a>
 
-            <a href="#" class="room-card searchable">
+            <a href="/templates/passo2reservaprof.html" class="room-card searchable" data-sala="Sala de aula - A03" data-status="aguardando">
               <div class="room-left">
                 <div class="room-thumb">
                   <img src="/assets/icons/image.png" alt="Sala" width="20" height="20">
@@ -152,7 +150,7 @@
               <span class="status-badge status-waiting">Aguardando</span>
             </a>
 
-            <a href="#" class="room-card searchable">
+            <a href="/templates/passo2reservaprof.html" class="room-card searchable" data-sala="Sala de aula - A04" data-status="disponivel">
               <div class="room-left">
                 <div class="room-thumb">
                   <img src="/assets/icons/image.png" alt="Sala" width="20" height="20">
@@ -165,7 +163,7 @@
               <span class="status-badge status-available">Disponível</span>
             </a>
 
-            <a href="#" class="room-card searchable">
+            <a href="/templates/passo2reservaprof.html" class="room-card searchable" data-sala="Sala de aula - A05" data-status="aguardando">
               <div class="room-left">
                 <div class="room-thumb">
                   <img src="/assets/icons/image.png" alt="Sala" width="20" height="20">
@@ -198,7 +196,6 @@
   <script>
     document.addEventListener('DOMContentLoaded', () => {
 
-      // --- Menu de Perfil ---
       const userProfile = document.getElementById('userProfile');
       const userDropdown = document.getElementById('userDropdown');
 
@@ -216,7 +213,6 @@
         });
       }
 
-      // --- Barra de pesquisa ---
       const searchInput = document.getElementById('search-input');
       const itemsToSearch = document.querySelectorAll('.searchable');
 
@@ -231,17 +227,26 @@
         });
       }
 
-      // --- Seleção de sala ---
+      // Ao clicar em uma sala, guarda qual foi escolhida e segue para o Passo 02.
+      // Salas "Negado" não avançam para o próximo passo.
       const roomCards = document.querySelectorAll('.room-card');
       roomCards.forEach(card => {
         card.addEventListener('click', (e) => {
-          e.preventDefault();
+          if (card.dataset.status === 'negado') {
+            e.preventDefault();
+            return;
+          }
+
           roomCards.forEach(c => c.classList.remove('selected'));
           card.classList.add('selected');
+
+          // Guarda a sala escolhida para uso no Passo 02, se necessário.
+          sessionStorage.setItem('salaSelecionada', card.dataset.sala || '');
+
+          // Deixa o próprio <a href="/templates/passo2reservaprof.html"> navegar normalmente.
         });
       });
 
-      // --- Menu mobile (hambúrguer) ---
       const menuToggle = document.getElementById('menuToggle');
       const sidebar = document.querySelector('.sidebar');
       const sidebarOverlay = document.getElementById('sidebarOverlay');

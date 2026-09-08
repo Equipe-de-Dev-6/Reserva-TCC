@@ -10,10 +10,6 @@
   --border-color: #E5E7EB;
   --green-bg: #D1FAE5;
   --green-text: #059669;
-  --red-bg: #FEE2E2;
-  --red-text: #DC2626;
-  --yellow-bg: #FEF3C7;
-  --yellow-text: #B45309;
 }
 
 * {
@@ -317,21 +313,19 @@ img {
   margin: 6px 0;
 }
 
-/* ============ QUICK ACTIONS TITLE ============ */
+/* ============ QUICK ACTIONS SECTION ============ */
 .quick-actions-section {
   margin-bottom: 24px;
-}
-
-.quick-actions-section h2 {
-  font-size: 16px;
-  font-weight: 700;
-  margin-bottom: 16px;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
 }
 
 /* ============ BOOKING LAYOUT ============ */
 .booking-layout {
   display: grid;
-  grid-template-columns: 300px 1fr 80px;
+  grid-template-columns: 300px 1fr 64px;
   gap: 24px;
   align-items: start;
 }
@@ -374,94 +368,73 @@ img {
   line-height: 1.35;
 }
 
-/* --- Lista de salas --- */
-.rooms-list {
+/* ============ SUCCESS CARD (Passo 03) ============ */
+.success-card {
+  background-color: var(--white);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 48px 40px;
+  min-width: 0;
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  min-width: 0;
-}
-
-.room-card {
-  background-color: var(--white);
-  border: 2px solid transparent;
-  border-radius: 12px;
-  padding: 14px 18px;
-  display: flex;
-  justify-content: space-between;
   align-items: center;
-  gap: 12px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.02);
-  transition: transform 0.15s, border-color 0.15s;
+  text-align: center;
+  gap: 24px;
+  animation: popIn 0.4s ease;
 }
 
-.room-card:hover {
-  transform: translateY(-2px);
+@keyframes popIn {
+  from {
+    opacity: 0;
+    transform: scale(0.94);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
 }
 
-.room-card.selected {
-  border-color: var(--senai-blue);
-}
-
-.room-left {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  min-width: 0;
-}
-
-.room-thumb {
-  width: 44px;
-  height: 40px;
-  background-color: var(--bg-color);
-  border: 1px solid var(--border-color);
-  border-radius: 8px;
+.success-icon {
+  width: 120px;
+  height: 120px;
   display: flex;
   align-items: center;
   justify-content: center;
-  flex-shrink: 0;
 }
 
-.room-info {
-  min-width: 0;
+.success-icon svg {
+  animation: float 2.4s ease-in-out infinite;
 }
 
-.room-info h4 {
-  font-size: 14px;
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+
+.success-text {
+  max-width: 480px;
+  font-size: 15px;
+  line-height: 1.6;
+  color: var(--text-dark);
+}
+
+.link-highlight {
+  color: var(--senai-red);
   font-weight: 700;
-  margin-bottom: 2px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
 }
 
-.room-info p {
-  font-size: 12px;
-  color: var(--text-gray);
+.btn-inicio {
+  background-color: var(--text-dark);
+  color: var(--white);
+  padding: 12px 28px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 700;
+  transition: 0.2s;
 }
 
-.status-badge {
-  padding: 4px 12px;
-  border-radius: 12px;
-  font-size: 11px;
-  font-weight: 600;
-  flex-shrink: 0;
-  white-space: nowrap;
-}
-
-.status-available {
-  background-color: var(--green-bg);
-  color: var(--green-text);
-}
-
-.status-denied {
-  background-color: var(--red-bg);
-  color: var(--red-text);
-}
-
-.status-waiting {
-  background-color: var(--yellow-bg);
-  color: var(--yellow-text);
+.btn-inicio:hover {
+  background-color: #111827;
 }
 
 /* --- Indicador de etapas --- */
@@ -469,12 +442,153 @@ img {
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: flex-start;
   gap: 0;
-  padding-top: 0;
-  height: fit-content;
-  position: sticky;
-  top: 12px;
+  padding-top: 4px;
+}
+
+.step {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  font-weight: 700;
+  background-color: #E5E7EB;
+  color: #9CA3AF;
+  flex-shrink: 0;
+  transition: background-color 0.3s, color 0.3s;
+}
+
+.step.active {
+  background-color: var(--senai-red);
+  color: var(--white);
+}
+
+.step-line {
+  width: 2px;
+  flex: 1;
+  min-height: 32px;
+  background-color: var(--border-color);
+  transition: background-color 0.3s;
+}
+
+.step-line.active-line {
+  background-color: var(--senai-red);
+}
+
+/* =====================================================
+   RESPONSIVO
+   ===================================================== */
+
+/* ---------- Tablets (≤ 1024px) ---------- */
+@media (max-width: 1024px) {
+  .search-container {
+    width: 220px;
+  }
+
+  .user-info {
+    display: none;
+  }
+
+  .main-content {
+    padding: 0 20px 20px;
+  }
+
+  .booking-layout {
+    grid-template-columns: 240px 1fr 56px;
+    gap: 16px;
+  }
+
+  .category-icon {
+    width: 130px;
+    height: 150px;
+  }
+
+  .category-icon img {
+    width: 70px;
+  }
+
+  .success-card {
+    padding: 36px 28px;
+  }
+}
+
+/* ---------- Tablets pequenos / celular grande (≤ 860px) ---------- */
+@media (max-width: 860px) {
+  body, html {
+    height: auto;
+    overflow: visible;
+  }
+
+  .app-container {
+    height: auto;
+    min-height: 100vh;
+  }
+
+  .main-content {
+    height: auto;
+    overflow: visible;
+  }
+
+  .sidebar {
+    position: fixed;
+    left: 0;
+    top: 0;
+    transform: translateX(-100%);
+    box-shadow: 4px 0 16px rgba(0,0,0,0.1);
+    z-index: 300;
+  }
+
+  .sidebar.open {
+    transform: translateX(0);
+  }
+
+  .menu-toggle {
+    display: flex;
+  }
+
+  .search-container {
+    display: none;
+  }
+
+  .booking-layout {
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      "steps"
+      "category"
+      "success";
+  }
+
+  .category-card {
+    grid-area: category;
+    flex-direction: row;
+    text-align: left;
+    align-items: center;
+    gap: 20px;
+  }
+
+  .category-icon {
+    width: 90px;
+    height: 90px;
+    flex-shrink: 0;
+  }
+
+  .category-icon img {
+    width: 48px;
+  }
+
+  .success-card {
+    grid-area: success;
+  }
+
+  .step-indicator {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0;
+  padding-top: 4px;
 }
 
 .step {
@@ -502,124 +616,6 @@ img {
   min-height: 32px;
   background-color: var(--border-color);
 }
-
-/* =====================================================
-   RESPONSIVO
-   ===================================================== */
-
-/* ---------- Tablets (≤ 1024px) ---------- */
-@media (max-width: 1024px) {
-  .search-container {
-    width: 220px;
-  }
-
-  .user-info {
-    display: none;
-  }
-
-  .main-content {
-    padding: 0 20px 20px;
-  }
-
-  .booking-layout {
-    grid-template-columns: 240px 1fr 70px;
-    gap: 16px;
-  }
-
-  .category-icon {
-    width: 130px;
-    height: 150px;
-  }
-
-  .category-icon img {
-    width: 70px;
-  }
-}
-
-/* ---------- Tablets pequenos / celular grande (≤ 860px) ---------- */
-@media (max-width: 860px) {
-  body, html {
-    height: auto;
-    overflow: visible;
-  }
-
-  .app-container {
-    height: auto;
-    min-height: 100vh;
-  }
-
-  .main-content {
-    height: auto;
-    overflow: visible;
-  }
-
-  /* Sidebar vira menu lateral deslizante */
-  .sidebar {
-    position: fixed;
-    left: 0;
-    top: 0;
-    transform: translateX(-100%);
-    box-shadow: 4px 0 16px rgba(0,0,0,0.1);
-    z-index: 300;
-  }
-
-  .sidebar.open {
-    transform: translateX(0);
-  }
-
-  .menu-toggle {
-    display: flex;
-  }
-
-  .search-container {
-    display: none;
-  }
-
-  /* Layout de reserva empilha: categoria em cima, salas embaixo,
-     indicador de etapas vira uma barra horizontal no topo da lista */
-  .booking-layout {
-    grid-template-columns: 1fr;
-    grid-template-areas:
-      "steps"
-      "category"
-      "rooms";
-  }
-
-  .category-card {
-    grid-area: category;
-    flex-direction: row;
-    text-align: left;
-    align-items: center;
-    gap: 20px;
-  }
-
-  .category-icon {
-    width: 90px;
-    height: 90px;
-    flex-shrink: 0;
-  }
-
-  .category-icon img {
-    width: 48px;
-  }
-
-  .rooms-list {
-    grid-area: rooms;
-  }
-
-  .step-indicator {
-    grid-area: steps;
-    flex-direction: row;
-    justify-content: center;
-    gap: 0;
-  }
-
-  .step-line {
-    width: auto;
-    height: 2px;
-    min-width: 32px;
-    flex: 1;
-  }
 }
 
 /* ---------- Celulares (≤ 600px) ---------- */
@@ -652,10 +648,6 @@ img {
     height: 40px;
   }
 
-  .quick-actions-section h2 {
-    font-size: 14px;
-  }
-
   .category-card {
     flex-direction: column;
     text-align: center;
@@ -670,16 +662,25 @@ img {
     width: 64px;
   }
 
-  .room-card {
-    flex-wrap: wrap;
+  .success-card {
+    padding: 28px 20px;
   }
 
-  .room-info h4 {
-    white-space: normal;
+  .success-icon {
+    width: 96px;
+    height: 96px;
+  }
+
+  .success-icon svg {
+    width: 96px;
+    height: 96px;
+  }
+
+  .btn-inicio {
+    width: 100%;
   }
 }
 
-/* ---------- Celulares muito pequenos (≤ 380px) ---------- */
 @media (max-width: 380px) {
   .sidebar {
     width: 220px;
@@ -698,30 +699,4 @@ img {
     height: 36px;
     font-size: 11px;
   }
-}
-
-/* FORÇA A BARRA LATERAL A FICAR COMPACTA NO TOPO */
-.sidebar {
-  display: flex !important;
-  flex-direction: column !important;
-  justify-content: space-between !important;
-}
-
-.sidebar-top {
-  display: flex !important;
-  flex-direction: column !important;
-  justify-content: flex-start !important;
-}
-
-.nav-menu {
-  display: flex !important;
-  flex-direction: column !important;
-  justify-content: flex-start !important;
-  gap: 4px !important; /* Mantém os botões coladinhos (pode aumentar para 8px se quiser) */
-  margin: 0 !important;
-  padding: 0 !important;
-}
-
-.nav-item {
-  margin-bottom: 0 !important;
 }
