@@ -333,6 +333,7 @@ img {
   display: grid;
   grid-template-columns: 300px 1fr 64px;
   gap: 24px;
+  align-items: start; /* O segredo para as bolinhas não esticarem está aqui */
 }
 
 /* --- Categoria selecionada --- */
@@ -373,94 +374,132 @@ img {
   line-height: 1.35;
 }
 
-/* --- Lista de salas --- */
-.rooms-list {
+/* ============ FORM CARD (Passo 02) ============ */
+.form-card {
+  background-color: var(--white);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 28px 32px;
+  min-width: 0;
+  animation: fadeInUp 0.35s ease;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.form-title {
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text-dark);
+  margin-bottom: 6px;
+}
+
+.form-subtitle {
+  font-size: 13px;
+  color: var(--text-gray);
+  padding-bottom: 16px;
+  margin-bottom: 20px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.reserva-form {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 18px;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
   min-width: 0;
 }
 
-.room-card {
-  background-color: var(--white);
-  border: 2px solid transparent;
-  border-radius: 12px;
-  padding: 14px 18px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 12px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.02);
-  transition: transform 0.15s, border-color 0.15s;
+.form-group label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-dark);
 }
 
-.room-card:hover {
-  transform: translateY(-2px);
-}
-
-.room-card.selected {
-  border-color: var(--senai-blue);
-}
-
-.room-left {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  min-width: 0;
-}
-
-.room-thumb {
-  width: 44px;
-  height: 40px;
-  background-color: var(--bg-color);
+.form-group input,
+.form-group textarea {
+  width: 100%;
+  padding: 10px 14px;
   border: 1px solid var(--border-color);
   border-radius: 8px;
+  font-size: 13px;
+  font-family: 'Inter', sans-serif;
+  color: var(--text-dark);
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  background-color: var(--white);
+}
+
+.form-group textarea {
+  resize: vertical;
+  min-height: 70px;
+}
+
+.form-group input::placeholder,
+.form-group textarea::placeholder {
+  color: #9CA3AF;
+}
+
+.form-group input:focus,
+.form-group textarea:focus {
+  border-color: var(--senai-red);
+  box-shadow: 0 0 0 3px rgba(227, 6, 19, 0.1);
+}
+
+.form-actions {
   display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
+  justify-content: flex-end;
+  gap: 12px;
+  padding-top: 8px;
 }
 
-.room-info {
-  min-width: 0;
-}
-
-.room-info h4 {
-  font-size: 14px;
+.btn-voltar,
+.btn-enviar {
+  padding: 10px 22px;
+  border-radius: 8px;
+  font-size: 13px;
   font-weight: 700;
-  margin-bottom: 2px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  cursor: pointer;
+  transition: 0.2s;
+  border: none;
 }
 
-.room-info p {
-  font-size: 12px;
-  color: var(--text-gray);
+.btn-voltar {
+  background-color: var(--white);
+  color: var(--text-dark);
+  border: 1px solid var(--border-color);
 }
 
-.status-badge {
-  padding: 4px 12px;
-  border-radius: 12px;
-  font-size: 11px;
-  font-weight: 600;
-  flex-shrink: 0;
-  white-space: nowrap;
+.btn-voltar:hover {
+  background-color: #F9FAFB;
 }
 
-.status-available {
-  background-color: var(--green-bg);
-  color: var(--green-text);
+.btn-enviar {
+  background-color: var(--senai-red);
+  color: var(--white);
 }
 
-.status-denied {
-  background-color: var(--red-bg);
-  color: var(--red-text);
-}
-
-.status-waiting {
-  background-color: var(--yellow-bg);
-  color: var(--yellow-text);
+.btn-enviar:hover {
+  background-color: #CC0000;
 }
 
 /* --- Indicador de etapas --- */
@@ -484,6 +523,7 @@ img {
   background-color: #E5E7EB;
   color: #9CA3AF;
   flex-shrink: 0;
+  transition: background-color 0.3s, color 0.3s;
 }
 
 .step.active {
@@ -494,8 +534,13 @@ img {
 .step-line {
   width: 2px;
   flex: 1;
-  min-height: 32px;
+  min-height: 40px; /* Isso controla a distância entre as bolinhas */
   background-color: var(--border-color);
+  transition: background-color 0.3s;
+}
+
+.step-line.active-line {
+  background-color: var(--senai-red);
 }
 
 /* =====================================================
@@ -529,6 +574,10 @@ img {
   .category-icon img {
     width: 70px;
   }
+
+  .form-card {
+    padding: 22px 24px;
+  }
 }
 
 /* ---------- Tablets pequenos / celular grande (≤ 860px) ---------- */
@@ -548,7 +597,6 @@ img {
     overflow: visible;
   }
 
-  /* Sidebar vira menu lateral deslizante */
   .sidebar {
     position: fixed;
     left: 0;
@@ -570,14 +618,12 @@ img {
     display: none;
   }
 
-  /* Layout de reserva empilha: categoria em cima, salas embaixo,
-     indicador de etapas vira uma barra horizontal no topo da lista */
   .booking-layout {
     grid-template-columns: 1fr;
     grid-template-areas:
       "steps"
       "category"
-      "rooms";
+      "form";
   }
 
   .category-card {
@@ -598,8 +644,12 @@ img {
     width: 48px;
   }
 
-  .rooms-list {
-    grid-area: rooms;
+  .form-card {
+    grid-area: form;
+  }
+
+  .form-row {
+    grid-template-columns: 1fr;
   }
 
   .step-indicator {
@@ -665,12 +715,18 @@ img {
     width: 64px;
   }
 
-  .room-card {
-    flex-wrap: wrap;
+  .form-card {
+    padding: 20px;
   }
 
-  .room-info h4 {
-    white-space: normal;
+  .form-actions {
+    flex-direction: column-reverse;
+  }
+
+  .btn-voltar,
+  .btn-enviar {
+    width: 100%;
+    text-align: center;
   }
 }
 
@@ -693,30 +749,4 @@ img {
     height: 36px;
     font-size: 11px;
   }
-}
-
-/* FORÇA A BARRA LATERAL A FICAR COMPACTA NO TOPO */
-.sidebar {
-  display: flex !important;
-  flex-direction: column !important;
-  justify-content: space-between !important;
-}
-
-.sidebar-top {
-  display: flex !important;
-  flex-direction: column !important;
-  justify-content: flex-start !important;
-}
-
-.nav-menu {
-  display: flex !important;
-  flex-direction: column !important;
-  justify-content: flex-start !important;
-  gap: 4px !important; /* Mantém os botões coladinhos (pode aumentar para 8px se quiser) */
-  margin: 0 !important;
-  padding: 0 !important;
-}
-
-.nav-item {
-  margin-bottom: 0 !important;
 }
