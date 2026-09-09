@@ -10,6 +10,10 @@
   --border-color: #E5E7EB;
   --green-bg: #D1FAE5;
   --green-text: #059669;
+  --red-bg: #FEE2E2;
+  --red-text: #DC2626;
+  --yellow-bg: #FEF3C7;
+  --yellow-text: #B45309;
 }
 
 * {
@@ -313,13 +317,15 @@ img {
   margin: 6px 0;
 }
 
-/* ============ QUICK ACTIONS SECTION ============ */
+/* ============ QUICK ACTIONS TITLE ============ */
 .quick-actions-section {
   margin-bottom: 24px;
-  display: flex;
-  flex-direction: column;
-  flex: 1;
-  min-height: 0;
+}
+
+.quick-actions-section h2 {
+  font-size: 16px;
+  font-weight: 700;
+  margin-bottom: 16px;
 }
 
 /* ============ BOOKING LAYOUT ============ */
@@ -327,7 +333,7 @@ img {
   display: grid;
   grid-template-columns: 300px 1fr 64px;
   gap: 24px;
-  align-items: start;
+  align-items: start; /* O segredo para as bolinhas não esticarem está aqui */
 }
 
 /* --- Categoria selecionada --- */
@@ -368,73 +374,132 @@ img {
   line-height: 1.35;
 }
 
-/* ============ SUCCESS CARD (Passo 03) ============ */
-.success-card {
+/* ============ FORM CARD (Passo 02) ============ */
+.form-card {
   background-color: var(--white);
   border: 1px solid var(--border-color);
   border-radius: 12px;
-  padding: 48px 40px;
+  padding: 28px 32px;
   min-width: 0;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
-  gap: 24px;
-  animation: popIn 0.4s ease;
+  animation: fadeInUp 0.35s ease;
 }
 
-@keyframes popIn {
+@keyframes fadeInUp {
   from {
     opacity: 0;
-    transform: scale(0.94);
+    transform: translateY(10px);
   }
   to {
     opacity: 1;
-    transform: scale(1);
+    transform: translateY(0);
   }
 }
 
-.success-icon {
-  width: 120px;
-  height: 120px;
+.form-title {
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text-dark);
+  margin-bottom: 6px;
+}
+
+.form-subtitle {
+  font-size: 13px;
+  color: var(--text-gray);
+  padding-bottom: 16px;
+  margin-bottom: 20px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.reserva-form {
   display: flex;
-  align-items: center;
-  justify-content: center;
+  flex-direction: column;
+  gap: 18px;
 }
 
-.success-icon svg {
-  animation: float 2.4s ease-in-out infinite;
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px;
 }
 
-@keyframes float {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-6px); }
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
 }
 
-.success-text {
-  max-width: 480px;
-  font-size: 15px;
-  line-height: 1.6;
+.form-group label {
+  font-size: 13px;
+  font-weight: 600;
   color: var(--text-dark);
 }
 
-.link-highlight {
-  color: var(--senai-red);
-  font-weight: 700;
+.form-group input,
+.form-group textarea {
+  width: 100%;
+  padding: 10px 14px;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  font-size: 13px;
+  font-family: 'Inter', sans-serif;
+  color: var(--text-dark);
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  background-color: var(--white);
 }
 
-.btn-inicio {
-  background-color: var(--text-dark);
-  color: var(--white);
-  padding: 12px 28px;
+.form-group textarea {
+  resize: vertical;
+  min-height: 70px;
+}
+
+.form-group input::placeholder,
+.form-group textarea::placeholder {
+  color: #9CA3AF;
+}
+
+.form-group input:focus,
+.form-group textarea:focus {
+  border-color: var(--senai-red);
+  box-shadow: 0 0 0 3px rgba(227, 6, 19, 0.1);
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  padding-top: 8px;
+}
+
+.btn-voltar,
+.btn-enviar {
+  padding: 10px 22px;
   border-radius: 8px;
   font-size: 13px;
   font-weight: 700;
+  cursor: pointer;
   transition: 0.2s;
+  border: none;
 }
 
-.btn-inicio:hover {
-  background-color: #111827;
+.btn-voltar {
+  background-color: var(--white);
+  color: var(--text-dark);
+  border: 1px solid var(--border-color);
+}
+
+.btn-voltar:hover {
+  background-color: #F9FAFB;
+}
+
+.btn-enviar {
+  background-color: var(--senai-red);
+  color: var(--white);
+}
+
+.btn-enviar:hover {
+  background-color: #CC0000;
 }
 
 /* --- Indicador de etapas --- */
@@ -469,7 +534,7 @@ img {
 .step-line {
   width: 2px;
   flex: 1;
-  min-height: 32px;
+  min-height: 40px; /* Isso controla a distância entre as bolinhas */
   background-color: var(--border-color);
   transition: background-color 0.3s;
 }
