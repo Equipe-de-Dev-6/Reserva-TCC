@@ -14,7 +14,7 @@
     <aside class="sidebar">
       <div class="sidebar-top">
 
-        <a href="/templates/paginainicialprofessor.html" class="logo">
+        <a href="/templates/passo002reservaprof.html" class="logo">
           <img src="/assets/img/Logo senai.png" alt=""> </a>
 
         <nav class="nav-menu">
@@ -24,8 +24,8 @@
           <a href="/templates/reservar_tela_prof.html" class="nav-item active">
         <img src="/assets/icons/restaurant.png" alt="" width="20" height="20">Reservar</a> </nav>
 
-          <a href="/templates/.html" class="nav-item">
-        <img src="/assets/icons/history.png" alt="" width="20" height="20">Histórico</a> </nav>
+          <a href="/templates/reservasprof.html" class="nav-item">
+        <img src="/assets/icons/reserved.png" alt="" width="20" height="20">Reservas</a> </nav>
 
           <a href="/templates/.html" class="nav-item">
         <img src="/assets/icons/calendar.png" alt="" width="20" height="20">Calendário</a> </nav>
@@ -88,7 +88,7 @@
             </div>
 
             <div class="user-dropdown" id="userDropdown">
-              <a href="/templates/.html" class="dropdown-item">Minhas Reservas</a>
+              <a href="/templates/reservasprof.html" class="dropdown-item">Minhas Reservas</a>
               <a href="/templates/.html" class="dropdown-item">Configurações</a>
               <div class="dropdown-divider"></div>
               <a href="/templates/login.html" class="dropdown-item logout">Sair</a>
@@ -104,7 +104,7 @@
 
           <div class="category-card">
             <div class="category-icon">
-              <img src="/assets/icons/shopping-cart.png" alt="Salas">
+              <img src="/assets/icons/shopping-cart.png" alt="Gabinetes">
             </div>
             <h3>Gabinetes de notebooks e equipamentos móveis</h3>
           </div>
@@ -149,7 +149,7 @@
               </div>
 
               <div class="form-actions">
-                <a href="/templates/escolherreservaprof.html" class="btn-voltar">Voltar</a>
+                <a href="/templates/escolherreservaprof3.html" class="btn-voltar">Voltar</a>
                 <button type="submit" class="btn-enviar">Enviar</button>
               </div>
             </form>
@@ -170,6 +170,7 @@
     </main>
   </div>
 
+  <script src="/js/reservas.js"></script>
   <script>
     document.addEventListener('DOMContentLoaded', () => {
 
@@ -216,6 +217,9 @@
             reservaForm.reportValidity();
             return;
           }
+
+          // Guarda os dados preenchidos para serem confirmados no Passo 03.
+          ReservasApp.stageReserva(reservaForm);
 
           window.location.href = '/templates/passo003reservaprof.html';
         });

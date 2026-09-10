@@ -14,7 +14,7 @@
     <aside class="sidebar">
       <div class="sidebar-top">
 
-        <a href="/templates/paginainicialprofessor.html" class="logo">
+        <a href="/templates/passo03reservaprof.html" class="logo">
           <img src="/assets/img/Logo senai.png" alt=""> </a>
 
         <nav class="nav-menu">
@@ -24,8 +24,8 @@
           <a href="/templates/reservar_tela_prof.html" class="nav-item active">
         <img src="/assets/icons/restaurant.png" alt="" width="20" height="20">Reservar</a> </nav>
 
-          <a href="/templates/.html" class="nav-item">
-        <img src="/assets/icons/history.png" alt="" width="20" height="20">Histórico</a> </nav>
+          <a href="/templates/reservasprof.html" class="nav-item">
+        <img src="/assets/icons/reserved.png" alt="" width="20" height="20">Reservas</a> </nav>
 
           <a href="/templates/.html" class="nav-item">
         <img src="/assets/icons/calendar.png" alt="" width="20" height="20">Calendário</a> </nav>
@@ -88,7 +88,7 @@
             </div>
 
             <div class="user-dropdown" id="userDropdown">
-              <a href="/templates/.html" class="dropdown-item">Minhas Reservas</a>
+              <a href="/templates/reservasprof.html" class="dropdown-item">Minhas Reservas</a>
               <a href="/templates/.html" class="dropdown-item">Configurações</a>
               <div class="dropdown-divider"></div>
               <a href="/templates/login.html" class="dropdown-item logout">Sair</a>
@@ -103,9 +103,9 @@
 
           <div class="category-card">
             <div class="category-icon">
-              <img src="/assets/icons/computer.png" alt="Salas">
+              <img src="/assets/icons/computer.png" alt="Laboratórios">
             </div>
-            <h3>Laboratórios de informatica, automação, mecânica e outros</h3>
+            <h3>Laboratórios de informática, automação, mecânica e outros</h3>
           </div>
 
           <div class="success-card">
@@ -114,10 +114,13 @@
             </div>
 
             <p class="success-text">
-              Sua solicitação de agendamento foi enviada com sucesso! Aguarde algum dos coordenadores aprovarem seu pedido. Se aprovado, ele será confirmado na aba “<a href="/templates/.html" class="link-highlight">Notificações</a>”.
+              Sua solicitação de agendamento foi enviada com sucesso! Aguarde algum dos coordenadores aprovarem seu pedido. Se aprovado, ele será confirmado na aba “<a href="/templates/reservasprof.html" class="link-highlight">Reservas</a>”.
             </p>
 
-            <a href="/templates/paginainicialprofessor.html" class="btn-inicio">Voltar ao início</a>
+            <div class="success-actions">
+              <a href="/templates/reservasprof.html" class="btn-ver-reservas">Ver minhas reservas</a>
+              <a href="/templates/paginainicialprofessor.html" class="btn-inicio">Voltar ao início</a>
+            </div>
           </div>
 
           <!-- Indicador de etapas -->
@@ -135,8 +138,13 @@
     </main>
   </div>
 
+  <script src="/js/reservas.js"></script>
   <script>
     document.addEventListener('DOMContentLoaded', () => {
+
+      // Confirma a reserva rascunhada no Passo 02 e a adiciona
+      // à lista definitiva de "Reservas" com status "Aguardando".
+      ReservasApp.commitStagedReserva();
 
       const userProfile = document.getElementById('userProfile');
       const userDropdown = document.getElementById('userDropdown');
