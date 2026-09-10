@@ -1,0 +1,303 @@
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Calendário - Gestão de salas e equipamentos</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://www.flaticon.com/flaticon.css">
+  <link rel="stylesheet" href="/css/calendarioprof.css">
+</head>
+<body>
+  <div class="app-container">
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+    <aside class="sidebar">
+      <div class="sidebar-top">
+
+        <a href="/templates/calendarioprof.html" class="logo">
+          <img src="/assets/img/Logo senai.png" alt=""> </a>
+
+        <nav class="nav-menu">
+        <a href="/templates/paginainicialprofessor.html" class="nav-item ">
+        <img src="/assets/icons/home.png" alt="" width="20" height="20">Início</a> </nav>
+
+          <a href="/templates/reservar_tela_prof.html" class="nav-item">
+        <img src="/assets/icons/restaurant.png" alt="" width="20" height="20">Reservar</a> </nav>
+
+          <a href="/templates/reservasprof.html" class="nav-item">
+        <img src="/assets/icons/reserved.png" alt="" width="20" height="20">Reservas</a> </nav>
+
+          <a href="/templates/calendarioprof.html" class="nav-item active">
+        <img src="/assets/icons/calendar.png" alt="" width="20" height="20">Calendário</a> </nav>
+
+
+          <a href="/templates/.html" class="nav-item">
+        <img src="/assets/icons/notification.png" alt="" width="20" height="20">Notificações</a> </nav>
+
+          <a href="/templates/.html" class="nav-item">
+        <img src="/assets/icons/box.png" alt="" width="20" height="20">Recursos</a> </nav>
+
+          <a href="/templates/.html" class="nav-item">
+        <img src="/assets/icons/gear.png" alt="" width="20" height="20">Configurações</a> </nav>
+        </nav>
+
+            <div class="divider"></div>
+
+        <a href="/templates/.html" class="nav-item">
+        <img src="/assets/icons/interrogation.png" alt="" width="20" height="20">Ajuda</a> </nav>
+      </div>
+
+      <a href="/templates/login.html" class="btn-logout">
+        <img src="/assets/icons/exit.png" alt="" width="20" height="20">Sair</a> </nav>
+        </nav>
+
+    </aside>
+
+    <main class="main-content">
+
+      <header class="header">
+        <button class="menu-toggle" id="menuToggle" aria-label="Abrir menu">
+          <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" viewBox="0 0 24 24"><path d="M3 6h18M3 12h18M3 18h18"></path></svg>
+        </button>
+
+        <div class="greeting">
+          <h1>Olá Thiago!</h1>
+          <p>Gerencie suas reservas e faça novos agendamentos</p>
+        </div>
+
+        <div class="header-actions">
+          <div class="search-container">
+              <svg width="18" height="18" fill="none" stroke="#6b7280" stroke-width="2" viewBox="0 0 24 24"><path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+              <input type="text" id="search-input" placeholder="Buscar salas, carrinhos, laboratórios...">
+          </div>
+
+          <a href=".html" class="icon-btn">
+              <img src="/assets/icons/notification (2).png" alt="Notificações" width="20" height="20">
+          </a>
+
+          <div class="user-profile" id="userProfile">
+            <div class="avatar-link">
+                <div class="avatar">
+                  <img src="/assets/icons/user (3).png" alt="Perfil do Usuário" width="28" height="28">
+                </div>
+            </div>
+
+            <div class="user-info">
+                <span class="name">Thiago</span>
+                <span class="role">Professor</span>
+            </div>
+
+            <div class="user-dropdown" id="userDropdown">
+              <a href="/templates/reservasprof.html" class="dropdown-item">Minhas Reservas</a>
+              <a href="/templates/.html" class="dropdown-item">Configurações</a>
+              <div class="dropdown-divider"></div>
+              <a href="/templates/login.html" class="dropdown-item logout">Sair</a>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <section class="calendar-section">
+        <h2>Calendário de Reservas</h2>
+
+        <div class="calendar-page-layout">
+
+          <div class="calendar-card">
+            <div class="calendar-nav">
+              <button class="calendar-nav-btn" id="calPrev" aria-label="Mês anterior">
+                <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"></path></svg>
+              </button>
+              <span class="calendar-month-label" id="calMonthLabel">Mês Ano</span>
+              <button class="calendar-nav-btn" id="calNext" aria-label="Próximo mês">
+                <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"></path></svg>
+              </button>
+            </div>
+
+            <div class="calendar-grid-header">
+              <span>Dom</span><span>Seg</span><span>Ter</span><span>Qua</span><span>Qui</span><span>Sex</span><span>Sáb</span>
+            </div>
+
+            <div class="calendar-grid" id="calendarGrid">
+              <!-- Renderizado dinamicamente via JS -->
+            </div>
+          </div>
+
+          <aside class="calendar-day-panel">
+            <h3 id="dayPanelTitle">Reservas - Dia --</h3>
+            <p class="day-panel-subtitle" id="dayPanelSubtitle">--</p>
+
+            <div id="dayPanelList">
+              <!-- Renderizado dinamicamente via JS -->
+            </div>
+
+            <a href="/templates/reservar_tela_prof.html" class="btn-nova-reserva-dia">+ Solicitar Nova Reserva</a>
+          </aside>
+
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <script src="/js/reservas.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+
+      const userProfile = document.getElementById('userProfile');
+      const userDropdown = document.getElementById('userDropdown');
+
+      if (userProfile && userDropdown) {
+        userProfile.addEventListener('click', (e) => {
+          e.stopPropagation();
+          if (userDropdown.contains(e.target)) return;
+          userDropdown.classList.toggle('active');
+        });
+
+        document.addEventListener('click', (e) => {
+          if (!userProfile.contains(e.target)) {
+            userDropdown.classList.remove('active');
+          }
+        });
+      }
+
+      const menuToggle = document.getElementById('menuToggle');
+      const sidebar = document.querySelector('.sidebar');
+      const sidebarOverlay = document.getElementById('sidebarOverlay');
+
+      if (menuToggle && sidebar && sidebarOverlay) {
+        menuToggle.addEventListener('click', () => {
+          sidebar.classList.toggle('open');
+          sidebarOverlay.classList.toggle('active');
+        });
+
+        sidebarOverlay.addEventListener('click', () => {
+          sidebar.classList.remove('open');
+          sidebarOverlay.classList.remove('active');
+        });
+      }
+
+      // ---------------------------------------------------------------
+      // Calendário (meses/anos infinitos, sincronizado com o dia real)
+      // ---------------------------------------------------------------
+      const hoje = new Date();
+      const hojeISO = ReservasApp.todayISO();
+
+      // Permite abrir o calendário já num dia específico via query string,
+      // por exemplo vindo de um clique no widget da página inicial:
+      // /templates/calendarioprof.html?ano=2026&mes=1&dia=12  (mes é 0-indexado)
+      const params = new URLSearchParams(window.location.search);
+      let anoAtual = params.has('ano') ? parseInt(params.get('ano'), 10) : hoje.getFullYear();
+      let mesAtual = params.has('mes') ? parseInt(params.get('mes'), 10) : hoje.getMonth();
+      let diaSelecionadoISO = params.has('dia')
+        ? ReservasApp.toISODate(anoAtual, mesAtual, parseInt(params.get('dia'), 10))
+        : hojeISO;
+
+      function nomeCategoriaIcone(categoria) {
+        const cat = (categoria || '').toLowerCase();
+        if (cat.includes('laborat')) return '/assets/icons/computer.png';
+        if (cat.includes('gabinete')) return '/assets/icons/shopping-cart.png';
+        return '/assets/icons/classroom.png';
+      }
+
+      function renderPainelDia(iso) {
+        const titulo = document.getElementById('dayPanelTitle');
+        const subtitulo = document.getElementById('dayPanelSubtitle');
+        const lista = document.getElementById('dayPanelList');
+
+        const partes = iso.split('-');
+        const dia = parseInt(partes[2], 10);
+        const mesIndex = parseInt(partes[1], 10) - 1;
+        const ano = parseInt(partes[0], 10);
+
+        titulo.textContent = `Reservas - Dia ${dia < 10 ? '0' + dia : dia}`;
+        subtitulo.textContent = `${dia} de ${ReservasApp.MESES[mesIndex]} de ${ano}`;
+
+        const reservasDoDia = ReservasApp.getReservasPorData(iso);
+
+        if (reservasDoDia.length === 0) {
+          lista.innerHTML = '<p class="day-panel-empty">Nenhuma reserva para este dia.</p>';
+          return;
+        }
+
+        lista.innerHTML = reservasDoDia.map((r) => {
+          const info = ReservasApp.statusInfo(r.status);
+          return `
+            <div class="day-reserva-item">
+              <p class="reserva-hora">${ReservasApp.formatHorario(r.horaEntrada, r.horaSaida)}</p>
+              <p class="reserva-titulo">${r.item || r.categoria}</p>
+              <p class="reserva-subtitulo">${r.motivo || ''}</p>
+              <span class="reserva-status-mini ${info.badgeClass}">${info.label}</span>
+            </div>
+          `;
+        }).join('');
+      }
+
+      function renderCalendario() {
+        document.getElementById('calMonthLabel').textContent = ReservasApp.mesLabel(anoAtual, mesAtual);
+
+        const celulas = ReservasApp.construirMatrizMes(anoAtual, mesAtual);
+        const gridEl = document.getElementById('calendarGrid');
+
+        gridEl.innerHTML = celulas.map((c) => {
+          const reservasDoDia = ReservasApp.getReservasPorData(c.iso);
+          const classes = ['calendar-day'];
+          if (!c.mesAtual) classes.push('muted');
+          if (reservasDoDia.length > 0) classes.push('has-reservation');
+          if (c.iso === hojeISO) classes.push('today');
+          if (c.iso === diaSelecionadoISO) classes.push('selected');
+
+          const badge = reservasDoDia.length > 0
+            ? `<span class="day-reserva-count">${reservasDoDia.length} Reserva${reservasDoDia.length > 1 ? 's' : ''}</span>`
+            : '';
+
+          return `
+            <div class="${classes.join(' ')}" data-iso="${c.iso}">
+              <span class="day-number">${c.dia}</span>
+              ${badge}
+            </div>
+          `;
+        }).join('');
+
+        renderPainelDia(diaSelecionadoISO);
+      }
+
+      document.getElementById('calendarGrid').addEventListener('click', (e) => {
+        const dayEl = e.target.closest('.calendar-day');
+        if (!dayEl) return;
+
+        diaSelecionadoISO = dayEl.dataset.iso;
+
+        // Se o dia clicado pertence a outro mês, navega até ele.
+        const [anoIso, mesIso] = diaSelecionadoISO.split('-').map(Number);
+        if (anoIso !== anoAtual || (mesIso - 1) !== mesAtual) {
+          anoAtual = anoIso;
+          mesAtual = mesIso - 1;
+        }
+
+        renderCalendario();
+      });
+
+      document.getElementById('calPrev').addEventListener('click', () => {
+        mesAtual -= 1;
+        if (mesAtual < 0) {
+          mesAtual = 11;
+          anoAtual -= 1;
+        }
+        renderCalendario();
+      });
+
+      document.getElementById('calNext').addEventListener('click', () => {
+        mesAtual += 1;
+        if (mesAtual > 11) {
+          mesAtual = 0;
+          anoAtual += 1;
+        }
+        renderCalendario();
+      });
+
+      renderCalendario();
+    });
+  </script>
+</body>
+</html>

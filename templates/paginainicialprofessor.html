@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -27,7 +28,7 @@
           <a href="/templates/reservasprof.html" class="nav-item">
         <img src="/assets/icons/reserved.png" alt="" width="20" height="20">Reservas</a> </nav>
 
-          <a href="/templates/.html" class="nav-item">
+          <a href="/templates/calendarioprof.html" class="nav-item">
         <img src="/assets/icons/calendar.png" alt="" width="20" height="20">Calendário</a> </nav>
 
 
@@ -154,36 +155,16 @@
           <div class="calendar-widget">
             <div class="cal-header">
               <h3>Calendário</h3>
-              <a href=".html" class="month-selector">Agosto 2026 -></a>
+              <div class="cal-nav">
+                <button class="cal-nav-btn" id="homeCalPrev" aria-label="Mês anterior">‹</button>
+                <a href="/templates/calendarioprof.html" class="month-selector" id="homeCalLabel">Mês Ano</a>
+                <button class="cal-nav-btn" id="homeCalNext" aria-label="Próximo mês">›</button>
+              </div>
             </div>
-            <div class="cal-grid">
+            <div class="cal-grid" id="homeCalGrid">
               <div class="day-name">D</div><div class="day-name">S</div><div class="day-name">T</div>
               <div class="day-name">Q</div><div class="day-name">Q</div><div class="day-name">S</div><div class="day-name">S</div>
-
-              <a href=".html" class="day-num muted">27</a><a href=".html" class="day-num muted">28</a>
-              <a href=".html" class="day-num muted">29</a><a href=".html" class="day-num muted">30</a>
-              <a href=".html" class="day-num muted">31</a><a href=".html" class="day-num">1</a>
-              <a href=".html" class="day-num">2</a>
-
-              <a href=".html" class="day-num">3</a><a href=".html" class="day-num">4</a>
-              <a href=".html" class="day-num">5</a><a href=".html" class="day-num">6</a>
-              <a href=".html" class="day-num">7</a><a href=".html" class="day-num">8</a>
-              <a href=".html" class="day-num">9</a>
-
-              <a href=".html" class="day-num">10</a><a href=".html" class="day-num">11</a>
-              <a href=".html" class="day-num">12</a><a href=".html" class="day-num">13</a>
-              <a href=".html" class="day-num">14</a><a href=".html" class="day-num">15</a>
-              <a href=".html" class="day-num">16</a>
-
-              <a href=".html" class="day-num">17</a><a href=".html" class="day-num">18</a>
-              <a href=".html" class="day-num">19</a><a href=".html" class="day-num">20</a>
-              <a href=".html" class="day-num">21</a><a href=".html" class="day-num">22</a>
-              <a href=".html" class="day-num">23</a>
-
-              <a href=".html" class="day-num">24</a><a href=".html" class="day-num">25</a>
-              <a href=".html" class="day-num active">26</a><a href=".html" class="day-num">27</a>
-              <a href=".html" class="day-num">28</a><a href=".html" class="day-num">29</a>
-              <a href=".html" class="day-num">30</a>
+              <!-- Os dias do mês são renderizados dinamicamente via JS logo abaixo -->
             </div>
           </div>
 
@@ -333,6 +314,59 @@
       });
 
       renderProximasReservas();
+
+      // --- Widget de Calendário (meses/anos infinitos, sincronizado com hoje) ---
+      const hoje = new Date();
+      let widgetAno = hoje.getFullYear();
+      let widgetMes = hoje.getMonth();
+      const hojeISO = ReservasApp.todayISO();
+
+      function renderCalendarioWidget() {
+        document.getElementById('homeCalLabel').textContent = ReservasApp.mesLabel(widgetAno, widgetMes);
+
+        const celulas = ReservasApp.construirMatrizMes(widgetAno, widgetMes);
+        const gridEl = document.getElementById('homeCalGrid');
+
+        // Remove apenas as células de dias (mantém os 7 cabeçalhos "day-name").
+        gridEl.querySelectorAll('.day-num').forEach((el) => el.remove());
+
+        celulas.forEach((c) => {
+          const reservasDoDia = ReservasApp.getReservasPorData(c.iso);
+          const anoDaCelula = parseInt(c.iso.slice(0, 4), 10);
+          const mesDaCelula = parseInt(c.iso.slice(5, 7), 10) - 1;
+          const el = document.createElement('a');
+          el.href = `/templates/calendarioprof.html?ano=${anoDaCelula}&mes=${mesDaCelula}&dia=${c.dia}`;
+
+          const classes = ['day-num'];
+          if (!c.mesAtual) classes.push('muted');
+          if (c.iso === hojeISO) classes.push('active');
+          if (reservasDoDia.length > 0) classes.push('has-reservation');
+          el.className = classes.join(' ');
+          el.textContent = c.dia;
+
+          gridEl.appendChild(el);
+        });
+      }
+
+      document.getElementById('homeCalPrev').addEventListener('click', () => {
+        widgetMes -= 1;
+        if (widgetMes < 0) {
+          widgetMes = 11;
+          widgetAno -= 1;
+        }
+        renderCalendarioWidget();
+      });
+
+      document.getElementById('homeCalNext').addEventListener('click', () => {
+        widgetMes += 1;
+        if (widgetMes > 11) {
+          widgetMes = 0;
+          widgetAno += 1;
+        }
+        renderCalendarioWidget();
+      });
+
+      renderCalendarioWidget();
     });
   </script>
 </body>

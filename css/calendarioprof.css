@@ -2,6 +2,7 @@
 
 :root {
   --senai-red: #E30613;
+  --senai-blue: #3B82F6;
   --bg-color: #F4F5F7;
   --white: #FFFFFF;
   --text-dark: #1F2937;
@@ -55,6 +56,7 @@ button {
   position: relative;
 }
 
+/* ============ SIDEBAR ============ */
 .sidebar {
   width: 250px;
   height: 100vh;
@@ -167,6 +169,7 @@ button {
   flex-shrink: 0;
 }
 
+/* ============ MAIN CONTENT ============ */
 .main-content {
   flex: 1;
   height: 100vh;
@@ -318,358 +321,269 @@ button {
   margin: 6px 0;
 }
 
-.quick-actions-section {
-  margin-bottom: 24px;
-}
-
-.quick-actions-section h2 {
-  font-size: 16px;
-  font-weight: 700;
-  margin-bottom: 12px;
-}
-
-.cards-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 16px;
-}
-
-.action-card {
-  background-color: var(--white);
-  padding: 20px;
-  border-radius: 12px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+/* ============ CALENDAR PAGE ============ */
+.calendar-section {
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  transition: transform 0.2s;
+  flex: 1;
+  min-height: 0;
+}
+
+.calendar-section > h2 {
+  font-size: 20px;
+  font-weight: 800;
+  margin-bottom: 16px;
+}
+
+.calendar-page-layout {
+  display: grid;
+  grid-template-columns: 1fr 320px;
+  gap: 24px;
+  flex: 1;
+  min-height: 0;
+  align-items: stretch;
+}
+
+.calendar-card {
+  background-color: var(--white);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 20px 24px;
+  display: flex;
+  flex-direction: column;
   min-width: 0;
+  min-height: 0;
+  overflow: hidden;
 }
 
-.action-card:hover {
-  transform: translateY(-2px);
-}
-
-.icon-box {
-  width: 40px;
-  height: 40px;
-  background-color: var(--senai-red);
-  border-radius: 8px;
+.calendar-nav {
   display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-bottom: 14px;
   flex-shrink: 0;
 }
 
-.card-text h3 {
+.calendar-nav-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
+  background-color: var(--white);
+  color: var(--text-dark);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: 0.2s;
+  flex-shrink: 0;
+}
+
+.calendar-nav-btn:hover {
+  background-color: var(--bg-color);
+}
+
+.calendar-month-label {
+  font-size: 14px;
+  font-weight: 700;
+  min-width: 130px;
+  text-align: center;
+}
+
+.calendar-grid-header {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: 8px;
+  margin-bottom: 4px;
+  flex-shrink: 0;
+}
+
+.calendar-grid-header span {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-gray);
+  text-align: center;
+}
+
+.calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  grid-auto-rows: minmax(0, 1fr);
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+}
+
+.calendar-day {
+  border-right: 1px solid var(--border-color);
+  border-bottom: 1px solid var(--border-color);
+  padding: 6px 8px;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  min-width: 0;
+  overflow: hidden;
+  cursor: pointer;
+  transition: background-color 0.15s;
+  position: relative;
+}
+
+.calendar-day:nth-child(7n) {
+  border-right: none;
+}
+
+.calendar-day:hover {
+  background-color: #FAFAFA;
+}
+
+.calendar-day .day-number {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-dark);
+  flex-shrink: 0;
+}
+
+.calendar-day.muted .day-number {
+  color: #D1D5DB;
+}
+
+.calendar-day.has-reservation {
+  background-color: #FEECEC;
+}
+
+.calendar-day.has-reservation:hover {
+  background-color: #FDE0E0;
+}
+
+.calendar-day.today .day-number {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background-color: var(--senai-red);
+  color: var(--white);
+}
+
+.calendar-day.selected {
+  box-shadow: inset 0 0 0 2px var(--senai-blue);
+}
+
+.day-reserva-count {
+  margin-top: auto;
+  align-self: flex-start;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  background-color: var(--senai-red);
+  color: var(--white);
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 10px;
+  white-space: nowrap;
+}
+
+/* --- Painel lateral "Reservas - Dia XX" --- */
+.calendar-day-panel {
+  background-color: var(--white);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 0;
+  overflow-y: auto;
+}
+
+.calendar-day-panel h3 {
   font-size: 15px;
   font-weight: 700;
   margin-bottom: 4px;
 }
 
-.card-text p {
+.calendar-day-panel .day-panel-subtitle {
   font-size: 12px;
   color: var(--text-gray);
-  line-height: 1.3;
+  padding-bottom: 14px;
+  margin-bottom: 14px;
+  border-bottom: 1px solid var(--border-color);
 }
 
-.dashboard-split {
-  display: grid;
-  grid-template-columns: 1fr 340px;
-  gap: 24px;
+.day-reserva-item {
+  padding: 12px 0;
+  border-bottom: 1px solid var(--border-color);
 }
 
-.section-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 12px;
+.day-reserva-item:last-of-type {
+  border-bottom: none;
 }
 
-.section-header h2 {
-  font-size: 16px;
-  font-weight: 700;
-}
-
-.ver-mais {
+.day-reserva-item .reserva-hora {
   font-size: 12px;
-  font-weight: 600;
-  color: var(--senai-red);
-  flex-shrink: 0;
-}
-
-.reservations {
-  display: flex;
-  flex-direction: column;
-  min-width: 0;
-}
-
-.res-list {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.res-card {
-  background-color: var(--white);
-  padding: 16px;
-  border-radius: 12px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 12px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.02);
-  transition: transform 0.2s;
-  flex-wrap: wrap;
-}
-
-.res-card:hover { transform: translateY(-2px); }
-
-.res-left {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  min-width: 0;
-}
-
-.res-right {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  flex-shrink: 0;
-}
-
-.img-placeholder {
-  width: 56px;
-  height: 48px;
-  background-color: var(--senai-red);
-  border: 1px solid var(--border-color);
-  border-radius: 8px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-}
-
-.res-info {
-  min-width: 0;
-}
-
-.res-info h4 {
-  font-size: 14px;
   font-weight: 700;
+  color: var(--senai-red);
+  margin-bottom: 4px;
+}
+
+.day-reserva-item .reserva-titulo {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-dark);
   margin-bottom: 2px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
 }
 
-.res-info p {
+.day-reserva-item .reserva-subtitulo {
   font-size: 12px;
   color: var(--text-gray);
+  line-height: 1.4;
 }
 
-.badge-green,
-.badge-yellow,
-.badge-red {
-  padding: 4px 12px;
-  border-radius: 12px;
-  font-size: 11px;
-  font-weight: 600;
-  flex-shrink: 0;
-  white-space: nowrap;
-}
-
-.badge-green {
-  background-color: var(--green-bg);
-  color: var(--green-text);
-}
-
-.badge-yellow {
-  background-color: var(--yellow-bg);
-  color: var(--yellow-text);
-}
-
-.badge-red {
-  background-color: var(--red-bg);
-  color: var(--red-text);
-}
-
-.btn-cancelar-reserva {
-  border: 1px solid var(--red-text);
-  background-color: var(--white);
-  color: var(--red-text);
-  font-size: 12px;
-  font-weight: 700;
-  padding: 7px 14px;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: 0.2s;
-  white-space: nowrap;
-}
-
-.btn-cancelar-reserva:hover {
-  background-color: var(--red-text);
-  color: var(--white);
-}
-
-.btn-cancelar-sm {
-  padding: 5px 10px;
-  font-size: 11px;
-}
-
-.res-empty {
-  background-color: var(--white);
-  border: 1px dashed var(--border-color);
-  border-radius: 12px;
-  padding: 24px;
-  text-align: center;
-  color: var(--text-gray);
-  font-size: 13px;
-}
-
-.res-empty a {
-  color: var(--senai-red);
+.day-reserva-item .reserva-status-mini {
+  display: inline-block;
+  margin-top: 6px;
+  padding: 2px 10px;
+  border-radius: 10px;
+  font-size: 10px;
   font-weight: 700;
 }
 
-.right-panel {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-  min-width: 0;
-}
-
-.calendar-widget {
-  background: var(--white);
-  padding: 20px;
-  border-radius: 12px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.02);
-}
-
-.cal-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 16px;
-}
-
-.cal-header h3 { font-size: 15px; font-weight: 700; }
-.month-selector { font-size: 12px; font-weight: 600; }
-
-.cal-nav {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.cal-nav-btn {
-  width: 22px;
-  height: 22px;
-  border-radius: 6px;
-  border: 1px solid var(--border-color);
-  background-color: var(--white);
-  color: var(--text-dark);
+.day-panel-empty {
   font-size: 13px;
-  line-height: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  transition: 0.2s;
-  flex-shrink: 0;
-}
-
-.cal-nav-btn:hover {
-  background-color: var(--bg-color);
-}
-
-.cal-grid {
-  display: grid;
-  grid-template-columns: repeat(7, 1fr);
-  text-align: center;
-  row-gap: 10px;
-}
-
-.day-name {
-  font-size: 11px;
-  font-weight: 600;
   color: var(--text-gray);
-  margin-bottom: 4px;
+  padding: 12px 0 20px;
 }
 
-.day-num {
-  position: relative;
-  font-size: 12px;
-  color: var(--text-dark);
-  padding: 6px 0;
-  border-radius: 6px;
-  margin: 0 2px;
-  transition: 0.2s;
-}
-
-.day-num:hover:not(.active) { background-color: var(--bg-color); }
-.day-num.muted { color: #D1D5DB; }
-.day-num.active {
+.btn-nova-reserva-dia {
+  margin-top: auto;
   background-color: var(--senai-red);
   color: var(--white);
-  font-weight: 700;
-}
-
-.day-num.has-reservation::after {
-  content: '';
-  position: absolute;
-  bottom: 2px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 4px;
-  height: 4px;
-  border-radius: 50%;
-  background-color: var(--senai-red);
-}
-
-.day-num.active.has-reservation::after {
-  background-color: var(--white);
-}
-
-.notices {
-  display: flex;
-  flex-direction: column;
-}
-
-.notice-card {
-  background: var(--white);
-  padding: 12px 16px;
+  text-align: center;
+  padding: 12px 0;
   border-radius: 8px;
-  border-left: 4px solid var(--senai-red);
-  margin-bottom: 10px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.02);
-  transition: transform 0.2s;
-}
-
-.notice-card:hover { transform: translateX(2px); }
-
-.notice-title {
-  display: flex;
-  align-items: center;
-  gap: 6px;
   font-size: 13px;
   font-weight: 700;
-  margin-bottom: 4px;
+  transition: 0.2s;
 }
 
-.notice-card p {
-  font-size: 11px;
-  color: var(--text-gray);
-  line-height: 1.3;
+.btn-nova-reserva-dia:hover {
+  background-color: #CC0000;
+}
+
+/* =====================================================
+   RESPONSIVO
+   ===================================================== */
+@media (max-width: 1200px) {
+  .calendar-page-layout {
+    grid-template-columns: 1fr 280px;
+  }
 }
 
 @media (max-width: 1024px) {
-  .dashboard-split {
-    grid-template-columns: 1fr 280px;
-    gap: 16px;
-  }
-
   .search-container {
     width: 220px;
   }
@@ -683,7 +597,7 @@ button {
   }
 }
 
-@media (max-width: 860px) {
+@media (max-width: 900px) {
   body, html {
     height: auto;
     overflow: visible;
@@ -716,16 +630,16 @@ button {
     display: flex;
   }
 
-  .dashboard-split {
+  .search-container {
+    display: none;
+  }
+
+  .calendar-page-layout {
     grid-template-columns: 1fr;
   }
 
-  .cards-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-
-  .search-container {
-    display: none;
+  .calendar-day {
+    min-height: 60px;
   }
 }
 
@@ -742,6 +656,7 @@ button {
     width: 100%;
     justify-content: flex-end;
     margin-top: 12px;
+    gap: 12px;
   }
 
   .greeting h1 {
@@ -752,47 +667,27 @@ button {
     font-size: 12px;
   }
 
-  .header-actions {
-    gap: 12px;
-  }
-
   .avatar {
     width: 40px;
     height: 40px;
   }
 
-  .cards-grid {
-    grid-template-columns: 1fr;
+  .calendar-section > h2 {
+    font-size: 16px;
   }
 
-  .quick-actions-section h2 {
-    font-size: 14px;
+  .calendar-card {
+    padding: 16px;
   }
 
-  .res-card {
-    flex-wrap: wrap;
+  .calendar-day {
+    min-height: 50px;
+    padding: 4px;
   }
 
-  .res-right {
-    width: 100%;
-    justify-content: space-between;
-  }
-
-  .res-info h4 {
-    white-space: normal;
-  }
-
-  .cal-grid {
-    row-gap: 6px;
-  }
-
-  .day-num {
-    font-size: 11px;
-    padding: 4px 0;
-  }
-
-  .notice-card p {
-    font-size: 10px;
+  .day-reserva-count {
+    font-size: 9px;
+    padding: 1px 5px;
   }
 }
 
@@ -807,10 +702,5 @@ button {
 
   .user-dropdown {
     width: 160px;
-  }
-
-  .icon-box {
-    width: 34px;
-    height: 34px;
   }
 }

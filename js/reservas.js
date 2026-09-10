@@ -140,6 +140,89 @@ const ReservasApp = (() => {
     return `${entrada || '--:--'} às ${saida || '--:--'}`;
   }
 
+  /**
+   * Retorna todas as reservas de uma data específica (formato "YYYY-MM-DD").
+   */
+  function getReservasPorData(isoDate) {
+    return getReservas().filter((r) => r.data === isoDate);
+  }
+
+  const MESES = [
+    'Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
+    'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro',
+  ];
+
+  function _pad2(n) {
+    return n < 10 ? '0' + n : '' + n;
+  }
+
+  function toISODate(ano, mesIndex, dia) {
+    return `${ano}-${_pad2(mesIndex + 1)}-${_pad2(dia)}`;
+  }
+
+  function todayISO() {
+    const hoje = new Date();
+    return toISODate(hoje.getFullYear(), hoje.getMonth(), hoje.getDate());
+  }
+
+  function mesLabel(ano, mesIndex) {
+    return `${MESES[mesIndex]} ${ano}`;
+  }
+
+  /**
+   * Constrói a matriz de dias de um mês (meses e anos infinitos: qualquer
+   * ano/mês, positivo ou negativo, é aceito - o próprio objeto Date do
+   * JavaScript normaliza a virada de ano automaticamente).
+   *
+   * Retorna um array de células: { dia, iso, mesAtual } onde "mesAtual"
+   * indica se o dia pertence ao mês exibido (false = dia de
+   * preenchimento do mês anterior/seguinte, mostrado "apagado").
+   */
+  function construirMatrizMes(ano, mesIndex) {
+    const primeiroDia = new Date(ano, mesIndex, 1);
+    const diaSemanaInicio = primeiroDia.getDay(); // 0 = Domingo
+    const diasNoMes = new Date(ano, mesIndex + 1, 0).getDate();
+    const diasNoMesAnterior = new Date(ano, mesIndex, 0).getDate();
+
+    const celulas = [];
+
+    // Dias de preenchimento do mês anterior
+    for (let i = 0; i < diaSemanaInicio; i++) {
+      const dia = diasNoMesAnterior - diaSemanaInicio + 1 + i;
+      const dataRef = new Date(ano, mesIndex - 1, dia);
+      celulas.push({
+        dia,
+        iso: toISODate(dataRef.getFullYear(), dataRef.getMonth(), dia),
+        mesAtual: false,
+      });
+    }
+
+    // Dias do mês corrente
+    for (let dia = 1; dia <= diasNoMes; dia++) {
+      celulas.push({
+        dia,
+        iso: toISODate(ano, mesIndex, dia),
+        mesAtual: true,
+      });
+    }
+
+    // Dias de preenchimento do mês seguinte (completa a última semana)
+    const restante = celulas.length % 7;
+    if (restante !== 0) {
+      const faltam = 7 - restante;
+      for (let dia = 1; dia <= faltam; dia++) {
+        const dataRef = new Date(ano, mesIndex + 1, dia);
+        celulas.push({
+          dia,
+          iso: toISODate(dataRef.getFullYear(), dataRef.getMonth(), dia),
+          mesAtual: false,
+        });
+      }
+    }
+
+    return celulas;
+  }
+
   return {
     getReservas,
     stageReserva,
@@ -148,5 +231,11 @@ const ReservasApp = (() => {
     statusInfo,
     formatDateBR,
     formatHorario,
+    getReservasPorData,
+    toISODate,
+    todayISO,
+    mesLabel,
+    construirMatrizMes,
+    MESES,
   };
 })();
