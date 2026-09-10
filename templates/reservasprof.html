@@ -199,6 +199,9 @@
           const info = ReservasApp.statusInfo(r.status);
           const dataFormatada = ReservasApp.formatDateBR(r.data);
           const horario = ReservasApp.formatHorario(r.horaEntrada, r.horaSaida);
+          const acoes = r.status === 'cancelada'
+            ? ''
+            : '<button class="btn-cancelar-reserva" data-cancel-id="' + r.id + '">Cancelar Reserva</button>';
 
           return `
             <div class="reserva-card searchable" data-id="${r.id}">
@@ -217,7 +220,8 @@
               </div>
               <div class="reserva-right">
                 <span class="${info.badgeClass}">${info.label}</span>
-                <button class="btn-cancelar-reserva" data-cancel-id="${r.id}">Cancelar Reserva</button>
+                ${acoes}
+                <button class="btn-excluir-reserva" data-delete-id="${r.id}">Excluir</button>
               </div>
             </div>
           `;
@@ -237,6 +241,14 @@
 
       // --- Cancelar reserva (delegação de evento) ---
       document.getElementById('reservasList').addEventListener('click', (e) => {
+        const deleteButton = e.target.closest('[data-delete-id]');
+        if (deleteButton) {
+          if (!window.confirm('Excluir esta reserva definitivamente?')) return;
+
+          ReservasApp.deleteReserva(deleteButton.dataset.deleteId);
+          return;
+        }
+
         const btn = e.target.closest('[data-cancel-id]');
         if (!btn) return;
 

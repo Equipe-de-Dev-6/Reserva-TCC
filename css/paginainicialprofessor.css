@@ -513,6 +513,25 @@ button {
   color: var(--white);
 }
 
+.btn-excluir-reserva {
+  border: 1px solid #d1d5db;
+  background-color: var(--white);
+  color: #374151;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 7px 14px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: 0.2s;
+  white-space: nowrap;
+}
+
+.btn-excluir-reserva:hover {
+  background-color: #374151;
+  border-color: #374151;
+  color: var(--white);
+}
+
 .btn-cancelar-sm {
   padding: 5px 10px;
   font-size: 11px;

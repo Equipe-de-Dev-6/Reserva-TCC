@@ -110,6 +110,8 @@ const ReservasApp = (() => {
    * Executa todos os listeners cadastrados.
    */
   function _onChange(payload) {
+    _updateNotificationIndicators();
+
     listeners
       .slice()
       .forEach((listener) => {
@@ -220,6 +222,92 @@ const ReservasApp = (() => {
   }
 
 
+  /**
+   * Atualiza o indicador azul nos links de notificações
+   * presentes em qualquer tela que carregue este arquivo.
+   */
+  function _updateNotificationIndicators() {
+    const links = document.querySelectorAll(
+      'a[href*="notificacoesprof.html"]'
+    );
+    const temNotificacoes = getNotificacoes().length > 0;
+
+    links.forEach((link) => {
+      link.classList.add('notifications-nav-link');
+
+      let badge = link.querySelector('.notifications-badge');
+
+      if (temNotificacoes && !badge) {
+        badge = document.createElement('span');
+        badge.className = 'notifications-badge';
+        badge.setAttribute('aria-label', 'Há notificações');
+        badge.setAttribute('title', 'Há notificações');
+        link.appendChild(badge);
+      }
+
+      if (!temNotificacoes && badge) {
+        badge.remove();
+      }
+
+      link.setAttribute(
+        'aria-label',
+        temNotificacoes ? 'Notificações: há novas notificações' : 'Notificações'
+      );
+    });
+  }
+
+
+  function _installNotificationIndicatorStyles() {
+    if (document.getElementById('reservas-notification-indicator-styles')) {
+      return;
+    }
+
+    const style = document.createElement('style');
+    style.id = 'reservas-notification-indicator-styles';
+    style.textContent = `
+      .notifications-nav-link {
+        position: relative;
+      }
+
+      .notifications-badge {
+        position: absolute;
+        top: 3px;
+        right: 2px;
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: #2563eb;
+        border: 2px solid #ffffff;
+        box-sizing: content-box;
+        pointer-events: none;
+      }
+
+      .nav-item.notifications-nav-link .notifications-badge {
+        top: 7px;
+        left: 28px;
+        right: auto;
+      }
+    `;
+
+    document.head.appendChild(style);
+  }
+
+
+  function _setupNotificationIndicators() {
+    _installNotificationIndicatorStyles();
+
+    if (document.readyState === 'loading') {
+      document.addEventListener(
+        'DOMContentLoaded',
+        _updateNotificationIndicators,
+        { once: true }
+      );
+    } else {
+      _updateNotificationIndicators();
+    }
+  }
+
+
   // =========================================================
   // NOTIFICAÇÕES
   // =========================================================
@@ -260,6 +348,75 @@ const ReservasApp = (() => {
       NOTIFICATIONS_KEY,
       notificacoes.slice(0, 100)
     );
+  }
+
+
+  /**
+   * Exclui uma reserva definitivamente do armazenamento local.
+   * As notificações ligadas a ela também são removidas.
+   */
+  function deleteReserva(id) {
+    const lista = getReservas();
+    const existe = lista.some((reserva) => reserva.id === id);
+
+    if (!existe) {
+      return false;
+    }
+
+    const salvou = _write(
+      STORAGE_KEY,
+      lista.filter((reserva) => reserva.id !== id)
+    );
+
+    if (!salvou) {
+      return false;
+    }
+
+    _write(
+      NOTIFICATIONS_KEY,
+      getNotificacoes().filter((notificacao) => notificacao.reservaId !== id)
+    );
+
+    _notify('excluir', { id });
+    return true;
+  }
+
+
+  /**
+   * Exclui uma notificação individualmente e persiste a alteração.
+   */
+  function deleteNotificacao(id) {
+    const notificacoes = getNotificacoes();
+    const existe = notificacoes.some((notificacao) => notificacao.id === id);
+
+    if (!existe) {
+      return false;
+    }
+
+    const salvou = _write(
+      NOTIFICATIONS_KEY,
+      notificacoes.filter((notificacao) => notificacao.id !== id)
+    );
+
+    if (!salvou) {
+      return false;
+    }
+
+    _notify('excluir-notificacao', { id });
+    return true;
+  }
+
+
+  /**
+   * Limpa todas as notificações persistidas.
+   */
+  function clearNotificacoes() {
+    if (!_write(NOTIFICATIONS_KEY, [])) {
+      return false;
+    }
+
+    _notify('limpar-notificacoes', null);
+    return true;
   }
 
 
@@ -825,10 +982,13 @@ const ReservasApp = (() => {
   // API PÚBLICA DO MÓDULO
   // =========================================================
 
+  _setupNotificationIndicators();
+
   return {
     // Leitura
     getReservas,
     getNotificacoes,
+    hasNotificacoes: () => getNotificacoes().length > 0,
 
     // Eventos
     subscribe,
@@ -838,6 +998,11 @@ const ReservasApp = (() => {
     commitStagedReserva,
     updateReserva,
     cancelReserva,
+    deleteReserva,
+
+    // Notificações
+    deleteNotificacao,
+    clearNotificacoes,
 
     // Status
     statusInfo,

@@ -107,11 +107,16 @@
             </header>
 
             <section>
-                <div class="greeting">
-                    <h2>
-                        Notificações
-                    </h2>
-                    <p>Acompanhe atualizações de reservas, alertas de recursos e manutenções programadas.</p>
+                <div class="notifications-heading">
+                    <div class="greeting">
+                        <h2>
+                            Notificações
+                        </h2>
+                        <p>Acompanhe atualizações de reservas, alertas de recursos e manutenções programadas.</p>
+                    </div>
+                    <button type="button" class="btn-limpar-notificacoes" id="clearNotificationsButton">
+                        Limpar notificações
+                    </button>
                 </div>
 
                 <aside class="notifications-container" id="notificationsList">
@@ -152,9 +157,15 @@
                             <p>Professor: ${escapeHtml(r.professor || 'Não informado')} · Aluno/turma: ${escapeHtml(r.curso || 'Não informado')} · Disciplina/motivo: ${escapeHtml(r.motivo || 'Não informado')} · Data: ${escapeHtml(ReservasApp.formatDateBR(r.data))} · Horário: ${escapeHtml(ReservasApp.formatHorario(r.horaEntrada, r.horaSaida))} · Status: ${escapeHtml(status.label)}.</p>
                         </div>
                         <span class="notification-time">${tempoRelativo(n.criadoEm)}</span>
+                        <button type="button" class="notification-delete" data-delete-notification-id="${escapeHtml(n.id)}" aria-label="Excluir esta notificação">Excluir</button>
                     </div>`;
                 }).join('') : '<p class="notification-empty">Nenhuma notificação de reserva.</p>';
                 configurarBusca();
+
+                const searchInput = document.getElementById('search-input');
+                if (searchInput && searchInput.value.trim()) {
+                    searchInput.dispatchEvent(new Event('input'));
+                }
             }
 
             function configurarBusca() {
@@ -169,6 +180,22 @@
 
             renderNotificacoes();
             ReservasApp.subscribe(renderNotificacoes);
+
+            document.getElementById('notificationsList').addEventListener('click', (event) => {
+                const button = event.target.closest('[data-delete-notification-id]');
+                if (!button) return;
+
+                if (!window.confirm('Excluir esta notificação?')) return;
+
+                ReservasApp.deleteNotificacao(button.dataset.deleteNotificationId);
+            });
+
+            document.getElementById('clearNotificationsButton').addEventListener('click', () => {
+                if (!ReservasApp.hasNotificacoes()) return;
+                if (!window.confirm('Excluir todas as notificações?')) return;
+
+                ReservasApp.clearNotificacoes();
+            });
 
             const userProfile = document.getElementById('userProfile');
             const userDropdown = document.getElementById('userDropdown');

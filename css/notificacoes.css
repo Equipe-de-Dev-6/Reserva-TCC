@@ -395,6 +395,37 @@ button {
    NOTIFICAÇÕES
 ============================== */
 
+.notifications-heading {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 16px;
+}
+
+.btn-limpar-notificacoes,
+.notification-delete {
+    border: 1px solid #d1d5db;
+    background: #ffffff;
+    color: #374151;
+    border-radius: 7px;
+    cursor: pointer;
+    font-size: 11px;
+    font-weight: 700;
+    transition: background-color 0.2s, color 0.2s, border-color 0.2s;
+}
+
+.btn-limpar-notificacoes {
+    padding: 8px 12px;
+    white-space: nowrap;
+}
+
+.btn-limpar-notificacoes:hover,
+.notification-delete:hover {
+    background: #eff6ff;
+    border-color: #2563eb;
+    color: #1d4ed8;
+}
+
 .notifications-container {
     margin-top: 30px;
     background: #ffffff;
@@ -413,6 +444,19 @@ button {
     position: relative;
 
     border-bottom: 1px solid #eeeeee;
+}
+
+.notification-delete {
+    margin-left: 12px;
+    padding: 6px 9px;
+    flex-shrink: 0;
+}
+
+.notification-empty {
+    padding: 24px;
+    color: var(--text-gray);
+    font-size: 13px;
+    text-align: center;
 }
 
 .notification-item:last-child {
@@ -504,9 +548,11 @@ button {
 /* TEMPO */
 
 .notification-time {
-    position: absolute;
+    position: static;
 
-    right: 18px;
+    margin-left: 12px;
+    white-space: nowrap;
+    flex-shrink: 0;
 
     font-size: 8px;
 
@@ -642,6 +688,29 @@ button {
 
   .notice-card p {
     font-size: 10px;
+  }
+
+  .notifications-heading {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .notification-item {
+    align-items: flex-start;
+    flex-wrap: wrap;
+  }
+
+  .notification-content {
+    min-width: calc(100% - 45px);
+  }
+
+  .notification-time {
+    position: static;
+    margin-left: 39px;
+  }
+
+  .notification-delete {
+    margin-left: 39px;
   }
 }
 

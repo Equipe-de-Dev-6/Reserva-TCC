@@ -282,6 +282,9 @@
 
         listaEl.innerHTML = proximas.map((r) => {
           const info = ReservasApp.statusInfo(r.status);
+          const acoes = r.status === 'cancelada'
+            ? ''
+            : '<button class="btn-cancelar-reserva btn-cancelar-sm" data-cancel-id="' + r.id + '">Cancelar Reserva</button>';
           return `
             <div class="res-card searchable" data-id="${r.id}">
               <div class="res-left">
@@ -295,7 +298,8 @@
               </div>
               <div class="res-right">
                 <span class="${info.badgeClass}">${info.label}</span>
-                <button class="btn-cancelar-reserva btn-cancelar-sm" data-cancel-id="${r.id}">Cancelar Reserva</button>
+                ${acoes}
+                <button class="btn-excluir-reserva btn-cancelar-sm" data-delete-id="${r.id}">Excluir</button>
               </div>
             </div>
           `;
@@ -303,6 +307,14 @@
       }
 
       document.getElementById('proximasReservasList').addEventListener('click', (e) => {
+        const deleteButton = e.target.closest('[data-delete-id]');
+        if (deleteButton) {
+          if (!window.confirm('Excluir esta reserva definitivamente?')) return;
+
+          ReservasApp.deleteReserva(deleteButton.dataset.deleteId);
+          return;
+        }
+
         const btn = e.target.closest('[data-cancel-id]');
         if (!btn) return;
 
