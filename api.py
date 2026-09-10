@@ -235,10 +235,33 @@ def reservas_admin():
 
 @app.get("/passo2_reserva_prof")
 def passo02_reserva_prof():
+    return FileResponse("templates/passo2reservaprof.html")
+
+
+@app.get("/passo02_reserva_prof")
+def passo02_reserva_prof():
     return FileResponse("templates/passo02reservaprof.html")
 
 
+@app.get("/passo002_reserva_prof")
+def passo02_reserva_prof():
+    return FileResponse("templates/passo002reservaprof.html")
 
+# ============================================================
+# CONFIRMAÇÃO DE RESERVA
+# ============================================================
+
+@app.get("/passo3_reserva_prof")
+def passo02_reserva_prof():
+    return FileResponse("templates/passo3reservaprof.html")
+
+@app.get("/passo03_reserva_prof")
+def passo02_reserva_prof():
+    return FileResponse("templates/passo03reservaprof.html")
+
+@app.get("/passo003_reserva_prof")
+def passo02_reserva_prof():
+    return FileResponse("templates/passo003reservaprof.html")
 
 # ============================================================
 # USUÁRIOS
