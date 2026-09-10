@@ -163,7 +163,7 @@ form {
 /* =========================
    BOTÃO ENTRAR
 ========================= */
-button[type="button"] {
+button[type="submit"] {
     width: 100%;
     padding: 14px 16px;
     border: none;
@@ -179,11 +179,11 @@ button[type="button"] {
     margin-top: 8px;
 }
 
-button[type="button"]:hover {
+button[type="submit"]:hover {
     background-color: var(--cor-hover);
 }
 
-button[type="button"]:active {
+button[type="submit"]:active {
     background-color: var(--cor-ativa);
     transform: scale(0.98);
 }
@@ -326,7 +326,7 @@ button[type="button"]:active {
         font-size: 13px;
     }
 
-    button[type="button"],
+    button[type="submit"],
     .google-btn {
         font-size: 13px;
         padding: 12px 14px;
