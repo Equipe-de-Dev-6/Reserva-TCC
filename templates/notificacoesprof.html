@@ -17,7 +17,7 @@
         <aside class="sidebar">
             <div class="sidebar-top">
 
-                <a href="/templates/notificacoes.html" class="logo">
+                <a href="/templates/notificacoesprof.html" class="logo">
                     <img src="/assets/img/Logo senai.png" alt=""> </a>
 
                 <nav class="nav-menu">
@@ -31,11 +31,11 @@
                 <a href="/templates/reservasprof.html" class="nav-item">
                     <img src="/assets/icons/reserved.png" alt="" width="20" height="20">Reservas</a> </nav>
 
-                <a href="/templates/.html" class="nav-item">
+                <a href="/templates/calendarioprof.html" class="nav-item">
                     <img src="/assets/icons/calendar.png" alt="" width="20" height="20">Calendário</a> </nav>
 
 
-                <a href="/templates/notificacoes.html" class="nav-item active">
+                <a href="/templates/notificacoesprof.html" class="nav-item active">
                     <img src="/assets/icons/notification.png" alt="" width="20" height="20">Notificações</a> </nav>
 
                 <a href="/templates/.html" class="nav-item">
@@ -80,7 +80,7 @@
                         <input type="text" id="search-input" placeholder="Buscar notificações...">
                     </div>
 
-                    <a href="/templates/notificacoes.html" class="icon-btn">
+                    <a href="/templates/notificacoesprof.html" class="icon-btn">
                         <img src="/assets/icons/notification (2).png" alt="Notificações" width="20" height="20">
                     </a>
 
@@ -114,131 +114,8 @@
                     <p>Acompanhe atualizações de reservas, alertas de recursos e manutenções programadas.</p>
                 </div>
 
-                <aside class="notifications-container">
-
-                    <!-- Notificação 1 -->
-                    <div class="notification-item searchable">
-                        <div class="notification-icon success">
-                            <img src="/assets/icons/calendar.png" alt="">
-                        </div>
-
-                        <div class="notification-content">
-                            <h3>
-                                Reserva confirmada - Lab. Física/Química C15
-                                <span class="notification-dot"></span>
-                            </h3>
-
-                            <p>
-                                Sua solicitação de reserva para o dia 27/08 no período matutino
-                                foi devidamente autorizada pela coordenação.
-                            </p>
-                        </div>
-                    </div>
-
-
-                    <!-- Notificação 2 -->
-                    <div class="notification-item searchable">
-                        <div class="notification-icon success">
-                            <img src="/assets/icons/calendar.png" alt="">
-                        </div>
-
-                        <div class="notification-content">
-                            <h3>
-                                Reserva confirmada - Lab. Física/Química C15
-                                <span class="notification-dot"></span>
-                            </h3>
-
-                            <p>
-                                Sua solicitação de reserva para o dia 28/08 no período matutino
-                                foi devidamente autorizada pela coordenação.
-                            </p>
-                        </div>
-                    </div>
-
-
-                    <!-- Notificação 3 -->
-                    <div class="notification-item searchable">
-                        <div class="notification-icon success">
-                            <img src="/assets/icons/calendar.png" alt="">
-                        </div>
-
-                        <div class="notification-content">
-                            <h3>
-                                Reserva confirmada - Lab. Física/Química C15
-                                <span class="notification-dot"></span>
-                            </h3>
-
-                            <p>
-                                Sua solicitação de reserva para o dia 31/08 no período matutino
-                                foi devidamente autorizada pela coordenação.
-                            </p>
-                        </div>
-                    </div>
-
-
-                    <!-- Notificação 4 -->
-                    <div class="notification-item searchable">
-                        <div class="notification-icon warning">
-                            <img src="/assets/icons/gear.png" alt="">
-                        </div>
-
-                        <div class="notification-content">
-                            <h3>
-                                Manutenção programada - Laboratório de mecânica
-                                <span class="notification-dot"></span>
-                            </h3>
-
-                            <p>
-                                O laboratório D07 passará por revisão de segurança preventiva
-                                dia 01/09 das 12h40 às 14h30 e estará inacessível.
-                            </p>
-                        </div>
-
-                        <span class="notification-time">ontem</span>
-                    </div>
-
-
-                    <!-- Notificação 5 -->
-                    <div class="notification-item searchable">
-                        <div class="notification-icon danger">
-                            <img src="/assets/icons/exit.png" alt="">
-                        </div>
-
-                        <div class="notification-content">
-                            <h3>
-                                Reserva cancelada pelo coordenador
-                            </h3>
-
-                            <p>
-                                A reserva solicitada para a Sala de Reuniões 02 no dia 29/08
-                                precisou ser cancelada por conflito de agenda institucional.
-                            </p>
-                        </div>
-
-                        <span class="notification-time">há 3 dias</span>
-                    </div>
-
-
-                    <!-- Notificação 6 -->
-                    <div class="notification-item searchable">
-                        <div class="notification-icon info">
-                            <img src="/assets/icons/box.png" alt="">
-                        </div>
-
-                        <div class="notification-content">
-                            <h3>
-                                Novo recurso disponível - Gabinete para Notebook (Eletroeletrônica A)
-                            </h3>
-
-                            <p>
-                                Dois novos projetores de alta resolução foram adicionados ao
-                                estoque para empréstimo no gabinete de equipamentos móveis.
-                            </p>
-                        </div>
-
-                        <span class="notification-time">há 1 semana</span>
-                    </div>
-
+                <aside class="notifications-container" id="notificationsList">
+                    <!-- Renderizado dinamicamente a partir do histórico persistido de reservas. -->
                 </aside>
 
             </section>
@@ -249,23 +126,49 @@
     <script src="/js/reservas.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            const searchInput = document.getElementById('search-input');
-            const itemsToSearch = document.querySelectorAll('.searchable');
+            function escapeHtml(value) {
+                return String(value ?? '').replace(/[&<>"']/g, (char) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[char]));
+            }
 
-            if (searchInput) {
+            function tempoRelativo(iso) {
+                const segundos = Math.max(0, Math.floor((Date.now() - new Date(iso).getTime()) / 1000));
+                if (segundos < 60) return 'agora';
+                if (segundos < 3600) return `há ${Math.floor(segundos / 60)} min`;
+                if (segundos < 86400) return `há ${Math.floor(segundos / 3600)} h`;
+                return `há ${Math.floor(segundos / 86400)} dia(s)`;
+            }
+
+            function renderNotificacoes() {
+                const list = document.getElementById('notificationsList');
+                const notificacoes = ReservasApp.getNotificacoes();
+                list.innerHTML = notificacoes.length ? notificacoes.map((n) => {
+                    const r = n.reserva || {};
+                    const status = ReservasApp.statusInfo(r.status);
+                    const acao = { criar: 'criada', editar: 'editada', cancelar: 'cancelada' }[n.action] || n.action;
+                    return `<div class="notification-item searchable">
+                        <div class="notification-icon ${n.action === 'cancelar' ? 'danger' : 'success'}"><img src="/assets/icons/calendar.png" alt=""></div>
+                        <div class="notification-content">
+                            <h3>Reserva ${escapeHtml(acao)} - ${escapeHtml(r.item || r.categoria || 'Recurso')}<span class="notification-dot"></span></h3>
+                            <p>Professor: ${escapeHtml(r.professor || 'Não informado')} · Aluno/turma: ${escapeHtml(r.curso || 'Não informado')} · Disciplina/motivo: ${escapeHtml(r.motivo || 'Não informado')} · Data: ${escapeHtml(ReservasApp.formatDateBR(r.data))} · Horário: ${escapeHtml(ReservasApp.formatHorario(r.horaEntrada, r.horaSaida))} · Status: ${escapeHtml(status.label)}.</p>
+                        </div>
+                        <span class="notification-time">${tempoRelativo(n.criadoEm)}</span>
+                    </div>`;
+                }).join('') : '<p class="notification-empty">Nenhuma notificação de reserva.</p>';
+                configurarBusca();
+            }
+
+            function configurarBusca() {
+                const searchInput = document.getElementById('search-input');
+                if (!searchInput || searchInput.dataset.bound) return;
+                searchInput.dataset.bound = 'true';
                 searchInput.addEventListener('input', (e) => {
-                    const searchTerm = e.target.value.toLowerCase().trim();
-
-                    itemsToSearch.forEach(item => {
-                        const text = item.textContent.toLowerCase();
-                        if (text.includes(searchTerm)) {
-                            item.style.display = '';
-                        } else {
-                            item.style.display = 'none';
-                        }
-                    });
+                    const term = e.target.value.toLowerCase().trim();
+                    document.querySelectorAll('#notificationsList .searchable').forEach(item => { item.style.display = item.textContent.toLowerCase().includes(term) ? '' : 'none'; });
                 });
             }
+
+            renderNotificacoes();
+            ReservasApp.subscribe(renderNotificacoes);
 
             const userProfile = document.getElementById('userProfile');
             const userDropdown = document.getElementById('userDropdown');
