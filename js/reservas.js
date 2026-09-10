@@ -1,241 +1,859 @@
 /**
  * reservas.js
- * Lógica compartilhada de reservas do professor.
  *
- * Como funciona (sem backend):
- * 1. Na tela de escolha da sala/lab/gabinete, o item escolhido é salvo em
- *    sessionStorage("salaSelecionada").
- * 2. No Passo 02 (formulário), ao enviar, os dados do formulário + a
- *    categoria (lida do próprio card ".category-card h3") são guardados em
- *    sessionStorage("senai_nova_reserva") - é uma reserva "rascunho".
- * 3. Na tela de confirmação (Passo 03), o rascunho é promovido para a lista
- *    definitiva em localStorage("senai_reservas_professor") com status
- *    "aguardando", um id único e a data de criação.
- * 4. As telas "Início" e "Reservas" leem essa lista para exibir os cards
- *    com o status (Aguardando / Aprovada / Negado) e o botão "Cancelar Reserva".
+ * Estado compartilhado das reservas do professor.
  *
- * OBS: como ainda não existe um backend de aprovação, toda reserva nova
- * entra como "aguardando". Os status "aprovada" e "negado" já são
- * totalmente suportados pela interface (cores, filtros etc.) e passarão a
- * aparecer assim que a parte de aprovação do coordenador for integrada.
+ * Persistência:
+ * - localStorage
+ *
+ * Sincronização entre páginas/abas:
+ * - BroadcastChannel
+ * - fallback para o evento "storage"
+ *
+ * Nenhuma tela precisa ser recarregada.
  */
 
 const ReservasApp = (() => {
+  // =========================================================
+  // CONFIGURAÇÕES E CHAVES DE ARMAZENAMENTO
+  // =========================================================
+
   const STORAGE_KEY = 'senai_reservas_professor';
   const TEMP_KEY = 'senai_nova_reserva';
+  const NOTIFICATIONS_KEY = 'senai_notificacoes_reservas';
   const SALA_KEY = 'salaSelecionada';
 
-  function _uid() {
-    return 'r_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2, 7);
+  const CHANNEL_NAME = 'senai-reservas-sync';
+
+  const channel =
+    typeof BroadcastChannel !== 'undefined'
+      ? new BroadcastChannel(CHANNEL_NAME)
+      : null;
+
+  const listeners = [];
+
+
+  // =========================================================
+  // FUNÇÕES INTERNAS
+  // =========================================================
+
+  /**
+   * Gera um ID único.
+   */
+  function _uid(prefix = 'r') {
+    return `${prefix}_${Date.now().toString(36)}_${Math.random()
+      .toString(36)
+      .slice(2, 8)}`;
   }
 
-  function getReservas() {
+
+  /**
+   * Lê dados do localStorage.
+   */
+  function _read(key, fallback = []) {
     try {
-      const raw = localStorage.getItem(STORAGE_KEY);
-      return raw ? JSON.parse(raw) : [];
+      const raw = localStorage.getItem(key);
+
+      return raw
+        ? JSON.parse(raw)
+        : fallback;
+
     } catch (e) {
-      console.error('Erro ao ler reservas:', e);
-      return [];
+      console.error(`Erro ao ler ${key}:`, e);
+      return fallback;
     }
   }
 
-  function _saveReservas(lista) {
+
+  /**
+   * Salva dados no localStorage.
+   */
+  function _write(key, value) {
     try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(lista));
+      localStorage.setItem(
+        key,
+        JSON.stringify(value)
+      );
+
       return true;
+
     } catch (e) {
-      console.error('Erro ao salvar reservas:', e);
+      console.error(`Erro ao salvar ${key}:`, e);
+
       return false;
     }
   }
 
+
   /**
-   * Lê os campos do formulário do Passo 02 e guarda um "rascunho" da
-   * reserva em sessionStorage, para ser confirmado na tela seguinte.
+   * Notifica todas as páginas e componentes
+   * sobre uma alteração nas reservas.
+   */
+  function _notify(action, reserva) {
+    const payload = {
+      action,
+      reserva,
+      timestamp: new Date().toISOString()
+    };
+
+    // Envia para outras abas
+    if (channel) {
+      channel.postMessage(payload);
+    }
+
+    // Atualiza a própria página
+    _onChange(payload);
+  }
+
+
+  /**
+   * Executa todos os listeners cadastrados.
+   */
+  function _onChange(payload) {
+    listeners
+      .slice()
+      .forEach((listener) => {
+        try {
+          listener(payload);
+
+        } catch (e) {
+          console.error(
+            'Erro ao atualizar tela:',
+            e
+          );
+        }
+      });
+
+
+    // Evento personalizado para outras partes do sistema
+    window.dispatchEvent(
+      new CustomEvent(
+        'senai:reservas-changed',
+        {
+          detail: payload
+        }
+      )
+    );
+  }
+
+
+  // =========================================================
+  // SINCRONIZAÇÃO ENTRE ABAS
+  // =========================================================
+
+  /**
+   * BroadcastChannel:
+   * sincroniza alterações entre abas abertas.
+   */
+  if (channel) {
+    channel.addEventListener(
+      'message',
+      (event) => {
+        _onChange(event.data || {});
+      }
+    );
+  }
+
+
+  /**
+   * Fallback utilizando o evento storage.
+   */
+  window.addEventListener(
+    'storage',
+    (event) => {
+      const keysMonitoradas = [
+        STORAGE_KEY,
+        NOTIFICATIONS_KEY
+      ];
+
+      if (keysMonitoradas.includes(event.key)) {
+        _onChange({
+          action: 'sync',
+          reserva: null,
+          timestamp: new Date().toISOString()
+        });
+      }
+    }
+  );
+
+
+  // =========================================================
+  // SISTEMA DE LISTENERS
+  // =========================================================
+
+  /**
+   * Permite que uma tela seja avisada
+   * quando alguma reserva mudar.
+   */
+  function subscribe(listener) {
+    if (typeof listener !== 'function') {
+      return () => {};
+    }
+
+    listeners.push(listener);
+
+
+    /**
+     * Retorna uma função para remover o listener.
+     */
+    return () => {
+      const index = listeners.indexOf(listener);
+
+      if (index >= 0) {
+        listeners.splice(index, 1);
+      }
+    };
+  }
+
+
+  // =========================================================
+  // LEITURA DE DADOS
+  // =========================================================
+
+  function getReservas() {
+    return _read(STORAGE_KEY, []);
+  }
+
+
+  function getNotificacoes() {
+    return _read(NOTIFICATIONS_KEY, []);
+  }
+
+
+  // =========================================================
+  // NOTIFICAÇÕES
+  // =========================================================
+
+  /**
+   * Cria uma notificação relacionada
+   * a uma alteração de reserva.
+   */
+  function _registrarNotificacao(action, reserva) {
+    const textos = {
+      criar: 'criada',
+      editar: 'editada',
+      cancelar: 'cancelada'
+    };
+
+    const notificacoes = getNotificacoes();
+
+
+    notificacoes.unshift({
+      id: _uid('n'),
+
+      reservaId: reserva.id,
+
+      action,
+
+      criadoEm: new Date().toISOString(),
+
+      titulo: `Reserva ${textos[action] || action}`,
+
+      reserva: {
+        ...reserva
+      }
+    });
+
+
+    // Mantém no máximo 100 notificações
+    _write(
+      NOTIFICATIONS_KEY,
+      notificacoes.slice(0, 100)
+    );
+  }
+
+
+  // =========================================================
+  // SALVAMENTO CENTRAL DE RESERVAS
+  // =========================================================
+
+  /**
+   * Salva a lista de reservas,
+   * registra uma notificação
+   * e sincroniza as telas.
+   */
+  function _saveReservas(
+    lista,
+    action,
+    reserva
+  ) {
+    const salvou = _write(
+      STORAGE_KEY,
+      lista
+    );
+
+    if (!salvou) {
+      return false;
+    }
+
+
+    _registrarNotificacao(
+      action,
+      reserva
+    );
+
+
+    _notify(
+      action,
+      reserva
+    );
+
+
+    return true;
+  }
+
+
+  // =========================================================
+  // CRIAÇÃO DE RESERVAS
+  // =========================================================
+
+  /**
+   * Armazena temporariamente os dados
+   * do formulário antes de confirmar a reserva.
    */
   function stageReserva(formEl) {
-    const categoriaEl = document.querySelector('.category-card h3');
-    const categoria = categoriaEl ? categoriaEl.textContent.trim() : 'Reserva';
-    const item = sessionStorage.getItem(SALA_KEY) || categoria;
+    const categoriaEl = document.querySelector(
+      '.category-card h3'
+    );
 
+
+    const categoria = categoriaEl
+      ? categoriaEl.textContent.trim()
+      : 'Reserva';
+
+
+    const item =
+      sessionStorage.getItem(SALA_KEY)
+      || categoria;
+
+
+    /**
+     * Busca o valor de um campo pelo ID.
+     */
     const getVal = (id) => {
-      const el = formEl.querySelector('#' + id);
-      return el ? el.value.trim() : '';
+      const el = formEl.querySelector(
+        '#' + id
+      );
+
+      return el
+        ? el.value.trim()
+        : '';
     };
+
 
     const rascunho = {
       categoria,
+
       item,
+
       professor: getVal('nomeProfessor'),
+
       curso: getVal('curso'),
+
       motivo: getVal('motivo'),
+
       data: getVal('data'),
+
       horaEntrada: getVal('horaEntrada'),
-      horaSaida: getVal('horaSaida'),
+
+      horaSaida: getVal('horaSaida')
     };
 
-    sessionStorage.setItem(TEMP_KEY, JSON.stringify(rascunho));
+
+    sessionStorage.setItem(
+      TEMP_KEY,
+      JSON.stringify(rascunho)
+    );
   }
 
+
   /**
-   * Deve ser chamada na tela de confirmação (Passo 03). Promove o
-   * rascunho guardado em sessionStorage para a lista definitiva de
-   * reservas, evitando duplicar caso a página seja recarregada.
+   * Confirma e salva uma reserva
+   * que estava armazenada temporariamente.
    */
   function commitStagedReserva() {
-    const raw = sessionStorage.getItem(TEMP_KEY);
-    if (!raw) return null;
+    const raw = sessionStorage.getItem(
+      TEMP_KEY
+    );
 
-    let rascunho;
-    try {
-      rascunho = JSON.parse(raw);
-    } catch (e) {
-      sessionStorage.removeItem(TEMP_KEY);
+
+    if (!raw) {
       return null;
     }
 
-    const reserva = Object.assign({}, rascunho, {
+
+    let rascunho;
+
+
+    try {
+      rascunho = JSON.parse(raw);
+
+    } catch (e) {
+      sessionStorage.removeItem(TEMP_KEY);
+
+      return null;
+    }
+
+
+    const reserva = {
+      ...rascunho,
+
       id: _uid(),
+
       status: 'aguardando',
+
       criadoEm: new Date().toISOString(),
-    });
+
+      atualizadoEm: new Date().toISOString()
+    };
+
 
     const lista = getReservas();
-    lista.unshift(reserva);
-    _saveReservas(lista);
 
+
+    // Adiciona a reserva no início da lista
+    lista.unshift(reserva);
+
+
+    _saveReservas(
+      lista,
+      'criar',
+      reserva
+    );
+
+
+    // Limpa os dados temporários
     sessionStorage.removeItem(TEMP_KEY);
+
     sessionStorage.removeItem(SALA_KEY);
+
 
     return reserva;
   }
 
-  function cancelReserva(id) {
-    const lista = getReservas().filter((r) => r.id !== id);
-    return _saveReservas(lista);
+
+  // =========================================================
+  // EDIÇÃO DE RESERVAS
+  // =========================================================
+
+  function updateReserva(
+    id,
+    alteracoes = {}
+  ) {
+    const lista = getReservas();
+
+
+    const index = lista.findIndex(
+      (reserva) => reserva.id === id
+    );
+
+
+    if (index < 0) {
+      return null;
+    }
+
+
+    const reserva = {
+      ...lista[index],
+
+      ...alteracoes,
+
+      id,
+
+      atualizadoEm: new Date().toISOString()
+    };
+
+
+    lista[index] = reserva;
+
+
+    return _saveReservas(
+      lista,
+      'editar',
+      reserva
+    )
+      ? reserva
+      : null;
   }
+
+
+  // =========================================================
+  // CANCELAMENTO
+  // =========================================================
+
+  function cancelReserva(id) {
+    const lista = getReservas();
+
+
+    const index = lista.findIndex(
+      (reserva) => reserva.id === id
+    );
+
+
+    if (index < 0) {
+      return false;
+    }
+
+
+    const reserva = {
+      ...lista[index],
+
+      status: 'cancelada',
+
+      canceladoEm: new Date().toISOString(),
+
+      atualizadoEm: new Date().toISOString()
+    };
+
+
+    lista[index] = reserva;
+
+
+    return _saveReservas(
+      lista,
+      'cancelar',
+      reserva
+    );
+  }
+
+
+  // =========================================================
+  // STATUS
+  // =========================================================
 
   function statusInfo(status) {
     switch (status) {
       case 'aprovada':
-        return { label: 'Aprovada', badgeClass: 'badge-green' };
+        return {
+          label: 'Aprovada',
+          badgeClass: 'badge-green'
+        };
+
+
       case 'negado':
-        return { label: 'Negado', badgeClass: 'badge-red' };
-      case 'aguardando':
+        return {
+          label: 'Negado',
+          badgeClass: 'badge-red'
+        };
+
+
+      case 'cancelada':
+        return {
+          label: 'Cancelada',
+          badgeClass: 'badge-red'
+        };
+
+
       default:
-        return { label: 'Aguardando...', badgeClass: 'badge-yellow' };
+        return {
+          label: 'Aguardando...',
+          badgeClass: 'badge-yellow'
+        };
     }
   }
 
+
+  // =========================================================
+  // FORMATAÇÃO
+  // =========================================================
+
+  /**
+   * Converte:
+   *
+   * 2026-09-10
+   *
+   * para:
+   *
+   * 10/09/2026
+   */
   function formatDateBR(isoDate) {
-    if (!isoDate) return '';
+    if (!isoDate) {
+      return '';
+    }
+
+
     const partes = isoDate.split('-');
-    if (partes.length !== 3) return isoDate;
-    const [ano, mes, dia] = partes;
-    return `${dia}/${mes}/${ano}`;
+
+
+    return partes.length === 3
+      ? `${partes[2]}/${partes[1]}/${partes[0]}`
+      : isoDate;
   }
 
-  function formatHorario(entrada, saida) {
-    if (!entrada && !saida) return '';
+
+  /**
+   * Formata o horário da reserva.
+   */
+  function formatHorario(
+    entrada,
+    saida
+  ) {
+    if (!entrada && !saida) {
+      return '';
+    }
+
+
     return `${entrada || '--:--'} às ${saida || '--:--'}`;
   }
 
+
+  // =========================================================
+  // CONSULTAS
+  // =========================================================
+
   /**
-   * Retorna todas as reservas de uma data específica (formato "YYYY-MM-DD").
+   * Retorna todas as reservas
+   * de uma determinada data.
    */
   function getReservasPorData(isoDate) {
-    return getReservas().filter((r) => r.data === isoDate);
+    return getReservas().filter(
+      (reserva) =>
+        reserva.data === isoDate
+    );
   }
+
+
+  // =========================================================
+  // CALENDÁRIO
+  // =========================================================
 
   const MESES = [
-    'Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
-    'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro',
+    'Janeiro',
+    'Fevereiro',
+    'Março',
+    'Abril',
+    'Maio',
+    'Junho',
+    'Julho',
+    'Agosto',
+    'Setembro',
+    'Outubro',
+    'Novembro',
+    'Dezembro'
   ];
 
+
+  /**
+   * Adiciona zero à esquerda.
+   *
+   * Exemplo:
+   * 5 → 05
+   */
   function _pad2(n) {
-    return n < 10 ? '0' + n : '' + n;
+    return n < 10
+      ? '0' + n
+      : '' + n;
   }
 
-  function toISODate(ano, mesIndex, dia) {
+
+  /**
+   * Cria uma data no formato ISO.
+   *
+   * Exemplo:
+   * 2026-09-10
+   */
+  function toISODate(
+    ano,
+    mesIndex,
+    dia
+  ) {
     return `${ano}-${_pad2(mesIndex + 1)}-${_pad2(dia)}`;
   }
 
+
+  /**
+   * Retorna a data atual
+   * no formato ISO.
+   */
   function todayISO() {
     const hoje = new Date();
-    return toISODate(hoje.getFullYear(), hoje.getMonth(), hoje.getDate());
+
+    return toISODate(
+      hoje.getFullYear(),
+      hoje.getMonth(),
+      hoje.getDate()
+    );
   }
 
-  function mesLabel(ano, mesIndex) {
+
+  /**
+   * Retorna o nome do mês.
+   *
+   * Exemplo:
+   * Setembro 2026
+   */
+  function mesLabel(
+    ano,
+    mesIndex
+  ) {
     return `${MESES[mesIndex]} ${ano}`;
   }
 
+
   /**
-   * Constrói a matriz de dias de um mês (meses e anos infinitos: qualquer
-   * ano/mês, positivo ou negativo, é aceito - o próprio objeto Date do
-   * JavaScript normaliza a virada de ano automaticamente).
-   *
-   * Retorna um array de células: { dia, iso, mesAtual } onde "mesAtual"
-   * indica se o dia pertence ao mês exibido (false = dia de
-   * preenchimento do mês anterior/seguinte, mostrado "apagado").
+   * Constrói a matriz de células
+   * utilizada para renderizar o calendário mensal.
    */
-  function construirMatrizMes(ano, mesIndex) {
-    const primeiroDia = new Date(ano, mesIndex, 1);
-    const diaSemanaInicio = primeiroDia.getDay(); // 0 = Domingo
-    const diasNoMes = new Date(ano, mesIndex + 1, 0).getDate();
-    const diasNoMesAnterior = new Date(ano, mesIndex, 0).getDate();
+  function construirMatrizMes(
+    ano,
+    mesIndex
+  ) {
+    const primeiroDia = new Date(
+      ano,
+      mesIndex,
+      1
+    );
+
+
+    // Dia da semana do primeiro dia
+    const inicio = primeiroDia.getDay();
+
+
+    // Quantidade de dias do mês atual
+    const dias = new Date(
+      ano,
+      mesIndex + 1,
+      0
+    ).getDate();
+
+
+    // Quantidade de dias do mês anterior
+    const anterior = new Date(
+      ano,
+      mesIndex,
+      0
+    ).getDate();
+
 
     const celulas = [];
 
-    // Dias de preenchimento do mês anterior
-    for (let i = 0; i < diaSemanaInicio; i++) {
-      const dia = diasNoMesAnterior - diaSemanaInicio + 1 + i;
-      const dataRef = new Date(ano, mesIndex - 1, dia);
+
+    // ---------------------------------------------------------
+    // DIAS DO MÊS ANTERIOR
+    // ---------------------------------------------------------
+
+    for (let i = 0; i < inicio; i++) {
+      const dia =
+        anterior - inicio + 1 + i;
+
+
+      const d = new Date(
+        ano,
+        mesIndex - 1,
+        dia
+      );
+
+
       celulas.push({
         dia,
-        iso: toISODate(dataRef.getFullYear(), dataRef.getMonth(), dia),
-        mesAtual: false,
+
+        iso: toISODate(
+          d.getFullYear(),
+          d.getMonth(),
+          dia
+        ),
+
+        mesAtual: false
       });
     }
 
-    // Dias do mês corrente
-    for (let dia = 1; dia <= diasNoMes; dia++) {
+
+    // ---------------------------------------------------------
+    // DIAS DO MÊS ATUAL
+    // ---------------------------------------------------------
+
+    for (
+      let dia = 1;
+      dia <= dias;
+      dia++
+    ) {
       celulas.push({
         dia,
-        iso: toISODate(ano, mesIndex, dia),
-        mesAtual: true,
+
+        iso: toISODate(
+          ano,
+          mesIndex,
+          dia
+        ),
+
+        mesAtual: true
       });
     }
 
-    // Dias de preenchimento do mês seguinte (completa a última semana)
-    const restante = celulas.length % 7;
-    if (restante !== 0) {
-      const faltam = 7 - restante;
-      for (let dia = 1; dia <= faltam; dia++) {
-        const dataRef = new Date(ano, mesIndex + 1, dia);
+
+    // ---------------------------------------------------------
+    // DIAS DO PRÓXIMO MÊS
+    // ---------------------------------------------------------
+
+    const restante =
+      celulas.length % 7;
+
+
+    if (restante) {
+      for (
+        let dia = 1;
+        dia <= 7 - restante;
+        dia++
+      ) {
+        const d = new Date(
+          ano,
+          mesIndex + 1,
+          dia
+        );
+
+
         celulas.push({
           dia,
-          iso: toISODate(dataRef.getFullYear(), dataRef.getMonth(), dia),
-          mesAtual: false,
+
+          iso: toISODate(
+            d.getFullYear(),
+            d.getMonth(),
+            dia
+          ),
+
+          mesAtual: false
         });
       }
     }
 
+
     return celulas;
   }
 
+
+  // =========================================================
+  // API PÚBLICA DO MÓDULO
+  // =========================================================
+
   return {
+    // Leitura
     getReservas,
+    getNotificacoes,
+
+    // Eventos
+    subscribe,
+
+    // Reservas
     stageReserva,
     commitStagedReserva,
+    updateReserva,
     cancelReserva,
+
+    // Status
     statusInfo,
+
+    // Formatação
     formatDateBR,
     formatHorario,
+
+    // Consultas
     getReservasPorData,
+
+    // Calendário
     toISODate,
     todayISO,
     mesLabel,
     construirMatrizMes,
-    MESES,
+    MESES
   };
 })();
