@@ -1,4 +1,21 @@
-@import url(global.css);
+@import url(broken_browser.css);
+@import url(cadastro.css);
+@import url(escolherreservaprof.css);
+@import url(escolherreservaprof2.css);
+@import url(escolherreservaprof3.css);
+@import url(esqueceu_senha.css);
 @import url(login.css);
 @import url(paginainicialprofessor.css);
+@import url(passo2reservaprof.css);
+@import url(passo02reservaprof.css);
+@import url(passo002reservaprof.css);
+@import url(passo3reservaprof.css);
+@import url(passo03reservaprof.css);
+@import url(passo003reservaprof.css);
 @import url(redefsenha.css);
+@import url(reservar_tela_prof.css);
+@import url(reservasprof.css);
+
+/* Arquivo sem nada abaixo: */
+
+@import url(global.css);
