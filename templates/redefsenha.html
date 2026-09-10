@@ -4,19 +4,19 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-    <link rel="stylesheet" href="/css/redefsenha.css">
+    <link rel="stylesheet" href="/static/css/redefsenha.css">
     <title>Redefinir Senha - Gestão de salas e equipamentos</title>
 </head>
 <body>
     <div class="container">
         <div class="logo">
-            <img src="/assets/img/Logo senai.png">
+            <img src="/static/assets/img/Logo senai.png" alt="Logo SENAI">
         </div>
         <div class="hr"></div>
         <div class="form-container">
             <h2>Enviamos um código de verificação para seu e-mail.</h2>
             <h2 class="ex-email">exemplo@gmail.com</h2>
-                    <div class="hr"></div>
+            <div class="hr"></div>
             
             <form action="/templates/login.html" method="GET">
                 <div class="input-container">
@@ -25,7 +25,7 @@
                 <button type="submit">Enviar código</button>
             </form>
         </div>
-        <a class="links" href="/">Voltar ao login</a>
+        <a class="links" href="/templates/login.html">Voltar ao login</a>
     </div>
 </body>
 </html>
