@@ -4,233 +4,498 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <title>Notificações - Gestão de salas e equipamentos</title>
+
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap"
         rel="stylesheet">
+
     <link rel="stylesheet" href="https://www.flaticon.com/flaticon.css">
-    <link rel="stylesheet" href="/static/css/notificacoes.css">
+
+    <link rel="stylesheet" href="/css/notificacoes.css">
 </head>
 
 <body>
+
     <div class="app-container">
+
         <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
         <aside class="sidebar">
+
             <div class="sidebar-top">
 
-                <a href="/templates/notificacoesprof.html" class="logo">
-                    <img src="/static/assets/img/Logo senai.png" alt=""> </a>
+                <a href="/notificacoes_prof" class="logo">
+                    <img src="/assets/img/Logo senai.png" alt="Logo SENAI">
+                </a>
 
                 <nav class="nav-menu">
-                    <a href="/templates/paginainicialprofessor.html" class="nav-item">
-                        <img src="/static/assets/icons/home.png" alt="" width="20" height="20">Início</a>
-                </nav>
 
-                <a href="/templates/reservar_tela_prof.html" class="nav-item">
-                    <img src="/static/assets/icons/restaurant.png" alt="" width="20" height="20">Reservar</a> </nav>
+                    <a href="/home" class="nav-item">
+                        <img src="/assets/icons/home.png" alt="" width="20" height="20">
+                        Início
+                    </a>
 
-                <a href="/templates/reservasprof.html" class="nav-item">
-                    <img src="/static/assets/icons/reserved.png" alt="" width="20" height="20">Reservas</a> </nav>
+                    <a href="/reservar" class="nav-item">
+                        <img src="/assets/icons/restaurant.png" alt="" width="20" height="20">
+                        Reservar
+                    </a>
 
-                <a href="/templates/calendarioprof.html" class="nav-item">
-                    <img src="/static/assets/icons/calendar.png" alt="" width="20" height="20">Calendário</a> </nav>
+                    <a href="/reservas_prof" class="nav-item">
+                        <img src="/assets/icons/reserved.png" alt="" width="20" height="20">
+                        Reservas
+                    </a>
 
+                    <a href="/calendario_prof" class="nav-item">
+                        <img src="/assets/icons/calendar.png" alt="" width="20" height="20">
+                        Calendário
+                    </a>
 
-                <a href="/templates/notificacoesprof.html" class="nav-item active">
-                    <img src="/static/assets/icons/notification.png" alt="" width="20" height="20">Notificações</a> </nav>
+                    <a href="/notificacoes_prof" class="nav-item active">
+                        <img src="/assets/icons/notification.png" alt="" width="20" height="20">
+                        Notificações
+                    </a>
 
-                <a href="/templates/.html" class="nav-item">
-                    <img src="/static/assets/icons/box.png" alt="" width="20" height="20">Recursos</a> </nav>
+                    <!-- Recursos -->
+                    <a href="#" class="nav-item">
+                        <img src="/assets/icons/box.png" alt="" width="20" height="20">
+                        Recursos
+                    </a>
 
-                <a href="/templates/.html" class="nav-item">
-                    <img src="/static/assets/icons/gear.png" alt="" width="20" height="20">Configurações</a> </nav>
+                    <!-- Configurações -->
+                    <a href="#" class="nav-item">
+                        <img src="/assets/icons/gear.png" alt="" width="20" height="20">
+                        Configurações
+                    </a>
+
                 </nav>
 
                 <div class="divider"></div>
 
-                <a href="/templates/.html" class="nav-item">
-                    <img src="/static/assets/icons/interrogation.png" alt="" width="20" height="20">Ajuda</a> </nav>
+                <!-- Ajuda -->
+                <a href="#" class="nav-item">
+                    <img src="/assets/icons/interrogation.png" alt="" width="20" height="20">
+                    Ajuda
+                </a>
+
             </div>
 
-            <a href="/templates/login.html" class="btn-logout">
-                <img src="/static/assets/icons/exit.png" alt="" width="20" height="20">Sair</a> </nav>
-            </nav>
+            <a href="/" class="btn-logout">
+                <img src="/assets/icons/exit.png" alt="" width="20" height="20">
+                Sair
+            </a>
 
         </aside>
 
         <main class="main-content">
 
             <header class="header">
+
                 <button class="menu-toggle" id="menuToggle" aria-label="Abrir menu">
+
                     <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2"
                         stroke-linecap="round" viewBox="0 0 24 24">
+
                         <path d="M3 6h18M3 12h18M3 18h18"></path>
+
                     </svg>
+
                 </button>
 
                 <div class="greeting">
+
                     <h1>Olá Thiago!</h1>
-                    <p>Gerencie suas reservas e faça novos agendamentos</p>
+
+                    <p>
+                        Gerencie suas reservas e faça novos agendamentos
+                    </p>
+
                 </div>
 
                 <div class="header-actions">
+
                     <div class="search-container">
+
                         <svg width="18" height="18" fill="none" stroke="#6b7280" stroke-width="2" viewBox="0 0 24 24">
+
                             <path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+
                         </svg>
+
                         <input type="text" id="search-input" placeholder="Buscar notificações...">
+
                     </div>
 
-                    <a href="/templates/notificacoesprof.html" class="icon-btn">
-                        <img src="/static/assets/icons/notification (2).png" alt="Notificações" width="20" height="20">
+                    <a href="/notificacoes_prof" class="icon-btn">
+
+                        <img src="/assets/icons/notification (2).png" alt="Notificações" width="20" height="20">
+
                     </a>
 
                     <div class="user-profile" id="userProfile">
+
                         <div class="avatar-link">
+
                             <div class="avatar">
-                                <img src="/static/assets/icons/user (3).png" alt="Perfil do Usuário" width="28" height="28">
+
+                                <img src="/assets/icons/user (3).png" alt="Perfil do Usuário" width="28" height="28">
+
                             </div>
+
                         </div>
 
                         <div class="user-info">
+
                             <span class="name">Thiago</span>
+
                             <span class="role">Professor</span>
+
                         </div>
 
                         <div class="user-dropdown" id="userDropdown">
-                            <a href="/templates/reservasprof.html" class="dropdown-item">Minhas Reservas</a>
-                            <a href="/templates/.html" class="dropdown-item">Configurações</a>
+
+                            <a href="/reservas_prof" class="dropdown-item">
+                                Minhas Reservas
+                            </a>
+
+                            <!-- Configurações -->
+                            <a href="#" class="dropdown-item">
+                                Configurações
+                            </a>
+
                             <div class="dropdown-divider"></div>
-                            <a href="/templates/login.html" class="dropdown-item logout">Sair</a>
+
+                            <a href="/" class="dropdown-item logout">
+                                Sair
+                            </a>
+
                         </div>
+
                     </div>
+
                 </div>
+
             </header>
 
             <section>
+
                 <div class="notifications-heading">
+
                     <div class="greeting">
+
                         <h2>
                             Notificações
                         </h2>
-                        <p>Acompanhe atualizações de reservas, alertas de recursos e manutenções programadas.</p>
+
+                        <p>
+                            Acompanhe atualizações de reservas, alertas de recursos e manutenções programadas.
+                        </p>
+
                     </div>
+
                     <button type="button" class="btn-limpar-notificacoes" id="clearNotificationsButton">
+
                         Limpar notificações
+
                     </button>
+
                 </div>
 
                 <aside class="notifications-container" id="notificationsList">
+
                     <!-- Renderizado dinamicamente a partir do histórico persistido de reservas. -->
+
                 </aside>
 
             </section>
+
         </main>
 
     </div>
 
-    <script src="/static/js/reservas.js"></script>
+    <script src="/js/reservas.js"></script>
+
     <script>
+
         document.addEventListener('DOMContentLoaded', () => {
+
             function escapeHtml(value) {
-                return String(value ?? '').replace(/[&<>"']/g, (char) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[char]));
+
+                return String(value ?? '').replace(
+                    /[&<>"']/g,
+                    (char) => ({
+                        '&': '&amp;',
+                        '<': '&lt;',
+                        '>': '&gt;',
+                        '"': '&quot;',
+                        "'": '&#39;'
+                    }[char])
+                );
+
             }
 
             function tempoRelativo(iso) {
-                const segundos = Math.max(0, Math.floor((Date.now() - new Date(iso).getTime()) / 1000));
-                if (segundos < 60) return 'agora';
-                if (segundos < 3600) return `há ${Math.floor(segundos / 60)} min`;
-                if (segundos < 86400) return `há ${Math.floor(segundos / 3600)} h`;
+
+                const segundos = Math.max(
+                    0,
+                    Math.floor(
+                        (Date.now() - new Date(iso).getTime()) / 1000
+                    )
+                );
+
+                if (segundos < 60) {
+                    return 'agora';
+                }
+
+                if (segundos < 3600) {
+                    return `há ${Math.floor(segundos / 60)} min`;
+                }
+
+                if (segundos < 86400) {
+                    return `há ${Math.floor(segundos / 3600)} h`;
+                }
+
                 return `há ${Math.floor(segundos / 86400)} dia(s)`;
+
             }
 
             function renderNotificacoes() {
-                const list = document.getElementById('notificationsList');
-                const notificacoes = ReservasApp.getNotificacoes();
-                list.innerHTML = notificacoes.length ? notificacoes.map((n) => {
-                    const r = n.reserva || {};
-                    const status = ReservasApp.statusInfo(r.status);
-                    const acao = { criar: 'criada', editar: 'editada', cancelar: 'cancelada' }[n.action] || n.action;
-                    return `<div class="notification-item searchable">
-                        <div class="notification-icon ${n.action === 'cancelar' ? 'danger' : 'success'}"><img src="/assets/icons/calendar.png" alt=""></div>
-                        <div class="notification-content">
-                            <h3>Reserva ${escapeHtml(acao)} - ${escapeHtml(r.item || r.categoria || 'Recurso')}<span class="notification-dot"></span></h3>
-                            <p>Professor: ${escapeHtml(r.professor || 'Não informado')} · Aluno/turma: ${escapeHtml(r.curso || 'Não informado')} · Disciplina/motivo: ${escapeHtml(r.motivo || 'Não informado')} · Data: ${escapeHtml(ReservasApp.formatDateBR(r.data))} · Horário: ${escapeHtml(ReservasApp.formatHorario(r.horaEntrada, r.horaSaida))} · Status: ${escapeHtml(status.label)}.</p>
-                        </div>
-                        <span class="notification-time">${tempoRelativo(n.criadoEm)}</span>
-                        <button type="button" class="notification-delete" data-delete-notification-id="${escapeHtml(n.id)}" aria-label="Excluir esta notificação">Excluir</button>
-                    </div>`;
-                }).join('') : '<p class="notification-empty">Nenhuma notificação de reserva.</p>';
+
+                const list =
+                    document.getElementById('notificationsList');
+
+                const notificacoes =
+                    ReservasApp.getNotificacoes();
+
+                list.innerHTML = notificacoes.length
+                    ? notificacoes.map((n) => {
+
+                        const r = n.reserva || {};
+
+                        const status =
+                            ReservasApp.statusInfo(r.status);
+
+                        const acao = {
+                            criar: 'criada',
+                            editar: 'editada',
+                            cancelar: 'cancelada'
+                        }[n.action] || n.action;
+
+                        return `
+
+                            <div class="notification-item searchable">
+
+                                <div class="notification-icon ${n.action === 'cancelar' ? 'danger' : 'success'}">
+
+                                    <img src="/assets/icons/calendar.png" alt="">
+
+                                </div>
+
+                                <div class="notification-content">
+
+                                    <h3>
+                                        Reserva ${escapeHtml(acao)} -
+                                        ${escapeHtml(r.item || r.categoria || 'Recurso')}
+
+                                        <span class="notification-dot"></span>
+
+                                    </h3>
+
+                                    <p>
+                                        Professor:
+                                        ${escapeHtml(r.professor || 'Não informado')}
+                                        · Aluno/turma:
+                                        ${escapeHtml(r.curso || 'Não informado')}
+                                        · Disciplina/motivo:
+                                        ${escapeHtml(r.motivo || 'Não informado')}
+                                        · Data:
+                                        ${escapeHtml(ReservasApp.formatDateBR(r.data))}
+                                        · Horário:
+                                        ${escapeHtml(
+                            ReservasApp.formatHorario(
+                                r.horaEntrada,
+                                r.horaSaida
+                            )
+                        )}
+                                        · Status:
+                                        ${escapeHtml(status.label)}.
+                                    </p>
+
+                                </div>
+
+                                <span class="notification-time">
+                                    ${tempoRelativo(n.criadoEm)}
+                                </span>
+
+                                <button
+                                    type="button"
+                                    class="notification-delete"
+                                    data-delete-notification-id="${escapeHtml(n.id)}"
+                                    aria-label="Excluir esta notificação">
+
+                                    Excluir
+
+                                </button>
+
+                            </div>
+
+                        `;
+
+                    }).join('')
+                    : '<p class="notification-empty">Nenhuma notificação de reserva.</p>';
+
                 configurarBusca();
 
-                const searchInput = document.getElementById('search-input');
+                const searchInput =
+                    document.getElementById('search-input');
+
                 if (searchInput && searchInput.value.trim()) {
                     searchInput.dispatchEvent(new Event('input'));
                 }
+
             }
 
             function configurarBusca() {
-                const searchInput = document.getElementById('search-input');
-                if (!searchInput || searchInput.dataset.bound) return;
+
+                const searchInput =
+                    document.getElementById('search-input');
+
+                if (!searchInput || searchInput.dataset.bound) {
+                    return;
+                }
+
                 searchInput.dataset.bound = 'true';
+
                 searchInput.addEventListener('input', (e) => {
-                    const term = e.target.value.toLowerCase().trim();
-                    document.querySelectorAll('#notificationsList .searchable').forEach(item => { item.style.display = item.textContent.toLowerCase().includes(term) ? '' : 'none'; });
+
+                    const term =
+                        e.target.value.toLowerCase().trim();
+
+                    document
+                        .querySelectorAll('#notificationsList .searchable')
+                        .forEach((item) => {
+
+                            item.style.display =
+                                item.textContent
+                                    .toLowerCase()
+                                    .includes(term)
+                                    ? ''
+                                    : 'none';
+
+                        });
+
                 });
+
             }
 
             renderNotificacoes();
+
             ReservasApp.subscribe(renderNotificacoes);
 
-            document.getElementById('notificationsList').addEventListener('click', (event) => {
-                const button = event.target.closest('[data-delete-notification-id]');
-                if (!button) return;
+            document
+                .getElementById('notificationsList')
+                .addEventListener('click', (event) => {
 
-                if (!window.confirm('Excluir esta notificação?')) return;
+                    const button =
+                        event.target.closest(
+                            '[data-delete-notification-id]'
+                        );
 
-                ReservasApp.deleteNotificacao(button.dataset.deleteNotificationId);
-            });
+                    if (!button) {
+                        return;
+                    }
 
-            document.getElementById('clearNotificationsButton').addEventListener('click', () => {
-                if (!ReservasApp.hasNotificacoes()) return;
-                if (!window.confirm('Excluir todas as notificações?')) return;
+                    if (!window.confirm(
+                        'Excluir esta notificação?'
+                    )) {
+                        return;
+                    }
 
-                ReservasApp.clearNotificacoes();
-            });
+                    ReservasApp.deleteNotificacao(
+                        button.dataset.deleteNotificationId
+                    );
 
-            const userProfile = document.getElementById('userProfile');
-            const userDropdown = document.getElementById('userDropdown');
+                });
+
+            document
+                .getElementById('clearNotificationsButton')
+                .addEventListener('click', () => {
+
+                    if (!ReservasApp.hasNotificacoes()) {
+                        return;
+                    }
+
+                    if (!window.confirm(
+                        'Excluir todas as notificações?'
+                    )) {
+                        return;
+                    }
+
+                    ReservasApp.clearNotificacoes();
+
+                });
+
+            const userProfile =
+                document.getElementById('userProfile');
+
+            const userDropdown =
+                document.getElementById('userDropdown');
 
             if (userProfile && userDropdown) {
+
                 userProfile.addEventListener('click', (e) => {
+
                     e.stopPropagation();
+
                     userDropdown.classList.toggle('active');
+
                 });
 
                 document.addEventListener('click', (e) => {
+
                     if (!userProfile.contains(e.target)) {
+
                         userDropdown.classList.remove('active');
+
                     }
+
                 });
+
             }
 
-            const menuToggle = document.getElementById('menuToggle');
-            const sidebar = document.querySelector('.sidebar');
-            const sidebarOverlay = document.getElementById('sidebarOverlay');
+            const menuToggle =
+                document.getElementById('menuToggle');
+
+            const sidebar =
+                document.querySelector('.sidebar');
+
+            const sidebarOverlay =
+                document.getElementById('sidebarOverlay');
 
             if (menuToggle && sidebar && sidebarOverlay) {
+
                 menuToggle.addEventListener('click', () => {
+
                     sidebar.classList.toggle('open');
+
                     sidebarOverlay.classList.toggle('active');
+
                 });
 
                 sidebarOverlay.addEventListener('click', () => {
+
                     sidebar.classList.remove('open');
+
                     sidebarOverlay.classList.remove('active');
+
                 });
+
             }
 
         });
+
     </script>
+
 </body>
 
 </html>

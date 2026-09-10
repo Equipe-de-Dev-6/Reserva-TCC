@@ -17,9 +17,32 @@ from model import (
 # ============================================================
 
 app = FastAPI()
-app.mount("/css", StaticFiles(directory="static/css"), name="css")
-app.mount("/js", StaticFiles(directory="static/js"), name="js")
-app.mount("/assets", StaticFiles(directory="static/assets"), name="assets")
+
+
+# ============================================================
+# ARQUIVOS ESTÁTICOS
+# ============================================================
+
+# A pasta física continua sendo "static",
+# mas a URL não possui "/static".
+
+app.mount(
+    "/css",
+    StaticFiles(directory="static/css"),
+    name="css"
+)
+
+app.mount(
+    "/js",
+    StaticFiles(directory="static/js"),
+    name="js"
+)
+
+app.mount(
+    "/assets",
+    StaticFiles(directory="static/assets"),
+    name="assets"
+)
 
 
 # ============================================================
@@ -38,29 +61,183 @@ app.add_middleware(
 # PÁGINAS
 # ============================================================
 
+# ------------------------------------------------------------
+# LOGIN
+# ------------------------------------------------------------
+
 @app.get("/")
 def login():
-    return FileResponse("templates/login.html")
+    return FileResponse(
+        "templates/login.html"
+    )
 
+
+# ------------------------------------------------------------
+# INÍCIO PROFESSOR
+# ------------------------------------------------------------
 
 @app.get("/home")
-def home():
-    return FileResponse("templates/paginainicialprofessor.html")
+def home_professor():
+    return FileResponse(
+        "templates/paginainicialprofessor.html"
+    )
 
+
+# ------------------------------------------------------------
+# INÍCIO ADMIN
+# ------------------------------------------------------------
 
 @app.get("/home_admin")
-def home():
-    return FileResponse("templates/paginainicialadm.html")
+def home_admin():
+    return FileResponse(
+        "templates/paginainicialadm.html"
+    )
 
+
+# ------------------------------------------------------------
+# CADASTRO
+# ------------------------------------------------------------
 
 @app.get("/cadastro")
-def home():
-    return FileResponse("templates/cadastro.html")
+def cadastro():
+    return FileResponse(
+        "templates/cadastro.html"
+    )
 
+
+# ------------------------------------------------------------
+# REDEFINIR SENHA
+# ------------------------------------------------------------
 
 @app.get("/redefinir_senha")
-def home():
-    return FileResponse("templates/redefsenha.html")
+def redefinir_senha():
+    return FileResponse(
+        "templates/redefsenha.html"
+    )
+
+
+# ------------------------------------------------------------
+# ESQUECEU SENHA
+# ------------------------------------------------------------
+
+@app.get("/esqueceu_senha")
+def esqueceu_senha():
+    return FileResponse(
+        "templates/esqueceu_senha.html"
+    )
+
+
+# ============================================================
+# PÁGINAS DO PROFESSOR
+# ============================================================
+
+# ------------------------------------------------------------
+# RESERVAR
+# ------------------------------------------------------------
+
+@app.get("/reservar")
+def reservar():
+    return FileResponse(
+        "templates/reservar_tela_prof.html"
+    )
+
+
+# ------------------------------------------------------------
+# RESERVAS
+# ------------------------------------------------------------
+
+@app.get("/reservas_prof")
+def reservas_prof():
+    return FileResponse(
+        "templates/reservasprof.html"
+    )
+
+
+# ------------------------------------------------------------
+# CALENDÁRIO
+# ------------------------------------------------------------
+
+@app.get("/calendario_prof")
+def calendario_prof():
+    return FileResponse(
+        "templates/calendarioprof.html"
+    )
+
+
+# ------------------------------------------------------------
+# NOTIFICAÇÕES
+# ------------------------------------------------------------
+
+@app.get("/notificacoes_prof")
+def notificacoes_prof():
+    return FileResponse(
+        "templates/notificacoesprof.html"
+    )
+
+
+# ------------------------------------------------------------
+# ESCOLHER RESERVA - SALAS
+# ------------------------------------------------------------
+
+@app.get("/escolher_reserva_salas")
+def escolher_reserva_salas():
+    return FileResponse(
+        "templates/escolherreservaprof.html"
+    )
+
+
+# ------------------------------------------------------------
+# ESCOLHER RESERVA - LABORATÓRIOS
+# ------------------------------------------------------------
+
+@app.get("/escolher_reserva_laboratorios")
+def escolher_reserva_laboratorios():
+    return FileResponse(
+        "templates/escolherreservaprof2.html"
+    )
+
+
+# ------------------------------------------------------------
+# ESCOLHER RESERVA - GABINETES
+# ------------------------------------------------------------
+
+@app.get("/escolher_reserva_gabinetes")
+def escolher_reserva_gabinetes():
+    return FileResponse(
+        "templates/escolherreservaprof3.html"
+    )
+
+
+# ============================================================
+# PÁGINAS DO ADMIN
+# ============================================================
+
+# ------------------------------------------------------------
+# RESERVAR - ADMIN
+# ------------------------------------------------------------
+
+@app.get("/reservar_admin")
+def reservar_admin():
+    return FileResponse(
+        "templates/reservar_tela_adm.html"
+    )
+
+
+# ------------------------------------------------------------
+# RESERVAS - ADMIN
+# ------------------------------------------------------------
+
+@app.get("/reservas_admin")
+def reservas_admin():
+    return FileResponse(
+        "templates/reservasadm.html"
+    )
+
+@app.get("/passo2_reserva_prof")
+def passo02_reserva_prof():
+    return FileResponse("templates/passo02reservaprof.html")
+
+
 
 
 # ============================================================
@@ -87,7 +264,9 @@ def listar_usuarios():
 
         usuario = Usuario.fromJson(dados)
 
-        usuarios.append(usuario.toJson())
+        usuarios.append(
+            usuario.toJson()
+        )
 
     return usuarios
 
@@ -100,6 +279,7 @@ def listar_usuarios():
 def cadastrar_usuario(usuario: Usuario):
 
     # Verifica se o email já existe
+
     resposta = (
         supabase
         .table("usuarios")
@@ -115,7 +295,9 @@ def cadastrar_usuario(usuario: Usuario):
             detail="Usuário já cadastrado"
         )
 
+
     # Cadastra o usuário
+
     resposta = (
         supabase
         .table("usuarios")
@@ -129,6 +311,7 @@ def cadastrar_usuario(usuario: Usuario):
             status_code=400,
             detail="Erro ao cadastrar usuário"
         )
+
 
     usuario_cadastrado = Usuario.fromJson(
         resposta.data[0]
@@ -161,6 +344,70 @@ def listar_salas():
 
         sala = Sala.fromJson(dados)
 
-        salas.append(sala.toJson())
+        salas.append(
+            sala.toJson()
+        )
 
     return salas
+
+
+# ============================================================
+# NOTEBOOKS
+# ============================================================
+
+# ------------------------------------------------------------
+# LISTAR NOTEBOOKS
+# ------------------------------------------------------------
+
+@app.get("/notebooks")
+def listar_notebooks():
+
+    resposta = (
+        supabase
+        .table("notebooks")
+        .select("*")
+        .execute()
+    )
+
+    notebooks = []
+
+    for dados in resposta.data:
+
+        notebook = Notebook.fromJson(dados)
+
+        notebooks.append(
+            notebook.toJson()
+        )
+
+    return notebooks
+
+
+# ============================================================
+# CARRINHOS
+# ============================================================
+
+# ------------------------------------------------------------
+# LISTAR CARRINHOS
+# ------------------------------------------------------------
+
+@app.get("/carrinhos")
+def listar_carrinhos():
+
+    resposta = (
+        supabase
+        .table("carrinhos")
+        .select("*")
+        .execute()
+    )
+
+    carrinhos = []
+
+    for dados in resposta.data:
+
+        carrinho = Carrinho.fromJson(dados)
+
+        carrinhos.append(
+            carrinho.toJson()
+        )
+
+    return carrinhos
