@@ -24,8 +24,8 @@
           <a href="/templates/reservar_tela_prof.html" class="nav-item">
         <img src="/assets/icons/restaurant.png" alt="" width="20" height="20">Reservar</a> </nav>
 
-          <a href="/templates/.html" class="nav-item">
-        <img src="/assets/icons/history.png" alt="" width="20" height="20">Histórico</a> </nav>
+          <a href="/templates/reservasprof.html" class="nav-item">
+        <img src="/assets/icons/reserved.png" alt="" width="20" height="20">Reservas</a> </nav>
 
           <a href="/templates/.html" class="nav-item">
         <img src="/assets/icons/calendar.png" alt="" width="20" height="20">Calendário</a> </nav>
@@ -88,7 +88,7 @@
             </div>
 
             <div class="user-dropdown" id="userDropdown">
-              <a href="/templates/.html" class="dropdown-item">Minhas Reservas</a>
+              <a href="/templates/reservasprof.html" class="dropdown-item">Minhas Reservas</a>
               <a href="/templates/.html" class="dropdown-item">Configurações</a>
               <div class="dropdown-divider"></div>
               <a href="/templates/login.html" class="dropdown-item logout">Sair</a>
@@ -137,61 +137,15 @@
         <section class="reservations">
           <div class="section-header">
             <h2>Próximas reservas</h2>
-            <a href=".html" class="ver-mais">Ver mais -></a>
+            <a href="/templates/reservasprof.html" class="ver-mais">Ver mais -></a>
           </div>
           
-          <div class="res-list">
-            <a href="index.html" class="res-card searchable">
-              <div class="res-left">
-                <div class="img-placeholder">
-                <img src="/assets/icons/image.png" alt="Laboratórios" width="24" height="24">
-                </div>
-                <div class="res-info">
-                  <h4>Laboratório de automação - C07</h4>
-                  <p>16 lugares</p>
-                </div>
-              </div>
-              <span class="badge badge-green">Aprovado</span>
-            </a>
+          <div class="res-list" id="proximasReservasList">
+            <!-- Renderizado dinamicamente via JS a partir de ReservasApp -->
+          </div>
 
-            <a href="index.html" class="res-card searchable">
-              <div class="res-left">
-                <div class="img-placeholder">
-                <img src="/assets/icons/image.png" alt="Laboratórios" width="24" height="24">
-                </div>
-                <div class="res-info">
-                  <h4>Laboratório de automação - C08</h4>
-                  <p>16 lugares</p>
-                </div>
-              </div>
-              <span class="badge badge-green">Aprovado</span>
-            </a>
-
-            <a href="index.html" class="res-card searchable">
-              <div class="res-left">
-                <div class="img-placeholder">
-                <img src="/assets/icons/image.png" alt="Laboratórios" width="24" height="24">
-                </div>
-                <div class="res-info">
-                  <h4>Laboratório de automação - C09</h4>
-                  <p>16 lugares</p>
-                </div>
-              </div>
-              <span class="badge badge-green">Aprovado</span>
-            </a>
-
-            <a href="index.html" class="res-card searchable">
-              <div class="res-left">
-                <div class="img-placeholder">
-                <img src="/assets/icons/image.png" alt="Laboratórios" width="24" height="24">
-                </div>
-                <div class="res-info">
-                  <h4>Laboratório de automação - C10</h4>
-                  <p>16 lugares</p>
-                </div>
-              </div>
-              <span class="badge badge-green">Aprovado</span>
-            </a>
+          <div class="res-empty" id="proximasReservasEmpty" style="display:none;">
+            <p>Você ainda não tem reservas. <a href="/templates/reservar_tela_prof.html">Fazer uma reserva -></a></p>
           </div>
         </section>
 
@@ -268,6 +222,7 @@
     </main>
   </div>
 
+  <script src="/js/reservas.js"></script>
   <script>
     document.addEventListener('DOMContentLoaded', () => {
       const searchInput = document.getElementById('search-input');
@@ -319,6 +274,65 @@
           sidebarOverlay.classList.remove('active');
         });
       }
+
+      // --- Próximas reservas (dinâmico) ---
+      function iconeDaCategoria(categoria) {
+        const cat = (categoria || '').toLowerCase();
+        if (cat.includes('laborat')) return '/assets/icons/computer.png';
+        if (cat.includes('gabinete')) return '/assets/icons/shopping-cart.png';
+        return '/assets/icons/classroom.png';
+      }
+
+      function renderProximasReservas() {
+        const listaEl = document.getElementById('proximasReservasList');
+        const emptyEl = document.getElementById('proximasReservasEmpty');
+        const todas = ReservasApp.getReservas();
+
+        // Mostra até 4 reservas mais recentes na página inicial.
+        const proximas = todas.slice(0, 4);
+
+        if (proximas.length === 0) {
+          listaEl.innerHTML = '';
+          emptyEl.style.display = 'block';
+          return;
+        }
+
+        emptyEl.style.display = 'none';
+
+        listaEl.innerHTML = proximas.map((r) => {
+          const info = ReservasApp.statusInfo(r.status);
+          return `
+            <div class="res-card searchable" data-id="${r.id}">
+              <div class="res-left">
+                <div class="img-placeholder">
+                  <img src="${iconeDaCategoria(r.categoria)}" alt="" width="24" height="24">
+                </div>
+                <div class="res-info">
+                  <h4>${r.item || r.categoria}</h4>
+                  <p>${ReservasApp.formatDateBR(r.data)} · ${ReservasApp.formatHorario(r.horaEntrada, r.horaSaida)}</p>
+                </div>
+              </div>
+              <div class="res-right">
+                <span class="${info.badgeClass}">${info.label}</span>
+                <button class="btn-cancelar-reserva btn-cancelar-sm" data-cancel-id="${r.id}">Cancelar Reserva</button>
+              </div>
+            </div>
+          `;
+        }).join('');
+      }
+
+      document.getElementById('proximasReservasList').addEventListener('click', (e) => {
+        const btn = e.target.closest('[data-cancel-id]');
+        if (!btn) return;
+
+        const confirmar = window.confirm('Tem certeza que deseja cancelar esta reserva?');
+        if (!confirmar) return;
+
+        ReservasApp.cancelReserva(btn.dataset.cancelId);
+        renderProximasReservas();
+      });
+
+      renderProximasReservas();
     });
   </script>
 </body>

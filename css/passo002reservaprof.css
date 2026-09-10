@@ -333,7 +333,7 @@ img {
   display: grid;
   grid-template-columns: 300px 1fr 64px;
   gap: 24px;
-  align-items: start; /* O segredo para as bolinhas não esticarem está aqui */
+  align-items: start;
 }
 
 /* --- Categoria selecionada --- */
@@ -534,7 +534,7 @@ img {
 .step-line {
   width: 2px;
   flex: 1;
-  min-height: 40px; /* Isso controla a distância entre as bolinhas */
+  min-height: 32px;
   background-color: var(--border-color);
   transition: background-color 0.3s;
 }

@@ -402,7 +402,7 @@ img {
   justify-content: center;
 }
 
-.success-icon svg {
+.success-icon img {
   animation: float 2.4s ease-in-out infinite;
 }
 
@@ -423,18 +423,38 @@ img {
   font-weight: 700;
 }
 
-.btn-inicio {
-  background-color: var(--text-dark);
-  color: var(--white);
-  padding: 12px 28px;
+.success-actions {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.btn-inicio,
+.btn-ver-reservas {
+  padding: 12px 24px;
   border-radius: 8px;
   font-size: 13px;
   font-weight: 700;
   transition: 0.2s;
 }
 
+.btn-inicio {
+  background-color: var(--text-dark);
+  color: var(--white);
+}
+
 .btn-inicio:hover {
   background-color: #111827;
+}
+
+.btn-ver-reservas {
+  background-color: var(--senai-red);
+  color: var(--white);
+}
+
+.btn-ver-reservas:hover {
+  background-color: #CC0000;
 }
 
 /* --- Indicador de etapas --- */
@@ -482,7 +502,6 @@ img {
    RESPONSIVO
    ===================================================== */
 
-/* ---------- Tablets (≤ 1024px) ---------- */
 @media (max-width: 1024px) {
   .search-container {
     width: 220px;
@@ -510,12 +529,11 @@ img {
     width: 70px;
   }
 
-  .form-card {
-    padding: 22px 24px;
+  .success-card {
+    padding: 36px 28px;
   }
 }
 
-/* ---------- Tablets pequenos / celular grande (≤ 860px) ---------- */
 @media (max-width: 860px) {
   body, html {
     height: auto;
@@ -558,7 +576,7 @@ img {
     grid-template-areas:
       "steps"
       "category"
-      "form";
+      "success";
   }
 
   .category-card {
@@ -579,12 +597,8 @@ img {
     width: 48px;
   }
 
-  .form-card {
-    grid-area: form;
-  }
-
-  .form-row {
-    grid-template-columns: 1fr;
+  .success-card {
+    grid-area: success;
   }
 
   .step-indicator {
@@ -602,7 +616,6 @@ img {
   }
 }
 
-/* ---------- Celulares (≤ 600px) ---------- */
 @media (max-width: 600px) {
   .main-content {
     padding: 0 16px 16px;
@@ -632,10 +645,6 @@ img {
     height: 40px;
   }
 
-  .quick-actions-section h2 {
-    font-size: 14px;
-  }
-
   .category-card {
     flex-direction: column;
     text-align: center;
@@ -650,22 +659,27 @@ img {
     width: 64px;
   }
 
-  .form-card {
-    padding: 20px;
+  .success-card {
+    padding: 28px 20px;
   }
 
-  .form-actions {
-    flex-direction: column-reverse;
+  .success-icon {
+    width: 96px;
+    height: 96px;
   }
 
-  .btn-voltar,
-  .btn-enviar {
+  .success-actions {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .btn-inicio,
+  .btn-ver-reservas {
     width: 100%;
     text-align: center;
   }
 }
 
-/* ---------- Celulares muito pequenos (≤ 380px) ---------- */
 @media (max-width: 380px) {
   .sidebar {
     width: 220px;

@@ -3,10 +3,10 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Reservar Salas - Gestão de salas e equipamentos</title>
+  <title>Minhas Reservas - Gestão de salas e equipamentos</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://www.flaticon.com/flaticon.css">
-  <link rel="stylesheet" href="/css/escolherreservaprof3.css">
+  <link rel="stylesheet" href="/css/reservasprof.css">
 </head>
 <body>
   <div class="app-container">
@@ -14,17 +14,17 @@
     <aside class="sidebar">
       <div class="sidebar-top">
         
-        <a href="/templates/escolherreservaprof2.html" class="logo">
+        <a href="/templates/reservasprof.html" class="logo">
           <img src="/assets/img/Logo senai.png" alt=""> </a>
         
         <nav class="nav-menu">
         <a href="/templates/paginainicialprofessor.html" class="nav-item ">
         <img src="/assets/icons/home.png" alt="" width="20" height="20">Início</a> </nav>
 
-          <a href="/templates/reservar_tela_prof.html" class="nav-item active">
+          <a href="/templates/reservar_tela_prof.html" class="nav-item">
         <img src="/assets/icons/restaurant.png" alt="" width="20" height="20">Reservar</a> </nav>
 
-          <a href="/templates/reservasprof.html" class="nav-item">
+          <a href="/templates/reservasprof.html" class="nav-item active">
         <img src="/assets/icons/reserved.png" alt="" width="20" height="20">Reservas</a> </nav>
 
           <a href="/templates/.html" class="nav-item">
@@ -52,6 +52,7 @@
         </nav>
 
     </aside>
+
     <main class="main-content">
       
       <header class="header">
@@ -96,101 +97,39 @@
         </div>
       </header>
 
-      <section class="quick-actions-section">
-        <h2>O que você deseja reservar hoje?</h2>
+      <section class="reservas-section">
 
-        <div class="booking-layout">
+        <div class="reservas-header">
+          <h2>Minhas solicitações</h2>
 
-          <div class="category-card">
-            <div class="category-icon">
-              <img src="/assets/icons/computer.png" alt="Salas">
-            </div>
-            <h3>Laboratórios de informatica, automação, mecânica e outros</h3>
+            <br>
+
+          <div class="filter-tabs" id="filterTabs">
+            <button class="filter-tab active" data-filter="todas">Todas</button>
+            <button class="filter-tab" data-filter="aguardando">Aguardando</button>
+            <button class="filter-tab" data-filter="aprovada">Aprovadas</button>
+            <button class="filter-tab" data-filter="negado">Negadas</button>
           </div>
-
-          <div class="rooms-list">
-
-            <a href="/templates/escolherreservaprof3.html" class="room-card searchable">
-              <div class="room-left">
-                <div class="room-thumb">
-                  <img src="/assets/icons/image.png" alt="Sala" width="20" height="20">
-                </div>
-                <div class="room-info">
-                  <h4>Laboratório de automação - C07</h4>
-                  <p>16 lugares</p>
-                </div>
-              </div>
-              <span class="status-badge status-available">Disponível</span>
-            </a>
-
-            <a href="/templates/escolherreservaprof3.html" class="room-card searchable selected">
-              <div class="room-left">
-                <div class="room-thumb">
-                  <img src="/assets/icons/image.png" alt="Sala" width="20" height="20">
-                </div>
-                <div class="room-info">
-                  <h4>Laboratório de informática - C08</h4>
-                  <p>16 lugares</p>
-                </div>
-              </div>
-              <span class="status-badge status-denied">Negado</span>
-            </a>
-
-            <a href="/templates/escolherreservaprof3.html" class="room-card searchable">
-              <div class="room-left">
-                <div class="room-thumb">
-                  <img src="/assets/icons/image.png" alt="Sala" width="20" height="20">
-                </div>
-                <div class="room-info">
-                  <h4>Laboratório de mecânica - C09</h4>
-                  <p>16 lugares</p>
-                </div>
-              </div>
-              <span class="status-badge status-waiting">Aguardando</span>
-            </a>
-
-            <a href="/templates/escolherreservaprof3.html" class="room-card searchable">
-              <div class="room-left">
-                <div class="room-thumb">
-                  <img src="/assets/icons/image.png" alt="Sala" width="20" height="20">
-                </div>
-                <div class="room-info">
-                  <h4>Laboratório de informática - C10</h4>
-                  <p>16 lugares</p>
-                </div>
-              </div>
-              <span class="status-badge status-available">Disponível</span>
-            </a>
-
-            <a href="/templates/escolherreservaprof3.html" class="room-card searchable">
-              <div class="room-left">
-                <div class="room-thumb">
-                  <img src="/assets/icons/image.png" alt="Sala" width="20" height="20">
-                </div>
-                <div class="room-info">
-                  <h4>Laboratório de mecânica - C11</h4>
-                  <p>16 lugares</p>
-                </div>
-              </div>
-              <span class="status-badge status-waiting">Aguardando</span>
-            </a>
-
-          </div>
-
-          <div class="step-indicator">
-            <div class="step active">01</div>
-            <div class="step-line"></div>
-            <div class="step">02</div>
-            <div class="step-line"></div>
-            <div class="step">03</div>
-          </div>
-
         </div>
+
+        <br>
+
+        <div class="reservas-list searchable-container" id="reservasList">
+          <!-- Cards de reserva são renderizados via JS -->
+        </div>
+
+        <div class="reservas-empty" id="reservasEmpty" style="display:none;">
+          <img src="/assets/icons/calendar.png" alt="">
+          <p>Você ainda não fez nenhuma reserva. Que tal agendar uma sala, laboratório ou gabinete agora mesmo?</p>
+          <a href="/templates/reservar_tela_prof.html" class="btn-nova-reserva">Fazer uma reserva</a>
+        </div>
+
       </section>
 
     </main>
   </div>
 
+  <script src="/js/reservas.js"></script>
   <script>
     document.addEventListener('DOMContentLoaded', () => {
 
@@ -211,34 +150,6 @@
         });
       }
 
-      const searchInput = document.getElementById('search-input');
-      const itemsToSearch = document.querySelectorAll('.searchable');
-
-      if (searchInput) {
-        searchInput.addEventListener('input', (e) => {
-          const searchTerm = e.target.value.toLowerCase().trim();
-
-          itemsToSearch.forEach(item => {
-            const text = item.textContent.toLowerCase();
-            item.style.display = text.includes(searchTerm) ? '' : 'none';
-          });
-        });
-      }
-
-      const roomCards = document.querySelectorAll('.room-card');
-      roomCards.forEach(card => {
-        card.addEventListener('click', (e) => {
-          e.preventDefault();
-          roomCards.forEach(c => c.classList.remove('selected'));
-          card.classList.add('selected');
-          
-          // Redirecionar para passo 2 após 300ms
-          setTimeout(() => {
-            window.location.href = '/templates/passo02reservaprof.html';
-          }, 300);
-        });
-      });
-
       const menuToggle = document.getElementById('menuToggle');
       const sidebar = document.querySelector('.sidebar');
       const sidebarOverlay = document.getElementById('sidebarOverlay');
@@ -255,6 +166,103 @@
         });
       }
 
+      // --- Ícone por categoria ---
+      function iconeDaCategoria(categoria) {
+        const cat = (categoria || '').toLowerCase();
+        if (cat.includes('laborat')) return '/assets/icons/computer.png';
+        if (cat.includes('gabinete')) return '/assets/icons/shopping-cart.png';
+        return '/assets/icons/classroom.png';
+      }
+
+      let filtroAtual = 'todas';
+
+      function renderReservas() {
+        const lista = ReservasApp.getReservas();
+        const listaEl = document.getElementById('reservasList');
+        const emptyEl = document.getElementById('reservasEmpty');
+
+        const filtradas = filtroAtual === 'todas'
+          ? lista
+          : lista.filter((r) => r.status === filtroAtual);
+
+        if (lista.length === 0) {
+          listaEl.innerHTML = '';
+          emptyEl.style.display = 'flex';
+          return;
+        }
+
+        emptyEl.style.display = 'none';
+
+        if (filtradas.length === 0) {
+          listaEl.innerHTML = '<p style="color:#6B7280;font-size:13px;padding:12px 4px;">Nenhuma reserva encontrada para este filtro.</p>';
+          return;
+        }
+
+        listaEl.innerHTML = filtradas.map((r) => {
+          const info = ReservasApp.statusInfo(r.status);
+          const dataFormatada = ReservasApp.formatDateBR(r.data);
+          const horario = ReservasApp.formatHorario(r.horaEntrada, r.horaSaida);
+
+          return `
+            <div class="reserva-card searchable" data-id="${r.id}">
+              <div class="reserva-left">
+                <div class="reserva-icon">
+                  <img src="${iconeDaCategoria(r.categoria)}" alt="">
+                </div>
+                <div class="reserva-info">
+                  <h4>${r.item || r.categoria}</h4>
+                  <p>${r.curso ? r.curso + ' · ' : ''}${r.professor || ''}</p>
+                  <div class="reserva-meta">
+                    <p>${dataFormatada}</p>
+                    <p>${horario}</p>
+                  </div>
+                </div>
+              </div>
+              <div class="reserva-right">
+                <span class="${info.badgeClass}">${info.label}</span>
+                <button class="btn-cancelar-reserva" data-cancel-id="${r.id}">Cancelar Reserva</button>
+              </div>
+            </div>
+          `;
+        }).join('');
+      }
+
+      // --- Filtros ---
+      const filterTabs = document.querySelectorAll('.filter-tab');
+      filterTabs.forEach((tab) => {
+        tab.addEventListener('click', () => {
+          filterTabs.forEach((t) => t.classList.remove('active'));
+          tab.classList.add('active');
+          filtroAtual = tab.dataset.filter;
+          renderReservas();
+        });
+      });
+
+      // --- Cancelar reserva (delegação de evento) ---
+      document.getElementById('reservasList').addEventListener('click', (e) => {
+        const btn = e.target.closest('[data-cancel-id]');
+        if (!btn) return;
+
+        const confirmar = window.confirm('Tem certeza que deseja cancelar esta reserva?');
+        if (!confirmar) return;
+
+        ReservasApp.cancelReserva(btn.dataset.cancelId);
+        renderReservas();
+      });
+
+      // --- Busca ---
+      const searchInput = document.getElementById('search-input');
+      if (searchInput) {
+        searchInput.addEventListener('input', (e) => {
+          const termo = e.target.value.toLowerCase().trim();
+          document.querySelectorAll('.reserva-card').forEach((card) => {
+            const texto = card.textContent.toLowerCase();
+            card.style.display = texto.includes(termo) ? '' : 'none';
+          });
+        });
+      }
+
+      renderReservas();
     });
   </script>
 </body>
