@@ -1,9 +1,9 @@
 from fastapi import FastAPI, HTTPException
-
+from fastapi.responses import FileResponse
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 
 from db import supabase
-
 from model import (
     Usuario,
     Sala,
@@ -17,6 +17,9 @@ from model import (
 # ============================================================
 
 app = FastAPI()
+app.mount("/css", StaticFiles(directory="static/css"), name="css")
+app.mount("/js", StaticFiles(directory="static/js"), name="js")
+app.mount("/assets", StaticFiles(directory="static/assets"), name="assets")
 
 
 # ============================================================
@@ -29,6 +32,35 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+
+# ============================================================
+# PÁGINAS
+# ============================================================
+
+@app.get("/")
+def login():
+    return FileResponse("templates/login.html")
+
+
+@app.get("/home")
+def home():
+    return FileResponse("templates/paginainicialprofessor.html")
+
+
+@app.get("/home_admin")
+def home():
+    return FileResponse("templates/paginainicialadm.html")
+
+
+@app.get("/cadastro")
+def home():
+    return FileResponse("templates/cadastro.html")
+
+
+@app.get("/redefinir_senha")
+def home():
+    return FileResponse("templates/redefsenha.html")
 
 
 # ============================================================
@@ -67,7 +99,7 @@ def listar_usuarios():
 @app.post("/usuarios")
 def cadastrar_usuario(usuario: Usuario):
 
-    # Verifica se já existe um usuário com esse e-mail
+    # Verifica se o email já existe
     resposta = (
         supabase
         .table("usuarios")
@@ -76,14 +108,14 @@ def cadastrar_usuario(usuario: Usuario):
         .execute()
     )
 
-    # Se encontrou algum usuário
     if resposta.data:
+
         raise HTTPException(
             status_code=400,
             detail="Usuário já cadastrado"
         )
 
-    # Se não existe, cadastra
+    # Cadastra o usuário
     resposta = (
         supabase
         .table("usuarios")
@@ -92,14 +124,18 @@ def cadastrar_usuario(usuario: Usuario):
     )
 
     if not resposta.data:
+
         raise HTTPException(
             status_code=400,
             detail="Erro ao cadastrar usuário"
         )
 
-    usuario_cadastrado = Usuario.fromJson(resposta.data[0])
+    usuario_cadastrado = Usuario.fromJson(
+        resposta.data[0]
+    )
 
     return usuario_cadastrado.toJson()
+
 
 # ============================================================
 # SALAS

@@ -1,54 +1,108 @@
 <!DOCTYPE html>
+
 <html lang="pt-BR">
+
 <head>
+
     <meta charset="UTF-8">
+
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
     <link rel="stylesheet" href="/css/login.css">
-    <title>Login - Gestão de salas e equipamentos</title>
+
+    <title>
+        Login - Gestão de salas e equipamentos
+    </title>
+
 </head>
+
+
 <body>
+
     <div class="container">
-        <div class="logo"> 
-            <img src="/assets/img/Logo senai.png">
+
+        <div class="logo">
+
+            <img src="/assets/img/Logo senai.png" alt="Logo SENAI">
+
         </div>
+
+
         <div class="hr"></div>
+
+
         <div class="form-container">
-            <h2>Gestão de salas e equipamentos</h2>
-            <form action="/templates/paginainicialprofessor.html">
+
+            <h2>
+                Gestão de salas e equipamentos
+            </h2>
+
+
+            <form>
+
+                <!-- EMAIL -->
 
                 <div class="input-container">
-                    <i class="bi bi-person-circle"></i>
-                    <input type="text" placeholder="Nome completo...">
-                </div>
 
-                <div class="input-container">
                     <i class="bi bi-envelope"></i>
-                    <input type="email" placeholder="Email...">
+
+                    <input type="email" id="email" placeholder="Email..." required>
+
                 </div>
+
+
+                <!-- SENHA -->
 
                 <div class="input-container">
+
                     <i class="bi bi-lock"></i>
-                    <input type="password" placeholder="Senha...">
+
+                    <input type="password" id="senha" placeholder="Senha..." required>
+
                 </div>
 
-                <button type="button" onclick="window.location.href='/templates/paginainicialprofessor.html'">Entrar</button>
+
+                <!-- BOTÃO -->
+
+                <button type="submit">
+                    Entrar
+                </button>
+
             </form>
 
-            <div class="links">
-                <p><a href="/templates/cadastro.html">Não possui conta? Cadastre-se</a></p>
 
-                <p><a href="/templates/esqueceu_senha.html">Esqueci minha senha</a></p>
+            <div class="links">
+
+                <p>
+
+                    <a href="/cadastro">
+                        Não possui conta? Cadastre-se
+                    </a>
+
+                </p>
+
+
+                <p>
+
+                    <a href="/redefinir_senha">
+                        Esqueci minha senha
+                    </a>
+
+                </p>
+
             </div>
 
-            <div class="divider">ou</div>
-            <button class="google-btn">
-                <p>...</p>
-            </button>
         </div>
+
     </div>
 
-    <script type="module" src="../js/cadastro.js"></script>
+
+    <!-- JAVASCRIPT -->
+
+    <script type="module" src="/js/login.js"></script>
 
 </body>
+
 </html>

@@ -19,14 +19,26 @@ async function entrar(event) {
                 usuario.senha === senha
         );
 
+
+        // Usuário não encontrado
         if (!usuario) {
+
             alert("Email ou senha incorretos!");
+
             return;
         }
 
+
+        // Login realizado
         alert("Login realizado com sucesso!");
 
-        window.location.href = "index.html";
+        if (email === 'lthiegue@sp.senai.br') {
+            window.location.href = 'http://127.0.0.1:8000/home_admin'
+        }
+        else {
+            window.location.href = "http://127.0.0.1:8000/home";
+        }
+
 
     } catch (erro) {
 
