@@ -234,7 +234,7 @@ def reservas_admin():
     )
 
 @app.get("/passo2_reserva_prof")
-def passo02_reserva_prof():
+def passo2_reserva_prof():
     return FileResponse("templates/passo2reservaprof.html")
 
 
@@ -244,7 +244,7 @@ def passo02_reserva_prof():
 
 
 @app.get("/passo002_reserva_prof")
-def passo02_reserva_prof():
+def passo002_reserva_prof():
     return FileResponse("templates/passo002reservaprof.html")
 
 # ============================================================
