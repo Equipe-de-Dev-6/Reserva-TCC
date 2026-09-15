@@ -208,6 +208,28 @@ def escolher_reserva_gabinetes():
     )
 
 
+# ------------------------------------------------------------
+# AJUDA
+# ------------------------------------------------------------
+
+@app.get("/ajuda")
+def ajuda():
+    return FileResponse(
+        "templates/ajuda.html"
+    )
+
+@app.get("/avios")
+def ajuda():
+    return FileResponse(
+        "templates/avisos.html"
+    )
+
+@app.get("/configuracoes")
+def configuracoes():
+    return FileResponse(
+        "templates/configuracoes.html"
+    )
+
 # ============================================================
 # PÁGINAS DO ADMIN
 # ============================================================
@@ -258,6 +280,7 @@ def passo02_reserva_prof():
 @app.get("/passo03_reserva_prof")
 def passo02_reserva_prof():
     return FileResponse("templates/passo03reservaprof.html")
+
 
 @app.get("/passo003_reserva_prof")
 def passo02_reserva_prof():
