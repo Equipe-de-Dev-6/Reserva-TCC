@@ -28,7 +28,8 @@ html {
   scrollbar-gutter: stable;
 }
 
-body, html {
+html,
+body {
   height: 100vh;
   width: 100vw;
   overflow: hidden;
@@ -45,6 +46,10 @@ img {
   max-width: 100%;
 }
 
+/* ============================================================
+   APP
+   ============================================================ */
+
 .app-container {
   display: flex;
   height: 100vh;
@@ -52,7 +57,10 @@ img {
   position: relative;
 }
 
-/* ============ SIDEBAR ============ */
+/* ============================================================
+   SIDEBAR
+   ============================================================ */
+
 .sidebar {
   width: 250px;
   height: 100vh;
@@ -165,7 +173,10 @@ img {
   flex-shrink: 0;
 }
 
-/* ============ MAIN CONTENT ============ */
+/* ============================================================
+   MAIN CONTENT
+   ============================================================ */
+
 .main-content {
   flex: 1;
   height: 100vh;
@@ -176,6 +187,10 @@ img {
   scrollbar-gutter: stable;
   min-width: 0;
 }
+
+/* ============================================================
+   HEADER
+   ============================================================ */
 
 .header {
   display: flex;
@@ -317,7 +332,10 @@ img {
   margin: 6px 0;
 }
 
-/* ============ QUICK ACTIONS TITLE ============ */
+/* ============================================================
+   QUICK ACTIONS
+   ============================================================ */
+
 .quick-actions-section {
   margin-bottom: 24px;
 }
@@ -328,7 +346,10 @@ img {
   margin-bottom: 16px;
 }
 
-/* ============ BOOKING LAYOUT ============ */
+/* ============================================================
+   BOOKING LAYOUT
+   ============================================================ */
+
 .booking-layout {
   display: grid;
   grid-template-columns: 300px 1fr 64px;
@@ -336,7 +357,10 @@ img {
   align-items: start;
 }
 
-/* --- Categoria selecionada --- */
+/* ============================================================
+   CATEGORY CARD
+   ============================================================ */
+
 .category-card {
   background-color: var(--white);
   border: 1px solid var(--border-color);
@@ -374,7 +398,10 @@ img {
   line-height: 1.35;
 }
 
-/* ============ FORM CARD (Passo 02) ============ */
+/* ============================================================
+   FORM CARD
+   ============================================================ */
+
 .form-card {
   background-color: var(--white);
   border: 1px solid var(--border-color);
@@ -389,6 +416,7 @@ img {
     opacity: 0;
     transform: translateY(10px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -465,6 +493,10 @@ img {
   box-shadow: 0 0 0 3px rgba(227, 6, 19, 0.1);
 }
 
+/* ============================================================
+   FORM ACTIONS
+   ============================================================ */
+
 .form-actions {
   display: flex;
   justify-content: flex-end;
@@ -502,7 +534,10 @@ img {
   background-color: #CC0000;
 }
 
-/* --- Indicador de etapas --- */
+/* ============================================================
+   INDICADOR DE ETAPAS
+   ============================================================ */
+
 .step-indicator {
   display: flex;
   flex-direction: column;
@@ -543,12 +578,14 @@ img {
   background-color: var(--senai-red);
 }
 
-/* =====================================================
+/* ============================================================
    RESPONSIVO
-   ===================================================== */
+   ============================================================ */
 
-/* ---------- Tablets (≤ 1024px) ---------- */
+/* Tablets */
+
 @media (max-width: 1024px) {
+
   .search-container {
     width: 220px;
   }
@@ -580,9 +617,12 @@ img {
   }
 }
 
-/* ---------- Tablets pequenos / celular grande (≤ 860px) ---------- */
+/* Tablets pequenos / celular grande */
+
 @media (max-width: 860px) {
-  body, html {
+
+  body,
+  html {
     height: auto;
     overflow: visible;
   }
@@ -602,7 +642,7 @@ img {
     left: 0;
     top: 0;
     transform: translateX(-100%);
-    box-shadow: 4px 0 16px rgba(0,0,0,0.1);
+    box-shadow: 4px 0 16px rgba(0, 0, 0, 0.1);
     z-index: 300;
   }
 
@@ -667,8 +707,10 @@ img {
   }
 }
 
-/* ---------- Celulares (≤ 600px) ---------- */
+/* Celulares */
+
 @media (max-width: 600px) {
+
   .main-content {
     padding: 0 16px 16px;
   }
@@ -730,8 +772,10 @@ img {
   }
 }
 
-/* ---------- Celulares muito pequenos (≤ 380px) ---------- */
+/* Celulares muito pequenos */
+
 @media (max-width: 380px) {
+
   .sidebar {
     width: 220px;
   }
