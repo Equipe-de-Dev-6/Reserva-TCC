@@ -63,7 +63,7 @@
           </a>
 
           <!-- Configurações -->
-          <a href="#" class="nav-item">
+          <a href="/configuracoes" class="nav-item">
             <img src="/assets/icons/gear.png" alt="" width="20" height="20">
             Configurações
           </a>
@@ -73,7 +73,7 @@
         <div class="divider"></div>
 
         <!-- Ajuda -->
-        <a href="#" class="nav-item">
+        <a href="/ajuda" class="nav-item">
           <img src="/assets/icons/interrogation.png" alt="" width="20" height="20">
           Ajuda
         </a>
@@ -122,9 +122,11 @@
           <div class="user-profile" id="userProfile">
 
             <div class="avatar-link">
+
               <div class="avatar">
                 <img src="/assets/icons/user (3).png" alt="Perfil do Usuário" width="28" height="28">
               </div>
+
             </div>
 
             <div class="user-info">
@@ -139,7 +141,7 @@
               </a>
 
               <!-- Configurações -->
-              <a href="#" class="dropdown-item">
+              <a href="/configuracoes" class="dropdown-item">
                 Configurações
               </a>
 
@@ -290,9 +292,10 @@
         const listaEl = document.getElementById('reservasList');
         const emptyEl = document.getElementById('reservasEmpty');
 
-        const filtradas = filtroAtual === 'todas'
-          ? lista
-          : lista.filter((r) => r.status === filtroAtual);
+        const filtradas =
+          filtroAtual === 'todas'
+            ? lista
+            : lista.filter((r) => r.status === filtroAtual);
 
         if (lista.length === 0) {
 
@@ -300,6 +303,7 @@
           emptyEl.style.display = 'flex';
 
           return;
+
         }
 
         emptyEl.style.display = 'none';
@@ -310,6 +314,7 @@
             '<p style="color:#6B7280;font-size:13px;padding:12px 4px;">Nenhuma reserva encontrada para este filtro.</p>';
 
           return;
+
         }
 
         listaEl.innerHTML = filtradas.map((r) => {
@@ -325,60 +330,72 @@
               r.horaSaida
             );
 
-          const acoes = r.status === 'cancelada'
-            ? ''
-            : '<button class="btn-cancelar-reserva" data-cancel-id="' +
-            r.id +
-            '">Cancelar Reserva</button>';
+          const acoes =
+            r.status === 'cancelada'
+              ? ''
+              : '<button class="btn-cancelar-reserva" data-cancel-id="' +
+              r.id +
+              '">Cancelar Reserva</button>';
 
           return `
-                        <div class="reserva-card searchable" data-id="${r.id}">
 
-                            <div class="reserva-left">
+            <div
+              class="reserva-card searchable"
+              data-id="${r.id}"
+            >
 
-                                <div class="reserva-icon">
-                                    <img src="${iconeDaCategoria(r.categoria)}" alt="">
-                                </div>
+              <div class="reserva-left">
 
-                                <div class="reserva-info">
+                <div class="reserva-icon">
+                  <img
+                    src="${iconeDaCategoria(r.categoria)}"
+                    alt=""
+                  >
+                </div>
 
-                                    <h4>${r.item || r.categoria}</h4>
+                <div class="reserva-info">
 
-                                    <p>
-                                        ${r.curso ? r.curso + ' · ' : ''}
-                                        ${r.professor || ''}
-                                    </p>
+                  <h4>
+                    ${r.item || r.categoria}
+                  </h4>
 
-                                    <div class="reserva-meta">
+                  <p>
+                    ${r.curso ? r.curso + ' · ' : ''}
+                    ${r.professor || ''}
+                  </p>
 
-                                        <p>${dataFormatada}</p>
+                  <div class="reserva-meta">
 
-                                        <p>${horario}</p>
+                    <p>${dataFormatada}</p>
 
-                                    </div>
+                    <p>${horario}</p>
 
-                                </div>
+                  </div>
 
-                            </div>
+                </div>
 
-                            <div class="reserva-right">
+              </div>
 
-                                <span class="${info.badgeClass}">
-                                    ${info.label}
-                                </span>
+              <div class="reserva-right">
 
-                                ${acoes}
+                <span class="${info.badgeClass}">
+                  ${info.label}
+                </span>
 
-                                <button
-                                    class="btn-excluir-reserva"
-                                    data-delete-id="${r.id}">
-                                    Excluir
-                                </button>
+                ${acoes}
 
-                            </div>
+                <button
+                  class="btn-excluir-reserva"
+                  data-delete-id="${r.id}"
+                >
+                  Excluir
+                </button>
 
-                        </div>
-                    `;
+              </div>
+
+            </div>
+
+          `;
 
         }).join('');
 
@@ -427,6 +444,7 @@
             renderReservas();
 
             return;
+
           }
 
           const btn =
