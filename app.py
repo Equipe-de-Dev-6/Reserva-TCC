@@ -267,6 +267,11 @@ def avisos(request: Request):
         return RedirectResponse(url="/", status_code=302)
     return FileResponse("templates/avisos.html")
 
+@app.get("/avisos")
+def ajuda():
+    return FileResponse(
+        "templates/avisos.html"
+    )
 
 @app.get("/configuracoes")
 def configuracoes(request: Request):

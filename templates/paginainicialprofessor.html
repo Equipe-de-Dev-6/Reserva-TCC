@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 
 <html lang="pt-BR">
@@ -103,17 +104,15 @@
           </a>
 
 
-          <!-- Página: Recursos -->
+          <!-- Página: Avisos -->
 
-          <!-- Ainda sem página definida -->
+          <a href="/avisos" class="nav-item">
 
-          <div class="nav-item">
+            <img src="/assets/icons/warning.png" alt="" width="20" height="20">
 
-            <img src="/assets/icons/box.png" alt="" width="20" height="20">
+            Avisos
 
-            Recursos
-
-          </div>
+          </a>
 
 
           <!-- Página: Configurações -->
@@ -269,10 +268,7 @@
               <!-- Página: Configurações -->
 
               <div class="dropdown-item">
-                <a href="/configuracoes" class="nav-item">
-                  <img src="/assets/icons/gear.png" alt="" width="20" height="20">
-                  Configurações
-                </a>
+                Configurações
               </div>
 
 
@@ -537,76 +533,37 @@
               </h2>
 
 
-              <!-- Página: Notificações -->
+              <!-- Página: Avisos -->
 
-              <a href="/notificacoes_prof" class="ver-mais">
+              <a href="/avisos" class="ver-mais">
                 Ver mais ->
               </a>
 
             </div>
 
 
-            <!-- Página: Notificações -->
+            <div class="avisos-preview-list" id="avisosPreviewList">
 
-            <a href="/notificacoes_prof" class="notice-card searchable">
+              <!-- Renderizado dinamicamente via JS -->
 
-              <div class="notice-title">
+            </div>
 
-                <img src="/assets/icons/warning.png" alt="Laboratórios" width="24" height="24">
 
-                Manutenção programada
-
-              </div>
-
+            <div class="avisos-preview-empty" id="avisosPreviewEmpty" style="display: none;">
 
               <p>
-                Laboratório de mecânica 1 (D07)
-                indisponível em 27/08/2026
+
+                Nenhum aviso publicado ainda.
+
+                <!-- Página: Avisos -->
+
+                <a href="/avisos">
+                  Criar o primeiro aviso ->
+                </a>
+
               </p>
 
-            </a>
-
-
-            <!-- Página: Notificações -->
-
-            <a href="/notificacoes_prof" class="notice-card searchable">
-
-              <div class="notice-title">
-
-                <img src="/assets/icons/warning.png" alt="Laboratórios" width="24" height="24">
-
-                Manutenção programada
-
-              </div>
-
-
-              <p>
-                Laboratório de mecânica 1 (D07)
-                indisponível em 28/08/2026
-              </p>
-
-            </a>
-
-
-            <!-- Página: Notificações -->
-
-            <a href="/notificacoes_prof" class="notice-card searchable">
-
-              <div class="notice-title">
-
-                <img src="/assets/icons/warning.png" alt="Laboratórios" width="24" height="24">
-
-                Manutenção programada
-
-              </div>
-
-
-              <p>
-                Laboratório de mecânica 1 (D07)
-                indisponível em 29/08/2026
-              </p>
-
-            </a>
+            </div>
 
 
           </div>
@@ -629,6 +586,8 @@
        ======================================================== -->
 
   <script src="/js/reservas.js"></script>
+
+  <script src="/js/avisos.js"></script>
 
 
   <script>
@@ -994,6 +953,94 @@
         renderCalendarioWidget();
 
       });
+
+
+      // ======================================================
+      // AVISOS IMPORTANTES (PRÉVIA)
+      // ======================================================
+
+      function renderAvisosPreview() {
+
+        const listaEl =
+          document.getElementById(
+            'avisosPreviewList'
+          );
+
+
+        const emptyEl =
+          document.getElementById(
+            'avisosPreviewEmpty'
+          );
+
+
+        const todos =
+          AvisosApp.getAvisos();
+
+
+        // Mostra apenas os 3 avisos mais recentes na Página Inicial.
+        const recentes =
+          todos.slice(0, 3);
+
+
+        if (recentes.length === 0) {
+
+          listaEl.innerHTML = '';
+
+          emptyEl.style.display = 'block';
+
+          return;
+
+        }
+
+
+        emptyEl.style.display = 'none';
+
+
+        listaEl.innerHTML =
+          recentes.map(a => {
+
+            return `
+
+              <a
+                href="/avisos"
+                class="notice-card searchable"
+              >
+
+                <div class="notice-title">
+
+                  <img
+                    src="/assets/icons/warning.png"
+                    alt=""
+                    width="24"
+                    height="24"
+                  >
+
+                  ${a.titulo}
+
+                </div>
+
+
+                <p>
+                  ${a.descricao}
+                </p>
+
+              </a>
+
+            `;
+
+          }).join('');
+
+      }
+
+
+      renderAvisosPreview();
+
+
+      // ======================================================
+      // ATUALIZAÇÃO DOS AVISOS
+      // ======================================================
+
+      AvisosApp.subscribe(renderAvisosPreview);
 
 
       // ======================================================
