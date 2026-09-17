@@ -2,6 +2,12 @@ from fastapi import FastAPI, HTTPException
 from fastapi.responses import FileResponse
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
+from starlette.middleware.sessions import SessionMiddleware
+from starlette.requests import Request
+from fastapi.responses import RedirectResponse
+from consulta import consultar_usuario_por_email_senha
+from dotenv import load_dotenv
+import os
 
 from db import supabase
 from model import (
@@ -18,13 +24,9 @@ from model import (
 
 app = FastAPI()
 
-
 # ============================================================
 # ARQUIVOS ESTÁTICOS
 # ============================================================
-
-# A pasta física continua sendo "static",
-# mas a URL não possui "/static".
 
 app.mount(
     "/css",
@@ -56,6 +58,13 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# ============================================================
+# MIDDLEWARE DE SESSÃO
+# ============================================================
+load_dotenv()
+SUPABASE_KEY = os.getenv("SUPABASE_KEY")
+app.add_middleware(SessionMiddleware, secret_key=SUPABASE_KEY)
+
 
 # ============================================================
 # PÁGINAS
@@ -66,21 +75,63 @@ app.add_middleware(
 # ------------------------------------------------------------
 
 @app.get("/")
-def login():
-    return FileResponse(
-        "templates/login.html"
-    )
+async def inicio(request: Request):
+    if request.session.get("usuario"):
+        return RedirectResponse(
+            url="/home",
+            status_code=302
+        )
 
+    return FileResponse("templates/login.html")
+
+
+@app.post('/login')
+async def login_post(request: Request):
+    """Processa login do usuário"""
+    dados = await request.form()
+    email = dados.get('email')
+    senha = dados.get('senha')
+
+    # Busca o usuário com email E senha corretos
+    usuarios = consultar_usuario_por_email_senha(email, senha)
+
+    # Se não encontrou o usuário
+    if not usuarios:
+        return {'erro': 'Email ou senha incorretos'}
+
+    # Usuário encontrado - armazena na sessão
+    usuario = usuarios[0]
+    request.session["usuario_id"] = usuario["id"]
+    request.session["usuario_email"] = usuario["email"]
+    request.session["usuario_nome"] = usuario["nome"]
+    
+    # Verifica se é admin
+    if usuario["email"] == 'lthiegue@sp.senai.br':
+        return {'status': 'adm'}
+    else:
+        return {'status': 'prof'}
+
+
+@app.post("/logout")
+async def logout(request: Request):
+    # Encerra a sessão do usuário
+    request.session.clear()
+
+    # Redireciona para a página inicial
+    return RedirectResponse(
+        url="/",
+        status_code=303
+    )
 
 # ------------------------------------------------------------
 # INÍCIO PROFESSOR
 # ------------------------------------------------------------
 
 @app.get("/home")
-def home_professor():
-    return FileResponse(
-        "templates/paginainicialprofessor.html"
-    )
+def home_professor(request: Request):  # ✅ Precisa ter request
+    if "usuario_id" not in request.session:
+        return RedirectResponse(url="/", status_code=302)
+    return FileResponse("templates/paginainicialprofessor.html")
 
 
 # ------------------------------------------------------------
@@ -88,10 +139,11 @@ def home_professor():
 # ------------------------------------------------------------
 
 @app.get("/home_admin")
-def home_admin():
-    return FileResponse(
-        "templates/paginainicialadm.html"
-    )
+def home_admin(request: Request):
+    """Home do admin - protegida por sessão"""
+    if "usuario_id" not in request.session:
+        return RedirectResponse(url="/", status_code=302)
+    return FileResponse("templates/paginainicialadm.html")
 
 
 # ------------------------------------------------------------
@@ -100,9 +152,7 @@ def home_admin():
 
 @app.get("/cadastro")
 def cadastro():
-    return FileResponse(
-        "templates/cadastro.html"
-    )
+    return FileResponse("templates/cadastro.html")
 
 
 # ------------------------------------------------------------
@@ -111,9 +161,7 @@ def cadastro():
 
 @app.get("/redefinir_senha")
 def redefinir_senha():
-    return FileResponse(
-        "templates/redefsenha.html"
-    )
+    return FileResponse("templates/redefsenha.html")
 
 
 # ------------------------------------------------------------
@@ -122,9 +170,7 @@ def redefinir_senha():
 
 @app.get("/esqueceu_senha")
 def esqueceu_senha():
-    return FileResponse(
-        "templates/esqueceu_senha.html"
-    )
+    return FileResponse("templates/esqueceu_senha.html")
 
 
 # ============================================================
@@ -132,25 +178,21 @@ def esqueceu_senha():
 # ============================================================
 
 # ------------------------------------------------------------
-# RESERVAR
-# ------------------------------------------------------------
-
-@app.get("/reservar")
-def reservar():
-    return FileResponse(
-        "templates/reservar_tela_prof.html"
-    )
-
-
-# ------------------------------------------------------------
 # RESERVAS
 # ------------------------------------------------------------
 
-@app.get("/reservas_prof")
-def reservas_prof():
-    return FileResponse(
-        "templates/reservasprof.html"
-    )
+@app.get("/reservar")
+def reservar(request: Request):
+
+    # Verifica se o usuário está logado
+    if "usuario_id" not in request.session:
+        return RedirectResponse(
+            url="/",
+            status_code=302
+        )
+
+    # Abre a página de reservas
+    return FileResponse("templates/reservar_tela_prof.html")
 
 
 # ------------------------------------------------------------
@@ -158,10 +200,10 @@ def reservas_prof():
 # ------------------------------------------------------------
 
 @app.get("/calendario_prof")
-def calendario_prof():
-    return FileResponse(
-        "templates/calendarioprof.html"
-    )
+def calendario_prof(request: Request):
+    if "usuario_id" not in request.session:
+        return RedirectResponse(url="/", status_code=302)
+    return FileResponse("templates/calendarioprof.html")
 
 
 # ------------------------------------------------------------
@@ -169,10 +211,10 @@ def calendario_prof():
 # ------------------------------------------------------------
 
 @app.get("/notificacoes_prof")
-def notificacoes_prof():
-    return FileResponse(
-        "templates/notificacoesprof.html"
-    )
+def notificacoes_prof(request: Request):
+    if "usuario_id" not in request.session:
+        return RedirectResponse(url="/", status_code=302)
+    return FileResponse("templates/notificacoesprof.html")
 
 
 # ------------------------------------------------------------
@@ -180,10 +222,10 @@ def notificacoes_prof():
 # ------------------------------------------------------------
 
 @app.get("/escolher_reserva_salas")
-def escolher_reserva_salas():
-    return FileResponse(
-        "templates/escolherreservaprof.html"
-    )
+def escolher_reserva_salas(request: Request):
+    if "usuario_id" not in request.session:
+        return RedirectResponse(url="/", status_code=302)
+    return FileResponse("templates/escolherreservaprof.html")
 
 
 # ------------------------------------------------------------
@@ -191,10 +233,10 @@ def escolher_reserva_salas():
 # ------------------------------------------------------------
 
 @app.get("/escolher_reserva_laboratorios")
-def escolher_reserva_laboratorios():
-    return FileResponse(
-        "templates/escolherreservaprof2.html"
-    )
+def escolher_reserva_laboratorios(request: Request):
+    if "usuario_id" not in request.session:
+        return RedirectResponse(url="/", status_code=302)
+    return FileResponse("templates/escolherreservaprof2.html")
 
 
 # ------------------------------------------------------------
@@ -202,10 +244,10 @@ def escolher_reserva_laboratorios():
 # ------------------------------------------------------------
 
 @app.get("/escolher_reserva_gabinetes")
-def escolher_reserva_gabinetes():
-    return FileResponse(
-        "templates/escolherreservaprof3.html"
-    )
+def escolher_reserva_gabinetes(request: Request):
+    if "usuario_id" not in request.session:
+        return RedirectResponse(url="/", status_code=302)
+    return FileResponse("templates/escolherreservaprof3.html")
 
 
 # ------------------------------------------------------------
@@ -213,22 +255,37 @@ def escolher_reserva_gabinetes():
 # ------------------------------------------------------------
 
 @app.get("/ajuda")
-def ajuda():
-    return FileResponse(
-        "templates/ajuda.html"
-    )
+def ajuda(request: Request):
+    if "usuario_id" not in request.session:
+        return RedirectResponse(url="/", status_code=302)
+    return FileResponse("templates/ajuda.html")
 
-@app.get("/avios")
-def ajuda():
-    return FileResponse(
-        "templates/avisos.html"
-    )
+
+@app.get("/avisos")
+def avisos(request: Request):
+    if "usuario_id" not in request.session:
+        return RedirectResponse(url="/", status_code=302)
+    return FileResponse("templates/avisos.html")
+
 
 @app.get("/configuracoes")
-def configuracoes():
-    return FileResponse(
-        "templates/configuracoes.html"
-    )
+def configuracoes(request: Request):
+    if "usuario_id" not in request.session:
+        return RedirectResponse(url="/", status_code=302)
+    return FileResponse("templates/configuracoes.html")
+
+
+# ============================================================
+# PÁGINAS DO ADMIN
+# ============================================================
+
+@app.get('/reservas_prof')
+def reservas_prof(request: Request):
+    if 'usuario_id' not in request.session:
+        return RedirectResponse(url='/', status_code=302)
+    return FileResponse('templates/reservasprof.html')
+
+
 
 # ============================================================
 # PÁGINAS DO ADMIN
@@ -239,10 +296,10 @@ def configuracoes():
 # ------------------------------------------------------------
 
 @app.get("/reservar_admin")
-def reservar_admin():
-    return FileResponse(
-        "templates/reservar_tela_adm.html"
-    )
+def reservar_admin(request: Request):
+    if "usuario_id" not in request.session:
+        return RedirectResponse(url="/", status_code=302)
+    return FileResponse("templates/reservar_tela_adm.html")
 
 
 # ------------------------------------------------------------
@@ -250,23 +307,30 @@ def reservar_admin():
 # ------------------------------------------------------------
 
 @app.get("/reservas_admin")
-def reservas_admin():
-    return FileResponse(
-        "templates/reservasadm.html"
-    )
+def reservas_admin(request: Request):
+    if "usuario_id" not in request.session:
+        return RedirectResponse(url="/", status_code=302)
+    return FileResponse("templates/reservasadm.html")
+
 
 @app.get("/passo2_reserva_prof")
-def passo2_reserva_prof():
+def passo2_reserva_prof(request: Request):
+    if "usuario_id" not in request.session:
+        return RedirectResponse(url="/", status_code=302)
     return FileResponse("templates/passo2reservaprof.html")
 
 
 @app.get("/passo02_reserva_prof")
-def passo02_reserva_prof():
+def passo02_reserva_prof(request: Request):
+    if "usuario_id" not in request.session:
+        return RedirectResponse(url="/", status_code=302)
     return FileResponse("templates/passo02reservaprof.html")
 
 
 @app.get("/passo002_reserva_prof")
-def passo002_reserva_prof():
+def passo002_reserva_prof(request: Request):
+    if "usuario_id" not in request.session:
+        return RedirectResponse(url="/", status_code=302)
     return FileResponse("templates/passo002reservaprof.html")
 
 # ============================================================
@@ -274,16 +338,23 @@ def passo002_reserva_prof():
 # ============================================================
 
 @app.get("/passo3_reserva_prof")
-def passo02_reserva_prof():
+def passo3_reserva_prof(request: Request):
+    if "usuario_id" not in request.session:
+        return RedirectResponse(url="/", status_code=302)
     return FileResponse("templates/passo3reservaprof.html")
 
+
 @app.get("/passo03_reserva_prof")
-def passo02_reserva_prof():
+def passo03_reserva_prof(request: Request):
+    if "usuario_id" not in request.session:
+        return RedirectResponse(url="/", status_code=302)
     return FileResponse("templates/passo03reservaprof.html")
 
 
 @app.get("/passo003_reserva_prof")
-def passo02_reserva_prof():
+def passo003_reserva_prof(request: Request):
+    if "usuario_id" not in request.session:
+        return RedirectResponse(url="/", status_code=302)
     return FileResponse("templates/passo003reservaprof.html")
 
 # ============================================================
