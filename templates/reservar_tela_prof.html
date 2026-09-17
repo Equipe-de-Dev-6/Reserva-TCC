@@ -2,7 +2,6 @@
 <html lang="pt-BR">
 
 <head>
-
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
@@ -12,65 +11,61 @@
     rel="stylesheet">
 
   <link rel="stylesheet" href="https://www.flaticon.com/flaticon.css">
-
   <link rel="stylesheet" href="/css/reservar_tela_prof.css">
-
 </head>
 
 <body>
-
   <div class="app-container">
 
     <div class="sidebar-overlay" id="sidebarOverlay"></div>
 
     <aside class="sidebar">
-
       <div class="sidebar-top">
 
-        <!-- Página: Reservar -->
-        <a href="/reservar" class="logo">
+        <!-- Logo -->
+        <a href="/home" class="logo">
           <img src="/assets/img/Logo senai.png" alt="SENAI">
         </a>
 
         <nav class="nav-menu">
 
-          <!-- Página: Início -->
+          <!-- Início -->
           <a href="/home" class="nav-item">
             <img src="/assets/icons/home.png" alt="" width="20" height="20">
             Início
           </a>
 
-          <!-- Página: Reservar -->
+          <!-- Reservar -->
           <a href="/reservar" class="nav-item active">
             <img src="/assets/icons/restaurant.png" alt="" width="20" height="20">
             Reservar
           </a>
 
-          <!-- Página: Reservas -->
+          <!-- Reservas -->
           <a href="/reservas_prof" class="nav-item">
             <img src="/assets/icons/reserved.png" alt="" width="20" height="20">
             Reservas
           </a>
 
-          <!-- Página: Calendário -->
+          <!-- Calendário -->
           <a href="/calendario_prof" class="nav-item">
             <img src="/assets/icons/calendar.png" alt="" width="20" height="20">
             Calendário
           </a>
 
-          <!-- Página: Notificações -->
+          <!-- Notificações -->
           <a href="/notificacoes_prof" class="nav-item">
             <img src="/assets/icons/notification.png" alt="" width="20" height="20">
             Notificações
           </a>
 
-          <!-- Página: Avisos -->
+          <!-- Avisos -->
           <a href="/avisos" class="nav-item">
             <img src="/assets/icons/warning.png" alt="" width="20" height="20">
             Avisos
           </a>
 
-          <!-- Página: Configurações -->
+          <!-- Configurações -->
           <a href="/configuracoes" class="nav-item">
             <img src="/assets/icons/gear.png" alt="" width="20" height="20">
             Configurações
@@ -80,7 +75,7 @@
 
         <div class="divider"></div>
 
-        <!-- Página: Ajuda -->
+        <!-- Ajuda -->
         <a href="/ajuda" class="nav-item">
           <img src="/assets/icons/interrogation.png" alt="" width="20" height="20">
           Ajuda
@@ -88,18 +83,18 @@
 
       </div>
 
-      <!-- Página: Login -->
+      <!-- Logout -->
       <form method="POST" action="/logout" class="logout-form">
         <button type="submit" class="btn-logout">
           <img src="/assets/icons/exit.png" alt="" width="20" height="20">
           Sair
         </button>
       </form>
-
     </aside>
 
     <main class="main-content">
 
+      <!-- Cabeçalho -->
       <header class="header">
 
         <button class="menu-toggle" id="menuToggle" aria-label="Abrir menu">
@@ -110,206 +105,185 @@
         </button>
 
         <div class="greeting">
-
-          <h1>
-            Olá Thiago!
-          </h1>
-
-          <p>
-            Gerencie suas reservas e faça novos agendamentos
-          </p>
-
+          <h1>Olá, <span id="nomeUsuario">Usuário</span>!</h1>
+          <p>Gerencie suas reservas e faça novos agendamentos</p>
         </div>
 
         <div class="header-actions">
 
+          <!-- Pesquisa -->
           <div class="search-container">
-
             <svg width="18" height="18" fill="none" stroke="#6b7280" stroke-width="2" viewBox="0 0 24 24">
               <path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
             </svg>
 
             <input type="text" id="search-input" placeholder="Buscar salas, carrinhos, laboratórios...">
-
           </div>
 
-          <!-- Página: Notificações -->
+          <!-- Notificações -->
           <a href="/notificacoes_prof" class="icon-btn">
             <img src="/assets/icons/notification (2).png" alt="Notificações" width="20" height="20">
           </a>
 
+          <!-- Perfil -->
           <div class="user-profile" id="userProfile">
 
             <div class="avatar-link">
-
               <div class="avatar">
-
                 <img src="/assets/icons/user (3).png" alt="Perfil do Usuário" width="28" height="28">
-
               </div>
-
             </div>
 
             <div class="user-info">
-
-              <span class="name">
-                Thiago
-              </span>
-
-              <span class="role">
-                Professor
-              </span>
-
+              <span class="name" id="nomePerfil">Usuário</span>
+              <span class="role">Professor</span>
             </div>
 
+            <!-- Dropdown -->
             <div class="user-dropdown" id="userDropdown">
 
-              <!-- Página: Minhas Reservas -->
               <a href="/reservas_prof" class="dropdown-item">
                 Minhas Reservas
               </a>
 
-              <!-- Página: Configurações -->
               <a href="/configuracoes" class="dropdown-item">
                 Configurações
               </a>
 
               <div class="dropdown-divider"></div>
 
-              <!-- Página: Login -->
               <form method="POST" action="/logout">
-                <button type="submit">
+                <button type="submit" class="dropdown-item logout">
                   Sair
                 </button>
               </form>
 
             </div>
-
           </div>
-
         </div>
-
       </header>
 
+      <!-- Ações de reserva -->
       <section class="quick-actions-section">
 
-        <h2>
-          O que você deseja reservar hoje?
-        </h2>
+        <h2>O que você deseja reservar hoje?</h2>
 
         <div class="cards-grid-large">
 
-          <!-- Página: Escolher Reserva - Salas -->
+          <!-- Salas -->
           <div class="large-action-card">
-
             <div class="card-text-top">
-
-              <h3>
-                Salas de aula, reuniões e treinamentos
-              </h3>
-
+              <h3>Salas de aula, reuniões e treinamentos</h3>
               <p>
                 Escolha espaços para aulas, reuniões e atividades
                 de treinamento.
               </p>
-
             </div>
 
             <div class="card-large-icon">
-
               <img src="/assets/icons/classroom.png" alt="Salas">
-
             </div>
 
             <a href="/escolher_reserva_salas" class="btn-ver-opcoes">
               Ver opções &rarr;
             </a>
-
           </div>
 
-          <!-- Página: Escolher Reserva - Laboratórios -->
+          <!-- Laboratórios -->
           <div class="large-action-card">
-
             <div class="card-text-top">
-
               <h3>
                 Laboratórios de informática, automação,
                 mecânica e outros
               </h3>
-
               <p>
                 Acesse laboratórios com equipamentos
                 especializados para práticas e projetos.
               </p>
-
             </div>
 
             <div class="card-large-icon">
-
               <img src="/assets/icons/computer.png" alt="Laboratórios">
-
             </div>
 
             <a href="/escolher_reserva_laboratorios" class="btn-ver-opcoes">
               Ver opções &rarr;
             </a>
-
           </div>
 
-          <!-- Página: Escolher Reserva - Gabinetes -->
+          <!-- Gabinetes -->
           <div class="large-action-card">
-
             <div class="card-text-top">
-
-              <h3>
-                Gabinetes de notebooks e equipamentos móveis
-              </h3>
-
+              <h3>Gabinetes de notebooks e equipamentos móveis</h3>
               <p>
                 Reserve gabinetes e equipamentos para atividades
                 móveis e em campo.
               </p>
-
             </div>
 
             <div class="card-large-icon">
-
               <img src="/assets/icons/shopping-cart.png" alt="Gabinetes">
-
             </div>
 
             <a href="/escolher_reserva_gabinetes" class="btn-ver-opcoes">
               Ver opções &rarr;
             </a>
-
           </div>
 
         </div>
-
       </section>
-
     </main>
-
   </div>
 
   <script>
-
     document.addEventListener('DOMContentLoaded', () => {
+
+      // ======================================================
+      // NOME DINÂMICO DO USUÁRIO LOGADO PELA SESSÃO
+      // ======================================================
+
+      async function carregarUsuario() {
+        const nomeUsuario = document.getElementById('nomeUsuario');
+        const nomePerfil = document.getElementById('nomePerfil');
+
+        try {
+          const resposta = await fetch('/usuario-logado', {
+            method: 'GET',
+            credentials: 'same-origin'
+          });
+
+          if (!resposta.ok) {
+            throw new Error('Erro ao consultar usuário logado');
+          }
+
+          const usuario = await resposta.json();
+
+          if (usuario.nome) {
+            if (nomeUsuario) {
+              nomeUsuario.textContent = usuario.nome;
+            }
+
+            if (nomePerfil) {
+              nomePerfil.textContent = usuario.nome;
+            }
+          }
+
+        } catch (erro) {
+          console.error('Erro ao carregar usuário:', erro);
+        }
+      }
+
+      carregarUsuario();
 
       // ======================================================
       // DROPDOWN DO USUÁRIO
       // ======================================================
 
-      const userProfile =
-        document.getElementById('userProfile');
-
-      const userDropdown =
-        document.getElementById('userDropdown');
+      const userProfile = document.getElementById('userProfile');
+      const userDropdown = document.getElementById('userDropdown');
 
       if (userProfile && userDropdown) {
-
         userProfile.addEventListener('click', (e) => {
-
           e.stopPropagation();
 
           if (userDropdown.contains(e.target)) {
@@ -317,112 +291,64 @@
           }
 
           userDropdown.classList.toggle('active');
-
         });
 
         document.addEventListener('click', (e) => {
-
           if (!userProfile.contains(e.target)) {
             userDropdown.classList.remove('active');
           }
-
         });
-
       }
 
       // ======================================================
       // PESQUISA
       // ======================================================
 
-      const searchInput =
-        document.getElementById('search-input');
-
-      const cards =
-        document.querySelectorAll('.large-action-card');
+      const searchInput = document.getElementById('search-input');
+      const cards = document.querySelectorAll('.large-action-card');
 
       if (searchInput) {
-
         searchInput.addEventListener('input', (e) => {
-
-          const searchTerm =
-            e.target.value
-              .toLowerCase()
-              .trim();
+          const searchTerm = e.target.value.toLowerCase().trim();
 
           cards.forEach(card => {
-
-            const titleElement =
-              card.querySelector('h3');
-
-            const descElement =
-              card.querySelector('p');
+            const titleElement = card.querySelector('h3');
+            const descElement = card.querySelector('p');
 
             if (titleElement && descElement) {
+              const title = titleElement.textContent.toLowerCase();
+              const description = descElement.textContent.toLowerCase();
 
-              const title =
-                titleElement.textContent.toLowerCase();
-
-              const description =
-                descElement.textContent.toLowerCase();
-
-              if (
-                title.includes(searchTerm) ||
-                description.includes(searchTerm)
-              ) {
-
-                card.style.display = 'flex';
-
-              } else {
-
-                card.style.display = 'none';
-
-              }
-
+              card.style.display =
+                title.includes(searchTerm) || description.includes(searchTerm)
+                  ? 'flex'
+                  : 'none';
             }
-
           });
-
         });
-
       }
 
       // ======================================================
       // MENU MOBILE
       // ======================================================
 
-      const menuToggle =
-        document.getElementById('menuToggle');
+      const menuToggle = document.getElementById('menuToggle');
+      const sidebar = document.querySelector('.sidebar');
+      const sidebarOverlay = document.getElementById('sidebarOverlay');
 
-      const sidebar =
-        document.querySelector('.sidebar');
-
-      const sidebarOverlay =
-        document.getElementById('sidebarOverlay');
-
-      if (
-        menuToggle &&
-        sidebar &&
-        sidebarOverlay
-      ) {
-
+      if (menuToggle && sidebar && sidebarOverlay) {
         menuToggle.addEventListener('click', () => {
-
           sidebar.classList.toggle('open');
           sidebarOverlay.classList.toggle('active');
-
         });
 
         sidebarOverlay.addEventListener('click', () => {
-
           sidebar.classList.remove('open');
           sidebarOverlay.classList.remove('active');
-
         });
-
       }
 
     });
-
   </script>
 
 </body>
