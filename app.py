@@ -123,6 +123,22 @@ async def logout(request: Request):
         status_code=303
     )
 
+@app.get("/usuario-logado")
+async def usuario_logado(request: Request):
+    """Retorna os dados do usuário armazenados na sessão"""
+
+    nome = request.session.get("usuario_nome")
+
+    if not nome:
+        raise HTTPException(
+            status_code=401,
+            detail="Usuário não autenticado"
+        )
+
+    return {
+        "nome": nome
+    }
+
 # ------------------------------------------------------------
 # INÍCIO PROFESSOR
 # ------------------------------------------------------------
