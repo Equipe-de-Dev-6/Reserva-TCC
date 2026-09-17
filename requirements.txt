@@ -1,4 +1,6 @@
-fastapi
-uvicorn
+fastapi[standard]
 supabase
 python-dotenv
+itsdangerous
+python-jose
+python-multipart

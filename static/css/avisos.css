@@ -28,8 +28,7 @@ html {
   scrollbar-gutter: stable;
 }
 
-html,
-body {
+body, html {
   height: 100vh;
   width: 100vw;
   overflow: hidden;
@@ -46,9 +45,9 @@ img {
   max-width: 100%;
 }
 
-/* ============================================================
-   APP
-   ============================================================ */
+button {
+  font-family: 'Inter', sans-serif;
+}
 
 .app-container {
   display: flex;
@@ -57,10 +56,7 @@ img {
   position: relative;
 }
 
-/* ============================================================
-   SIDEBAR
-   ============================================================ */
-
+/* ============ SIDEBAR ============ */
 .sidebar {
   width: 250px;
   height: 100vh;
@@ -173,10 +169,7 @@ img {
   flex-shrink: 0;
 }
 
-/* ============================================================
-   MAIN CONTENT
-   ============================================================ */
-
+/* ============ MAIN CONTENT ============ */
 .main-content {
   flex: 1;
   height: 100vh;
@@ -187,10 +180,6 @@ img {
   scrollbar-gutter: stable;
   min-width: 0;
 }
-
-/* ============================================================
-   HEADER
-   ============================================================ */
 
 .header {
   display: flex;
@@ -332,101 +321,75 @@ img {
   margin: 6px 0;
 }
 
-/* ============================================================
-   QUICK ACTIONS
-   ============================================================ */
-
-.quick-actions-section {
-  margin-bottom: 24px;
+/* ============ CABEÇALHO DA PÁGINA AVISOS ============ */
+.avisos-section {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
 }
 
-.quick-actions-section h2 {
-  font-size: 16px;
+.avisos-page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.avisos-page-header h2 {
+  font-size: 20px;
+  font-weight: 800;
+  margin-bottom: 4px;
+}
+
+.avisos-page-header p {
+  font-size: 13px;
+  color: var(--text-gray);
+}
+
+.btn-criar-aviso {
+  background-color: var(--senai-red);
+  color: var(--white);
+  border: none;
+  padding: 12px 20px;
+  border-radius: 8px;
+  font-size: 13px;
   font-weight: 700;
-  margin-bottom: 16px;
+  cursor: pointer;
+  transition: 0.2s;
+  flex-shrink: 0;
+  white-space: nowrap;
 }
 
-/* ============================================================
-   BOOKING LAYOUT
-   ============================================================ */
-
-.booking-layout {
-  display: grid;
-  grid-template-columns: 300px 1fr 64px;
-  gap: 24px;
-  align-items: start;
+.btn-criar-aviso:hover {
+  background-color: #CC0000;
 }
 
-/* ============================================================
-   CATEGORY CARD
-   ============================================================ */
-
-.category-card {
+/* ============ FORMULÁRIO DE NOVO AVISO ============ */
+.aviso-form-card {
   background-color: var(--white);
   border: 1px solid var(--border-color);
   border-radius: 12px;
   padding: 24px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
-  gap: 16px;
+  margin-bottom: 20px;
+  display: none;
+  animation: fadeInUp 0.3s ease;
 }
 
-.category-icon {
-  width: 170px;
-  height: 190px;
-  background-color: var(--senai-red);
-  border-radius: 8px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-}
-
-.category-icon img {
-  width: 90px;
-  height: auto;
-  object-fit: contain;
-  filter: brightness(0) invert(1);
-}
-
-.category-card h3 {
-  font-size: 16px;
-  font-weight: 700;
-  color: var(--text-dark);
-  line-height: 1.35;
-}
-
-/* ============================================================
-   FORM CARD
-   ============================================================ */
-
-.form-card {
-  background-color: var(--white);
-  border: 1px solid var(--border-color);
-  border-radius: 12px;
-  padding: 28px 32px;
-  min-width: 0;
-  animation: fadeInUp 0.35s ease;
+.aviso-form-card.active {
+  display: block;
 }
 
 @keyframes fadeInUp {
-  from {
-    opacity: 0;
-    transform: translateY(10px);
-  }
-
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 .form-title {
-  font-size: 18px;
+  font-size: 16px;
   font-weight: 800;
-  color: var(--text-dark);
   margin-bottom: 6px;
 }
 
@@ -493,10 +456,6 @@ img {
   box-shadow: 0 0 0 3px rgba(227, 6, 19, 0.1);
 }
 
-/* ============================================================
-   FORM ACTIONS
-   ============================================================ */
-
 .form-actions {
   display: flex;
   justify-content: flex-end;
@@ -534,58 +493,107 @@ img {
   background-color: #CC0000;
 }
 
-/* ============================================================
-   INDICADOR DE ETAPAS
-   ============================================================ */
-
-.step-indicator {
+/* ============ LISTA DE AVISOS ============ */
+.avisos-list {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  gap: 0;
-  padding-top: 4px;
+  gap: 12px;
+  padding-bottom: 12px;
 }
 
-.step {
-  width: 44px;
-  height: 44px;
-  border-radius: 50%;
+.notice-card {
+  background: var(--white);
+  padding: 14px 16px;
+  border-radius: 8px;
+  border-left: 4px solid var(--senai-red);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+  transition: transform 0.2s;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.notice-card:hover {
+  transform: translateX(2px);
+}
+
+.notice-card-main {
+  min-width: 0;
+  flex: 1;
+}
+
+.notice-title {
   display: flex;
   align-items: center;
-  justify-content: center;
-  font-size: 13px;
+  gap: 6px;
+  font-size: 14px;
   font-weight: 700;
-  background-color: #E5E7EB;
-  color: #9CA3AF;
-  flex-shrink: 0;
-  transition: background-color 0.3s, color 0.3s;
+  margin-bottom: 4px;
 }
 
-.step.active {
-  background-color: var(--senai-red);
+.notice-card p {
+  font-size: 12px;
+  color: var(--text-gray);
+  line-height: 1.4;
+}
+
+.notice-card .notice-data {
+  font-size: 11px;
+  color: var(--text-gray);
+  margin-top: 6px;
+  font-weight: 600;
+}
+
+.btn-excluir-aviso {
+  border: 1px solid #d1d5db;
+  background-color: var(--white);
+  color: #374151;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 7px 14px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: 0.2s;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.btn-excluir-aviso:hover {
+  background-color: #374151;
+  border-color: #374151;
   color: var(--white);
 }
 
-.step-line {
-  width: 2px;
-  flex: 1;
-  min-height: 32px;
-  background-color: var(--border-color);
-  transition: background-color 0.3s;
+/* ============ ESTADO VAZIO ============ */
+.avisos-empty {
+  background-color: var(--white);
+  border: 1px dashed var(--border-color);
+  border-radius: 12px;
+  padding: 48px 24px;
+  text-align: center;
+  color: var(--text-gray);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
 }
 
-.step-line.active-line {
-  background-color: var(--senai-red);
+.avisos-empty img {
+  width: 48px;
+  opacity: 0.6;
 }
 
-/* ============================================================
+.avisos-empty p {
+  font-size: 14px;
+  max-width: 320px;
+}
+
+/* =====================================================
    RESPONSIVO
-   ============================================================ */
-
-/* Tablets */
-
+   ===================================================== */
 @media (max-width: 1024px) {
-
   .search-container {
     width: 220px;
   }
@@ -597,32 +605,10 @@ img {
   .main-content {
     padding: 0 20px 20px;
   }
-
-  .booking-layout {
-    grid-template-columns: 240px 1fr 56px;
-    gap: 16px;
-  }
-
-  .category-icon {
-    width: 130px;
-    height: 150px;
-  }
-
-  .category-icon img {
-    width: 70px;
-  }
-
-  .form-card {
-    padding: 22px 24px;
-  }
 }
 
-/* Tablets pequenos / celular grande */
-
 @media (max-width: 860px) {
-
-  body,
-  html {
+  body, html {
     height: auto;
     overflow: visible;
   }
@@ -642,7 +628,7 @@ img {
     left: 0;
     top: 0;
     transform: translateX(-100%);
-    box-shadow: 4px 0 16px rgba(0, 0, 0, 0.1);
+    box-shadow: 4px 0 16px rgba(0,0,0,0.1);
     z-index: 300;
   }
 
@@ -658,59 +644,12 @@ img {
     display: none;
   }
 
-  .booking-layout {
-    grid-template-columns: 1fr;
-    grid-template-areas:
-      "steps"
-      "category"
-      "form";
-  }
-
-  .category-card {
-    grid-area: category;
-    flex-direction: row;
-    text-align: left;
-    align-items: center;
-    gap: 20px;
-  }
-
-  .category-icon {
-    width: 90px;
-    height: 90px;
-    flex-shrink: 0;
-  }
-
-  .category-icon img {
-    width: 48px;
-  }
-
-  .form-card {
-    grid-area: form;
-  }
-
   .form-row {
     grid-template-columns: 1fr;
   }
-
-  .step-indicator {
-    grid-area: steps;
-    flex-direction: row;
-    justify-content: center;
-    gap: 0;
-  }
-
-  .step-line {
-    width: auto;
-    height: 2px;
-    min-width: 32px;
-    flex: 1;
-  }
 }
 
-/* Celulares */
-
 @media (max-width: 600px) {
-
   .main-content {
     padding: 0 16px 16px;
   }
@@ -739,26 +678,22 @@ img {
     height: 40px;
   }
 
-  .quick-actions-section h2 {
-    font-size: 14px;
+  .avisos-page-header h2 {
+    font-size: 17px;
   }
 
-  .category-card {
-    flex-direction: column;
+  .btn-criar-aviso {
+    width: 100%;
     text-align: center;
   }
 
-  .category-icon {
-    width: 130px;
-    height: 130px;
+  .notice-card {
+    flex-direction: column;
+    align-items: stretch;
   }
 
-  .category-icon img {
-    width: 64px;
-  }
-
-  .form-card {
-    padding: 20px;
+  .btn-excluir-aviso {
+    width: 100%;
   }
 
   .form-actions {
@@ -772,10 +707,7 @@ img {
   }
 }
 
-/* Celulares muito pequenos */
-
 @media (max-width: 380px) {
-
   .sidebar {
     width: 220px;
   }
@@ -786,11 +718,5 @@ img {
 
   .user-dropdown {
     width: 160px;
-  }
-
-  .step {
-    width: 36px;
-    height: 36px;
-    font-size: 11px;
   }
 }
