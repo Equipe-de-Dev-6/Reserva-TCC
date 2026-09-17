@@ -177,68 +177,6 @@ button[type="submit"]:active {
 /* =========================
    DIVISOR "OU"
 ========================= */
-.divider {
-    position: relative;
-    width: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 14px;
-    font-weight: 700;
-    color: var(--cor-texto);
-    margin: 18px 0;
-}
-
-.divider::before,
-.divider::after {
-    content: "";
-    position: absolute;
-    top: 50%;
-    width: 40%;
-    height: 2px;
-    background-color: var(--cor-secundaria);
-    transform: translateY(-50%);
-}
-
-.divider::before {
-    left: 0;
-}
-
-.divider::after {
-    right: 0;
-}
-
-/* =========================
-   GOOGLE
-========================= */
-.google-btn {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 100%;
-    padding: 14px 16px;
-    border: 1px solid var(--cor-borda);
-    border-radius: var(--border-radius);
-    background-color: var(--cor-fundo);
-    color: var(--cor-texto);
-    cursor: pointer;
-    transition: all 0.3s ease;
-    font-size: 20px;
-}
-
-.google-btn:hover {
-    background-color: #f5f5f5;
-    border-color: var(--cor-secundaria);
-    box-shadow: var(--sombra);
-}
-
-.google-btn:active {
-    border-color: var(--cor-principal);
-}
-
-.google-btn p {
-    margin: 0;
-}
 
 /* =========================
    RESPONSIVO
