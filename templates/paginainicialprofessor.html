@@ -152,13 +152,12 @@
 
       <!-- Página: Login -->
 
-      <a href="/" class="btn-logout">
-
-        <img src="/assets/icons/exit.png" alt="" width="20" height="20">
-
-        Sair
-
-      </a>
+      <form method="POST" action="/logout" class="logout-form">
+        <button type="submit" class="btn-logout">
+          <img src="/assets/icons/exit.png" alt="" width="20" height="20">
+          Sair
+        </button>
+      </form>
 
 
     </aside>
@@ -278,9 +277,11 @@
 
               <!-- Página: Login -->
 
-              <a href="/" class="dropdown-item logout">
-                Sair
-              </a>
+              <form method="POST" action="/logout">
+                <button type="submit">
+                  Sair
+                </button>
+              </form>
 
 
             </div>
