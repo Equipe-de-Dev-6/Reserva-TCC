@@ -9,20 +9,16 @@
 
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap"
     rel="stylesheet">
-
   <link rel="stylesheet" href="https://www.flaticon.com/flaticon.css">
-
   <link rel="stylesheet" href="/css/reservasprof.css">
 </head>
 
 <body>
-
   <div class="app-container">
 
     <div class="sidebar-overlay" id="sidebarOverlay"></div>
 
     <aside class="sidebar">
-
       <div class="sidebar-top">
 
         <a href="/reservas_prof" class="logo">
@@ -30,7 +26,6 @@
         </a>
 
         <nav class="nav-menu">
-
           <a href="/home" class="nav-item">
             <img src="/assets/icons/home.png" alt="" width="20" height="20">
             Início
@@ -67,7 +62,6 @@
             <img src="/assets/icons/gear.png" alt="" width="20" height="20">
             Configurações
           </a>
-
         </nav>
 
         <div class="divider"></div>
@@ -77,7 +71,6 @@
           <img src="/assets/icons/interrogation.png" alt="" width="20" height="20">
           Ajuda
         </a>
-
       </div>
 
       <form method="POST" action="/logout" class="logout-form">
@@ -86,7 +79,6 @@
           Sair
         </button>
       </form>
-
     </aside>
 
     <main class="main-content">
@@ -101,20 +93,18 @@
         </button>
 
         <div class="greeting">
-          <h1>Olá Thiago!</h1>
+          <h1>Olá <span id="nomeUsuario">...</span>!</h1>
           <p>Gerencie suas reservas e faça novos agendamentos</p>
         </div>
 
         <div class="header-actions">
 
           <div class="search-container">
-
             <svg width="18" height="18" fill="none" stroke="#6b7280" stroke-width="2" viewBox="0 0 24 24">
               <path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
             </svg>
 
             <input type="text" id="search-input" placeholder="Buscar salas, carrinhos, laboratórios...">
-
           </div>
 
           <a href="/notificacoes_prof" class="icon-btn">
@@ -124,15 +114,13 @@
           <div class="user-profile" id="userProfile">
 
             <div class="avatar-link">
-
               <div class="avatar">
                 <img src="/assets/icons/user (3).png" alt="Perfil do Usuário" width="28" height="28">
               </div>
-
             </div>
 
             <div class="user-info">
-              <span class="name">Thiago</span>
+              <span class="name" id="nomePerfil">...</span>
               <span class="role">Professor</span>
             </div>
 
@@ -154,23 +142,18 @@
                   Sair
                 </button>
               </form>
-
             </div>
 
           </div>
-
         </div>
-
       </header>
 
       <section class="reservas-section">
 
         <div class="reservas-header">
-
           <h2>Minhas solicitações</h2>
 
           <div class="filter-tabs" id="filterTabs">
-
             <button class="filter-tab active" data-filter="todas">
               Todas
             </button>
@@ -186,9 +169,7 @@
             <button class="filter-tab" data-filter="negado">
               Negadas
             </button>
-
           </div>
-
         </div>
 
         <div class="reservas-list searchable-container" id="reservasList">
@@ -196,7 +177,6 @@
         </div>
 
         <div class="reservas-empty" id="reservasEmpty" style="display: none;">
-
           <img src="/assets/icons/calendar.png" alt="">
 
           <p>
@@ -207,28 +187,56 @@
           <a href="/reservar" class="btn-nova-reserva">
             Fazer uma reserva
           </a>
-
         </div>
 
       </section>
-
     </main>
-
   </div>
 
   <script src="/js/reservas.js"></script>
 
   <script>
+    // Busca o nome do usuário autenticado pela sessão do FastAPI.
+    async function carregarUsuario() {
+      try {
+        const resposta = await fetch('/usuario-logado', {
+          method: 'GET',
+          credentials: 'same-origin'
+        });
+
+        if (!resposta.ok) {
+          if (resposta.status === 401) {
+            window.location.href = '/';
+          }
+          return;
+        }
+
+        const usuario = await resposta.json();
+        const nome = usuario.nome || 'Usuário';
+
+        const nomeUsuario = document.getElementById('nomeUsuario');
+        const nomePerfil = document.getElementById('nomePerfil');
+
+        if (nomeUsuario) {
+          nomeUsuario.textContent = nome;
+        }
+
+        if (nomePerfil) {
+          nomePerfil.textContent = nome;
+        }
+      } catch (erro) {
+        console.error('Erro ao carregar usuário:', erro);
+      }
+    }
 
     document.addEventListener('DOMContentLoaded', () => {
+      carregarUsuario();
 
       const userProfile = document.getElementById('userProfile');
       const userDropdown = document.getElementById('userDropdown');
 
       if (userProfile && userDropdown) {
-
         userProfile.addEventListener('click', (e) => {
-
           e.stopPropagation();
 
           if (userDropdown.contains(e.target)) {
@@ -236,17 +244,13 @@
           }
 
           userDropdown.classList.toggle('active');
-
         });
 
         document.addEventListener('click', (e) => {
-
           if (!userProfile.contains(e.target)) {
             userDropdown.classList.remove('active');
           }
-
         });
-
       }
 
       const menuToggle = document.getElementById('menuToggle');
@@ -254,25 +258,18 @@
       const sidebarOverlay = document.getElementById('sidebarOverlay');
 
       if (menuToggle && sidebar && sidebarOverlay) {
-
         menuToggle.addEventListener('click', () => {
-
           sidebar.classList.toggle('open');
           sidebarOverlay.classList.toggle('active');
-
         });
 
         sidebarOverlay.addEventListener('click', () => {
-
           sidebar.classList.remove('open');
           sidebarOverlay.classList.remove('active');
-
         });
-
       }
 
       function iconeDaCategoria(categoria) {
-
         const cat = (categoria || '').toLowerCase();
 
         if (cat.includes('laborat')) {
@@ -284,15 +281,12 @@
         }
 
         return '/assets/icons/classroom.png';
-
       }
 
       let filtroAtual = 'todas';
 
       function renderReservas() {
-
         const lista = ReservasApp.getReservas();
-
         const listaEl = document.getElementById('reservasList');
         const emptyEl = document.getElementById('reservasEmpty');
 
@@ -302,37 +296,27 @@
             : lista.filter((r) => r.status === filtroAtual);
 
         if (lista.length === 0) {
-
           listaEl.innerHTML = '';
           emptyEl.style.display = 'flex';
-
           return;
-
         }
 
         emptyEl.style.display = 'none';
 
         if (filtradas.length === 0) {
-
           listaEl.innerHTML =
             '<p style="color:#6B7280;font-size:13px;padding:12px 4px;">Nenhuma reserva encontrada para este filtro.</p>';
-
           return;
-
         }
 
         listaEl.innerHTML = filtradas.map((r) => {
-
           const info = ReservasApp.statusInfo(r.status);
+          const dataFormatada = ReservasApp.formatDateBR(r.data);
 
-          const dataFormatada =
-            ReservasApp.formatDateBR(r.data);
-
-          const horario =
-            ReservasApp.formatHorario(
-              r.horaEntrada,
-              r.horaSaida
-            );
+          const horario = ReservasApp.formatHorario(
+            r.horaEntrada,
+            r.horaSaida
+          );
 
           const acoes =
             r.status === 'cancelada'
@@ -342,14 +326,11 @@
               '">Cancelar Reserva</button>';
 
           return `
-
             <div
               class="reserva-card searchable"
               data-id="${r.id}"
             >
-
               <div class="reserva-left">
-
                 <div class="reserva-icon">
                   <img
                     src="${iconeDaCategoria(r.categoria)}"
@@ -358,7 +339,6 @@
                 </div>
 
                 <div class="reserva-info">
-
                   <h4>
                     ${r.item || r.categoria}
                   </h4>
@@ -369,19 +349,13 @@
                   </p>
 
                   <div class="reserva-meta">
-
                     <p>${dataFormatada}</p>
-
                     <p>${horario}</p>
-
                   </div>
-
                 </div>
-
               </div>
 
               <div class="reserva-right">
-
                 <span class="${info.badgeClass}">
                   ${info.label}
                 </span>
@@ -394,47 +368,32 @@
                 >
                   Excluir
                 </button>
-
               </div>
-
             </div>
-
           `;
-
         }).join('');
-
       }
 
-      const filterTabs =
-        document.querySelectorAll('.filter-tab');
+      const filterTabs = document.querySelectorAll('.filter-tab');
 
       filterTabs.forEach((tab) => {
-
         tab.addEventListener('click', () => {
-
-          filterTabs.forEach((t) =>
-            t.classList.remove('active')
-          );
+          filterTabs.forEach((t) => t.classList.remove('active'));
 
           tab.classList.add('active');
-
           filtroAtual = tab.dataset.filter;
 
           renderReservas();
-
         });
-
       });
 
       document
         .getElementById('reservasList')
         .addEventListener('click', (e) => {
 
-          const deleteButton =
-            e.target.closest('[data-delete-id]');
+          const deleteButton = e.target.closest('[data-delete-id]');
 
           if (deleteButton) {
-
             if (!window.confirm(
               'Excluir esta reserva definitivamente?'
             )) {
@@ -446,22 +405,18 @@
             );
 
             renderReservas();
-
             return;
-
           }
 
-          const btn =
-            e.target.closest('[data-cancel-id]');
+          const btn = e.target.closest('[data-cancel-id]');
 
           if (!btn) {
             return;
           }
 
-          const confirmar =
-            window.confirm(
-              'Tem certeza que deseja cancelar esta reserva?'
-            );
+          const confirmar = window.confirm(
+            'Tem certeza que deseja cancelar esta reserva?'
+          );
 
           if (!confirmar) {
             return;
@@ -472,43 +427,29 @@
           );
 
           renderReservas();
-
         });
 
-      const searchInput =
-        document.getElementById('search-input');
+      const searchInput = document.getElementById('search-input');
 
       if (searchInput) {
-
         searchInput.addEventListener('input', (e) => {
-
-          const termo =
-            e.target.value.toLowerCase().trim();
+          const termo = e.target.value.toLowerCase().trim();
 
           document
             .querySelectorAll('.reserva-card')
             .forEach((card) => {
-
-              const texto =
-                card.textContent.toLowerCase();
+              const texto = card.textContent.toLowerCase();
 
               card.style.display =
                 texto.includes(termo) ? '' : 'none';
-
             });
-
         });
-
       }
 
       renderReservas();
-
       ReservasApp.subscribe(() => renderReservas());
-
     });
-
   </script>
-
 </body>
 
 </html>
