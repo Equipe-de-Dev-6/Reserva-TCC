@@ -10,6 +10,10 @@
   --border-color: #E5E7EB;
   --green-bg: #D1FAE5;
   --green-text: #059669;
+  --red-bg: #FEE2E2;
+  --red-text: #DC2626;
+  --yellow-bg: #FEF3C7;
+  --yellow-text: #B45309;
 }
 
 * {
@@ -24,7 +28,8 @@ html {
   scrollbar-gutter: stable;
 }
 
-body, html {
+html,
+body {
   height: 100vh;
   width: 100vw;
   overflow: hidden;
@@ -41,6 +46,10 @@ img {
   max-width: 100%;
 }
 
+/* ============================================================
+   APP
+   ============================================================ */
+
 .app-container {
   display: flex;
   height: 100vh;
@@ -48,7 +57,10 @@ img {
   position: relative;
 }
 
-/* ============ SIDEBAR ============ */
+/* ============================================================
+   SIDEBAR
+   ============================================================ */
+
 .sidebar {
   width: 250px;
   height: 100vh;
@@ -161,7 +173,10 @@ img {
   flex-shrink: 0;
 }
 
-/* ============ MAIN CONTENT ============ */
+/* ============================================================
+   MAIN CONTENT
+   ============================================================ */
+
 .main-content {
   flex: 1;
   height: 100vh;
@@ -172,6 +187,10 @@ img {
   scrollbar-gutter: stable;
   min-width: 0;
 }
+
+/* ============================================================
+   HEADER
+   ============================================================ */
 
 .header {
   display: flex;
@@ -313,22 +332,31 @@ img {
   margin: 6px 0;
 }
 
-/* ============ QUICK ACTIONS SECTION ============ */
+/* ============================================================
+   QUICK ACTIONS
+   ============================================================ */
+
 .quick-actions-section {
   margin-bottom: 24px;
-  display: flex;
-  flex-direction: column;
-  flex: 1;
-  min-height: 0;
 }
 
-/* ============ BOOKING LAYOUT ============ */
+.quick-actions-section h2 {
+  font-size: 16px;
+  font-weight: 700;
+  margin-bottom: 16px;
+}
+
+/* ============================================================
+   BOOKING LAYOUT
+   ============================================================ */
+
 .booking-layout {
   display: grid;
   grid-template-columns: 300px 1fr 64px;
   gap: 24px;
   align-items: start;
 }
+
 
 /* --- Categoria selecionada --- */
 .category-card {
