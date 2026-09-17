@@ -1,266 +1,690 @@
 <!DOCTYPE html>
+
 <html lang="pt-BR">
+
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Ajuda - Gestão de salas e equipamentos</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://www.flaticon.com/flaticon.css">
-  <link rel="stylesheet" href="/static/css/paginainicialprofessor.css">
-  <link rel="stylesheet" href="/static/css/ajuda.css">
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Ajuda - Gestão de salas e equipamentos</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap"
+        rel="stylesheet">
+
+    <link rel="stylesheet" href="/static/css/ajuda.css">
+
 </head>
+
+
 <body>
-  <div class="app-container">
-    <div class="sidebar-overlay" id="sidebarOverlay"></div>
-    <aside class="sidebar">
-      <div class="sidebar-top">
 
-        <a href="/templates/paginainicialprofessor.html" class="logo">
-          <img src="/static/assets/img/Logo senai.png" alt=""> </a>
+    <div class="app-container">
 
-        <nav class="nav-menu">
-        <a href="/templates/paginainicialprofessor.html" class="nav-item">
-        <img src="/static/assets/icons/home.png" alt="" width="20" height="20">Início</a> </nav>
-
-          <a href="/templates/reservar_tela_prof.html" class="nav-item">
-        <img src="/static/assets/icons/restaurant.png" alt="" width="20" height="20">Reservar</a> </nav>
-
-          <a href="/templates/reservasprof.html" class="nav-item">
-        <img src="/static/assets/icons/reserved.png" alt="" width="20" height="20">Reservas</a> </nav>
-
-          <a href="/templates/calendarioprof.html" class="nav-item">
-        <img src="/static/assets/icons/calendar.png" alt="" width="20" height="20">Calendário</a> </nav>
+        <div class="sidebar-overlay" id="sidebarOverlay"></div>
 
 
-          <a href="/templates/notificacoesprof.html" class="nav-item">
-        <img src="/static/assets/icons/notification.png" alt="" width="20" height="20">Notificações</a> </nav>
+        <!-- ======================================================
+         SIDEBAR
+         ====================================================== -->
 
-          <a href="/templates/avisosimporntanteprof.html" class="nav-item">
-        <img src="/static/assets/icons/box.png" alt="" width="20" height="20">Avisos</a> </nav>
+        <aside class="sidebar">
 
-          <a href="/templates/.html" class="nav-item">
-        <img src="/static/assets/icons/gear.png" alt="" width="20" height="20">Configurações</a> </nav>
-        </nav>
+            <div class="sidebar-top">
 
-            <div class="divider"></div>
 
-        <a href="/templates/ajuda.html" class="nav-item active">
-        <img src="/static/assets/icons/interrogation.png" alt="" width="20" height="20">Ajuda</a> </nav>
-      </div>
+                <!-- Página: Início -->
 
-      <a href="/templates/login.html" class="btn-logout">
-        <img src="/static/assets/icons/exit.png" alt="" width="20" height="20">Sair</a> </nav>
-        </nav>
+                <a href="/home" class="logo">
 
-    </aside>
+                    <img src="/static/assets/img/Logo senai.png" alt="SENAI">
 
-    <main class="main-content">
+                </a>
 
-      <header class="header">
-        <button class="menu-toggle" id="menuToggle" aria-label="Abrir menu">
-          <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" viewBox="0 0 24 24"><path d="M3 6h18M3 12h18M3 18h18"></path></svg>
-        </button>
 
-        <div class="greeting">
-          <h1>Olá Thiago!</h1>
-          <p>Gerencie suas reservas e faça novos agendamentos</p>
-        </div>
+                <nav class="nav-menu">
 
-        <div class="header-actions">
-          <div class="search-container">
-              <svg width="18" height="18" fill="none" stroke="#6b7280" stroke-width="2" viewBox="0 0 24 24"><path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
-              <input type="text" id="search-input" placeholder="Buscar salas, carrinhos, laboratórios...">
-          </div>
 
-          <a href="/templates/notificacoesprof.html" class="icon-btn">
-              <img src="/static/assets/icons/notification (2).png" alt="Notificações" width="20" height="20">
-          </a>
+                    <!-- Página: Início -->
 
-          <div class="user-profile" id="userProfile">
-            <div class="avatar-link">
-                <div class="avatar">
-                  <img src="/static/assets/icons/user (3).png" alt="Perfil do Usuário" width="28" height="28">
+                    <a href="/home" class="nav-item">
+
+                        <img src="/static/assets/icons/home.png" alt="" width="20" height="20">
+
+                        Início
+
+                    </a>
+
+
+                    <!-- Página: Reservar -->
+
+                    <a href="/reservar" class="nav-item">
+
+                        <img src="/static/assets/icons/restaurant.png" alt="" width="20" height="20">
+
+                        Reservar
+
+                    </a>
+
+
+                    <!-- Página: Reservas -->
+
+                    <a href="/reservasprof" class="nav-item">
+
+                        <img src="/static/assets/icons/reserved.png" alt="" width="20" height="20">
+
+                        Reservas
+
+                    </a>
+
+
+                    <!-- Página: Calendário -->
+
+                    <a href="/calendarioprof" class="nav-item">
+
+                        <img src="/static/assets/icons/calendar.png" alt="" width="20" height="20">
+
+                        Calendário
+
+                    </a>
+
+
+                    <!-- Página: Notificações -->
+
+                    <a href="/notificacoesprof" class="nav-item">
+
+                        <img src="/static/assets/icons/notification.png" alt="" width="20" height="20">
+
+                        Notificações
+
+                    </a>
+
+
+                    <!-- Página: Avisos -->
+
+                    <a href="/avisos" class="nav-item">
+
+                        <img src="/static/assets/icons/warning.png" alt="" width="20" height="20">
+
+                        Avisos
+
+                    </a>
+
+
+                    <!-- Página: Configurações -->
+
+                    <!-- Ainda sem página definida -->
+
+                    <div class="nav-item">
+
+                        <img src="/static/assets/icons/gear.png" alt="" width="20" height="20">
+
+                        Configurações
+
+                    </div>
+
+
+                </nav>
+
+
+                <div class="divider"></div>
+
+
+                <!-- Página: Ajuda (página atual) -->
+
+                <a href="/ajuda" class="nav-item active">
+
+                    <img src="/static/assets/icons/interrogation.png" alt="" width="20" height="20">
+
+                    Ajuda
+
+                </a>
+
+
+            </div>
+
+
+            <!-- Página: Login -->
+
+            <form method="POST" action="/logout" class="logout-form">
+                <button type="submit" class="btn-logout">
+                    <img src="/static/assets/icons/exit.png" alt="" width="20" height="20">
+                    Sair
+                </button>
+            </form>
+
+
+        </aside>
+
+
+        <!-- ======================================================
+         CONTEÚDO PRINCIPAL
+         ====================================================== -->
+
+        <main class="main-content">
+
+
+            <!-- ====================================================
+           HEADER
+           ==================================================== -->
+
+            <header class="header">
+
+
+                <button class="menu-toggle" id="menuToggle" aria-label="Abrir menu">
+
+                    <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" viewBox="0 0 24 24">
+
+                        <path d="M3 6h18M3 12h18M3 18h18"></path>
+
+                    </svg>
+
+                </button>
+
+
+                <div class="greeting">
+
+                    <h1>
+                        Olá Thiago!
+                    </h1>
+
+                    <p>
+                        Gerencie suas reservas e faça novos agendamentos
+                    </p>
+
                 </div>
+
+
+                <div class="header-actions">
+
+
+                    <div class="search-container">
+
+                        <svg width="18" height="18" fill="none" stroke="#6b7280" stroke-width="2" viewBox="0 0 24 24">
+
+                            <path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+
+                        </svg>
+
+
+                        <input type="text" id="search-input" placeholder="Buscar salas, carrinhos, laboratórios...">
+
+                    </div>
+
+
+                    <!-- Página: Notificações -->
+
+                    <a href="/notificacoesprof" class="icon-btn">
+
+                        <img src="/static/assets/icons/notification (2).png" alt="Notificações" width="20" height="20">
+
+                    </a>
+
+
+                    <div class="user-profile" id="userProfile">
+
+
+                        <div class="avatar-link">
+
+                            <div class="avatar">
+
+                                <img src="/static/assets/icons/user (3).png" alt="Perfil do Usuário" width="28"
+                                    height="28">
+
+                            </div>
+
+                        </div>
+
+
+                        <div class="user-info">
+
+                            <span class="name">
+                                Thiago
+                            </span>
+
+                            <span class="role">
+                                Professor
+                            </span>
+
+                        </div>
+
+
+                        <div class="user-dropdown" id="userDropdown">
+
+
+                            <!-- Página: Minhas Reservas -->
+
+                            <a href="/reservasprof" class="dropdown-item">
+                                Minhas Reservas
+                            </a>
+
+
+                            <!-- Página: Configurações -->
+
+                            <div class="dropdown-item">
+                                Configurações
+                            </div>
+
+
+                            <div class="dropdown-divider"></div>
+
+
+                            <!-- Página: Login -->
+
+                            <form method="POST" action="/logout">
+                                <button class="dropdown-item" type="submit">
+                                    Sair
+                                </button>
+                            </form>
+
+
+                        </div>
+
+
+                    </div>
+
+
+                </div>
+
+
+            </header>
+
+
+            <!-- ====================================================
+           BANNER
+           ==================================================== -->
+
+            <section class="help-banner">
+
+                <h2>
+                    Como podemos ajudar você hoje?
+                </h2>
+
+                <p>
+                    Encontre respostas rápidas para suas dúvidas sobre reservas de salas, empréstimo de notebooks e
+                    gerenciamento de laboratórios do SENAI.
+                </p>
+
+            </section>
+
+
+            <!-- ====================================================
+           CANAIS DE ATENDIMENTO + PERGUNTAS FREQUENTES
+           ==================================================== -->
+
+            <div class="help-split">
+
+
+                <!-- ==================================================
+             CANAIS DE ATENDIMENTO
+             ================================================== -->
+
+                <section class="channels-section">
+
+                    <h2>
+                        Canais de Atendimento
+                    </h2>
+
+
+                    <div class="channels-list">
+
+
+                        <div class="channel-card">
+
+                            <div class="channel-icon">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                    stroke-linecap="round" stroke-linejoin="round">
+                                    <polyline points="16 18 22 12 16 6"></polyline>
+                                    <polyline points="8 6 2 12 8 18"></polyline>
+                                </svg>
+                            </div>
+
+                            <div class="channel-text">
+
+                                <h3>
+                                    Suporte Técnico de TI
+                                </h3>
+
+                                <p>
+                                    Problemas com credenciais, acesso ao sistema ou falhas técnicas em equipamentos
+                                    móveis e
+                                    gabinetes de notebooks.
+                                    <a class="submit-email" href="https://outlook.live.com/mail/0/deeplink/compose?to=suporte@senai.br&subject=Solicitação%20de%20ajuda&body=Olá,%20preciso%20de%20ajuda."
+                                        target="_blank">
+                                        Enviar e-mail
+                                    </a>
+                                </p>
+
+                            </div>
+
+                        </div>
+
+
+                        <div class="channel-card">
+
+                            <div class="channel-icon">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                    stroke-linecap="round" stroke-linejoin="round">
+                                    <circle cx="12" cy="12" r="10"></circle>
+                                    <line x1="12" y1="8" x2="12" y2="12"></line>
+                                    <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                                </svg>
+                            </div>
+
+                            <div class="channel-text">
+
+                                <h3>
+                                    Secretaria e Coordenação
+                                </h3>
+
+                                <p>
+                                    Dúvidas sobre grades horárias, permissões especiais para laboratórios avançados e
+                                    conflitos de
+                                    agendamento.
+
+                                    <a class="submit-email" href="https://outlook.live.com/mail/0/deeplink/compose?to=suporte@senai.br&subject=Solicitação%20de%20ajuda&body=Olá,%20preciso%20de%20ajuda."
+                                        target="_blank">
+                                        Enviar e-mail
+                                    </a>
+                                </p>
+
+                            </div>
+
+                        </div>
+
+
+                        <div class="channel-card">
+
+                            <div class="channel-icon">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                    stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                                    <polyline points="14 2 14 8 20 8"></polyline>
+                                    <line x1="16" y1="13" x2="8" y2="13"></line>
+                                    <line x1="16" y1="17" x2="8" y2="17"></line>
+                                    <polyline points="10 9 9 9 8 9"></polyline>
+                                </svg>
+                            </div>
+
+                            <div class="channel-text">
+
+                                <h3>
+                                    Manuais de Instrução
+                                </h3>
+
+                                <p>
+                                    Acesse os guias em PDF detalhados sobre as melhores práticas para o uso de salas de
+                                    reunião,
+                                    projetores e recursos didáticos.
+                                    <a class="submit-email" href="https://outlook.live.com/mail/0/deeplink/compose?to=suporte@senai.br&subject=Solicitação%20de%20ajuda&body=Olá,%20preciso%20de%20ajuda."
+                                        target="_blank">
+                                        Enviar e-mail
+                                    </a>
+                                </p>
+
+                            </div>
+
+                        </div>
+
+
+                    </div>
+
+                </section>
+
+
+                <!-- ==================================================
+             PERGUNTAS FREQUENTES
+             ================================================== -->
+
+                <section class="faq-section">
+
+                    <h2>
+                        Perguntas Frequentes
+                    </h2>
+
+
+                    <div class="faq-list" id="faqList">
+
+
+                        <div class="faq-item">
+
+                            <div class="faq-question">
+
+                                <span>
+                                    Como realizar a reserva de um laboratório de informática?
+                                </span>
+
+                                <svg class="faq-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <polyline points="6 9 12 15 18 9"></polyline>
+                                </svg>
+
+                            </div>
+
+                            <p class="faq-answer">
+                                Acesse a aba 'Reservas' no menu lateral, escolha a opção 'Laboratórios', selecione o
+                                horário livre
+                                desejado no calendário e confirme informando a turma e recurso necessário.
+                            </p>
+
+                        </div>
+
+
+                        <div class="faq-item">
+
+                            <div class="faq-question">
+
+                                <span>
+                                    Qual o tempo máximo de permanência com o gabinete de notebooks?
+                                </span>
+
+                                <svg class="faq-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <polyline points="6 9 12 15 18 9"></polyline>
+                                </svg>
+
+                            </div>
+
+                            <p class="faq-answer">
+                                O período padrão de empréstimo para os gabinetes de notebooks é equivalente ao horário
+                                da sua
+                                aula vigente. Caso precise estender, realize um novo pedido sujeito a aprovação.
+                            </p>
+
+                        </div>
+
+
+                        <div class="faq-item">
+
+                            <div class="faq-question">
+
+                                <span>
+                                    O que fazer em caso de equipamentos danificados ou ausentes?
+                                </span>
+
+                                <svg class="faq-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <polyline points="6 9 12 15 18 9"></polyline>
+                                </svg>
+
+                            </div>
+
+                            <p class="faq-answer">
+                                Reporte imediatamente na aba 'Notificações' ou procure a equipe de TI local. Evite
+                                tentar
+                                consertar cabos ou projetores por conta própria para garantir a segurança.
+                            </p>
+
+                        </div>
+
+
+                        <div class="faq-item">
+
+                            <div class="faq-question">
+
+                                <span>
+                                    Posso cancelar uma reserva de sala já confirmada?
+                                </span>
+
+                                <svg class="faq-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <polyline points="6 9 12 15 18 9"></polyline>
+                                </svg>
+
+                            </div>
+
+                            <p class="faq-answer">
+                                Sim, localize a reserva na sua aba de 'Histórico' ou 'Calendário' e clique em 'Cancelar
+                                Reserva'.
+                                Recomendamos fazer isso com no mínimo 24h de antecedência.
+                            </p>
+
+                        </div>
+
+
+                    </div>
+
+                </section>
+
+
             </div>
 
-            <div class="user-info">
-                <span class="name">Thiago</span>
-                <span class="role">Professor</span>
-            </div>
 
-            <div class="user-dropdown" id="userDropdown">
-              <a href="/templates/reservasprof.html" class="dropdown-item">Minhas Reservas</a>
-              <a href="/templates/.html" class="dropdown-item">Configurações</a>
-              <div class="dropdown-divider"></div>
-              <a href="/templates/login.html" class="dropdown-item logout">Sair</a>
-            </div>
-          </div>
-        </div>
-      </header>
+        </main>
 
-      <section class="help-hero searchable">
-        <h2>Como podemos ajudar você hoje?</h2>
-        <p>Encontre respostas rápidas para suas dúvidas sobre reservas de salas, empréstimo de notebooks e gerenciamento de laboratórios do SENAI.</p>
-      </section>
 
-      <div class="help-split">
+    </div>
 
-        <div class="help-channels">
-          <h2>Canais de Atendimento</h2>
 
-          <div class="channel-card searchable">
-            <div class="channel-icon channel-icon-ti">
-              <img src="/static/assets/icons/code.png" alt="" width="20" height="20">
-            </div>
-            <div class="channel-text">
-              <h3>Suporte Técnico de TI</h3>
-              <p>Problemas com credenciais, acesso ao sistema ou falhas técnicas em equipamentos móveis e gabinetes de notebooks.</p>
-            </div>
-          </div>
+    <!-- ========================================================
+       JAVASCRIPT
+       ======================================================== -->
 
-          <div class="channel-card searchable">
-            <div class="channel-icon channel-icon-secretaria">
-              <img src="/static/assets/icons/info.png" alt="" width="20" height="20">
-            </div>
-            <div class="channel-text">
-              <h3>Secretaria e Coordenação</h3>
-              <p>Dúvidas sobre grades horárias, permissões especiais para laboratórios avançados e conflitos de agendamento.</p>
-            </div>
-          </div>
+    <script>
 
-          <div class="channel-card searchable">
-            <div class="channel-icon channel-icon-manuais">
-              <img src="/static/assets/icons/book.png" alt="" width="20" height="20">
-            </div>
-            <div class="channel-text">
-              <h3>Manuais de Instrução</h3>
-              <p>Acesse os guias em PDF detalhados sobre as melhores práticas para o uso de salas de reunião, projetores e recursos didáticos.</p>
-            </div>
-          </div>
-        </div>
+        document.addEventListener('DOMContentLoaded', () => {
 
-        <div class="help-faq">
-          <h2>Perguntas Frequentes</h2>
 
-          <div class="faq-list" id="faqList">
-            <div class="faq-item searchable">
-              <button class="faq-question" data-faq-toggle>
-                <span>Como realizar a reserva de um laboratório de informática?</span>
-                <svg class="faq-chevron" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"></path></svg>
-              </button>
-              <div class="faq-answer">
-                <p>Acesse a aba "Reservas" no menu lateral, escolha a opção "Laboratórios", selecione o horário livre desejado no calendário e confirme informando a turma e recurso necessário.</p>
-              </div>
-            </div>
+            // ======================================================
+            // DROPDOWN DO USUÁRIO
+            // ======================================================
 
-            <div class="faq-item searchable">
-              <button class="faq-question" data-faq-toggle>
-                <span>Qual o tempo máximo de permanência com o gabinete de notebooks?</span>
-                <svg class="faq-chevron" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"></path></svg>
-              </button>
-              <div class="faq-answer">
-                <p>O período padrão de empréstimo para os gabinetes de notebooks é equivalente ao horário da sua aula vigente. Caso precise estender, realize um novo pedido sujeito a aprovação.</p>
-              </div>
-            </div>
+            const userProfile =
+                document.getElementById('userProfile');
 
-            <div class="faq-item searchable">
-              <button class="faq-question" data-faq-toggle>
-                <span>O que fazer em caso de equipamentos danificados ou ausentes?</span>
-                <svg class="faq-chevron" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"></path></svg>
-              </button>
-              <div class="faq-answer">
-                <p>Reporte imediatamente na aba "Notificações" ou procure a equipe de TI local. Evite tentar consertar cabos ou projetores por conta própria para garantir a segurança.</p>
-              </div>
-            </div>
+            const userDropdown =
+                document.getElementById('userDropdown');
 
-            <div class="faq-item searchable">
-              <button class="faq-question" data-faq-toggle>
-                <span>Posso cancelar uma reserva de sala já confirmada?</span>
-                <svg class="faq-chevron" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"></path></svg>
-              </button>
-              <div class="faq-answer">
-                <p>Sim, localize a reserva na sua aba de "Histórico" ou "Calendário" e clique em "Cancelar Reserva". Recomendamos fazer isso com no mínimo 24h de antecedência.</p>
-              </div>
-            </div>
-          </div>
-        </div>
 
-      </div>
+            if (userProfile && userDropdown) {
 
-    </main>
-  </div>
+                userProfile.addEventListener('click', (e) => {
 
-  <script src="/static/js/reservas.js"></script>
-  <script>
-    document.addEventListener('DOMContentLoaded', () => {
-      const searchInput = document.getElementById('search-input');
-      const itemsToSearch = document.querySelectorAll('.searchable');
+                    e.stopPropagation();
 
-      if (searchInput) {
-        searchInput.addEventListener('input', (e) => {
-          const searchTerm = e.target.value.toLowerCase().trim();
+                    userDropdown.classList.toggle('active');
 
-          itemsToSearch.forEach(item => {
-            const text = item.textContent.toLowerCase();
-            if (text.includes(searchTerm)) {
-              item.style.display = '';
-            } else {
-              item.style.display = 'none';
+                });
+
+
+                document.addEventListener('click', (e) => {
+
+                    if (!userProfile.contains(e.target)) {
+
+                        userDropdown.classList.remove('active');
+
+                    }
+
+                });
+
             }
-          });
+
+
+            // ======================================================
+            // MENU MOBILE
+            // ======================================================
+
+            const menuToggle =
+                document.getElementById('menuToggle');
+
+            const sidebar =
+                document.querySelector('.sidebar');
+
+            const sidebarOverlay =
+                document.getElementById('sidebarOverlay');
+
+
+            if (
+                menuToggle &&
+                sidebar &&
+                sidebarOverlay
+            ) {
+
+                menuToggle.addEventListener('click', () => {
+
+                    sidebar.classList.toggle('open');
+
+                    sidebarOverlay.classList.toggle('active');
+
+                });
+
+
+                sidebarOverlay.addEventListener('click', () => {
+
+                    sidebar.classList.remove('open');
+
+                    sidebarOverlay.classList.remove('active');
+
+                });
+
+            }
+
+
+            // ======================================================
+            // ACCORDION DE PERGUNTAS FREQUENTES
+            // ======================================================
+
+            const faqList =
+                document.getElementById('faqList');
+
+
+            if (faqList) {
+
+                // Todas as perguntas iniciam abertas, como na referência.
+                faqList
+                    .querySelectorAll('.faq-item')
+                    .forEach(item => item.classList.add('open'));
+
+
+                faqList.addEventListener('click', (e) => {
+
+                    const question =
+                        e.target.closest('.faq-question');
+
+
+                    if (!question) {
+
+                        return;
+
+                    }
+
+
+                    question
+                        .closest('.faq-item')
+                        .classList.toggle('open');
+
+                });
+
+            }
+
+
         });
-      }
 
-      const userProfile = document.getElementById('userProfile');
-      const userDropdown = document.getElementById('userDropdown');
+    </script>
 
-      if (userProfile && userDropdown) {
-        userProfile.addEventListener('click', (e) => {
-          e.stopPropagation();
-          userDropdown.classList.toggle('active');
-        });
 
-        document.addEventListener('click', (e) => {
-          if (!userProfile.contains(e.target)) {
-            userDropdown.classList.remove('active');
-          }
-        });
-      }
-
-      const menuToggle = document.getElementById('menuToggle');
-      const sidebar = document.querySelector('.sidebar');
-      const sidebarOverlay = document.getElementById('sidebarOverlay');
-
-      if (menuToggle && sidebar && sidebarOverlay) {
-        menuToggle.addEventListener('click', () => {
-          sidebar.classList.toggle('open');
-          sidebarOverlay.classList.toggle('active');
-        });
-
-        sidebarOverlay.addEventListener('click', () => {
-          sidebar.classList.remove('open');
-          sidebarOverlay.classList.remove('active');
-        });
-      }
-
-      // --- Perguntas Frequentes (accordion) ---
-      const faqList = document.getElementById('faqList');
-      if (faqList) {
-        faqList.addEventListener('click', (e) => {
-          const btn = e.target.closest('[data-faq-toggle]');
-          if (!btn) return;
-
-          const item = btn.closest('.faq-item');
-          const isOpen = item.classList.contains('open');
-
-          faqList.querySelectorAll('.faq-item.open').forEach((el) => el.classList.remove('open'));
-
-          if (!isOpen) {
-            item.classList.add('open');
-          }
-        });
-      }
-    });
-  </script>
 </body>
+
 </html>
