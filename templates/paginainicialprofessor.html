@@ -1,12 +1,8 @@
-
 <!DOCTYPE html>
-
 <html lang="pt-BR">
 
 <head>
-
   <meta charset="UTF-8">
-
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <title>Início - Gestão de salas e equipamentos</title>
@@ -17,9 +13,7 @@
   <link rel="stylesheet" href="https://www.flaticon.com/flaticon.css">
 
   <link rel="stylesheet" href="/css/paginainicialprofessor.css">
-
 </head>
-
 
 <body>
 
@@ -27,173 +21,95 @@
 
     <div class="sidebar-overlay" id="sidebarOverlay"></div>
 
-
-    <!-- ======================================================
-         SIDEBAR
-         ====================================================== -->
-
+    <!-- SIDEBAR -->
     <aside class="sidebar">
 
       <div class="sidebar-top">
 
-
-        <!-- Página: Início -->
-
+        <!-- Logo -->
         <a href="/home" class="logo">
-
           <img src="/assets/img/Logo senai.png" alt="SENAI">
-
         </a>
 
-
+        <!-- Menu -->
         <nav class="nav-menu">
 
-
-          <!-- Página: Início -->
-
           <a href="/home" class="nav-item active">
-
             <img src="/assets/icons/home.png" alt="" width="20" height="20">
-
             Início
-
           </a>
-
-
-          <!-- Página: Reservar -->
 
           <a href="/reservar" class="nav-item">
-
             <img src="/assets/icons/restaurant.png" alt="" width="20" height="20">
-
             Reservar
-
           </a>
-
-
-          <!-- Página: Reservas -->
 
           <a href="/reservas_prof" class="nav-item">
-
             <img src="/assets/icons/reserved.png" alt="" width="20" height="20">
-
             Reservas
-
           </a>
-
-
-          <!-- Página: Calendário -->
 
           <a href="/calendario_prof" class="nav-item">
-
             <img src="/assets/icons/calendar.png" alt="" width="20" height="20">
-
             Calendário
-
           </a>
-
-
-          <!-- Página: Notificações -->
 
           <a href="/notificacoes_prof" class="nav-item">
-
             <img src="/assets/icons/notification.png" alt="" width="20" height="20">
-
             Notificações
-
           </a>
-
-
-          <!-- Página: Avisos -->
 
           <a href="/avisos" class="nav-item">
-
             <img src="/assets/icons/warning.png" alt="" width="20" height="20">
-
             Avisos
-
           </a>
 
-
-          <!-- Página: Configurações -->
-
-          <!-- Ainda sem página definida -->
-
-          <div class="nav-item">
-
+          <a href="/configuracoes" class="nav-item">
             <img src="/assets/icons/gear.png" alt="" width="20" height="20">
-
             Configurações
-
-          </div>
-
+          </a>
 
         </nav>
 
-
         <div class="divider"></div>
 
-
-        <!-- Página: Ajuda -->
-
-        <!-- Ainda sem página definida -->
-
-        <div class="nav-item">
-
+        <!-- Ajuda -->
+        <a href="/ajuda" class="nav-item">
           <img src="/assets/icons/interrogation.png" alt="" width="20" height="20">
-
           Ajuda
-
-        </div>
-
+        </a>
 
       </div>
 
+      <!-- Sair -->
+      <form method="POST" action="/logout" class="logout-form">
 
-      <!-- Página: Login -->
+        <button type="submit" class="btn-logout">
+          <img src="/assets/icons/exit.png" alt="" width="20" height="20">
+          Sair
+        </button>
 
-      <a href="/" class="btn-logout">
-
-        <img src="/assets/icons/exit.png" alt="" width="20" height="20">
-
-        Sair
-
-      </a>
-
+      </form>
 
     </aside>
 
-
-    <!-- ======================================================
-         CONTEÚDO PRINCIPAL
-         ====================================================== -->
-
+    <!-- CONTEÚDO PRINCIPAL -->
     <main class="main-content">
 
-
-      <!-- ====================================================
-           HEADER
-           ==================================================== -->
-
+      <!-- HEADER -->
       <header class="header">
 
-
         <button class="menu-toggle" id="menuToggle" aria-label="Abrir menu">
-
           <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
             viewBox="0 0 24 24">
-
             <path d="M3 6h18M3 12h18M3 18h18"></path>
-
           </svg>
-
         </button>
-
 
         <div class="greeting">
 
           <h1>
-            Olá Thiago!
+            Olá <span id="nomeUsuario"></span>
           </h1>
 
           <p>
@@ -202,51 +118,39 @@
 
         </div>
 
-
         <div class="header-actions">
 
-
+          <!-- Pesquisa -->
           <div class="search-container">
 
             <svg width="18" height="18" fill="none" stroke="#6b7280" stroke-width="2" viewBox="0 0 24 24">
-
               <path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-
             </svg>
-
 
             <input type="text" id="search-input" placeholder="Buscar salas, carrinhos, laboratórios...">
 
           </div>
 
-
-          <!-- Página: Notificações -->
-
+          <!-- Notificações -->
           <a href="/notificacoes_prof" class="icon-btn">
-
             <img src="/assets/icons/notification (2).png" alt="Notificações" width="20" height="20">
-
           </a>
 
-
+          <!-- Perfil -->
           <div class="user-profile" id="userProfile">
-
 
             <div class="avatar-link">
 
               <div class="avatar">
-
                 <img src="/assets/icons/user (3).png" alt="Perfil do Usuário" width="28" height="28">
-
               </div>
 
             </div>
 
-
             <div class="user-info">
 
-              <span class="name">
-                Thiago
+              <span class="name" id="nomePerfil">
+                Usuário
               </span>
 
               <span class="role">
@@ -255,77 +159,52 @@
 
             </div>
 
-
+            <!-- Dropdown -->
             <div class="user-dropdown" id="userDropdown">
-
-
-              <!-- Página: Minhas Reservas -->
 
               <a href="/reservas_prof" class="dropdown-item">
                 Minhas Reservas
               </a>
 
-
-              <!-- Página: Configurações -->
-
-              <div class="dropdown-item">
+              <a href="/configuracoes" class="dropdown-item">
                 Configurações
-              </div>
-
+              </a>
 
               <div class="dropdown-divider"></div>
 
-
-              <!-- Página: Login -->
-
-              <a href="/" class="dropdown-item logout">
-                Sair
-              </a>
-
+              <form method="POST" action="/logout">
+                <button type="submit">
+                  Sair
+                </button>
+              </form>
 
             </div>
 
-
           </div>
-
 
         </div>
 
-
       </header>
 
-
-      <!-- ====================================================
-           AÇÕES RÁPIDAS
-           ==================================================== -->
-
+      <!-- AÇÕES RÁPIDAS -->
       <section class="quick-actions-section">
-
 
         <h2>
           O que você deseja reservar hoje?
         </h2>
 
-
         <div class="cards-grid">
 
-
-          <!-- Página: Escolher Reserva - Salas -->
-
+          <!-- Salas -->
           <a href="/escolher_reserva_salas" class="action-card searchable">
 
             <div class="icon-box">
-
               <img src="/assets/icons/classroom.png" alt="Ícone de Salas" width="24" height="24">
-
             </div>
-
 
             <div class="card-text">
 
-              <h3>
-                Salas
-              </h3>
+              <h3>Salas</h3>
 
               <p>
                 Salas de aula, reuniões e treinamentos
@@ -335,23 +214,16 @@
 
           </a>
 
-
-          <!-- Página: Escolher Reserva - Laboratórios -->
-
+          <!-- Laboratórios -->
           <a href="/escolher_reserva_laboratorios" class="action-card searchable">
 
             <div class="icon-box">
-
               <img src="/assets/icons/computer.png" alt="Laboratórios" width="24" height="24">
-
             </div>
-
 
             <div class="card-text">
 
-              <h3>
-                Laboratórios
-              </h3>
+              <h3>Laboratórios</h3>
 
               <p>
                 Laboratórios de informática, automação,
@@ -362,23 +234,16 @@
 
           </a>
 
-
-          <!-- Página: Escolher Reserva - Gabinetes -->
-
+          <!-- Gabinetes -->
           <a href="/escolher_reserva_gabinetes" class="action-card searchable">
 
             <div class="icon-box">
-
               <img src="/assets/icons/shopping-cart.png" alt="Gabinetes" width="24" height="24">
-
             </div>
-
 
             <div class="card-text">
 
-              <h3>
-                Gabinetes
-              </h3>
+              <h3>Gabinetes</h3>
 
               <p>
                 Gabinetes de notebooks e equipamentos móveis
@@ -388,26 +253,15 @@
 
           </a>
 
-
         </div>
-
 
       </section>
 
-
-      <!-- ====================================================
-           DASHBOARD
-           ==================================================== -->
-
+      <!-- DASHBOARD -->
       <div class="dashboard-split">
 
-
-        <!-- ==================================================
-             RESERVAS
-             ================================================== -->
-
+        <!-- RESERVAS -->
         <section class="reservations">
-
 
           <div class="section-header">
 
@@ -415,90 +269,59 @@
               Próximas reservas
             </h2>
 
-
-            <!-- Página: Reservas -->
-
             <a href="/reservas_prof" class="ver-mais">
-              Ver mais ->
+              Ver mais -&gt;
             </a>
 
           </div>
 
-
           <div class="res-list" id="proximasReservasList">
-
             <!-- Renderizado dinamicamente via JS -->
-
           </div>
-
 
           <div class="res-empty" id="proximasReservasEmpty" style="display: none;">
 
             <p>
-
               Você ainda não tem reservas.
 
-              <!-- Página: Reservar -->
-
               <a href="/reservar">
-                Fazer uma reserva ->
+                Fazer uma reserva -&gt;
               </a>
-
             </p>
 
           </div>
 
-
         </section>
 
-
-        <!-- ==================================================
-             PAINEL DIREITO
-             ================================================== -->
-
+        <!-- PAINEL DIREITO -->
         <aside class="right-panel">
 
-
-          <!-- =================================================
-               CALENDÁRIO
-               ================================================= -->
-
+          <!-- CALENDÁRIO -->
           <div class="calendar-widget">
 
-
             <div class="cal-header">
-
 
               <h3>
                 Calendário
               </h3>
 
-
               <div class="cal-nav">
-
 
                 <button class="cal-nav-btn" id="homeCalPrev" aria-label="Mês anterior">
                   ‹
                 </button>
 
-
-                <!-- Página: Calendário -->
-
                 <a href="/calendario_prof" class="month-selector" id="homeCalLabel">
                   Mês Ano
                 </a>
-
 
                 <button class="cal-nav-btn" id="homeCalNext" aria-label="Próximo mês">
                   ›
                 </button>
 
-
               </div>
 
-
             </div>
-
 
             <div class="cal-grid" id="homeCalGrid">
 
@@ -510,20 +333,14 @@
               <div class="day-name">S</div>
               <div class="day-name">S</div>
 
-              <!-- Os dias são renderizados pelo JavaScript -->
+              <!-- Dias renderizados pelo JavaScript -->
 
             </div>
 
-
           </div>
 
-
-          <!-- =================================================
-               AVISOS
-               ================================================= -->
-
+          <!-- AVISOS -->
           <div class="notices">
-
 
             <div class="section-header">
 
@@ -531,51 +348,35 @@
                 Avisos importantes
               </h2>
 
-
-              <!-- Página: Avisos -->
-
               <a href="/avisos" class="ver-mais">
-                Ver mais ->
+                Ver mais -&gt;
               </a>
 
             </div>
 
-
             <div class="avisos-preview-list" id="avisosPreviewList">
-
               <!-- Renderizado dinamicamente via JS -->
-
             </div>
-
 
             <div class="avisos-preview-empty" id="avisosPreviewEmpty" style="display: none;">
 
               <p>
-
                 Nenhum aviso publicado ainda.
 
-                <!-- Página: Avisos -->
-
                 <a href="/avisos">
-                  Criar o primeiro aviso ->
+                  Criar o primeiro aviso -&gt;
                 </a>
-
               </p>
 
             </div>
 
-
           </div>
-
 
         </aside>
 
-
       </div>
 
-
     </main>
-
 
   </div>
 
@@ -588,10 +389,64 @@
 <script src="/js/avisos.js"></script>
 <script src="/js/notificacoes-push.js"></script>
 
-
+  <!-- JAVASCRIPT INTERNO -->
   <script>
 
     document.addEventListener('DOMContentLoaded', () => {
+
+      // ======================================================
+      // NOME DO USUÁRIO LOGADO
+      // ======================================================
+
+      async function carregarUsuario() {
+
+        const nomeUsuario =
+          document.getElementById('nomeUsuario');
+
+        const nomePerfil =
+          document.getElementById('nomePerfil');
+
+        try {
+
+          const resposta = await fetch('/usuario-logado', {
+            method: 'GET',
+            credentials: 'same-origin'
+          });
+
+          // Se não estiver autenticado, volta para o login
+          if (resposta.status === 401) {
+            window.location.href = '/';
+            return;
+          }
+
+          if (!resposta.ok) {
+            throw new Error('Erro ao consultar usuário');
+          }
+
+          const usuario = await resposta.json();
+
+          // Atualiza a saudação
+          if (nomeUsuario) {
+            nomeUsuario.textContent = usuario.nome;
+          }
+
+          // Atualiza o nome no perfil
+          if (nomePerfil) {
+            nomePerfil.textContent = usuario.nome;
+          }
+
+        } catch (erro) {
+
+          console.error(
+            'Erro ao carregar usuário:',
+            erro
+          );
+
+        }
+
+      }
+
+      carregarUsuario();
 
 
       // ======================================================
@@ -604,32 +459,20 @@
       const itemsToSearch =
         document.querySelectorAll('.searchable');
 
-
       if (searchInput) {
 
         searchInput.addEventListener('input', (e) => {
 
           const searchTerm =
-            e.target.value
-              .toLowerCase()
-              .trim();
-
+            e.target.value.toLowerCase().trim();
 
           itemsToSearch.forEach(item => {
 
             const text =
               item.textContent.toLowerCase();
 
-
-            if (text.includes(searchTerm)) {
-
-              item.style.display = '';
-
-            } else {
-
-              item.style.display = 'none';
-
-            }
+            item.style.display =
+              text.includes(searchTerm) ? '' : 'none';
 
           });
 
@@ -648,24 +491,21 @@
       const userDropdown =
         document.getElementById('userDropdown');
 
-
       if (userProfile && userDropdown) {
 
         userProfile.addEventListener('click', (e) => {
 
+          // Não fecha o dropdown ao clicar dentro dele
           e.stopPropagation();
 
           userDropdown.classList.toggle('active');
 
         });
 
-
         document.addEventListener('click', (e) => {
 
           if (!userProfile.contains(e.target)) {
-
             userDropdown.classList.remove('active');
-
           }
 
         });
@@ -686,26 +526,18 @@
       const sidebarOverlay =
         document.getElementById('sidebarOverlay');
 
-
-      if (
-        menuToggle &&
-        sidebar &&
-        sidebarOverlay
-      ) {
+      if (menuToggle && sidebar && sidebarOverlay) {
 
         menuToggle.addEventListener('click', () => {
 
           sidebar.classList.toggle('open');
-
           sidebarOverlay.classList.toggle('active');
 
         });
 
-
         sidebarOverlay.addEventListener('click', () => {
 
           sidebar.classList.remove('open');
-
           sidebarOverlay.classList.remove('active');
 
         });
@@ -722,20 +554,13 @@
         const cat =
           (categoria || '').toLowerCase();
 
-
         if (cat.includes('laborat')) {
-
           return '/assets/icons/computer.png';
-
         }
-
 
         if (cat.includes('gabinete')) {
-
           return '/assets/icons/shopping-cart.png';
-
         }
-
 
         return '/assets/icons/classroom.png';
 
@@ -753,118 +578,106 @@
             'proximasReservasList'
           );
 
-
         const emptyEl =
           document.getElementById(
             'proximasReservasEmpty'
           );
 
+        if (!listaEl || !emptyEl) return;
 
         const todas =
           ReservasApp.getReservas();
 
-
         const proximas =
           todas.slice(0, 4);
-
 
         if (proximas.length === 0) {
 
           listaEl.innerHTML = '';
-
           emptyEl.style.display = 'block';
 
           return;
 
         }
 
-
         emptyEl.style.display = 'none';
 
+        listaEl.innerHTML = proximas.map(r => {
 
-        listaEl.innerHTML =
-          proximas.map(r => {
+          const info =
+            ReservasApp.statusInfo(r.status);
 
-            const info =
-              ReservasApp.statusInfo(r.status);
+          const acoes =
+            r.status === 'cancelada'
+              ? ''
+              : `
+                                <button
+                                    class="btn-cancelar-reserva btn-cancelar-sm"
+                                    data-cancel-id="${r.id}"
+                                >
+                                    Cancelar Reserva
+                                </button>
+                            `;
 
+          return `
+                        <div
+                            class="res-card searchable"
+                            data-id="${r.id}"
+                        >
 
-            const acoes =
-              r.status === 'cancelada'
-                ? ''
-                : `
-                  <button
-                    class="btn-cancelar-reserva btn-cancelar-sm"
-                    data-cancel-id="${r.id}"
-                  >
-                    Cancelar Reserva
-                  </button>
-                `;
+                            <div class="res-left">
 
+                                <div class="img-placeholder">
 
-            return `
+                                    <img
+                                        src="${iconeDaCategoria(r.categoria)}"
+                                        alt=""
+                                        width="24"
+                                        height="24"
+                                    >
 
-              <div
-                class="res-card searchable"
-                data-id="${r.id}"
-              >
+                                </div>
 
-                <div class="res-left">
+                                <div class="res-info">
 
-                  <div class="img-placeholder">
+                                    <h4>
+                                        ${r.item || r.categoria}
+                                    </h4>
 
-                    <img
-                      src="${iconeDaCategoria(r.categoria)}"
-                      alt=""
-                      width="24"
-                      height="24"
-                    >
+                                    <p>
+                                        ${ReservasApp.formatDateBR(r.data)}
+                                        ·
+                                        ${ReservasApp.formatHorario(
+            r.horaEntrada,
+            r.horaSaida
+          )}
+                                    </p>
 
-                  </div>
+                                </div>
 
+                            </div>
 
-                  <div class="res-info">
+                            <div class="res-right">
 
-                    <h4>
-                      ${r.item || r.categoria}
-                    </h4>
+                                <span class="${info.badgeClass}">
+                                    ${info.label}
+                                </span>
 
-                    <p>
-                      ${ReservasApp.formatDateBR(r.data)}
-                      ·
-                      ${ReservasApp.formatHorario(
-              r.horaEntrada,
-              r.horaSaida
-            )}
-                    </p>
+                                ${acoes}
 
-                  </div>
+                                <button
+                                    class="btn-excluir-reserva btn-cancelar-sm"
+                                    data-delete-id="${r.id}"
+                                >
+                                    Excluir
+                                </button>
 
-                </div>
+                            </div>
 
+                        </div>
+                    `;
 
-                <div class="res-right">
-
-                  <span class="${info.badgeClass}">
-                    ${info.label}
-                  </span>
-
-                  ${acoes}
-
-                  <button
-                    class="btn-excluir-reserva btn-cancelar-sm"
-                    data-delete-id="${r.id}"
-                  >
-                    Excluir
-                  </button>
-
-                </div>
-
-              </div>
-
-            `;
-
-          }).join('');
+        }).join('');
 
       }
 
@@ -873,27 +686,26 @@
       // AÇÕES DAS RESERVAS
       // ======================================================
 
-      document
-        .getElementById('proximasReservasList')
-        .addEventListener('click', (e) => {
+      const listaReservas =
+        document.getElementById(
+          'proximasReservasList'
+        );
 
+      if (listaReservas) {
+
+        listaReservas.addEventListener('click', (e) => {
 
           const deleteButton =
             e.target.closest('[data-delete-id]');
 
-
           if (deleteButton) {
 
-            if (
-              !window.confirm(
+            const confirmar =
+              window.confirm(
                 'Excluir esta reserva definitivamente?'
-              )
-            ) {
+              );
 
-              return;
-
-            }
-
+            if (!confirmar) return;
 
             ReservasApp.deleteReserva(
               deleteButton.dataset.deleteId
@@ -903,40 +715,27 @@
 
           }
 
-
           const btn =
             e.target.closest('[data-cancel-id]');
 
-
-          if (!btn) {
-
-            return;
-
-          }
-
+          if (!btn) return;
 
           const confirmar =
             window.confirm(
               'Tem certeza que deseja cancelar esta reserva?'
             );
 
-
-          if (!confirmar) {
-
-            return;
-
-          }
-
+          if (!confirmar) return;
 
           ReservasApp.cancelReserva(
             btn.dataset.cancelId
           );
 
-
           renderProximasReservas();
 
         });
 
+      }
 
       renderProximasReservas();
 
@@ -948,7 +747,6 @@
       ReservasApp.subscribe(() => {
 
         renderProximasReservas();
-
         renderCalendarioWidget();
 
       });
@@ -965,72 +763,62 @@
             'avisosPreviewList'
           );
 
-
         const emptyEl =
           document.getElementById(
             'avisosPreviewEmpty'
           );
 
+        if (!listaEl || !emptyEl) return;
 
         const todos =
           AvisosApp.getAvisos();
 
-
-        // Mostra apenas os 3 avisos mais recentes na Página Inicial.
+        // Mostra os 3 avisos mais recentes
         const recentes =
           todos.slice(0, 3);
-
 
         if (recentes.length === 0) {
 
           listaEl.innerHTML = '';
-
           emptyEl.style.display = 'block';
 
           return;
 
         }
 
-
         emptyEl.style.display = 'none';
 
+        listaEl.innerHTML = recentes.map(a => {
 
-        listaEl.innerHTML =
-          recentes.map(a => {
+          return `
+                        <a
+                            href="/avisos"
+                            class="notice-card searchable"
+                        >
 
-            return `
+                            <div class="notice-title">
 
-              <a
-                href="/avisos"
-                class="notice-card searchable"
-              >
+                                <img
+                                    src="/assets/icons/warning.png"
+                                    alt=""
+                                    width="24"
+                                    height="24"
+                                >
 
-                <div class="notice-title">
+                                ${a.titulo}
 
-                  <img
-                    src="/assets/icons/warning.png"
-                    alt=""
-                    width="24"
-                    height="24"
-                  >
+                            </div>
 
-                  ${a.titulo}
+                            <p>
+                                ${a.descricao}
+                            </p>
 
-                </div>
+                        </a>
+                    `;
 
-
-                <p>
-                  ${a.descricao}
-                </p>
-
-              </a>
-
-            `;
-
-          }).join('');
+        }).join('');
 
       }
-
 
       renderAvisosPreview();
 
@@ -1054,21 +842,25 @@
       let widgetMes =
         hoje.getMonth();
 
-
       const hojeISO =
         ReservasApp.todayISO();
 
 
       function renderCalendarioWidget() {
 
-        document.getElementById(
-          'homeCalLabel'
-        ).textContent =
+        const labelEl =
+          document.getElementById('homeCalLabel');
+
+        const gridEl =
+          document.getElementById('homeCalGrid');
+
+        if (!labelEl || !gridEl) return;
+
+        labelEl.textContent =
           ReservasApp.mesLabel(
             widgetAno,
             widgetMes
           );
-
 
         const celulas =
           ReservasApp.construirMatrizMes(
@@ -1076,84 +868,50 @@
             widgetMes
           );
 
-
-        const gridEl =
-          document.getElementById(
-            'homeCalGrid'
-          );
-
-
+        // Remove os dias anteriores
         gridEl
           .querySelectorAll('.day-num')
           .forEach(el => el.remove());
 
-
         celulas.forEach(c => {
-
 
           const reservasDoDia =
             ReservasApp.getReservasPorData(
               c.iso
             );
 
-
           const anoDaCelula =
-            parseInt(
-              c.iso.slice(0, 4),
-              10
-            );
-
+            parseInt(c.iso.slice(0, 4), 10);
 
           const mesDaCelula =
-            parseInt(
-              c.iso.slice(5, 7),
-              10
-            ) - 1;
-
+            parseInt(c.iso.slice(5, 7), 10) - 1;
 
           const el =
             document.createElement('a');
 
-
-          // Página: Calendário
-
+          // Abre o calendário na data selecionada
           el.href =
             `/calendario_prof?ano=${anoDaCelula}&mes=${mesDaCelula}&dia=${c.dia}`;
 
-
-          const classes = [
-            'day-num'
-          ];
-
+          const classes = ['day-num'];
 
           if (!c.mesAtual) {
-
             classes.push('muted');
-
           }
-
 
           if (c.iso === hojeISO) {
-
             classes.push('active');
-
           }
-
 
           if (reservasDoDia.length > 0) {
-
             classes.push('has-reservation');
-
           }
-
 
           el.className =
             classes.join(' ');
 
-
           el.textContent =
             c.dia;
-
 
           gridEl.appendChild(el);
 
@@ -1166,52 +924,54 @@
       // MÊS ANTERIOR
       // ======================================================
 
-      document
-        .getElementById('homeCalPrev')
-        .addEventListener('click', () => {
+      const homeCalPrev =
+        document.getElementById('homeCalPrev');
 
+      if (homeCalPrev) {
+
+        homeCalPrev.addEventListener('click', () => {
 
           widgetMes -= 1;
-
 
           if (widgetMes < 0) {
 
             widgetMes = 11;
-
             widgetAno -= 1;
 
           }
 
-
           renderCalendarioWidget();
 
         });
+
+      }
 
 
       // ======================================================
       // PRÓXIMO MÊS
       // ======================================================
 
-      document
-        .getElementById('homeCalNext')
-        .addEventListener('click', () => {
+      const homeCalNext =
+        document.getElementById('homeCalNext');
 
+      if (homeCalNext) {
+
+        homeCalNext.addEventListener('click', () => {
 
           widgetMes += 1;
-
 
           if (widgetMes > 11) {
 
             widgetMes = 0;
-
             widgetAno += 1;
 
           }
 
-
           renderCalendarioWidget();
 
         });
+
+      }
 
 
       // ======================================================
@@ -1223,7 +983,6 @@
     });
 
   </script>
-
 
 </body>
 
