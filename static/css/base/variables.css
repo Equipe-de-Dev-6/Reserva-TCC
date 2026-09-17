@@ -1,0 +1,32 @@
+:root {
+    --senai-red: #E30613;
+    --bg-color: #F4F5F7;
+    --white: #FFFFFF;
+    --text-dark: #1F2937;
+    --text-gray: #6B7280;
+    --border-color: #E5E7EB;
+    --green-bg: #D1FAE5;
+    --green-text: #059669;
+    --red-bg: #FEE2E2;
+    --red-text: #DC2626;
+    --yellow-bg: #FEF3C7;
+    --yellow-text: #B45309;
+
+
+    
+    /* Cores principais */
+    --cor-principal: #FF0000;
+    --cor-hover: #CC0000;
+    --cor-ativa: #990000;
+    --cor-clara: #FF3333;
+
+    /* Cores de fundo e texto */
+    --cor-fundo: #FFFFFF;
+    --cor-texto: #111111;
+    --cor-secundaria: #666666;
+
+    /* Bordas e efeitos */
+    --cor-borda: #DDDDDD;
+    --sombra: 0 4px 12px rgba(0, 0, 0, 0.15);
+    --border-radius: 8px;
+}

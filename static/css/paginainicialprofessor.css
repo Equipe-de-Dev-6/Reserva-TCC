@@ -1,49 +1,5 @@
 @import url('https://fonts.googleapis.com/css2?family=Manrope:wght@200..800&family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap');
 
-:root {
-  --senai-red: #E30613;
-  --bg-color: #F4F5F7;
-  --white: #FFFFFF;
-  --text-dark: #1F2937;
-  --text-gray: #6B7280;
-  --border-color: #E5E7EB;
-  --green-bg: #D1FAE5;
-  --green-text: #059669;
-  --red-bg: #FEE2E2;
-  --red-text: #DC2626;
-  --yellow-bg: #FEF3C7;
-  --yellow-text: #B45309;
-}
-
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-  font-family: 'Inter', sans-serif;
-}
-
-html {
-  -webkit-text-size-adjust: 100%;
-  scrollbar-gutter: stable;
-}
-
-body, html {
-  height: 100vh;
-  width: 100vw;
-  overflow: hidden;
-  background-color: var(--bg-color);
-  color: var(--text-dark);
-}
-
-a {
-  text-decoration: none;
-  color: inherit;
-}
-
-img {
-  max-width: 100%;
-}
-
 button {
   font-family: 'Inter', sans-serif;
 }
@@ -338,7 +294,7 @@ button {
   background-color: var(--white);
   padding: 20px;
   border-radius: 12px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
   display: flex;
   flex-direction: column;
   gap: 12px;
@@ -418,12 +374,14 @@ button {
   justify-content: space-between;
   align-items: center;
   gap: 12px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
   transition: transform 0.2s;
   flex-wrap: wrap;
 }
 
-.res-card:hover { transform: translateY(-2px); }
+.res-card:hover {
+  transform: translateY(-2px);
+}
 
 .res-left {
   display: flex;
@@ -563,7 +521,7 @@ button {
   background: var(--white);
   padding: 20px;
   border-radius: 12px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
 }
 
 .cal-header {
@@ -573,8 +531,15 @@ button {
   margin-bottom: 16px;
 }
 
-.cal-header h3 { font-size: 15px; font-weight: 700; }
-.month-selector { font-size: 12px; font-weight: 600; }
+.cal-header h3 {
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.month-selector {
+  font-size: 12px;
+  font-weight: 600;
+}
 
 .cal-nav {
   display: flex;
@@ -627,8 +592,14 @@ button {
   transition: 0.2s;
 }
 
-.day-num:hover:not(.active) { background-color: var(--bg-color); }
-.day-num.muted { color: #D1D5DB; }
+.day-num:hover:not(.active) {
+  background-color: var(--bg-color);
+}
+
+.day-num.muted {
+  color: #D1D5DB;
+}
+
 .day-num.active {
   background-color: var(--senai-red);
   color: var(--white);
@@ -662,11 +633,13 @@ button {
   border-radius: 8px;
   border-left: 4px solid var(--senai-red);
   margin-bottom: 10px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
   transition: transform 0.2s;
 }
 
-.notice-card:hover { transform: translateX(2px); }
+.notice-card:hover {
+  transform: translateX(2px);
+}
 
 .notice-title {
   display: flex;
@@ -703,7 +676,9 @@ button {
 }
 
 @media (max-width: 860px) {
-  body, html {
+
+  body,
+  html {
     height: auto;
     overflow: visible;
   }
@@ -723,7 +698,7 @@ button {
     left: 0;
     top: 0;
     transform: translateX(-100%);
-    box-shadow: 4px 0 16px rgba(0,0,0,0.1);
+    box-shadow: 4px 0 16px rgba(0, 0, 0, 0.1);
     z-index: 300;
   }
 

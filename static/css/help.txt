@@ -1,0 +1,7 @@
+static/css/components/
+├── header.css
+├── sidebar.css
+├── buttons.css
+├── forms.css
+├── cards.css
+└── modal.css

@@ -1,53 +1,5 @@
 @import url('https://fonts.googleapis.com/css2?family=Manrope:wght@200..800&family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap');
 
-:root {
-  --senai-red: #E30613;
-  --bg-color: #F4F5F7;
-  --white: #FFFFFF;
-  --text-dark: #1F2937;
-  --text-gray: #6B7280;
-  --border-color: #E5E7EB;
-  --green-bg: #D1FAE5;
-  --green-text: #059669;
-  --red-bg: #FEE2E2;
-  --red-text: #DC2626;
-  --yellow-bg: #FEF3C7;
-  --yellow-text: #B45309;
-}
-
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-  font-family: 'Inter', sans-serif;
-}
-
-html {
-  -webkit-text-size-adjust: 100%;
-  scrollbar-gutter: stable;
-}
-
-body, html {
-  height: 100vh;
-  width: 100vw;
-  overflow: hidden;
-  background-color: var(--bg-color);
-  color: var(--text-dark);
-}
-
-a {
-  text-decoration: none;
-  color: inherit;
-}
-
-img {
-  max-width: 100%;
-}
-
-button {
-  font-family: 'Inter', sans-serif;
-}
-
 .app-container {
   display: flex;
   height: 100vh;
@@ -338,7 +290,7 @@ button {
   background-color: var(--white);
   padding: 20px;
   border-radius: 12px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
   display: flex;
   flex-direction: column;
   gap: 12px;
@@ -396,167 +348,167 @@ button {
 ============================== */
 
 .notifications-heading {
-    display: flex;
-    align-items: flex-end;
-    justify-content: space-between;
-    gap: 16px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
 }
 
 .btn-limpar-notificacoes,
 .notification-delete {
-    border: 1px solid #d1d5db;
-    background: #ffffff;
-    color: #374151;
-    border-radius: 7px;
-    cursor: pointer;
-    font-size: 11px;
-    font-weight: 700;
-    transition: background-color 0.2s, color 0.2s, border-color 0.2s;
+  border: 1px solid #d1d5db;
+  background: #ffffff;
+  color: #374151;
+  border-radius: 7px;
+  cursor: pointer;
+  font-size: 11px;
+  font-weight: 700;
+  transition: background-color 0.2s, color 0.2s, border-color 0.2s;
 }
 
 .btn-limpar-notificacoes {
-    padding: 8px 12px;
-    white-space: nowrap;
+  padding: 8px 12px;
+  white-space: nowrap;
 }
 
 .btn-limpar-notificacoes:hover,
 .notification-delete:hover {
-    background: #eff6ff;
-    border-color: #2563eb;
-    color: #1d4ed8;
+  background: #eff6ff;
+  border-color: #2563eb;
+  color: #1d4ed8;
 }
 
 .notifications-container {
-    margin-top: 30px;
-    background: #ffffff;
-    border: 1px solid #e5e7eb;
-    border-radius: 6px;
-    overflow: hidden;
+  margin-top: 30px;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  overflow: hidden;
 }
 
 .notification-item {
-    min-height: 57px;
-    padding: 12px 18px;
+  min-height: 57px;
+  padding: 12px 18px;
 
-    display: flex;
-    align-items: center;
+  display: flex;
+  align-items: center;
 
-    position: relative;
+  position: relative;
 
-    border-bottom: 1px solid #eeeeee;
+  border-bottom: 1px solid #eeeeee;
 }
 
 .notification-delete {
-    margin-left: 12px;
-    padding: 6px 9px;
-    flex-shrink: 0;
+  margin-left: 12px;
+  padding: 6px 9px;
+  flex-shrink: 0;
 }
 
 .notification-empty {
-    padding: 24px;
-    color: var(--text-gray);
-    font-size: 13px;
-    text-align: center;
+  padding: 24px;
+  color: var(--text-gray);
+  font-size: 13px;
+  text-align: center;
 }
 
 .notification-item:last-child {
-    border-bottom: none;
+  border-bottom: none;
 }
 
 
 /* ÍCONE */
 
 .notification-icon {
-    width: 27px;
-    height: 27px;
-    min-width: 27px;
+  width: 27px;
+  height: 27px;
+  min-width: 27px;
 
-    border-radius: 50%;
+  border-radius: 50%;
 
-    display: flex;
-    align-items: center;
-    justify-content: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 
-    margin-right: 12px;
+  margin-right: 12px;
 }
 
 .notification-icon img {
-    width: 14px;
-    height: 14px;
+  width: 14px;
+  height: 14px;
 }
 
 
 /* CORES DOS ÍCONES */
 
 .notification-icon.success {
-    background: #dcfce7;
+  background: #dcfce7;
 }
 
 .notification-icon.warning {
-    background: #fef3c7;
+  background: #fef3c7;
 }
 
 .notification-icon.danger {
-    background: #fee2e2;
+  background: #fee2e2;
 }
 
 .notification-icon.info {
-    background: #dbeafe;
+  background: #dbeafe;
 }
 
 
 /* TEXTO */
 
 .notification-content {
-    flex: 1;
+  flex: 1;
 }
 
 .notification-content h3 {
-    margin: 0 0 3px;
+  margin: 0 0 3px;
 
-    font-size: 11px;
-    font-weight: 700;
+  font-size: 11px;
+  font-weight: 700;
 
-    color: #1f2937;
+  color: #1f2937;
 }
 
 .notification-content p {
-    margin: 0;
+  margin: 0;
 
-    font-size: 10px;
+  font-size: 10px;
 
-    color: #4b5563;
+  color: #4b5563;
 }
 
 
 /* BOLINHA DE NÃO LIDA */
 
 .notification-dot {
-    display: inline-block;
+  display: inline-block;
 
-    width: 4px;
-    height: 4px;
+  width: 4px;
+  height: 4px;
 
-    margin-left: 3px;
+  margin-left: 3px;
 
-    border-radius: 50%;
+  border-radius: 50%;
 
-    background: #2563eb;
+  background: #2563eb;
 }
 
 
 /* TEMPO */
 
 .notification-time {
-    position: static;
+  position: static;
 
-    margin-left: 12px;
-    white-space: nowrap;
-    flex-shrink: 0;
+  margin-left: 12px;
+  white-space: nowrap;
+  flex-shrink: 0;
 
-    font-size: 8px;
+  font-size: 8px;
 
-    color: #9ca3af;
+  color: #9ca3af;
 }
 
 @media (max-width: 1024px) {
@@ -579,7 +531,9 @@ button {
 }
 
 @media (max-width: 860px) {
-  body, html {
+
+  body,
+  html {
     height: auto;
     overflow: visible;
   }
@@ -599,7 +553,7 @@ button {
     left: 0;
     top: 0;
     transform: translateX(-100%);
-    box-shadow: 4px 0 16px rgba(0,0,0,0.1);
+    box-shadow: 4px 0 16px rgba(0, 0, 0, 0.1);
     z-index: 300;
   }
 

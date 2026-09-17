@@ -1,50 +1,5 @@
 @import url('https://fonts.googleapis.com/css2?family=Manrope:wght@200..800&family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap');
 
-:root {
-  --senai-red: #E30613;
-  --senai-blue: #3B82F6;
-  --bg-color: #F4F5F7;
-  --white: #FFFFFF;
-  --text-dark: #1F2937;
-  --text-gray: #6B7280;
-  --border-color: #E5E7EB;
-  --green-bg: #D1FAE5;
-  --green-text: #059669;
-  --red-bg: #FEE2E2;
-  --red-text: #DC2626;
-  --yellow-bg: #FEF3C7;
-  --yellow-text: #B45309;
-}
-
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-  font-family: 'Inter', sans-serif;
-}
-
-html {
-  -webkit-text-size-adjust: 100%;
-  scrollbar-gutter: stable;
-}
-
-body, html {
-  height: 100vh;
-  width: 100vw;
-  overflow: hidden;
-  background-color: var(--bg-color);
-  color: var(--text-dark);
-}
-
-a {
-  text-decoration: none;
-  color: inherit;
-}
-
-img {
-  max-width: 100%;
-}
-
 .app-container {
   display: flex;
   height: 100vh;
@@ -385,7 +340,7 @@ img {
   justify-content: space-between;
   align-items: center;
   gap: 12px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
   transition: transform 0.15s, border-color 0.15s;
 }
 
@@ -525,7 +480,9 @@ img {
 }
 
 @media (max-width: 860px) {
-  body, html {
+
+  body,
+  html {
     height: auto;
     overflow: visible;
   }
@@ -545,7 +502,7 @@ img {
     left: 0;
     top: 0;
     transform: translateX(-100%);
-    box-shadow: 4px 0 16px rgba(0,0,0,0.1);
+    box-shadow: 4px 0 16px rgba(0, 0, 0, 0.1);
     z-index: 300;
   }
 
