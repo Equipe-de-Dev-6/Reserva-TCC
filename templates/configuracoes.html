@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Configurações - Gestão de salas e equipamentos</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap"
+    rel="stylesheet">
+
+  <link rel="stylesheet" href="/static/css/configruacoes.css    ">
+
+</head>
+
+<body>
+
+  <div class="app-container">
+
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <aside class="sidebar">
+
+      <div class="sidebar-top">
+
+        <!-- Logo SENAI -->
+        <a href="/reservar" class="logo">
+          <img src="/assets/img/Logo senai.png" alt="SENAI">
+        </a>
+
+        <nav class="nav-menu">
+
+          <!-- Página: Início -->
+          <a href="/home" class="nav-item">
+            <img src="/assets/icons/home.png" alt="" width="20" height="20">
+            Início
+          </a>
+
+          <!-- Página: Reservar -->
+          <a href="/reservar" class="nav-item">
+            <img src="/assets/icons/restaurant.png" alt="" width="20" height="20">
+            Reservar
+          </a>
+
+          <!-- Página: Reservas -->
+          <a href="/reservas_prof" class="nav-item">
+            <img src="/assets/icons/reserved.png" alt="" width="20" height="20">
+            Reservas
+          </a>
+
+          <!-- Página: Calendário -->
+          <a href="/calendario_prof" class="nav-item">
+            <img src="/assets/icons/calendar.png" alt="" width="20" height="20">
+            Calendário
+          </a>
+
+          <!-- Página: Notificações -->
+          <a href="/notificacoes_prof" class="nav-item">
+            <img src="/assets/icons/notification.png" alt="" width="20" height="20">
+            Notificações
+          </a>
+
+          <!-- Página: Avisos -->
+          <a href="/avisos" class="nav-item">
+            <img src="/assets/icons/warning.png" alt="" width="20" height="20">
+            Avisos
+          </a>
+
+          <!-- Página: Configurações -->
+          <a href="/configuracoes" class="nav-item active">
+            <img src="/assets/icons/gear.png" alt="" width="20" height="20">
+            Configurações
+          </a>
+
+        </nav>
+
+        <div class="divider"></div>
+
+        <!-- Página: Ajuda -->
+        <a href="/ajuda" class="nav-item">
+          <img src="/assets/icons/interrogation.png" alt="" width="20" height="20">
+          Ajuda
+        </a>
+
+      </div>
+
+      <!-- Página: Login -->
+      <a href="/" class="btn-logout">
+        <img src="/assets/icons/exit.png" alt="" width="20" height="20">
+        Sair
+      </a>
+
+    </aside>
+
+
+    <main class="main-content">
+
+      <header class="header">
+
+        <button class="menu-toggle" id="menuToggle" aria-label="Abrir menu">
+
+          <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" viewBox="0 0 24 24">
+
+            <path d="M3 6h18M3 12h18M3 18h18"></path>
+
+          </svg>
+
+        </button>
+
+
+        <div class="greeting">
+
+          <h1>
+            Olá Thiago!
+          </h1>
+
+          <p>
+            Gerencie suas reservas e faça novos agendamentos
+          </p>
+
+        </div>
+
+
+        <div class="header-actions">
+
+          <div class="search-container">
+
+            <svg width="18" height="18" fill="none" stroke="#6b7280"
+              stroke-width="2" viewBox="0 0 24 24">
+
+              <path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+
+            </svg>
+
+            <input
+              type="text"
+              id="search-input"
+              placeholder="Buscar salas, carrinhos, laboratórios...">
+
+          </div>
+
+
+          <!-- Página: Notificações -->
+          <a href="/notificacoes_prof" class="icon-btn">
+
+            <img
+              src="/assets/icons/notification (2).png"
+              alt="Notificações"
+              width="20"
+              height="20">
+
+          </a>
+
+
+          <div class="user-profile" id="userProfile">
+
+            <div class="avatar-link">
+
+              <div class="avatar">
+
+                <img
+                  src="/assets/icons/user (3).png"
+                  alt="Perfil do Usuário"
+                  width="28"
+                  height="28">
+
+              </div>
+
+            </div>
+
+
+            <div class="user-info">
+
+              <span class="name">
+                Thiago
+              </span>
+
+              <span class="role">
+                Professor
+              </span>
+
+            </div>
+
+
+            <div class="user-dropdown" id="userDropdown">
+
+              <!-- Minhas Reservas -->
+              <a href="/reservas_prof" class="dropdown-item">
+                Minhas Reservas
+              </a>
+
+              <!-- Configurações -->
+              <a href="/configuracoes" class="dropdown-item">
+                Configurações
+              </a>
+
+              <div class="dropdown-divider"></div>
+
+              <!-- Login -->
+              <a href="/" class="dropdown-item logout">
+                Sair
+              </a>
+
+            </div>
+
+          </div>
+
+        </div>
+
+      </header>
+
+
+      <!-- CONTEÚDO DAS CONFIGURAÇÕES -->
+
+      <section class="settings-section">
+
+        <h2>
+          Configurações da Conta
+        </h2>
+
+
+        <div class="settings-card">
+
+          <div class="settings-header">
+
+            <h3>
+              Informações do Perfil
+            </h3>
+
+            <p>
+              Atualize as informações principais do seu perfil de Professor do SENAI
+            </p>
+
+          </div>
+
+
+          <div class="settings-divider"></div>
+
+
+          <div class="profile-form">
+
+
+            <!-- Nome Completo -->
+            <div class="form-group">
+
+              <label for="nome">
+                Nome Completo
+              </label>
+
+              <div class="input-container">
+
+                <input
+                  type="text"
+                  id="nome"
+                  name="nome">
+
+              </div>
+
+            </div>
+
+
+            <!-- Cargo / Função -->
+            <div class="form-group">
+
+              <label for="cargo">
+                Cargo / Função
+              </label>
+
+              <div class="input-container">
+
+                <input
+                  type="text"
+                  id="cargo"
+                  name="cargo">
+
+              </div>
+
+            </div>
+
+
+            <!-- E-mail -->
+            <div class="form-group">
+
+              <label for="email">
+                E-mail Institucional
+              </label>
+
+              <div class="input-container">
+
+                <input
+                  type="email"
+                  id="email"
+                  name="email">
+
+              </div>
+
+            </div>
+
+
+            <!-- Departamento -->
+            <div class="form-group">
+
+              <label for="departamento">
+                Departamento
+              </label>
+
+              <div class="input-container">
+
+                <input
+                  type="text"
+                  id="departamento"
+                  name="departamento">
+
+              </div>
+
+            </div>
+
+          </div>
+
+
+          <div class="settings-divider"></div>
+
+
+          <!-- Notificações -->
+
+          <div class="notifications-section">
+
+            <h3>
+              Preferências de Notificações
+            </h3>
+
+
+            <div class="notification-option">
+
+              <div>
+
+                <strong>
+                  Notificações de reservas
+                </strong>
+
+                <p>
+                  Receba notificações sobre suas reservas.
+                </p>
+
+              </div>
+
+              <label class="switch">
+
+                <input
+                  type="checkbox"
+                  id="notificacoesReservas"
+                  checked>
+
+                <span class="slider"></span>
+
+              </label>
+
+            </div>
+
+
+            <div class="notification-option">
+
+              <div>
+
+                <strong>
+                  Notificações do sistema
+                </strong>
+
+                <p>
+                  Receba notificações importantes do sistema.
+                </p>
+
+              </div>
+
+              <label class="switch">
+
+                <input
+                  type="checkbox"
+                  id="notificacoesSistema"
+                  checked>
+
+                <span class="slider"></span>
+
+              </label>
+
+            </div>
+
+          </div>
+
+
+          <div class="settings-divider"></div>
+
+
+          <div class="settings-buttons">
+
+            <button
+              type="button"
+              class="btn-cancelar"
+              id="btnCancelar">
+
+              Cancelar
+
+            </button>
+
+
+            <button
+              type="button"
+              class="btn-salvar"
+              id="btnSalvar">
+
+              Salvar Configurações
+
+            </button>
+
+          </div>
+
+        </div>
+
+      </section>
+
+    </main>
+
+  </div>
+
+
+  <script>
+
+    document.addEventListener('DOMContentLoaded', () => {
+
+
+      // ======================================================
+      // DROPDOWN DO USUÁRIO
+      // ======================================================
+
+      const userProfile =
+        document.getElementById('userProfile');
+
+      const userDropdown =
+        document.getElementById('userDropdown');
+
+
+      if (userProfile && userDropdown) {
+
+        userProfile.addEventListener('click', (e) => {
+
+          e.stopPropagation();
+
+          if (userDropdown.contains(e.target)) {
+            return;
+          }
+
+          userDropdown.classList.toggle('active');
+
+        });
+
+
+        document.addEventListener('click', (e) => {
+
+          if (!userProfile.contains(e.target)) {
+
+            userDropdown.classList.remove('active');
+
+          }
+
+        });
+
+      }
+
+
+      // ======================================================
+      // MENU MOBILE
+      // ======================================================
+
+      const menuToggle =
+        document.getElementById('menuToggle');
+
+      const sidebar =
+        document.querySelector('.sidebar');
+
+      const sidebarOverlay =
+        document.getElementById('sidebarOverlay');
+
+
+      if (
+        menuToggle &&
+        sidebar &&
+        sidebarOverlay
+      ) {
+
+        menuToggle.addEventListener('click', () => {
+
+          sidebar.classList.toggle('open');
+
+          sidebarOverlay.classList.toggle('active');
+
+        });
+
+
+        sidebarOverlay.addEventListener('click', () => {
+
+          sidebar.classList.remove('open');
+
+          sidebarOverlay.classList.remove('active');
+
+        });
+
+      }
+
+
+      // ======================================================
+      // BOTÃO CANCELAR
+      // ======================================================
+
+      const btnCancelar =
+        document.getElementById('btnCancelar');
+
+
+      if (btnCancelar) {
+
+        btnCancelar.addEventListener('click', () => {
+
+          document.getElementById('nome').value = '';
+          document.getElementById('cargo').value = '';
+          document.getElementById('email').value = '';
+          document.getElementById('departamento').value = '';
+
+        });
+
+      }
+
+
+      // ======================================================
+      // BOTÃO SALVAR
+      // ======================================================
+
+      const btnSalvar =
+        document.getElementById('btnSalvar');
+
+
+      if (btnSalvar) {
+
+        btnSalvar.addEventListener('click', () => {
+
+          alert('Configurações salvas com sucesso!');
+
+        });
+
+      }
+
+    });
+
+  </script>
+
+</body>
+
+</html>
