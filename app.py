@@ -218,7 +218,7 @@ def ajuda():
         "templates/ajuda.html"
     )
 
-@app.get("/avios")
+@app.get("/avisos")
 def ajuda():
     return FileResponse(
         "templates/avisos.html"
