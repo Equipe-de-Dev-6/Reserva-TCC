@@ -116,15 +116,15 @@
 
                     <!-- Ainda sem página definida -->
 
-                        <a href="/configuracoes" class="nav-item">
+                    <a href="/configuracoes" class="nav-item">
 
                         <img src="/assets/icons/gear.png" alt="" width="20" height="20">
 
-                            Configurações
+                        Configurações
 
-                        </a>
+                    </a>
 
-                </a>
+                    </a>
 
 
                 </nav>
@@ -232,8 +232,7 @@
 
                             <div class="avatar">
 
-                                <img src="/assets/icons/user (3).png" alt="Perfil do Usuário" width="28"
-                                    height="28">
+                                <img src="/assets/icons/user (3).png" alt="Perfil do Usuário" width="28" height="28">
 
                             </div>
 
@@ -353,7 +352,8 @@
                                     Problemas com credenciais, acesso ao sistema ou falhas técnicas em equipamentos
                                     móveis e
                                     gabinetes de notebooks.
-                                    <a class="submit-email" href="https://outlook.live.com/mail/0/deeplink/compose?to=suporte@senai.br&subject=Solicitação%20de%20ajuda&body=Olá,%20preciso%20de%20ajuda."
+                                    <a class="submit-email"
+                                        href="https://outlook.live.com/mail/0/deeplink/compose?to=suporte@senai.br&subject=Solicitação%20de%20ajuda&body=Olá,%20preciso%20de%20ajuda."
                                         target="_blank">
                                         Enviar e-mail
                                     </a>
@@ -386,7 +386,8 @@
                                     conflitos de
                                     agendamento.
 
-                                    <a class="submit-email" href="https://outlook.live.com/mail/0/deeplink/compose?to=suporte@senai.br&subject=Solicitação%20de%20ajuda&body=Olá,%20preciso%20de%20ajuda."
+                                    <a class="submit-email"
+                                        href="https://outlook.live.com/mail/0/deeplink/compose?to=suporte@senai.br&subject=Solicitação%20de%20ajuda&body=Olá,%20preciso%20de%20ajuda."
                                         target="_blank">
                                         Enviar e-mail
                                     </a>
@@ -420,7 +421,8 @@
                                     Acesse os guias em PDF detalhados sobre as melhores práticas para o uso de salas de
                                     reunião,
                                     projetores e recursos didáticos.
-                                    <a class="submit-email" href="https://outlook.live.com/mail/0/deeplink/compose?to=suporte@senai.br&subject=Solicitação%20de%20ajuda&body=Olá,%20preciso%20de%20ajuda."
+                                    <a class="submit-email"
+                                        href="https://outlook.live.com/mail/0/deeplink/compose?to=suporte@senai.br&subject=Solicitação%20de%20ajuda&body=Olá,%20preciso%20de%20ajuda."
                                         target="_blank">
                                         Enviar e-mail
                                     </a>
@@ -566,28 +568,31 @@
 
     <script>
 
+        // Função separada para facilitar a leitura e os testes.
+        async function carregarUsuarioDaSessao() {
+            try {
+                const consulta = await fetch('/usuario-logado');
+
+                const consulta_json = await consulta.json();
+                const nome = consulta_json.nome || 'Usuário';
+                const nomeUsuario = document.getElementById('userName');
+                const greetingTitle = document.getElementById('greetingTitle');
+
+                nomeUsuario.textContent = nome;
+                greetingTitle.textContent = `Olá, ${nome}!`;
+
+            }
+
+            catch (erro) {
+                // A página continua funcionando mesmo se a sessão expirar.
+                console.log('Não foi possível carregar os dados da sessão.', erro);
+            }
+        }
+
+
         document.addEventListener('DOMContentLoaded', () => {
 
-
-            // Busca os dados do usuário na sessão ativa para personalizar
-            // o cabeçalho da página de ajuda.
-            fetch('/usuario-logado')
-                .then(response => {
-                    if (!response.ok) throw new Error('Sessão inválida');
-                    return response.json();
-                })
-                .then(usuario => {
-                    const nome = usuario.nome || 'Usuário';
-                    const nomeUsuario = document.getElementById('userName');
-                    const greetingTitle = document.getElementById('greetingTitle');
-
-                    if (nomeUsuario) nomeUsuario.textContent = nome;
-                    if (greetingTitle) greetingTitle.textContent = `Olá, ${nome}!`;
-                })
-                .catch(() => {
-                    // A rota /usuario-logado continua sendo a proteção final
-                    // caso a sessão expire enquanto a página está carregando.
-                });
+            carregarUsuarioDaSessao();
 
 
             // ======================================================
