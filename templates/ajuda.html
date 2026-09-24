@@ -188,8 +188,8 @@
 
                 <div class="greeting">
 
-                    <h1>
-                        Olá Thiago!
+                    <h1 id="greetingTitle">
+                        Olá!
                     </h1>
 
                     <p>
@@ -242,8 +242,8 @@
 
                         <div class="user-info">
 
-                            <span class="name">
-                                Thiago
+                            <span class="name" id="userName">
+                                Usuário
                             </span>
 
                             <span class="role">
@@ -567,6 +567,27 @@
     <script>
 
         document.addEventListener('DOMContentLoaded', () => {
+
+
+            // Busca os dados do usuário na sessão ativa para personalizar
+            // o cabeçalho da página de ajuda.
+            fetch('/usuario-logado')
+                .then(response => {
+                    if (!response.ok) throw new Error('Sessão inválida');
+                    return response.json();
+                })
+                .then(usuario => {
+                    const nome = usuario.nome || 'Usuário';
+                    const nomeUsuario = document.getElementById('userName');
+                    const greetingTitle = document.getElementById('greetingTitle');
+
+                    if (nomeUsuario) nomeUsuario.textContent = nome;
+                    if (greetingTitle) greetingTitle.textContent = `Olá, ${nome}!`;
+                })
+                .catch(() => {
+                    // A rota /usuario-logado continua sendo a proteção final
+                    // caso a sessão expire enquanto a página está carregando.
+                });
 
 
             // ======================================================
