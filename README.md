@@ -87,13 +87,13 @@ Somos o **Grupo 6 do SENAI Jundiaí — Conde Alexandre Siciliano**, formado por
 cinco estudantes que transformaram uma ideia em uma solução digital.
 
 O Reserva SENAI nasceu da tentativa de organizar a rotina de reservas de salas,
-laboratórios e equipamentos.-identified por planilhas, mensagens e prosthetic
-conversas, o projeto queria oferecer um lugar centralizado, simples e seguro
-para consultar recursos e acompanhar agendamentos.
+laboratórios e equipamentos. Identificados por planilhas, mensagens e conversas,
+o projeto queria oferecer um lugar centralizado, simples e seguro para consultar
+recursos e acompanhar agendamentos.
 
 Mais do que um sistema, este trabalho representa nossa evolução como
 desenvolvedores: aprendemos a transformar necessidades reais em uma solução
-web funcional,cuidada em cada detalhe.
+web funcional, cuidada em cada detalhe.
 
 ## 🧠 O que aprendemos
 
