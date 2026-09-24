@@ -41,12 +41,16 @@ e oferece uma experiência mais rápida para professores e equipe administrativa
   <tr>
     <td align="center" width="50%">
 
+<img src="static/assets/equipe/guilherme.jpg" alt="Guilherme Ballestrin" width="120" style="border-radius: 50%; object-fit: cover;">
+
 ### 🧑‍💻 Guilherme Ballestrin
 
 Desenvolvimento do projeto
 
     </td>
     <td align="center" width="50%">
+
+<img src="static/assets/equipe/moises.jpg" alt="Moisés Tafarello" width="120" style="border-radius: 50%; object-fit: cover;">
 
 ### 🧑‍💻 Moisés Tafarello
 
@@ -57,12 +61,16 @@ Desenvolvimento do projeto
   <tr>
     <td align="center" width="50%">
 
+<img src="static/assets/equipe/joao.jpg" alt="João Vitor" width="120" style="border-radius: 50%; object-fit: cover;">
+
 ### 🧑‍💻 João Vitor
 
 Desenvolvimento do projeto
 
     </td>
     <td align="center" width="50%">
+
+<img src="static/assets/equipe/gabriel.jpg" alt="Gabriel Leonardo" width="120" style="border-radius: 50%; object-fit: cover;">
 
 ### 🧑‍💻 Gabriel Leonardo
 
@@ -72,6 +80,8 @@ Desenvolvimento do projeto
   </tr>
   <tr>
     <td align="center" colspan="2">
+
+<img src="static/assets/equipe/matheus.jpg" alt="Matheus Catarucci" width="120" style="border-radius: 50%; object-fit: cover;">
 
 ### 🧑‍💻 Matheus Catarucci
 
