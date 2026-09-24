@@ -309,6 +309,15 @@ button {
   background-color: var(--bg-color);
 }
 
+button.dropdown-item {
+  width: 100%;
+  border: 0;
+  background-color: transparent;
+  text-align: left;
+  cursor: pointer;
+  appearance: none;
+}
+
 .dropdown-item.logout {
   color: var(--senai-red);
   font-weight: 600;
