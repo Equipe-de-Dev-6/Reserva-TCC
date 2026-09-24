@@ -81,7 +81,7 @@ e oferece uma experiência mais rápida para professores e equipe administrativa
 - **Matheus:** liderança do Scrum, desenvolvimento da API e criptografia.
 - **Guilherme:** rotas da API, integração e suporte ao back-end.
 - **João Vitor:** interface, experiência do usuário, HTML e CSS.
-- **Gabriel:** interface, experiência do usuário, HTML e CSS.
+- **Gabriel:** interface, experiência do usuário, HTML, CSS e JS.
 - **Moisés:** modelagem de dados, banco, testes e implantação.
 
 ## 🎓 Nossa história
