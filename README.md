@@ -14,7 +14,6 @@
   <p>
     <img src="https://readme-typing-svg.demolab.com?font=Fira+Code&size=28&duration=3500&pause=1000&color=E30613&center=true&width=650&lines=Reserva+inteligente+-+simples,+rapida+e+segura." alt="Reserva SENAI" />
   </p>
-
   <p>
     <img alt="FastAPI" src="https://img.shields.io/badge/API-FastAPI-009688?style=flat-square&logo=fastapi&logoColor=white">
     <img alt="Python" src="https://img.shields.io/badge/Python-3.10%2B-3776AB?style=flat-square&logo=python&logoColor=white">
@@ -213,14 +212,6 @@ As senhas nunca são armazenadas em texto plano.
 ├── .env                   # Variáveis de ambiente (não versionado)
 └── requirements.txt       # Dependências do projeto
 ```
-
-## 🗺️ Roadmap
-
-- [ ] Melhorar o sistema de perfis e permissões.
-- [ ] Adicionar gestão completa de salas e equipamentos.
-- [ ] Implementar histórico detalhado de reservas.
-- [ ] Adicionar notificações de conflitos e confirmações.
-- [ ] Ampliar testes automatizados para a API.
 
 ---
 
