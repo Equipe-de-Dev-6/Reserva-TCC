@@ -1,4 +1,4 @@
-const API_URL = "http://127.0.0.1:8000";
+// A API usa caminhos relativos para funcionar em qualquer host e porta.
 
 // ============================================================
 // USUÁRIOS
@@ -6,7 +6,7 @@ const API_URL = "http://127.0.0.1:8000";
 
 async function listarUsuarios() {
 
-    const resposta = await fetch(`${API_URL}/usuarios`);
+    const resposta = await fetch(`/usuarios`);
 
     if (!resposta.ok) {
         throw new Error("Erro ao buscar usuários");
@@ -21,7 +21,7 @@ async function listarUsuarios() {
 
 async function cadastrarUsuario(dados) {
 
-    const resposta = await fetch(`${API_URL}/usuarios`, {
+    const resposta = await fetch(`/usuarios`, {
 
         method: "POST",
 
@@ -45,7 +45,7 @@ async function cadastrarUsuario(dados) {
 
 async function listarSalas() {
 
-    const resposta = await fetch(`${API_URL}/salas`);
+    const resposta = await fetch(`/salas`);
 
     if (!resposta.ok) {
         throw new Error("Erro ao buscar salas");
@@ -57,7 +57,7 @@ async function listarSalas() {
 
 async function buscarSala(id) {
 
-    const resposta = await fetch(`${API_URL}/salas/${id}`);
+    const resposta = await fetch(`/salas/${id}`);
 
     if (!resposta.ok) {
         throw new Error("Sala não encontrada");
@@ -69,7 +69,7 @@ async function buscarSala(id) {
 
 async function cadastrarSala(dados) {
 
-    const resposta = await fetch(`${API_URL}/salas`, {
+    const resposta = await fetch(`/salas`, {
 
         method: "POST",
 
@@ -90,7 +90,7 @@ async function cadastrarSala(dados) {
 
 async function atualizarSala(id, dados) {
 
-    const resposta = await fetch(`${API_URL}/salas/${id}`, {
+    const resposta = await fetch(`/salas/${id}`, {
 
         method: "PUT",
 
@@ -111,7 +111,7 @@ async function atualizarSala(id, dados) {
 
 async function excluirSala(id) {
 
-    const resposta = await fetch(`${API_URL}/salas/${id}`, {
+    const resposta = await fetch(`/salas/${id}`, {
 
         method: "DELETE"
     });
@@ -130,7 +130,7 @@ async function excluirSala(id) {
 
 async function listarNotebooks() {
 
-    const resposta = await fetch(`${API_URL}/notebooks`);
+    const resposta = await fetch(`/notebooks`);
 
     if (!resposta.ok) {
         throw new Error("Erro ao buscar notebooks");
@@ -142,7 +142,7 @@ async function listarNotebooks() {
 
 async function buscarNotebook(id) {
 
-    const resposta = await fetch(`${API_URL}/notebooks/${id}`);
+    const resposta = await fetch(`/notebooks/${id}`);
 
     if (!resposta.ok) {
         throw new Error("Notebook não encontrado");
@@ -154,7 +154,7 @@ async function buscarNotebook(id) {
 
 async function cadastrarNotebook(dados) {
 
-    const resposta = await fetch(`${API_URL}/notebooks`, {
+    const resposta = await fetch(`/notebooks`, {
 
         method: "POST",
 
@@ -175,7 +175,7 @@ async function cadastrarNotebook(dados) {
 
 async function atualizarNotebook(id, dados) {
 
-    const resposta = await fetch(`${API_URL}/notebooks/${id}`, {
+    const resposta = await fetch(`/notebooks/${id}`, {
 
         method: "PUT",
 
@@ -196,7 +196,7 @@ async function atualizarNotebook(id, dados) {
 
 async function excluirNotebook(id) {
 
-    const resposta = await fetch(`${API_URL}/notebooks/${id}`, {
+    const resposta = await fetch(`/notebooks/${id}`, {
 
         method: "DELETE"
     });
@@ -215,7 +215,7 @@ async function excluirNotebook(id) {
 
 async function listarCarrinhos() {
 
-    const resposta = await fetch(`${API_URL}/carrinhos`);
+    const resposta = await fetch(`/carrinhos`);
 
     if (!resposta.ok) {
         throw new Error("Erro ao buscar carrinhos");
@@ -227,7 +227,7 @@ async function listarCarrinhos() {
 
 async function buscarCarrinho(id) {
 
-    const resposta = await fetch(`${API_URL}/carrinhos/${id}`);
+    const resposta = await fetch(`/carrinhos/${id}`);
 
     if (!resposta.ok) {
         throw new Error("Carrinho não encontrado");
@@ -239,7 +239,7 @@ async function buscarCarrinho(id) {
 
 async function cadastrarCarrinho(dados) {
 
-    const resposta = await fetch(`${API_URL}/carrinhos`, {
+    const resposta = await fetch(`/carrinhos`, {
 
         method: "POST",
 
@@ -260,7 +260,7 @@ async function cadastrarCarrinho(dados) {
 
 async function atualizarCarrinho(id, dados) {
 
-    const resposta = await fetch(`${API_URL}/carrinhos/${id}`, {
+    const resposta = await fetch(`/carrinhos/${id}`, {
 
         method: "PUT",
 
@@ -281,7 +281,7 @@ async function atualizarCarrinho(id, dados) {
 
 async function excluirCarrinho(id) {
 
-    const resposta = await fetch(`${API_URL}/carrinhos/${id}`, {
+    const resposta = await fetch(`/carrinhos/${id}`, {
 
         method: "DELETE"
     });

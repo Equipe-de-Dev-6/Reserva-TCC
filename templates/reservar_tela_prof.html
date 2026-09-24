@@ -105,7 +105,7 @@
         </button>
 
         <div class="greeting">
-          <h1>Olá, <span id="nomeUsuario">Usuário</span>!</h1>
+          <h1><span id="nomeUsuario"></span></h1>
           <p>Gerencie suas reservas e faça novos agendamentos</p>
         </div>
 
@@ -235,121 +235,8 @@
     </main>
   </div>
 
-  <script>
-    document.addEventListener('DOMContentLoaded', () => {
-
-      // ======================================================
-      // NOME DINÂMICO DO USUÁRIO LOGADO PELA SESSÃO
-      // ======================================================
-
-      async function carregarUsuario() {
-        const nomeUsuario = document.getElementById('nomeUsuario');
-        const nomePerfil = document.getElementById('nomePerfil');
-
-        try {
-          const resposta = await fetch('/usuario-logado', {
-            method: 'GET',
-            credentials: 'same-origin'
-          });
-
-          if (!resposta.ok) {
-            throw new Error('Erro ao consultar usuário logado');
-          }
-
-          const usuario = await resposta.json();
-
-          if (usuario.nome) {
-            if (nomeUsuario) {
-              nomeUsuario.textContent = usuario.nome;
-            }
-
-            if (nomePerfil) {
-              nomePerfil.textContent = usuario.nome;
-            }
-          }
-
-        } catch (erro) {
-          console.error('Erro ao carregar usuário:', erro);
-        }
-      }
-
-      carregarUsuario();
-
-      // ======================================================
-      // DROPDOWN DO USUÁRIO
-      // ======================================================
-
-      const userProfile = document.getElementById('userProfile');
-      const userDropdown = document.getElementById('userDropdown');
-
-      if (userProfile && userDropdown) {
-        userProfile.addEventListener('click', (e) => {
-          e.stopPropagation();
-
-          if (userDropdown.contains(e.target)) {
-            return;
-          }
-
-          userDropdown.classList.toggle('active');
-        });
-
-        document.addEventListener('click', (e) => {
-          if (!userProfile.contains(e.target)) {
-            userDropdown.classList.remove('active');
-          }
-        });
-      }
-
-      // ======================================================
-      // PESQUISA
-      // ======================================================
-
-      const searchInput = document.getElementById('search-input');
-      const cards = document.querySelectorAll('.large-action-card');
-
-      if (searchInput) {
-        searchInput.addEventListener('input', (e) => {
-          const searchTerm = e.target.value.toLowerCase().trim();
-
-          cards.forEach(card => {
-            const titleElement = card.querySelector('h3');
-            const descElement = card.querySelector('p');
-
-            if (titleElement && descElement) {
-              const title = titleElement.textContent.toLowerCase();
-              const description = descElement.textContent.toLowerCase();
-
-              card.style.display =
-                title.includes(searchTerm) || description.includes(searchTerm)
-                  ? 'flex'
-                  : 'none';
-            }
-          });
-        });
-      }
-
-      // ======================================================
-      // MENU MOBILE
-      // ======================================================
-
-      const menuToggle = document.getElementById('menuToggle');
-      const sidebar = document.querySelector('.sidebar');
-      const sidebarOverlay = document.getElementById('sidebarOverlay');
-
-      if (menuToggle && sidebar && sidebarOverlay) {
-        menuToggle.addEventListener('click', () => {
-          sidebar.classList.toggle('open');
-          sidebarOverlay.classList.toggle('active');
-        });
-
-        sidebarOverlay.addEventListener('click', () => {
-          sidebar.classList.remove('open');
-          sidebarOverlay.classList.remove('active');
-        });
-      }
-
-    });
-  </script>
+  <script type="module" src="/js/usuario.js"></script>
+<script type="module" src="/js/pages/reservar_tela_prof.js"></script>
 
 </body>
 

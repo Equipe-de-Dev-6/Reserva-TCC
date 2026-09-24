@@ -263,6 +263,30 @@ As senhas nunca são armazenadas em texto plano.
 | `GET` | `/home_admin` | Página inicial da administração |
 | `GET` | `/ajuda` | Central de ajuda |
 
+## 🧩 Arquitetura JavaScript
+
+A camada JavaScript foi separada em módulos para facilitar manutenção e testes:
+
+```text
+static/js/
+├── api.js                 # Comunicação com a API
+├── app.js                 # Orquestração dos módulos comuns
+├── usuario.js             # Dados do usuário autenticado
+├── menu.js                # Menu de perfil e menu mobile
+├── faq.js                 # Acordeão de perguntas frequentes
+├── search.js              # Utilitário de busca
+├── reservas.js            # Estado e persistência das reservas
+├── avisos.js              # Estado dos avisos
+├── notificacoes-push.js   # Notificações do navegador
+└── pages/                 # Lógica específica de cada página
+```
+
+- `app.js` inicializa os módulos comuns.
+- `usuario.js` executa `carregarUsuario()` ao ser carregado.
+- `pages/` contém apenas a lógica específica de cada tela.
+- Os módulos compartilhados são carregados antes dos módulos de página.
+- Os HTMLs não possuem scripts inline.
+
 ## Estrutura do projeto
 
 ```text

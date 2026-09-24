@@ -188,9 +188,7 @@
 
                 <div class="greeting">
 
-                    <h1 id="greetingTitle">
-                        Olá!
-                    </h1>
+                    <h1><span id="nomeUsuario"></span></h1>
 
                     <p>
                         Gerencie suas reservas e faça novos agendamentos
@@ -241,7 +239,7 @@
 
                         <div class="user-info">
 
-                            <span class="name" id="userName">
+                            <span class="name" id="nomePerfil">
                                 Usuário
                             </span>
 
@@ -566,151 +564,8 @@
        JAVASCRIPT
        ======================================================== -->
 
-    <script>
-
-        // Função separada para facilitar a leitura e os testes.
-        async function carregarUsuarioDaSessao() {
-            try {
-                const consulta = await fetch('/usuario-logado');
-
-                const consulta_json = await consulta.json();
-                const nome = consulta_json.nome || 'Usuário';
-                const nomeUsuario = document.getElementById('userName');
-                const greetingTitle = document.getElementById('greetingTitle');
-
-                nomeUsuario.textContent = nome;
-                greetingTitle.textContent = `Olá, ${nome}!`;
-
-            }
-
-            catch (erro) {
-                // A página continua funcionando mesmo se a sessão expirar.
-                console.log('Não foi possível carregar os dados da sessão.', erro);
-            }
-        }
-
-
-        document.addEventListener('DOMContentLoaded', () => {
-
-            carregarUsuarioDaSessao();
-
-
-            // ======================================================
-            // DROPDOWN DO USUÁRIO
-            // ======================================================
-
-            const userProfile =
-                document.getElementById('userProfile');
-
-            const userDropdown =
-                document.getElementById('userDropdown');
-
-
-            if (userProfile && userDropdown) {
-
-                userProfile.addEventListener('click', (e) => {
-
-                    e.stopPropagation();
-
-                    userDropdown.classList.toggle('active');
-
-                });
-
-
-                document.addEventListener('click', (e) => {
-
-                    if (!userProfile.contains(e.target)) {
-
-                        userDropdown.classList.remove('active');
-
-                    }
-
-                });
-
-            }
-
-
-            // ======================================================
-            // MENU MOBILE
-            // ======================================================
-
-            const menuToggle =
-                document.getElementById('menuToggle');
-
-            const sidebar =
-                document.querySelector('.sidebar');
-
-            const sidebarOverlay =
-                document.getElementById('sidebarOverlay');
-
-
-            if (
-                menuToggle &&
-                sidebar &&
-                sidebarOverlay
-            ) {
-
-                menuToggle.addEventListener('click', () => {
-
-                    sidebar.classList.toggle('open');
-
-                    sidebarOverlay.classList.toggle('active');
-
-                });
-
-
-                sidebarOverlay.addEventListener('click', () => {
-
-                    sidebar.classList.remove('open');
-
-                    sidebarOverlay.classList.remove('active');
-
-                });
-
-            }
-
-
-            // ======================================================
-            // ACCORDION DE PERGUNTAS FREQUENTES
-            // ======================================================
-
-            const faqList =
-                document.getElementById('faqList');
-
-
-            if (faqList) {
-
-                // Todas as perguntas iniciam abertas, como na referência.
-                faqList
-                    .querySelectorAll('.faq-item')
-                    .forEach(item => item.classList.add('open'));
-
-
-                faqList.addEventListener('click', (e) => {
-
-                    const question =
-                        e.target.closest('.faq-question');
-
-
-                    if (!question) {
-
-                        return;
-
-                    }
-
-
-                    question
-                        .closest('.faq-item')
-                        .classList.toggle('open');
-
-                });
-
-            }
-
-
-        });
-
-    </script>
+    <script type="module" src="/js/usuario.js"></script>
+<script type="module" src="/js/pages/ajuda.js"></script>
 
 
 </body>

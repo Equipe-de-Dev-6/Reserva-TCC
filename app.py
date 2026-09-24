@@ -139,6 +139,7 @@ async def logout(request: Request):
     )
 
 @app.get("/usuario-logado")
+@app.get("/usuario_logado")
 async def usuario_logado(request: Request):
     """Retorna os dados do usuário armazenados na sessão"""
 
@@ -153,6 +154,19 @@ async def usuario_logado(request: Request):
     return {
         "nome": nome
     }
+
+# ============================================================
+# SERVICE WORKER
+# ============================================================
+
+@app.get("/sw.js")
+def service_worker():
+    """Serve o service worker na raiz, como esperado pelo navegador."""
+    return FileResponse(
+        "static/sw.js",
+        media_type="application/javascript",
+    )
+
 
 # ------------------------------------------------------------
 # INÍCIO PROFESSOR
