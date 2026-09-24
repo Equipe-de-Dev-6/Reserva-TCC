@@ -5,7 +5,7 @@ from fastapi.staticfiles import StaticFiles
 from starlette.middleware.sessions import SessionMiddleware
 from starlette.requests import Request
 from fastapi.responses import RedirectResponse
-from consulta import consultar_usuario_por_email_senha
+from criptografia import hash_password, verify_password
 from dotenv import load_dotenv
 import os
 
@@ -92,15 +92,30 @@ async def login_post(request: Request):
     email = dados.get('email')
     senha = dados.get('senha')
 
-    # Busca o usuário com email E senha corretos
-    usuarios = consultar_usuario_por_email_senha(email, senha)
+    # Busca o usuário no Supabase apenas pelo e-mail. A senha não participa
+    # da consulta porque ela é salva no banco como hash bcrypt.
+    resposta = (
+        supabase
+        .table("usuarios")
+        .select("*")
+        .eq("email", email)
+        .execute()
+    )
 
-    # Se não encontrou o usuário
+    usuarios = resposta.data or []
+
+    # Retorna uma mensagem específica quando o e-mail não está cadastrado.
     if not usuarios:
+        return {'erro': 'E-mail não encontrado'}
+
+    usuario = usuarios[0]
+
+    # O bcrypt compara a senha enviada com o hash armazenado. A senha em
+    # texto plano nunca é comparada diretamente nem retornada pela API.
+    if not verify_password(senha, usuario.get("senha", "")):
         return {'erro': 'Email ou senha incorretos'}
 
-    # Usuário encontrado - armazena na sessão
-    usuario = usuarios[0]
+    # Usuário autenticado - armazena somente os dados necessários na sessão.
     request.session["usuario_id"] = usuario["id"]
     request.session["usuario_email"] = usuario["email"]
     request.session["usuario_nome"] = usuario["nome"]
@@ -396,15 +411,18 @@ def listar_usuarios():
         .execute()
     )
 
+    # Monta uma resposta segura, removendo a coluna de senha/hash antes de
+    # enviar os dados dos usuários para o frontend.
     usuarios = []
 
     for dados in resposta.data:
 
-        usuario = Usuario.fromJson(dados)
-
-        usuarios.append(
-            usuario.toJson()
-        )
+        # Não expor hashes de senha na resposta da API.
+        usuarios.append({
+            "id": dados.get("id"),
+            "nome": dados.get("nome"),
+            "email": dados.get("email"),
+        })
 
     return usuarios
 
@@ -416,7 +434,8 @@ def listar_usuarios():
 @app.post("/usuarios")
 def cadastrar_usuario(usuario: Usuario):
 
-    # Verifica se o email já existe
+    # Consulta o Supabase antes de inserir para impedir duplicidade de
+    # e-mails. Essa verificação é feita diretamente no banco de dados.
 
     resposta = (
         supabase
@@ -434,12 +453,16 @@ def cadastrar_usuario(usuario: Usuario):
         )
 
 
-    # Cadastra o usuário
+    # Cadastra o usuário somente com o hash da senha. A senha original
+    # permanece apenas na memória durante esta requisição.
+    dados_usuario = usuario.toJson()
+    dados_usuario["senha"] = hash_password(usuario.senha)
 
+    # O Supabase recebe o hash, nunca a senha original.
     resposta = (
         supabase
         .table("usuarios")
-        .insert(usuario.toJson())
+        .insert(dados_usuario)
         .execute()
     )
 
@@ -451,11 +474,13 @@ def cadastrar_usuario(usuario: Usuario):
         )
 
 
-    usuario_cadastrado = Usuario.fromJson(
-        resposta.data[0]
-    )
-
-    return usuario_cadastrado.toJson()
+    # Nunca retorna a senha nem o hash para o cliente.
+    usuario_cadastrado = resposta.data[0]
+    return {
+        "id": usuario_cadastrado.get("id"),
+        "nome": usuario_cadastrado.get("nome"),
+        "email": usuario_cadastrado.get("email"),
+    }
 
 
 # ============================================================
