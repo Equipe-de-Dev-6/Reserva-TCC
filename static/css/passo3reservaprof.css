@@ -112,7 +112,8 @@ img {
   font-weight: 500;
   color: var(--text-gray);
   border-radius: 8px;
-  transition: all 0.2s;
+  transition: background-color 0.2s ease, color 0.2s ease; 
+  border-left: 4px solid transparent; 
 }
 
 .nav-item:hover {
@@ -146,7 +147,7 @@ img {
   font-size: 14px;
   font-weight: 600;
   color: var(--text-dark);
-  transition: 0.2s;
+  transition: background-color 0.2s ease;
 }
 
 .btn-logout:hover {
