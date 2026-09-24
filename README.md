@@ -63,7 +63,7 @@ e oferece uma experiência mais rápida para professores e equipe administrativa
       <h3>🎨 Gabriel</h3>
       <img src="static/assets/equipe/gabriel.jpg" alt="Gabriel" width="140" style="border-radius:50%; object-fit:cover;">
       <p><strong>Desenvolvedor Front-end • UI/UX</strong></p>
-      <p>Desenvolveu as páginas HTML e realizou a estilização CSS da interface.</p>
+      <p>Desenvolveu as páginas HTML e realizou a estilização CSS da interface junto com as animações do JavaScript.</p>
     </td>
   </tr>
   <tr>
