@@ -35,61 +35,54 @@ de salas, laboratórios, gabinetes e equipamentos.
 A aplicação reduz o uso de planilhas, centraliza informações de disponibilidade
 e oferece uma experiência mais rápida para professores e equipe administrativa.
 
-## 👥 Nosso grupo
+## 👥 Nossa equipe
 
 <table>
   <tr>
     <td align="center" width="50%">
-
-<img src="static/assets/equipe/guilherme.jpg" alt="Guilherme Ballestrin" width="120" style="border-radius: 50%; object-fit: cover;">
-
-### 🧑‍💻 Guilherme Ballestrin
-
-Desenvolvimento do projeto
-
+      <h3>🧑‍💻 Matheus Catarucci</h3>
+      <img src="static/assets/equipe/matheus.jpg" alt="Matheus Catarucci" width="140" style="border-radius:50%; object-fit:cover;">
+      <p><strong>Scrum Master • Back-end</strong></p>
+      <p>Desenvolveu a API, o sistema de criptografia e auxiliar na coordenação geral do projeto.</p>
     </td>
     <td align="center" width="50%">
-
-<img src="static/assets/equipe/moises.jpg" alt="Moisés Tafarello" width="120" style="border-radius: 50%; object-fit: cover;">
-
-### 🧑‍💻 Moisés Tafarello
-
-Desenvolvimento do projeto
-
+      <h3>⚙️ Guilherme Ballestrin</h3>
+      <img src="static/assets/equipe/guilherme.jpg" alt="Guilherme Ballestrin" width="140" style="border-radius:50%; object-fit:cover;">
+      <p><strong>Desenvolvedor Back-end</strong></p>
+      <p>Auxiliou nas rotas gerais da API e na integração geral do projeto.</p>
     </td>
   </tr>
   <tr>
     <td align="center" width="50%">
-
-<img src="static/assets/equipe/joao.jpg" alt="João Vitor" width="120" style="border-radius: 50%; object-fit: cover;">
-
-### 🧑‍💻 João Vitor
-
-Desenvolvimento do projeto
-
+      <h3>🎨 João Vitor</h3>
+      <img src="static/assets/equipe/joao.jpg" alt="João Vitor" width="140" style="border-radius:50%; object-fit:cover;">
+      <p><strong>Desenvolvedor Front-end • UI/UX</strong></p>
+      <p>Desenvolveu as páginas HTML e realizou a estilização CSS da interface.</p>
     </td>
     <td align="center" width="50%">
-
-<img src="static/assets/equipe/gabriel.jpg" alt="Gabriel Leonardo" width="120" style="border-radius: 50%; object-fit: cover;">
-
-### 🧑‍💻 Gabriel Leonardo
-
-Desenvolvimento do projeto
-
+      <h3>🎨 Gabriel</h3>
+      <img src="static/assets/equipe/gabriel.jpg" alt="Gabriel" width="140" style="border-radius:50%; object-fit:cover;">
+      <p><strong>Desenvolvedor Front-end • UI/UX</strong></p>
+      <p>Desenvolveu as páginas HTML e realizou a estilização CSS da interface.</p>
     </td>
   </tr>
   <tr>
     <td align="center" colspan="2">
-
-<img src="static/assets/equipe/matheus.jpg" alt="Matheus Catarucci" width="120" style="border-radius: 50%; object-fit: cover;">
-
-### 🧑‍💻 Matheus Catarucci
-
-Desenvolvimento do projeto
-
+      <h3>🗄️ Moisés Tafarello</h3>
+      <img src="static/assets/equipe/moises.jpg" alt="Moisés Tafarello" width="140" style="border-radius:50%; object-fit:cover;">
+      <p><strong>Manipulador de Dados</strong></p>
+      <p>Desenvolveu e arquitetou o banco de dados, responsável pelos testes e pela implantação dos serviços.</p>
     </td>
   </tr>
 </table>
+
+### 🎯 Funções da equipe
+
+- **Matheus:** liderança do Scrum, desenvolvimento da API e criptografia.
+- **Guilherme:** rotas da API, integração e suporte ao back-end.
+- **João Vitor:** interface, experiência do usuário, HTML e CSS.
+- **Gabriel:** interface, experiência do usuário, HTML e CSS.
+- **Moisés:** modelagem de dados, banco, testes e implantação.
 
 ## 🎓 Nossa história
 
