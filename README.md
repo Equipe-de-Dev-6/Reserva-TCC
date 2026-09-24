@@ -2,27 +2,36 @@
 
   <img src="static/assets/img/Logo senai.png" alt="Logo Reserva SENAI" width="220">
 
-  # Reserva SENAI
+  # 🚀 Reserva SENAI
 
   <p><strong>Gestão inteligente de reservas de salas, laboratórios e equipamentos.</strong></p>
 
   <p>
-    Organize ocupação, consulte disponibilidade e simplifique o agendamento
+    ✨ Organize ocupação, consulte disponibilidade e simplifique o agendamento
     dos recursos do SENAI em um único lugar.
+  </p>
+
+  <p>
+    <img src="https://readme-typing-svg.demolab.com?font=Fira+Code&size=28&duration=3500&pause=1000&color=E30613&center=true&width=650&lines=Reserva+inteligente+-+simples,+rapida+e+segura." alt="Reserva SENAI" />
   </p>
 
   <p>
     <img alt="FastAPI" src="https://img.shields.io/badge/API-FastAPI-009688?style=flat-square&logo=fastapi&logoColor=white">
     <img alt="Python" src="https://img.shields.io/badge/Python-3.10%2B-3776AB?style=flat-square&logo=python&logoColor=white">
     <img alt="Supabase" src="https://img.shields.io/badge/Database-Supabase-3ECF8E?style=flat-square&logo=supabase&logoColor=white">
-    <img alt="Security" src="https://img.shields.io/badge/Security-bcrypt-E30613?style=flat-square">
+    <img alt="Security" src="https://img.shields.io/badge/🔒-bcrypt-E30613?style=flat-square">
+    <img alt="Status" src="https://img.shields.io/badge/status-em%20desenvolvimento-orange?style=flat-square">
+  </p>
+
+  <p>
+    <img src="https://media.giphy.com/media/L8K62iTDkzGX6/giphy.gif" alt="Demonstração animada do sistema" width="420">
   </p>
 
 </div>
 
 ---
 
-## Sobre o projeto
+## 💡 Sobre o projeto
 
 O **Reserva SENAI** é uma plataforma web para organizar e controlar reservas
 de salas, laboratórios, gabinetes e equipamentos.
@@ -30,17 +39,52 @@ de salas, laboratórios, gabinetes e equipamentos.
 A aplicação reduz o uso de planilhas, centraliza informações de disponibilidade
 e oferece uma experiência mais rápida para professores e equipe administrativa.
 
-## Funcionalidades
+## ✨ Funcionalidades
 
-- Consulta de disponibilidade de recursos.
+<table>
+  <tr>
+    <td width="50%">
+
+### 🗓️ Reservas inteligentes
+
+- Consulta de disponibilidade em tempo real.
 - Reserva de salas, laboratórios e equipamentos.
 - Acompanhamento de reservas e histórico de utilização.
-- Área administrativa para gestão dos recursos.
-- Controle de acesso com sessão de usuário.
-- Autenticação protegida com hash de senha usando **bcrypt**.
-- Interface responsiva para desktop e dispositivos móveis.
 
-## Tecnologias utilizadas
+    </td>
+    <td width="50%">
+
+### 🔐 Acesso seguro
+
+- Autenticação protegida com **bcrypt**.
+- Senhas nunca armazenadas em texto plano.
+- Sessão de usuário para proteger páginas administrativas.
+
+    </td>
+  </tr>
+  <tr>
+    <td width="50%">
+
+### 👨‍💼 Gestão centralizada
+
+- Área administrativa para gestão dos recursos.
+- Organização de usuários e permissões.
+- Menos trabalho manual e mais eficiência.
+
+    </td>
+    <td width="50%">
+
+### 📱 Experiência responsiva
+
+- Interface adaptada para desktop e celular.
+- 📋 Menus organizados
+- Navegação simples e intuitiva.
+
+    </td>
+  </tr>
+</table>
+
+## 🛠️ Tecnologias utilizadas
 
 | Tecnologia | Utilização |
 |---|---|
@@ -52,7 +96,18 @@ e oferece uma experiência mais rápida para professores e equipe administrativa
 | **JavaScript** | Interações no frontend |
 | **bcrypt** | Hash seguro das senhas |
 
-## Começando
+## 🔄 Como funciona?
+
+```mermaid
+flowchart LR
+    A[👨‍🏫 Usuário] --> B[🌐 Interface Web]
+    B --> C[⚡ FastAPI]
+    C --> D[(🗄️ Supabase)]
+    C --> E[🔐 bcrypt]
+    D --> F[📅 Recursos e reservas]
+```
+
+## 🚀 Começando
 
 ### Pré-requisitos
 
@@ -118,7 +173,7 @@ Acesse a aplicação no navegador:
 http://127.0.0.1:8000
 ```
 
-## Segurança
+## 🔐 Segurança
 
 As senhas nunca são armazenadas em texto plano.
 
@@ -128,7 +183,7 @@ As senhas nunca são armazenadas em texto plano.
 - A senha original não é retornada pela API.
 - O hash não é retornado nas respostas de listagem ou cadastro.
 
-## Endpoints principais
+## 📡 Endpoints principais
 
 | Método | Rota | Descrição |
 |---|---|---|
@@ -159,7 +214,7 @@ As senhas nunca são armazenadas em texto plano.
 └── requirements.txt       # Dependências do projeto
 ```
 
-## Roadmap
+## 🗺️ Roadmap
 
 - [ ] Melhorar o sistema de perfis e permissões.
 - [ ] Adicionar gestão completa de salas e equipamentos.
