@@ -259,6 +259,7 @@ As senhas nunca são armazenadas em texto plano.
 | `POST` | `/usuarios` | Cadastro de usuário |
 | `GET` | `/usuarios` | Listagem de usuários |
 | `GET` | `/salas` | Listagem de salas |
+| `GET` | `/salas/{id}` | Detalhes de uma sala |
 | `GET` | `/home` | Página inicial do professor |
 | `GET` | `/home_admin` | Página inicial da administração |
 | `GET` | `/ajuda` | Central de ajuda |

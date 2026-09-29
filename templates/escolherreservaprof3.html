@@ -224,175 +224,33 @@
 
             <div class="category-icon">
 
-              <img src="/assets/icons/shopping-cart.png" alt="Gabinetes">
+              <img src="/assets/icons/shopping-cart.png" alt="Carrinhos e equipamentos">
 
             </div>
 
             <h3>
-              Gabinetes de notebooks e equipamentos móveis
+              Carrinhos e equipamentos móveis
             </h3>
 
           </div>
 
           <!-- ===================================================
-               LISTA DE GABINETES
+               CARRINHOS E EQUIPAMENTOS
+
+               Essa parte fica vazia por enquanto: o cadastro de
+               carrinhos e equipamentos ainda não foi populado
+               no banco. Quando existir, a lista é preenchida
+               pela API da mesma forma que as salas.
           ==================================================== -->
-          <div class="rooms-list">
 
-            <!-- Gabinete A -->
-            <a href="#" class="room-card searchable" data-sala="Gabinete de Notebook - A" data-status="disponivel">
+          <div
+            class="rooms-list"
+            data-lista-carrinhos
+          >
 
-              <div class="room-left">
-
-                <div class="room-thumb">
-
-                  <img src="/assets/icons/image.png" alt="Gabinete" width="20" height="20">
-
-                </div>
-
-                <div class="room-info">
-
-                  <h4>
-                    Gabinete de Notebook - A
-                  </h4>
-
-                  <p>
-                    32 Notebooks
-                  </p>
-
-                </div>
-
-              </div>
-
-              <span class="status-badge status-available">
-                Disponível
-              </span>
-
-            </a>
-
-            <!-- Gabinete B -->
-            <a href="#" class="room-card searchable selected" data-sala="Gabinete de Notebook - B" data-status="negado">
-
-              <div class="room-left">
-
-                <div class="room-thumb">
-
-                  <img src="/assets/icons/image.png" alt="Gabinete" width="20" height="20">
-
-                </div>
-
-                <div class="room-info">
-
-                  <h4>
-                    Gabinete de Notebook - B
-                  </h4>
-
-                  <p>
-                    32 Notebooks
-                  </p>
-
-                </div>
-
-              </div>
-
-              <span class="status-badge status-denied">
-                Negado
-              </span>
-
-            </a>
-
-            <!-- Gabinete C -->
-            <a href="#" class="room-card searchable" data-sala="Gabinete de Notebook - C" data-status="aguardando">
-
-              <div class="room-left">
-
-                <div class="room-thumb">
-
-                  <img src="/assets/icons/image.png" alt="Gabinete" width="20" height="20">
-
-                </div>
-
-                <div class="room-info">
-
-                  <h4>
-                    Gabinete de Notebook - C
-                  </h4>
-
-                  <p>
-                    32 Notebooks
-                  </p>
-
-                </div>
-
-              </div>
-
-              <span class="status-badge status-waiting">
-                Aguardando
-              </span>
-
-            </a>
-
-            <!-- Gabinete D -->
-            <a href="#" class="room-card searchable" data-sala="Gabinete de Notebook - D" data-status="disponivel">
-
-              <div class="room-left">
-
-                <div class="room-thumb">
-
-                  <img src="/assets/icons/image.png" alt="Gabinete" width="20" height="20">
-
-                </div>
-
-                <div class="room-info">
-
-                  <h4>
-                    Gabinete de Notebook - D
-                  </h4>
-
-                  <p>
-                    32 Notebooks
-                  </p>
-
-                </div>
-
-              </div>
-
-              <span class="status-badge status-available">
-                Disponível
-              </span>
-
-            </a>
-
-            <!-- Gabinete E -->
-            <a href="#" class="room-card searchable" data-sala="Gabinete de Notebook - E" data-status="aguardando">
-
-              <div class="room-left">
-
-                <div class="room-thumb">
-
-                  <img src="/assets/icons/image.png" alt="Gabinete" width="20" height="20">
-
-                </div>
-
-                <div class="room-info">
-
-                  <h4>
-                    Gabinete de Notebook - E
-                  </h4>
-
-                  <p>
-                    32 Notebooks
-                  </p>
-
-                </div>
-
-              </div>
-
-              <span class="status-badge status-waiting">
-                Aguardando
-              </span>
-
-            </a>
+            <p class="rooms-empty">
+              Nenhum carrinho ou equipamento cadastrado.
+            </p>
 
           </div>
 
@@ -430,6 +288,8 @@
   <!-- =========================================================
        JAVASCRIPT
   ========================================================== -->
+  <script type="module" src="/js/salas.js"></script>
+
   <script>
 
     document.addEventListener('DOMContentLoaded', () => {
@@ -470,88 +330,6 @@
         });
 
       }
-
-      // ========================================================
-      // BARRA DE PESQUISA
-      // ========================================================
-
-      const searchInput =
-        document.getElementById('search-input');
-
-      const itemsToSearch =
-        document.querySelectorAll('.searchable');
-
-      if (searchInput) {
-
-        searchInput.addEventListener('input', (e) => {
-
-          const searchTerm =
-            e.target.value.toLowerCase().trim();
-
-          itemsToSearch.forEach((item) => {
-
-            const text =
-              item.textContent.toLowerCase();
-
-            item.style.display =
-              text.includes(searchTerm) ? '' : 'none';
-
-          });
-
-        });
-
-      }
-
-      // ========================================================
-      // SELEÇÃO DOS GABINETES
-      // ========================================================
-
-      const roomCards =
-        document.querySelectorAll('.room-card');
-
-      roomCards.forEach((card) => {
-
-        card.addEventListener('click', (e) => {
-
-          // Gabinete negado não pode ser selecionado
-          if (card.dataset.status === 'negado') {
-
-            e.preventDefault();
-
-            return;
-
-          }
-
-          // Remove seleção dos outros gabinetes
-          roomCards.forEach((c) => {
-
-            c.classList.remove('selected');
-
-          });
-
-          // Seleciona o gabinete atual
-          card.classList.add('selected');
-
-          // Guarda o gabinete selecionado
-          sessionStorage.setItem(
-            'salaSelecionada',
-            card.dataset.sala || ''
-          );
-
-          // Impede o href="#"
-          e.preventDefault();
-
-          // Redireciona para o Passo 02
-          setTimeout(() => {
-
-            window.location.href =
-              '/passo02_reserva_prof';
-
-          }, 300);
-
-        });
-
-      });
 
       // ========================================================
       // MENU MOBILE

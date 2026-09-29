@@ -503,7 +503,7 @@ def listar_salas():
 
     salas = []
 
-    for dados in resposta.data:
+    for dados in resposta.data or []:
 
         sala = Sala.fromJson(dados)
 
@@ -512,6 +512,34 @@ def listar_salas():
         )
 
     return salas
+
+
+# ------------------------------------------------------------
+# BUSCAR SALA POR ID
+# ------------------------------------------------------------
+
+@app.get("/salas/{sala_id}")
+def buscar_sala(sala_id: int):
+    """Retorna somente o json de uma sala, já com o contexto montado"""
+
+    resposta = (
+        supabase
+        .table("salas")
+        .select("*")
+        .eq("id", sala_id)
+        .execute()
+    )
+
+    salas = resposta.data or []
+
+    if not salas:
+
+        raise HTTPException(
+            status_code=404,
+            detail="Sala não encontrada"
+        )
+
+    return Sala.fromJson(salas[0]).toJson()
 
 
 # ============================================================

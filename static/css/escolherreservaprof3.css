@@ -681,3 +681,11 @@ img {
     font-size: 11px;
   }
 }
+
+/* Mensagem exibida quando a API não devolve salas para a categoria. */
+.rooms-empty {
+  color: #6b7280;
+  font-size: 14px;
+  padding: 16px;
+  text-align: center;
+}
