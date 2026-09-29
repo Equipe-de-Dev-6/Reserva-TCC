@@ -16,6 +16,7 @@ from model import (
     Notebook,
     Carrinho
 )
+from consulta_salas import consultar_salas_reservaveis
 
 
 # ============================================================
@@ -493,17 +494,15 @@ def cadastrar_usuario(usuario: Usuario):
 
 @app.get("/salas")
 def listar_salas():
+    """Lista as salas reserváveis, já com o contexto montado
 
-    resposta = (
-        supabase
-        .table("salas")
-        .select("*")
-        .execute()
-    )
+    O filtro das salas que aparecem nas telas de reserva é feito
+    na consulta ao banco, então o frontend recebe apenas elas.
+    """
 
     salas = []
 
-    for dados in resposta.data or []:
+    for dados in consultar_salas_reservaveis():
 
         sala = Sala.fromJson(dados)
 

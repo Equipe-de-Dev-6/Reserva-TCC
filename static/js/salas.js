@@ -8,48 +8,12 @@
  * gerados a partir de GET /salas, usando o "contexto" devolvido
  * pela API (setor, quantidade de alunos, equipamentos e descrição).
  *
- * A tabela "salas" não tem coluna de categoria, então a separação
- * entre as telas é feita aqui.
+ * A API já devolve somente as salas reserváveis, porque o filtro
+ * acontece na consulta ao banco. Aqui só resta separar cada sala
+ * entre a tela de Salas e a de Laboratórios.
  */
 
 import { listarSalas, buscarSala } from '/js/api.js';
-
-
-/**
- * Palavras usadas para classificar cada sala.
- *
- * A ordem importa: as salas que não servem para reserva
- * (portas, depósitos, cozinhas) são descartadas primeiro, para
- * não aparecerem como salas de aula.
- */
-/**
- * Salas que fazem parte das telas de reserva.
- *
- * A lista foi levantada a partir do cadastro do campus e contém
- * apenas as salas e laboratórios usados por professores. O que
- * ficou de fora (portas, depósitos, cozinhas, cilindradas de gás)
- * não é reservável e por isso não aparece.
- *
- * A seleção é feita pelo "id" e não pelo nome, porque existem
- * salas com o mesmo nome e ids diferentes (as duas C24, por exemplo).
- *
- * Para incluir ou remover uma sala, ajuste apenas esta lista.
- */
-const SALAS_RESERVAVEIS = [
-  1,   2,   3,   4,   5,   6,   7,   8,   9,   10,  11,  12,
-  13,  14,  15,  18,  19,  20,  24,  25,  28,  31,  35,  56,
-  57,  58,  59,  60,  61,  62,  63,  64,  65,  66,  67,  69,
-  70,  71,  72,  75,  77,  78,  79,  80,  81,  89,  90,  91
-];
-
-
-/**
- * Uma sala é laboratório quando a própria descrição diz
- * "Laboratório". Salas de prática sem essa palavra no texto
- * (Sala de TI, Metrologia, salas de eletrônica) continuam
- * na lista de Salas.
- */
-const PALAVRA_LABORATORIO = 'laborat';
 
 
 // ============================================================
@@ -57,95 +21,28 @@ const PALAVRA_LABORATORIO = 'laborat';
 // ============================================================
 
 /**
- * Remove os acentos, para que a comparação funcione tanto com
- * "eletrônica" quanto com "eletronica".
+ * Uma sala é laboratório quando a própria descrição diz
+ * "Laboratório". Salas de prática sem essa palavra no texto
+ * (Sala de TI, Metrologia, salas de eletrônica) continuam
+ * sendo tratadas como salas.
  */
-function semAcento(texto) {
-  return texto
-    .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '');
-}
+const PALAVRA_LABORATORIO = 'laborat';
 
 
 /**
- * Monta o texto usado para decidir a categoria da sala.
- */
-function textoDaSala(sala) {
-
-  const contexto = sala.contexto || {};
-
-  const partes = {
-    nome: semAcento(String(sala.nome || '').toLowerCase()),
-    descricao: semAcento(String(contexto.descricao || '').toLowerCase()),
-    setor: semAcento(String(contexto.setor || '').toLowerCase()),
-    equipamentos: semAcento(
-      (contexto.equipamentos || []).join(' ').toLowerCase()
-    )
-  };
-
-  partes.tudo = [
-    partes.nome,
-    partes.descricao,
-    partes.setor,
-    partes.equipamentos
-  ]
-    .filter(Boolean)
-    .join(' ');
-
-  return partes;
-}
-
-
-/**
- * Termos curtos que precisam ser palavra inteira.
+ * Descobre em qual das telas a sala deve aparecer.
  *
- * Procurados como parte de qualquer texto, eles dariam falso
- * positivo: "ti" existe dentro de "prática" e "mdi" pode
- * fazer parte do nome de um equipamento.
- */
-const TERMOS_INTEIROS = new Set(['ti', 'mdi']);
-
-
-/**
- * Procura um termo dentro do texto da sala.
- *
- * A maior parte dos termos è procurada como começo de palavra
- * ("laborat" em "laboratório"), porque assim as palavras que
- * não terminaram com a vogal ainda são encontradas. Os termos
- * de TERMOS_INTEIROS exigem início e fim de palavra.
- */
-function contemTermo(texto, termo) {
-
-  if (!TERMOS_INTEIROS.has(termo)) {
-    return texto.includes(termo);
-  }
-
-  const padrao = new RegExp(
-    `(^|[^a-z0-9])${termo}([^a-z0-9]|$)`
-  );
-
-  return padrao.test(texto);
-}
-
-
-/**
- * Descobre em qual das três telas a sala deve aparecer.
- *
- * Retorna null quando a sala não é reservável, para que ela
- * não seja oferecida ao professor.
+ * A API já entrega somente as salas reserváveis, então aqui
+ * basta decidir entre a tela de Salas e a de Laboratórios.
  */
 function categorizar(sala) {
 
-  // Fora da lista do levantamento, a sala não é exibida.
-  if (!SALAS_RESERVAVEIS.includes(sala.id)) {
-    return null;
-  }
-
   const contexto = sala.contexto || {};
 
-  const descricao = semAcento(
-    String(contexto.descricao || '').toLowerCase()
-  );
+  const descricao = String(contexto.descricao || '')
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '');
 
   return descricao.includes(PALAVRA_LABORATORIO)
     ? 'laboratorios'
@@ -158,31 +55,36 @@ function categorizar(sala) {
 // ============================================================
 
 /**
- * Escolhe a linha de detalhe exibida abaixo do nome da sala.
+ * Monta o título do card no padrão "nome - descrição".
+ *
+ * Quando a sala não tem descrição cadastrada, fica apenas
+ * o nome, para não sobrar o separador no fim do título.
+ */
+function tituloDaSala(sala) {
+
+  const descricao = (sala.contexto || {}).descricao;
+
+  return descricao
+    ? `${sala.nome} - ${descricao}`
+    : sala.nome;
+}
+
+
+/**
+ * Monta a linha abaixo do título, sempre com a mesma forma:
+ * "32 lugares".
+ *
+ * Salas sem capacidade informada (o banco traz "Não informado" ou
+ * o campo vazio) ficam sem essa linha, em vez de mostrar um texto
+ *ivariado que quebraria o padrão.
  */
 function detalheDaSala(sala) {
 
-  const contexto = sala.contexto || {};
+  const quantidade = (sala.contexto || {}).quantidade_alunos;
 
-  if (contexto.quantidade_alunos) {
-    return `${contexto.quantidade_alunos} lugares`;
-  }
-
-  if (contexto.setor) {
-    return contexto.setor;
-  }
-
-  if (contexto.descricao) {
-    return contexto.descricao;
-  }
-
-  const equipamentos = contexto.equipamentos || [];
-
-  if (equipamentos.length) {
-    return `${equipamentos.length} equipamento(s)`;
-  }
-
-  return 'Sem informações cadastradas';
+  return quantidade
+    ? `${quantidade} lugares`
+    : '';
 }
 
 
@@ -223,15 +125,20 @@ function criarCard(sala, proximoPasso) {
   info.className = 'room-info';
 
   const titulo = document.createElement('h4');
-  titulo.textContent = contexto.descricao
-    ? `${sala.nome} — ${contexto.descricao}`
-    : sala.nome;
-
-  const detalhe = document.createElement('p');
-  detalhe.textContent = detalheDaSala(sala);
+  titulo.textContent = tituloDaSala(sala);
 
   info.appendChild(titulo);
-  info.appendChild(detalhe);
+
+  const detalhe = detalheDaSala(sala);
+
+  if (detalhe) {
+
+    const linha = document.createElement('p');
+    linha.textContent = detalhe;
+
+    info.appendChild(linha);
+
+  }
 
   left.appendChild(thumb);
   left.appendChild(info);
