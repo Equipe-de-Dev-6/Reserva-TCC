@@ -13,7 +13,6 @@ from db import supabase
 from model import (
     Usuario,
     Sala,
-    Notebook,
     Carrinho
 )
 
@@ -97,6 +96,7 @@ async def login_post(request: Request):
     dados = await request.form()
     email = (dados.get('email') or '').strip().lower()
     senha = dados.get('senha') or ''
+    cargo = dados.get('cargo') or ''
 
     # Busca o usuário no Supabase
     resposta = (
@@ -121,6 +121,7 @@ async def login_post(request: Request):
     request.session["usuario_id"] = usuario["id"]
     request.session["usuario_email"] = usuario["email"]
     request.session["usuario_nome"] = usuario["nome"]
+    request.session["usuario_cargo"] = usuario["cargo"]
 
     # O login responde em JSON com o perfil, e não com um redirect:
     # a tela de login chama a rota com fetch e só navega para a home
@@ -493,14 +494,9 @@ def cadastrar_usuario(usuario: Usuario):
             status_code=400,
             detail="Erro ao cadastrar usuário"
         )
-
-
-    # Nunca retorna a senha nem o hash para o cliente.
-    usuario_cadastrado = resposta.data[0]
+    
     return {
-        "id": usuario_cadastrado.get("id"),
-        "nome": usuario_cadastrado.get("nome"),
-        "email": usuario_cadastrado.get("email"),
+        "Usuário cadastrado com sucesso"
     }
 
 
