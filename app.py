@@ -115,7 +115,7 @@ async def login_post(request: Request):
     usuario = usuarios[0]
 
     if not verify_password(senha, usuario.get("senha", "")):
-        return {'erro': 'Email ou senha incorretos'}
+        return {'erro': 'Senha incorretos'}
 
     # Armazena na sessão
     request.session["usuario_id"] = usuario["id"]
@@ -130,9 +130,9 @@ async def login_post(request: Request):
     # A comparação é feita em caixa baixa para não depender de como
     # o e-mail foi gravado no banco.
     if usuario["email"].strip().lower() == EMAIL_ADMIN:
-        return {'status': 'adm'}
+        return {'cargo': 'coordenador'}
 
-    return {'status': 'prof'}
+    return {'cargo': 'prof'}
 
 
 @app.post("/logout")

@@ -25,9 +25,9 @@ async function entrar(event) {
         }
 
         // Redireciona conforme o tipo de usuário
-        if (dados.status === "adm") {
+        if (dados.cargo === "coordenador") {
             window.location.href = "/home_admin";
-        } else if (dados.status === "prof") {
+        } else if (dados.cargo === "prof") {
             window.location.href = "/home";
         } else {
             alert("Resposta inesperada do servidor.");
