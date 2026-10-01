@@ -446,7 +446,10 @@
         });
       }
 
-      renderReservas();
+      // Busca as reservas do professor na API antes de
+      // desenhar a lista. Sem isso a tela abriria vazia.
+      ReservasApp.carregar().then(() => renderReservas());
+
       ReservasApp.subscribe(() => renderReservas());
     });
   </script>

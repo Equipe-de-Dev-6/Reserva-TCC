@@ -305,7 +305,26 @@
 
     document.addEventListener("DOMContentLoaded", () => {
 
-      ReservasApp.commitStagedReserva();
+      // A gravação acontece na API. Quando ela recusa, o motivo
+      // volta em { erro } e a tela avisa em vez de fingir que
+      // deu certo.
+      ReservasApp.commitStagedReserva().then((resultado) => {
+
+        if (!resultado) {
+          return;
+        }
+
+        if (resultado.erro) {
+
+          window.alert(
+            'Não foi possível criar a reserva: ' + resultado.erro
+          );
+
+          window.location.href = "/passo002_reserva_prof";
+
+        }
+
+      });
 
       const userProfile =
         document.getElementById("userProfile");

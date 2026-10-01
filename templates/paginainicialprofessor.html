@@ -975,10 +975,18 @@
 
 
       // ======================================================
-      // INICIALIZA CALENDÁRIO
+      // INICIALIZA CALENDÁRIO E RESERVAS
       // ======================================================
 
-      renderCalendarioWidget();
+      // As reservas vêm da API. O carregamento acontece antes
+      // de desenhar as listas e o calendário, para que os
+      // marcadores do mês e os próximos pedidos apareçam.
+      ReservasApp.carregar().then(() => {
+
+        renderProximasReservas();
+        renderCalendarioWidget();
+
+      });
 
     });
 

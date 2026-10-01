@@ -7,12 +7,23 @@ from starlette.requests import Request
 from fastapi.responses import RedirectResponse
 from criptografia import hash_password, verify_password
 from dotenv import load_dotenv
+from datetime import datetime
 import os
 
 from db import supabase
 from model import (
     Usuario,
+    UsuarioAtualizacao,
     Sala,
+    SalaEscrita,
+    ReservaEscrita,
+    ReservaDecisao,
+    STATUS_APROVADA,
+    STATUS_NEGADA,
+    STATUS_CANCELADA,
+    STATUS_RESERVAS,
+    hora_para_timestamp,
+    data_para_timestamp,
     Notebook,
     Carrinho
 )
@@ -354,6 +365,39 @@ def passo003_reserva_prof(request: Request):
 
 
 # ------------------------------------------------------------
+# AUXILIARES DE AUTORIZAÇÃO
+# ------------------------------------------------------------
+
+# E-mail do administrador. A mesma conta é conferida no login,
+# em /login, para escolher a home de cada perfil.
+EMAIL_ADMIN = "lthiegue@sp.senai.br"
+
+
+def exigir_login(request: Request):
+    """Devolve o id do usuário logado ou interrompe com 401."""
+    usuario_id = request.session.get("usuario_id")
+
+    if not usuario_id:
+        raise HTTPException(
+            status_code=401,
+            detail="Usuário não autenticado"
+        )
+
+    return usuario_id
+
+
+def exigir_admin(request: Request):
+    """Garante que quem está chamando é o administrador."""
+    exigir_login(request)
+
+    if request.session.get("usuario_email") != EMAIL_ADMIN:
+        raise HTTPException(
+            status_code=403,
+            detail="Acesso permitido somente ao administrador"
+        )
+
+
+# ------------------------------------------------------------
 # SESSÃO
 # ------------------------------------------------------------
 
@@ -519,6 +563,730 @@ def buscar_sala(sala_id: int):
         )
 
     return Sala.fromJson(salas[0]).toJson()
+
+
+# ------------------------------------------------------------
+# LISTAR TODAS AS SALAS (ADMIN)
+# ------------------------------------------------------------
+# A tela de Gerenciar Salas precisa enxergar também as salas
+# que não aparecem nas telas de reserva, porque é justamente
+# nelas que o administrador decide o que liberar ou retirar.
+#
+# O caminho começa com "/admin" para não ser capturado por
+# /salas/{sala_id}, que vem antes na lista de rotas e deixaria
+# de funcionar se este caminho fosse "/salas/admin".
+
+@app.get("/admin/salas")
+def listar_salas_admin(request: Request):
+    exigir_admin(request)
+
+    resposta = (
+        supabase
+        .table("salas")
+        .select("*")
+        .order("nome")
+        .execute()
+    )
+
+    return [
+        Sala.fromJson(dados).toJson()
+        for dados in (resposta.data or [])
+    ]
+
+
+# ------------------------------------------------------------
+# CADASTRAR SALA (ADMIN)
+# ------------------------------------------------------------
+
+@app.post("/salas")
+def cadastrar_sala(sala: SalaEscrita, request: Request):
+    exigir_admin(request)
+
+    dados_sala = sala.toJson()
+
+    # Rejeita nomes repetidos porque o banco não tem restrição
+    # para isso, e duas salas com o mesmo nome confundem quem
+    # tenta reservá-las.
+    duplicada = (
+        supabase
+        .table("salas")
+        .select("id")
+        .eq("nome", dados_sala["nome"].strip())
+        .execute()
+    )
+
+    if duplicada.data:
+
+        raise HTTPException(
+            status_code=400,
+            detail="Já existe uma sala com esse nome"
+        )
+
+    resposta = (
+        supabase
+        .table("salas")
+        .insert(dados_sala)
+        .execute()
+    )
+
+    if not resposta.data:
+
+        raise HTTPException(
+            status_code=400,
+            detail="Erro ao cadastrar sala"
+        )
+
+    return Sala.fromJson(resposta.data[0]).toJson()
+
+
+# ------------------------------------------------------------
+# EDITAR SALA (ADMIN)
+# ------------------------------------------------------------
+
+@app.put("/salas/{sala_id}")
+def atualizar_sala(sala_id: int, sala: SalaEscrita, request: Request):
+    exigir_admin(request)
+
+    atual = (
+        supabase
+        .table("salas")
+        .select("*")
+        .eq("id", sala_id)
+        .execute()
+    )
+
+    if not (atual.data or []):
+
+        raise HTTPException(
+            status_code=404,
+            detail="Sala não encontrada"
+        )
+
+    dados_sala = sala.toJson()
+
+    # A verificação de nome ignora a própria sala, para que
+    # editar sem trocar o nome não seja barrado como duplicata.
+    duplicada = (
+        supabase
+        .table("salas")
+        .select("id")
+        .eq("nome", dados_sala["nome"].strip())
+        .neq("id", sala_id)
+        .execute()
+    )
+
+    if duplicada.data:
+
+        raise HTTPException(
+            status_code=400,
+            detail="Já existe uma sala com esse nome"
+        )
+
+    resposta = (
+        supabase
+        .table("salas")
+        .update(dados_sala)
+        .eq("id", sala_id)
+        .execute()
+    )
+
+    if not resposta.data:
+
+        raise HTTPException(
+            status_code=400,
+            detail="Erro ao atualizar sala"
+        )
+
+    return Sala.fromJson(resposta.data[0]).toJson()
+
+
+# ------------------------------------------------------------
+# EXCLUIR SALA (ADMIN)
+# ------------------------------------------------------------
+
+@app.delete("/salas/{sala_id}")
+def excluir_sala(sala_id: int, request: Request):
+    """Remove a sala do cadastro.
+
+    A exclusão é recusada quando a sala tem reservas
+    registradas, para não deixar um agendamento antigo
+    apontando para uma sala que não existe mais.
+    """
+
+    exigir_admin(request)
+
+    sala = (
+        supabase
+        .table("salas")
+        .select("id")
+        .eq("id", sala_id)
+        .execute()
+    )
+
+    if not (sala.data or []):
+
+        raise HTTPException(
+            status_code=404,
+            detail="Sala não encontrada"
+        )
+
+    reservas = (
+        supabase
+        .table("reservas")
+        .select("id")
+        .eq("sala_id", sala_id)
+        .execute()
+    )
+
+    if reservas.data:
+
+        raise HTTPException(
+            status_code=409,
+            detail="A sala possui reservas registradas e não pode ser excluída"
+        )
+
+    resposta = (
+        supabase
+        .table("salas")
+        .delete()
+        .eq("id", sala_id)
+        .execute()
+    )
+
+    return {
+        "id": sala_id,
+        "excluida": bool(resposta.data)
+    }
+
+
+# ============================================================
+# RESERVAS
+# ============================================================
+# Fluxo: o professor cria a reserva (POST /reservas) e ela
+# nasce com o status "aguardando". O administrador responde em
+# PATCH /reservas/{id}/decisao, approving or rejecting it.
+
+
+# ------------------------------------------------------------
+# LISTAR RESERVAS
+# ------------------------------------------------------------
+# O professor vê apenas as reservas dele. O administrador vê
+# todas, e pode filtrar por status.
+
+@app.get("/reservas")
+def listar_reservas(request: Request, status: str | None = None):
+
+    usuario_id = exigir_login(request)
+
+    consulta = supabase.table("reservas").select("*")
+
+    if request.session.get("usuario_email") != EMAIL_ADMIN:
+
+        consulta = consulta.eq("usuario_id", usuario_id)
+
+    elif status:
+
+        consulta = consulta.eq("status", status)
+
+    reservas = (
+        consulta
+        .order("id", desc=True)
+        .execute()
+    )
+
+    return montar_lista_reservas(reservas.data or [])
+
+
+# ------------------------------------------------------------
+# BUSCAR RESERVA POR ID
+# ------------------------------------------------------------
+
+@app.get("/reservas/{reserva_id}")
+def buscar_reserva(reserva_id: int, request: Request):
+
+    usuario_id = exigir_login(request)
+
+    resposta = (
+        supabase
+        .table("reservas")
+        .select("*")
+        .eq("id", reserva_id)
+        .execute()
+    )
+
+    reservas = resposta.data or []
+
+    if not reservas:
+
+        raise HTTPException(
+            status_code=404,
+            detail="Reserva não encontrada"
+        )
+
+    reserva = reservas[0]
+
+    # Uma reserva só é visível para quem a criou, exceto para
+    # o administrador, que precisa dela para aprovar.
+    if (
+        request.session.get("usuario_email") != EMAIL_ADMIN
+        and reserva.get("usuario_id") != usuario_id
+    ):
+
+        raise HTTPException(
+            status_code=403,
+            detail="Reserva pertence a outro usuário"
+        )
+
+    return montar_reserva(reserva)
+
+
+# ------------------------------------------------------------
+# ADICIONAR RESERVA (PROFESSOR)
+# ------------------------------------------------------------
+
+@app.post("/reservas")
+def criar_reserva(reserva: ReservaEscrita, request: Request):
+    """Registra o pedido de reserva feito pelo professor.
+
+    A reserva entra com o status "aguardando". Quem libera é o
+    administrador, em PATCH /reservas/{id}/decisao.
+    """
+
+    usuario_id = exigir_login(request)
+
+    # A sala precisa existir: sem esta checagem o banco aceitaria
+    # uma reserva apontando para uma sala inexistente.
+    sala = (
+        supabase
+        .table("salas")
+        .select("id, nome, disponibilidade")
+        .eq("id", reserva.sala_id)
+        .execute()
+    )
+
+    if not (sala.data or []):
+
+        raise HTTPException(
+            status_code=404,
+            detail="Sala não encontrada"
+        )
+
+    if not sala.data[0].get("disponibilidade", True):
+
+        raise HTTPException(
+            status_code=400,
+            detail="A sala está indisponível para reservas"
+        )
+
+    # Converte as datas e os horários do formulário em timestamp.
+    # Os dois campos separados (data e hora) viram uma coluna só.
+    try:
+
+        data_inicio = data_para_timestamp(
+            reserva.data_inicio,
+            hora_para_timestamp(reserva.hora_entrada or "08:00")
+        )
+
+        data_fim = data_para_timestamp(
+            reserva.data_fim,
+            hora_para_timestamp(reserva.hora_saida or "18:00")
+        )
+
+    except ValueError as erro:
+
+        raise HTTPException(
+            status_code=400,
+            detail=f"Data ou horário inválido: {erro}"
+        )
+
+    if data_fim <= data_inicio:
+
+        raise HTTPException(
+            status_code=400,
+            detail="O horário de término deve ser depois do início"
+        )
+
+    dados = reserva.toJson()
+
+    dados.update({
+        "usuario_id": usuario_id,
+        "data_inicio": data_inicio.isoformat(),
+        "data_fim": data_fim.isoformat(),
+        # O nome do professor vem da sessão, e não do corpo do
+        # pedido, para que a reserva não fique registrada em nome
+        # de outra pessoa.
+        "professor": request.session.get("usuario_nome") or dados["professor"],
+        "item": dados["item"] or sala.data[0].get("nome"),
+        "criado_em": datetime.now().isoformat(),
+        "atualizado_em": datetime.now().isoformat(),
+    })
+
+    # Duas reservas do mesmo professor não podem ocupar a mesma
+    # sala no mesmo horário.
+    conflito = (
+        supabase
+        .table("reservas")
+        .select("id")
+        .eq("sala_id", reserva.sala_id)
+        .eq("usuario_id", usuario_id)
+        .neq("status", STATUS_CANCELADA)
+        .lt("data_inicio", dados["data_fim"])
+        .gt("data_fim", dados["data_inicio"])
+        .execute()
+    )
+
+    if conflito.data:
+
+        raise HTTPException(
+            status_code=409,
+            detail="Você já possui uma reserva desta sala neste horário"
+        )
+
+    resposta = (
+        supabase
+        .table("reservas")
+        .insert(dados)
+        .execute()
+    )
+
+    if not resposta.data:
+
+        raise HTTPException(
+            status_code=400,
+            detail="Erro ao criar reserva"
+        )
+
+    return montar_reserva(resposta.data[0])
+
+
+# ------------------------------------------------------------
+# DECIDIR RESERVA (ADMIN)
+# ------------------------------------------------------------
+# Aprova ou recusa a reserva. O corpo manda apenas o status
+# desejado, que precisa ser "aprovada", "negada" ou "cancelada".
+
+@app.patch("/reservas/{reserva_id}/decisao")
+def decidir_reserva(
+    reserva_id: int,
+    decisao: ReservaDecisao,
+    request: Request
+):
+
+    exigir_admin(request)
+
+    if decisao.status not in STATUS_RESERVAS:
+
+        raise HTTPException(
+            status_code=400,
+            detail="Status de reserva inválido"
+        )
+
+    if decisao.status not in (
+        STATUS_APROVADA,
+        STATUS_NEGADA,
+        STATUS_CANCELADA,
+    ):
+
+        raise HTTPException(
+            status_code=400,
+            detail="A decisão deve ser aprovada, negada ou cancelada"
+        )
+
+    atual = (
+        supabase
+        .table("reservas")
+        .select("*")
+        .eq("id", reserva_id)
+        .execute()
+    )
+
+    if not (atual.data or []):
+
+        raise HTTPException(
+            status_code=404,
+            detail="Reserva não encontrada"
+        )
+
+    # Uma reserva já respondida não muda de status outra vez.
+    if atual.data[0].get("status") != "aguardando":
+
+        raise HTTPException(
+            status_code=409,
+            detail="Esta reserva já foi respondida"
+        )
+
+    resposta = (
+        supabase
+        .table("reservas")
+        .update({
+            "status": decisao.status,
+            "atualizado_em": datetime.now().isoformat(),
+        })
+        .eq("id", reserva_id)
+        .execute()
+    )
+
+    if not resposta.data:
+
+        raise HTTPException(
+            status_code=400,
+            detail="Erro ao atualizar a reserva"
+        )
+
+    return montar_reserva(resposta.data[0])
+
+
+# ------------------------------------------------------------
+# CANCELAR RESERVA (PROFESSOR)
+# ------------------------------------------------------------
+
+@app.delete("/reservas/{reserva_id}")
+def cancelar_reserva(reserva_id: int, request: Request):
+    """Cancela uma reserva que ainda não foi respondida."""
+
+    usuario_id = exigir_login(request)
+
+    atual = (
+        supabase
+        .table("reservas")
+        .select("*")
+        .eq("id", reserva_id)
+        .execute()
+    )
+
+    if not (atual.data or []):
+
+        raise HTTPException(
+            status_code=404,
+            detail="Reserva não encontrada"
+        )
+
+    reserva = atual.data[0]
+
+    # O professor cancela a própria reserva; o administrador
+    # cancela qualquer uma.
+    if (
+        request.session.get("usuario_email") != EMAIL_ADMIN
+        and reserva.get("usuario_id") != usuario_id
+    ):
+
+        raise HTTPException(
+            status_code=403,
+            detail="Reserva pertence a outro usuário"
+        )
+
+    # Reserva já recusada não volta para "aguardando": ela
+    # seria aprovada sem que ninguém pedisse de novo.
+    if reserva.get("status") != "aguardando":
+
+        raise HTTPException(
+            status_code=409,
+            detail="Somente reservas aguardando podem ser canceladas"
+        )
+
+    resposta = (
+        supabase
+        .table("reservas")
+        .update({
+            "status": STATUS_CANCELADA,
+            "atualizado_em": datetime.now().isoformat(),
+        })
+        .eq("id", reserva_id)
+        .execute()
+    )
+
+    if not resposta.data:
+
+        raise HTTPException(
+            status_code=400,
+            detail="Erro ao cancelar a reserva"
+        )
+
+    return montar_reserva(resposta.data[0])
+
+
+# ------------------------------------------------------------
+# MONTAGEM DA RESPOSTA
+# ------------------------------------------------------------
+# O nome da sala vem junto para o frontend não precisar fazer
+# uma segunda requisição só para exibir o título do card.
+
+def montar_reserva(dados: dict):
+    """Junta a reserva com o nome da sala para a resposta."""
+    reserva = dict(dados)
+
+    sala_id = reserva.get("sala_id")
+
+    if sala_id:
+
+        sala = (
+            supabase
+            .table("salas")
+            .select("nome")
+            .eq("id", sala_id)
+            .execute()
+        )
+
+        if sala.data:
+
+            reserva["sala_nome"] = sala.data[0].get("nome")
+
+    return reserva
+
+
+def montar_lista_reservas(dados: list):
+    """Monta várias reservas resolvendo o nome de cada sala."""
+    return [
+        montar_reserva(reserva)
+        for reserva in dados
+    ]
+
+
+# ============================================================
+# PROFESSORES (ADMIN)
+# ============================================================
+
+# ------------------------------------------------------------
+# ATUALIZAR PROFESSOR (ADMIN)
+# ------------------------------------------------------------
+
+@app.put("/usuarios/{usuario_id}")
+def atualizar_usuario(
+    usuario_id: int,
+    usuario: UsuarioAtualizacao,
+    request: Request
+):
+    """Atualiza nome e e-mail de um professor.
+
+    A senha não é alterada aqui: ela fica de fora da resposta e
+    da gravação, então o hash guardado no banco permanece.
+    """
+    exigir_admin(request)
+
+    atual = (
+        supabase
+        .table("usuarios")
+        .select("id")
+        .eq("id", usuario_id)
+        .execute()
+    )
+
+    if not (atual.data or []):
+
+        raise HTTPException(
+            status_code=404,
+            detail="Usuário não encontrado"
+        )
+
+    dados_usuario = usuario.toJson()
+
+    # O e-mail identifica o usuário no login, então ele precisa
+    # ser único. A verificação ignora o próprio usuário.
+    duplicado = (
+        supabase
+        .table("usuarios")
+        .select("id")
+        .eq("email", dados_usuario["email"].strip())
+        .neq("id", usuario_id)
+        .execute()
+    )
+
+    if duplicado.data:
+
+        raise HTTPException(
+            status_code=400,
+            detail="Já existe um usuário com esse e-mail"
+        )
+
+    resposta = (
+        supabase
+        .table("usuarios")
+        .update(dados_usuario)
+        .eq("id", usuario_id)
+        .execute()
+    )
+
+    if not resposta.data:
+
+        raise HTTPException(
+            status_code=400,
+            detail="Erro ao atualizar usuário"
+        )
+
+    usuario_atualizado = resposta.data[0]
+
+    # O hash da senha nunca volta para o frontend.
+    return {
+        "id": usuario_atualizado.get("id"),
+        "nome": usuario_atualizado.get("nome"),
+        "email": usuario_atualizado.get("email"),
+    }
+
+
+# ------------------------------------------------------------
+# EXCLUIR PROFESSOR (ADMIN)
+# ------------------------------------------------------------
+
+@app.delete("/usuarios/{usuario_id}")
+def excluir_usuario(usuario_id: int, request: Request):
+    """Remove um professor do cadastro.
+
+    Usuários com reservas pendentes não podem ser removidos,
+    porque o administrador ainda precisa saber de quem é o
+    pedido antes de responder.
+    """
+    exigir_admin(request)
+
+    if request.session.get("usuario_id") == usuario_id:
+
+        raise HTTPException(
+            status_code=400,
+            detail="Você não pode excluir a própria conta"
+        )
+
+    atual = (
+        supabase
+        .table("usuarios")
+        .select("id")
+        .eq("id", usuario_id)
+        .execute()
+    )
+
+    if not (atual.data or []):
+
+        raise HTTPException(
+            status_code=404,
+            detail="Usuário não encontrado"
+        )
+
+    pendentes = (
+        supabase
+        .table("reservas")
+        .select("id")
+        .eq("usuario_id", usuario_id)
+        .eq("status", "aguardando")
+        .execute()
+    )
+
+    if pendentes.data:
+
+        raise HTTPException(
+            status_code=409,
+            detail="O professor possui reservas aguardando decisão"
+        )
+
+    resposta = (
+        supabase
+        .table("usuarios")
+        .delete()
+        .eq("id", usuario_id)
+        .execute()
+    )
+
+    return {
+        "id": usuario_id,
+        "excluido": bool(resposta.data)
+    }
 
 
 # ============================================================
