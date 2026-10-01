@@ -269,7 +269,7 @@ def aprovar_reservas_adm(request: Request):
     """Tela do admin para aprovar ou recusar as reservas dos professores"""
     if "usuario_id" not in request.session:
         return RedirectResponse(url="/", status_code=302)
-    return FileResponse("templates/aprovar_reservas_adm.html")
+    return FileResponse("templates/aprovarreservasadm.html")
 
 
 @app.get("/professores_adm")

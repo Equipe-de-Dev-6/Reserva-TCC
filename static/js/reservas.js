@@ -4,17 +4,19 @@
  * Estado compartilhado das reservas do professor.
  *
  * Persistência:
- * - em memória, no próprio navegador
+ * - no localStorage, para que a reserva continue existindo
+ *   depois de recarregar a página
  *
- * O localStorage foi removido. Sem rotas de API para as reservas,
- * os dados existem apenas enquanto a aba estiver aberta: ao recarregar
- * a página, a lista volta a ficar vazia. Quando o backend de reservas
- * existir, basta trocar _read/_write pelas chamadas da API.
+ * O localStorage guarda a lista no navegador. Quando existir o
+ * backend de reservas, basta trocar _read/_write pelas chamadas
+ * da API, como já está previsto neste arquivo.
  *
  * Sincronização entre abas:
  * - BroadcastChannel
  *
- * Nenhuma tela precisa ser recarregada.
+ * Nenhuma tela precisa ser recarregada: a reserva criada pelo
+ * professor aparece na tela do administrador e a decisão do
+ * administrador volta para a tela do professor.
  */
 
 const ReservasApp = (() => {
@@ -41,9 +43,10 @@ const ReservasApp = (() => {
   // ESTADO
   // =========================================================
 
-  // A lista começa vazia em cada carregamento da página.
-  let reservas = [];
-  let notificacoes = [];
+  // Recupera as listas que já estavam salvas no navegador.
+  // Assim, a reserva continua na tela mesmo depois de recarregar.
+  let reservas = _read('reservas', []);
+  let notificacoes = _read('notificacoes', []);
 
 
   // =========================================================
@@ -61,24 +64,56 @@ const ReservasApp = (() => {
 
 
   /**
-   * Lê uma lista do estado em memória.
+   * Lê uma lista do estado.
    *
-   * Mantém a assinatura usada antes pela leitura do localStorage,
-   * para que a troca seja feita em um único lugar.
+   * Busca no localStorage e, se não houver nada salvo ainda,
+   * devolve o valor padrão. É por aqui que a troca pela API
+   * será feita no futuro.
    */
-  function _read(_key, fallback = []) {
-    return fallback;
+  function _read(key, fallback = []) {
+    try {
+      const bruto = localStorage.getItem(key);
+
+      if (!bruto) {
+        return fallback;
+      }
+
+      const dados = JSON.parse(bruto);
+
+      return Array.isArray(dados) ? dados : fallback;
+
+    } catch (e) {
+      console.error(
+        'Erro ao ler as reservas salvas:',
+        e
+      );
+
+      return fallback;
+    }
   }
 
 
   /**
-   * Grava uma lista no estado em memória.
+   * Grava uma lista no estado e no localStorage.
    *
    * O valor é copiado para uma nova lista, evitando que a tela
    * segure uma referência que muda por baixo dos panos.
    */
   function _write(key, value) {
     const copia = Array.isArray(value) ? [...value] : value;
+
+    try {
+      localStorage.setItem(
+        key,
+        JSON.stringify(copia)
+      );
+
+    } catch (e) {
+      console.warn(
+        'Não foi possível salvar as reservas:',
+        e
+      );
+    }
 
     if (key === 'reservas') {
       reservas = copia;
@@ -151,6 +186,67 @@ const ReservasApp = (() => {
   // =========================================================
 
   /**
+   * Aplica na lista desta aba a alteração que veio de outra.
+   *
+   * É o que faz a reserva criada na tela do professor aparecer
+   * na tela do administrador, e a decisão do administrador
+   * voltar para a tela do professor.
+   */
+  function _aplicarDeOutraAba(payload) {
+    const reserva = payload.reserva;
+
+    // Sem reserva não há o que aplicar. 'excluir-notificacao'
+    // e 'limpar-notificacoes' também passam por aqui.
+    if (!reserva || !reserva.id) {
+      return;
+    }
+
+    const lista = getReservas();
+
+    const existe = lista.some(
+      (item) => item.id === reserva.id
+    );
+
+    // Reserva nova feita em outra aba
+    if (payload.action === 'criar' && !existe) {
+      _write(
+        'reservas',
+        [reserva, ...lista]
+      );
+
+      return;
+    }
+
+    // Reserva excluída em outra aba
+    if (payload.action === 'excluir' && existe) {
+      _write(
+        'reservas',
+        lista.filter(
+          (item) => item.id !== reserva.id
+        )
+      );
+
+      return;
+    }
+
+    // Reserva editada, cancelada, aprovada ou rejeitada
+    // em outra aba
+    if (existe) {
+      _write(
+        'reservas',
+        lista.map((item) => {
+
+          return item.id === reserva.id
+            ? { ...item, ...reserva }
+            : item;
+
+        })
+      );
+    }
+  }
+
+
+  /**
    * BroadcastChannel:
    * sincroniza alterações entre abas abertas.
    */
@@ -158,7 +254,13 @@ const ReservasApp = (() => {
     channel.addEventListener(
       'message',
       (event) => {
-        _onChange(event.data || {});
+
+        const payload = event.data || {};
+
+        _aplicarDeOutraAba(payload);
+
+        _onChange(payload);
+
       }
     );
   }
@@ -167,9 +269,26 @@ const ReservasApp = (() => {
   /**
    * Fallback utilizando o evento storage.
    */
-  // O evento "storage" existia para observar o localStorage
-  // compartilhado entre abas. Com o estado em memória ele não se
-  // aplica, porque cada aba tem a sua própria lista.
+  // O evento "storage" observa o localStorage compartilhado
+  // entre abas e cobre o caso de uma aba que estava fechada
+  // quando a reserva foi salva.
+  window.addEventListener(
+    'storage',
+    (event) => {
+
+      if (!event.key || event.key !== 'reservas') {
+        return;
+      }
+
+      _write(
+        'reservas',
+        _read('reservas')
+      );
+
+      _onChange({ action: 'sincronizar' });
+
+    }
+  );
 
 
   // =========================================================
