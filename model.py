@@ -1,6 +1,8 @@
 import re
 import unicodedata
 
+from datetime import datetime
+
 from pydantic import BaseModel
 
 
@@ -27,6 +29,198 @@ class Usuario(BaseModel):
             'nome': self.nome,
             'email': self.email,
             'senha': self.senha
+        }
+
+
+# ============================================================
+# MODELO: USUÁRIO PARA ATUALIZAÇÃO
+# ============================================================
+
+class UsuarioAtualizacao(BaseModel):
+    """Dados que o administrador pode alterar em um professor.
+
+    A senha não entra aqui de propósito: trocar a senha do
+    professor é uma operação à parte, feita pelo próprio
+    usuário, e não pela tela de gestão de professores.
+    """
+
+    nome: str
+    email: str
+
+    def toJson(self):
+        return {
+            'nome': self.nome,
+            'email': self.email
+        }
+
+
+# ============================================================
+# MODELO: SALA PARA ESCRITA
+# ============================================================
+
+class SalaEscrita(BaseModel):
+    """Dados que o administrador envia ao criar ou editar uma sala.
+
+    A API monta a coluna "caracteristica" a partir dos campos
+    recebidos, porque no banco a descrição da sala é um único
+    texto. O contexto continua sendo derivado desse texto na
+    leitura, então o frontend não muda.
+    """
+
+    nome: str
+    setor: str = ''
+    quantidade_alunos: int | None = None
+    equipamentos: list[str] = []
+    descricao: str = ''
+    disponibilidade: bool = True
+
+    def toJson(self):
+        return {
+            'nome': self.nome,
+            'caracteristica': montar_caracteristica(self),
+            'disponibilidade': self.disponibilidade
+        }
+
+
+# ============================================================
+# MODELO: RESERVA
+# ============================================================
+
+# Status possíveis de uma reserva. "aguardando" é o estado em que
+# a reserva nasce e fica parada até o administrador responder.
+STATUS_AGUARDANDO = 'aguardando'
+STATUS_APROVADA = 'aprovada'
+STATUS_NEGADA = 'negada'
+STATUS_CANCELADA = 'cancelada'
+
+STATUS_RESERVAS = (
+    STATUS_AGUARDANDO,
+    STATUS_APROVADA,
+    STATUS_NEGADA,
+    STATUS_CANCELADA,
+)
+
+
+class ReservaEscrita(BaseModel):
+    """Reserva enviada pelo professor ao solicitar um agendamento.
+
+    O formulário traz a data separada das horas, então
+    "data_inicio" e "data_fim" chegam como "AAAA-MM-DD" e a hora
+    vai em "hora_entrada" e "hora_saida" ("HH:MM"). Se a hora vier
+    embutida na data, ela é aproveitada e o campo separado é
+    ignorado.
+    """
+
+    sala_id: int
+    data_inicio: str
+    data_fim: str
+    hora_entrada: str = ''
+    hora_saida: str = ''
+    categoria: str = ''
+    item: str = ''
+    professor: str = ''
+    curso: str = ''
+    motivo: str = ''
+
+    @classmethod
+    def fromJson(cls, json: dict):
+        return cls(
+            sala_id=json['sala_id'],
+            data_inicio=json['data_inicio'],
+            data_fim=json['data_fim'],
+            hora_entrada=json.get('hora_entrada') or '',
+            hora_saida=json.get('hora_saida') or '',
+            categoria=json.get('categoria') or '',
+            item=json.get('item') or '',
+            professor=json.get('professor') or '',
+            curso=json.get('curso') or '',
+            motivo=json.get('motivo') or ''
+        )
+
+    def toJson(self):
+        return {
+            'sala_id': self.sala_id,
+            'categoria': self.categoria or None,
+            'item': self.item or None,
+            'professor': self.professor or None,
+            'curso': self.curso or None,
+            'motivo': self.motivo or None,
+            'status': STATUS_AGUARDANDO
+        }
+
+
+def hora_para_timestamp(valor):
+    """Normaliza um horário para "HH:MM:SS".
+
+    Aceita "8:00", "08:00" e "08:00:00", e sempre devolve o
+    formato que o banco guarda. Levanta ValueError quando o
+    texto não é um horário válido, para a API responder 400 em
+    vez de gravar um horário quebrado.
+    """
+    texto = str(valor or "").strip()
+
+    if not texto:
+        raise ValueError("Horário não informado")
+
+    partes = texto.split(":")
+
+    if len(partes) < 2:
+        raise ValueError(f"Horário inválido: {texto}")
+
+    hora = int(partes[0])
+    minuto = int(partes[1])
+    segundo = int(partes[2]) if len(partes) > 2 and partes[2] else 0
+
+    if not (0 <= hora <= 23 and 0 <= minuto <= 59 and 0 <= segundo <= 59):
+        raise ValueError(f"Horário fora do intervalo: {texto}")
+
+    return f"{hora:02d}:{minuto:02d}:{segundo:02d}"
+
+
+def data_para_timestamp(data, hora):
+    """Junta "AAAA-MM-DD" com "HH:MM:SS" em um timestamp.
+
+    Se a data já vier com a hora embutida
+    ("2026-10-10T08:00:00"), ela é usada como está.
+    """
+    texto = str(data or "").strip()
+
+    if not texto:
+        raise ValueError("Data não informada")
+
+    # Data com hora embutida: usa como veio.
+    if "T" in texto:
+        try:
+            return datetime.fromisoformat(texto)
+
+        except ValueError:
+
+            raise ValueError(f'data "{texto}" não está no formato AAAA-MM-DD')
+
+    # Rótulos do próprio navegador podem vir em dd/mm/aaaa.
+    if "/" in texto:
+        dia, mes, ano = texto.split("/")
+        texto = f"{ano}-{mes}-{dia}"
+
+    try:
+        return datetime.fromisoformat(f"{texto}T{hora}")
+
+    except ValueError:
+
+        # A mensagem do datetime é técnica demais para quem está
+        # preenchendo o formulário, então vira uma frase sobre o
+        # formato esperado.
+        raise ValueError(f'data "{texto}" não está no formato AAAA-MM-DD')
+
+
+class ReservaDecisao(BaseModel):
+    """Decisão do administrador sobre uma reserva pendente."""
+
+    status: str
+
+    def toJson(self):
+        return {
+            'status': self.status
         }
 
 
@@ -171,6 +365,61 @@ def montar_contexto_sala(caracteristica):
             contexto["quantidade_alunos"] = int(capacidade.group(1))
 
     return contexto
+
+
+# ============================================================
+# MONTAGEM DA COLUNA "caracteristica" DAS SALAS
+# ============================================================
+
+# Rótulos gravados na coluna "caracteristica", na mesma ordem em
+# que montar_contexto_sala procura por eles.
+ROTULOS_ESCRITA = (
+    ("setor", "Setor"),
+    ("quantidade_alunos", "Quantidade de alunos"),
+    ("equipamentos", "Equipamentos"),
+    ("descricao", "Descrição"),
+)
+
+
+def montar_caracteristica(sala):
+    """Junta os campos da sala em uma única linha de texto.
+
+    O banco guarda a característica da sala em um único campo de
+    texto. A escrita faz o caminho inverso de
+    montar_contexto_sala: os campos separados viram rótulos
+    ("Setor: ...") separados por ";", e a leitura monta o
+    contexto de volta.
+    """
+    partes = []
+
+    for campo, rotulo in ROTULOS_ESCRITA:
+
+        valor = getattr(sala, campo)
+
+        if campo == 'equipamentos':
+
+            # A lista de equipamentos vira uma linha separada por
+            # vírgulas, que é como a leitura espera separar.
+            itens = [
+                item
+                for item in (
+                    limpar_texto(str(equipamento))
+                    for equipamento in (valor or [])
+                )
+                if item
+            ]
+
+            if itens:
+                partes.append(f"{rotulo}: {', '.join(itens)}")
+
+            continue
+
+        texto = limpar_texto(str(valor)) if valor is not None else None
+
+        if texto is not None:
+            partes.append(f"{rotulo}: {texto}")
+
+    return "; ".join(partes) or None
 
 
 def normalizar_historico(historico):

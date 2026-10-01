@@ -268,6 +268,43 @@ As senhas nunca são armazenadas em texto plano.
 | `GET` | `/configuracoes_adm` | Configurações da conta do administrador |
 | `GET` | `/ajuda` | Central de ajuda |
 
+### Reservas
+
+O fluxo tem dois papéis: o professor pede, o administrador decide.
+
+| Método | Rota | Quem pode | Descrição |
+|---|---|---|---|
+| `GET` | `/reservas` | todos | Lista reservas (o professor vê só as dele) |
+| `GET` | `/reservas?status=` | admin | Filtra por `aguardando`, `aprovada`, `negada` ou `cancelada` |
+| `GET` | `/reservas/{id}` | dono ou admin | Detalhe de uma reserva |
+| `POST` | `/reservas` | professor | Cria a reserva, que entra como `aguardando` |
+| `PATCH` | `/reservas/{id}/decisao` | admin | Aprova, nega ou cancela |
+| `DELETE` | `/reservas/{id}` | dono ou admin | Cancela uma reserva que ninguém respondeu |
+
+### Salas (CRUD do administrador)
+
+| Método | Rota | Descrição |
+|---|---|---|
+| `GET` | `/admin/salas` | Lista todas as salas, inclusive as não reserváveis |
+| `POST` | `/salas` | Cadastra uma sala |
+| `PUT` | `/salas/{id}` | Edita uma sala |
+| `DELETE` | `/salas/{id}` | Exclui uma sala (recusa se houver reservas) |
+
+### Professores (CRUD do administrador)
+
+| Método | Rota | Descrição |
+|---|---|---|
+| `GET` | `/usuarios` | Lista usuários, sem a coluna de senha |
+| `POST` | `/usuarios` | Cadastra um usuário |
+| `PUT` | `/usuarios/{id}` | Edita nome e e-mail |
+| `DELETE` | `/usuarios/{id}` | Exclui (recusa se houver reservas pendentes) |
+
+### Migração do banco
+
+A tabela `reservas` precisa de colunas que não existiam no script original.
+Rode `migracao_reservas.sql` no SQL Editor do Supabase antes de usar as
+rotas de reservas.
+
 ## Estrutura do projeto
 
 ```text

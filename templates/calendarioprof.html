@@ -491,7 +491,10 @@
           renderCalendario();
         });
 
-      renderCalendario();
+      // Busca as reservas na API antes de montar o calendário,
+      // senão os marcadores do mês não apareceriam.
+      ReservasApp.carregar().then(() => renderCalendario());
+
       ReservasApp.subscribe(() => renderCalendario());
     });
   </script>
