@@ -16,6 +16,7 @@ from model import (
     Notebook,
     Carrinho
 )
+from consulta_salas import consultar_salas_reservaveis
 
 
 # ============================================================
@@ -493,17 +494,15 @@ def cadastrar_usuario(usuario: Usuario):
 
 @app.get("/salas")
 def listar_salas():
+    """Lista as salas reserváveis, já com o contexto montado
 
-    resposta = (
-        supabase
-        .table("salas")
-        .select("*")
-        .execute()
-    )
+    O filtro das salas que aparecem nas telas de reserva é feito
+    na consulta ao banco, então o frontend recebe apenas elas.
+    """
 
     salas = []
 
-    for dados in resposta.data:
+    for dados in consultar_salas_reservaveis():
 
         sala = Sala.fromJson(dados)
 
@@ -512,6 +511,34 @@ def listar_salas():
         )
 
     return salas
+
+
+# ------------------------------------------------------------
+# BUSCAR SALA POR ID
+# ------------------------------------------------------------
+
+@app.get("/salas/{sala_id}")
+def buscar_sala(sala_id: int):
+    """Retorna somente o json de uma sala, já com o contexto montado"""
+
+    resposta = (
+        supabase
+        .table("salas")
+        .select("*")
+        .eq("id", sala_id)
+        .execute()
+    )
+
+    salas = resposta.data or []
+
+    if not salas:
+
+        raise HTTPException(
+            status_code=404,
+            detail="Sala não encontrada"
+        )
+
+    return Sala.fromJson(salas[0]).toJson()
 
 
 # ============================================================

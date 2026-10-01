@@ -7,13 +7,14 @@
 // Como funciona (sem backend):
 //
 // 1. Na página "Avisos" (/avisos_prof), o professor preenche o
-//    formulário e clica em "Publicar Aviso". O aviso é salvo em
-//    localStorage("senai_avisos_professor").
+//    formulário e clica em "Publicar Aviso". O aviso é guardado
+//    em memória, no próprio navegador.
 //
-// 2. A Página Inicial (/home) lê essa mesma lista para montar o
-//    bloco "Avisos importantes". Como os dois lugares leem do
-//    mesmo localStorage, o que for criado em um aparece no outro
-//    automaticamente (e vice-versa).
+// 2. A lista vive no estado do módulo. Como o localStorage foi
+//    removido, cada carregamento de página começa com a lista
+//    vazia e os avisos somem ao recarregar. Quando existir o
+//    backend de avisos, basta trocar o _saveAvisos por uma
+//    chamada à API.
 //
 // 3. AvisosApp.subscribe(fn) permite que uma página "escute"
 //    mudanças (criação/exclusão) feitas nela mesma e sempre
@@ -24,7 +25,11 @@
 
 const AvisosApp = (() => {
 
-  const STORAGE_KEY = 'senai_avisos_professor';
+  // ========================================================
+  // ESTADO
+  // ========================================================
+
+  let avisos = [];
 
   const _listeners = [];
 
@@ -53,41 +58,21 @@ const AvisosApp = (() => {
 
   function getAvisos() {
 
-    try {
-
-      const raw = localStorage.getItem(STORAGE_KEY);
-
-      const lista = raw ? JSON.parse(raw) : [];
-
-      // Mais recentes primeiro.
-      return lista.sort((a, b) => new Date(b.criadoEm) - new Date(a.criadoEm));
-
-    } catch (e) {
-
-      console.error('Erro ao ler avisos:', e);
-
-      return [];
-
-    }
+    // Mais recentes primeiro.
+    return [...avisos].sort(
+      (a, b) => new Date(b.criadoEm) - new Date(a.criadoEm)
+    );
 
   }
 
 
   function _saveAvisos(lista) {
 
-    try {
+    // Guarda uma cópia, para que a tela não segure uma
+    // referência que muda por baixo dos panos.
+    avisos = [...lista];
 
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(lista));
-
-      return true;
-
-    } catch (e) {
-
-      console.error('Erro ao salvar avisos:', e);
-
-      return false;
-
-    }
+    return true;
 
   }
 

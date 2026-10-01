@@ -4,24 +4,29 @@
  * Estado compartilhado das reservas do professor.
  *
  * Persistência:
- * - localStorage
+ * - em memória, no próprio navegador
  *
- * Sincronização entre páginas/abas:
+ * O localStorage foi removido. Sem rotas de API para as reservas,
+ * os dados existem apenas enquanto a aba estiver aberta: ao recarregar
+ * a página, a lista volta a ficar vazia. Quando o backend de reservas
+ * existir, basta trocar _read/_write pelas chamadas da API.
+ *
+ * Sincronização entre abas:
  * - BroadcastChannel
- * - fallback para o evento "storage"
  *
  * Nenhuma tela precisa ser recarregada.
  */
 
 const ReservasApp = (() => {
   // =========================================================
-  // CONFIGURAÇÕES E CHAVES DE ARMAZENAMENTO
+  // CONFIGURAÇÕES E ESTADO EM MEMÓRIA
   // =========================================================
 
-  const STORAGE_KEY = 'senai_reservas_professor';
-  const TEMP_KEY = 'senai_nova_reserva';
-  const NOTIFICATIONS_KEY = 'senai_notificacoes_reservas';
+  // O sessionStorage é usado apenas para transportar a escolha
+  // entre as três páginas do agendamento (passo 01 -> 02 -> 03).
+  // Ele não guarda a lista de reservas e some ao fechar a aba.
   const SALA_KEY = 'salaSelecionada';
+  const TEMP_KEY = 'senai_nova_reserva';
 
   const CHANNEL_NAME = 'senai-reservas-sync';
 
@@ -31,6 +36,14 @@ const ReservasApp = (() => {
       : null;
 
   const listeners = [];
+
+  // =========================================================
+  // ESTADO
+  // =========================================================
+
+  // A lista começa vazia em cada carregamento da página.
+  let reservas = [];
+  let notificacoes = [];
 
 
   // =========================================================
@@ -48,40 +61,34 @@ const ReservasApp = (() => {
 
 
   /**
-   * Lê dados do localStorage.
+   * Lê uma lista do estado em memória.
+   *
+   * Mantém a assinatura usada antes pela leitura do localStorage,
+   * para que a troca seja feita em um único lugar.
    */
-  function _read(key, fallback = []) {
-    try {
-      const raw = localStorage.getItem(key);
-
-      return raw
-        ? JSON.parse(raw)
-        : fallback;
-
-    } catch (e) {
-      console.error(`Erro ao ler ${key}:`, e);
-      return fallback;
-    }
+  function _read(_key, fallback = []) {
+    return fallback;
   }
 
 
   /**
-   * Salva dados no localStorage.
+   * Grava uma lista no estado em memória.
+   *
+   * O valor é copiado para uma nova lista, evitando que a tela
+   * segure uma referência que muda por baixo dos panos.
    */
   function _write(key, value) {
-    try {
-      localStorage.setItem(
-        key,
-        JSON.stringify(value)
-      );
+    const copia = Array.isArray(value) ? [...value] : value;
 
-      return true;
-
-    } catch (e) {
-      console.error(`Erro ao salvar ${key}:`, e);
-
-      return false;
+    if (key === 'reservas') {
+      reservas = copia;
     }
+
+    if (key === 'notificacoes') {
+      notificacoes = copia;
+    }
+
+    return true;
   }
 
 
@@ -160,23 +167,9 @@ const ReservasApp = (() => {
   /**
    * Fallback utilizando o evento storage.
    */
-  window.addEventListener(
-    'storage',
-    (event) => {
-      const keysMonitoradas = [
-        STORAGE_KEY,
-        NOTIFICATIONS_KEY
-      ];
-
-      if (keysMonitoradas.includes(event.key)) {
-        _onChange({
-          action: 'sync',
-          reserva: null,
-          timestamp: new Date().toISOString()
-        });
-      }
-    }
-  );
+  // O evento "storage" existia para observar o localStorage
+  // compartilhado entre abas. Com o estado em memória ele não se
+  // aplica, porque cada aba tem a sua própria lista.
 
 
   // =========================================================
@@ -213,12 +206,12 @@ const ReservasApp = (() => {
   // =========================================================
 
   function getReservas() {
-    return _read(STORAGE_KEY, []);
+    return reservas;
   }
 
 
   function getNotificacoes() {
-    return _read(NOTIFICATIONS_KEY, []);
+    return notificacoes;
   }
 
 
@@ -345,7 +338,7 @@ const ReservasApp = (() => {
 
     // Mantém no máximo 100 notificações
     _write(
-      NOTIFICATIONS_KEY,
+      'notificacoes',
       notificacoes.slice(0, 100)
     );
   }
@@ -364,7 +357,7 @@ const ReservasApp = (() => {
     }
 
     const salvou = _write(
-      STORAGE_KEY,
+      'reservas',
       lista.filter((reserva) => reserva.id !== id)
     );
 
@@ -373,7 +366,7 @@ const ReservasApp = (() => {
     }
 
     _write(
-      NOTIFICATIONS_KEY,
+      'notificacoes',
       getNotificacoes().filter((notificacao) => notificacao.reservaId !== id)
     );
 
@@ -394,7 +387,7 @@ const ReservasApp = (() => {
     }
 
     const salvou = _write(
-      NOTIFICATIONS_KEY,
+      'notificacoes',
       notificacoes.filter((notificacao) => notificacao.id !== id)
     );
 
@@ -411,7 +404,7 @@ const ReservasApp = (() => {
    * Limpa todas as notificações persistidas.
    */
   function clearNotificacoes() {
-    if (!_write(NOTIFICATIONS_KEY, [])) {
+    if (!_write('notificacoes', [])) {
       return false;
     }
 
@@ -435,7 +428,7 @@ const ReservasApp = (() => {
     reserva
   ) {
     const salvou = _write(
-      STORAGE_KEY,
+      'reservas',
       lista
     );
 
@@ -465,6 +458,32 @@ const ReservasApp = (() => {
   // =========================================================
 
   /**
+   * Recupera a sala escolhida na tela anterior.
+   *
+   * A tela de escolha grava o json devolvido pela API
+   * ({ id, nome, contexto }). O nome é usado para exibir
+   * na reserva.
+   */
+  function lerSalaSelecionada() {
+    const bruto = sessionStorage.getItem(SALA_KEY);
+
+    if (!bruto) {
+      return '';
+    }
+
+    try {
+      const sala = JSON.parse(bruto);
+
+      return sala && sala.nome ? sala.nome : '';
+
+    } catch (e) {
+      // Formato antigo, em que era gravado apenas o nome.
+      return bruto;
+    }
+  }
+
+
+  /**
    * Armazena temporariamente os dados
    * do formulário antes de confirmar a reserva.
    */
@@ -479,9 +498,7 @@ const ReservasApp = (() => {
       : 'Reserva';
 
 
-    const item =
-      sessionStorage.getItem(SALA_KEY)
-      || categoria;
+    const item = lerSalaSelecionada() || categoria;
 
 
     /**
