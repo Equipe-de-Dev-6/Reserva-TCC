@@ -68,11 +68,15 @@ app.add_middleware(SessionMiddleware, secret_key=SUPABASE_KEY)
 
 
 # ============================================================
-# PÁGINAS
+# ROTAS DE PÁGINA
 # ============================================================
+# Entregam um template HTML para o navegador. Quando a página faz
+# parte de uma área logada, a rota verifica a sessão e redireciona
+# para o login quando o usuário não está autenticado.
+
 
 # ------------------------------------------------------------
-# LOGIN
+# AUTENTICAÇÃO
 # ------------------------------------------------------------
 
 @app.get("/")
@@ -139,24 +143,29 @@ async def logout(request: Request):
         status_code=303
     )
 
-@app.get("/usuario-logado")
-async def usuario_logado(request: Request):
-    """Retorna os dados do usuário armazenados na sessão"""
-
-    nome = request.session.get("usuario_nome")
-
-    if not nome:
-        raise HTTPException(
-            status_code=401,
-            detail="Usuário não autenticado"
-        )
-
-    return {
-        "nome": nome
-    }
 
 # ------------------------------------------------------------
-# INÍCIO PROFESSOR
+# PÁGINAS PÚBLICAS
+# ------------------------------------------------------------
+# Acesso liberado: cadastro e recuperação de senha.
+
+@app.get("/cadastro")
+def cadastro():
+    return FileResponse("templates/cadastro.html")
+
+
+@app.get("/redefinir_senha")
+def redefinir_senha():
+    return FileResponse("templates/redefsenha.html")
+
+
+@app.get("/esqueceu_senha")
+def esqueceu_senha():
+    return FileResponse("templates/esqueceu_senha.html")
+
+
+# ------------------------------------------------------------
+# PÁGINAS DO PROFESSOR
 # ------------------------------------------------------------
 
 @app.get("/home")
@@ -165,53 +174,6 @@ def home_professor(request: Request):  # ✅ Precisa ter request
         return RedirectResponse(url="/", status_code=302)
     return FileResponse("templates/paginainicialprofessor.html")
 
-
-# ------------------------------------------------------------
-# INÍCIO ADMIN
-# ------------------------------------------------------------
-
-@app.get("/home_admin")
-def home_admin(request: Request):
-    """Home do admin - protegida por sessão"""
-    if "usuario_id" not in request.session:
-        return RedirectResponse(url="/", status_code=302)
-    return FileResponse("templates/paginainicialadm.html")
-
-
-# ------------------------------------------------------------
-# CADASTRO
-# ------------------------------------------------------------
-
-@app.get("/cadastro")
-def cadastro():
-    return FileResponse("templates/cadastro.html")
-
-
-# ------------------------------------------------------------
-# REDEFINIR SENHA
-# ------------------------------------------------------------
-
-@app.get("/redefinir_senha")
-def redefinir_senha():
-    return FileResponse("templates/redefsenha.html")
-
-
-# ------------------------------------------------------------
-# ESQUECEU SENHA
-# ------------------------------------------------------------
-
-@app.get("/esqueceu_senha")
-def esqueceu_senha():
-    return FileResponse("templates/esqueceu_senha.html")
-
-
-# ============================================================
-# PÁGINAS DO PROFESSOR
-# ============================================================
-
-# ------------------------------------------------------------
-# RESERVAS
-# ------------------------------------------------------------
 
 @app.get("/reservar")
 def reservar(request: Request):
@@ -227,20 +189,12 @@ def reservar(request: Request):
     return FileResponse("templates/reservar_tela_prof.html")
 
 
-# ------------------------------------------------------------
-# CALENDÁRIO
-# ------------------------------------------------------------
-
 @app.get("/calendario_prof")
 def calendario_prof(request: Request):
     if "usuario_id" not in request.session:
         return RedirectResponse(url="/", status_code=302)
     return FileResponse("templates/calendarioprof.html")
 
-
-# ------------------------------------------------------------
-# NOTIFICAÇÕES
-# ------------------------------------------------------------
 
 @app.get("/notificacoes_prof")
 def notificacoes_prof(request: Request):
@@ -249,20 +203,12 @@ def notificacoes_prof(request: Request):
     return FileResponse("templates/notificacoesprof.html")
 
 
-# ------------------------------------------------------------
-# ESCOLHER RESERVA - SALAS
-# ------------------------------------------------------------
-
 @app.get("/escolher_reserva_salas")
 def escolher_reserva_salas(request: Request):
     if "usuario_id" not in request.session:
         return RedirectResponse(url="/", status_code=302)
     return FileResponse("templates/escolherreservaprof.html")
 
-
-# ------------------------------------------------------------
-# ESCOLHER RESERVA - LABORATÓRIOS
-# ------------------------------------------------------------
 
 @app.get("/escolher_reserva_laboratorios")
 def escolher_reserva_laboratorios(request: Request):
@@ -271,10 +217,6 @@ def escolher_reserva_laboratorios(request: Request):
     return FileResponse("templates/escolherreservaprof2.html")
 
 
-# ------------------------------------------------------------
-# ESCOLHER RESERVA - GABINETES
-# ------------------------------------------------------------
-
 @app.get("/escolher_reserva_gabinetes")
 def escolher_reserva_gabinetes(request: Request):
     if "usuario_id" not in request.session:
@@ -282,9 +224,12 @@ def escolher_reserva_gabinetes(request: Request):
     return FileResponse("templates/escolherreservaprof3.html")
 
 
-# ------------------------------------------------------------
-# AJUDA
-# ------------------------------------------------------------
+@app.get('/reservas_prof')
+def reservas_prof(request: Request):
+    if 'usuario_id' not in request.session:
+        return RedirectResponse(url='/', status_code=302)
+    return FileResponse('templates/reservasprof.html')
+
 
 @app.get("/ajuda")
 def ajuda(request: Request):
@@ -299,11 +244,6 @@ def avisos(request: Request):
         return RedirectResponse(url="/", status_code=302)
     return FileResponse("templates/avisos.html")
 
-@app.get("/avisos")
-def ajuda():
-    return FileResponse(
-        "templates/avisos.html"
-    )
 
 @app.get("/configuracoes")
 def configuracoes(request: Request):
@@ -312,43 +252,53 @@ def configuracoes(request: Request):
     return FileResponse("templates/configuracoes.html")
 
 
-# ============================================================
-# PÁGINAS DO ADMIN
-# ============================================================
-
-@app.get('/reservas_prof')
-def reservas_prof(request: Request):
-    if 'usuario_id' not in request.session:
-        return RedirectResponse(url='/', status_code=302)
-    return FileResponse('templates/reservasprof.html')
-
-
-
-# ============================================================
-# PÁGINAS DO ADMIN
-# ============================================================
-
 # ------------------------------------------------------------
-# RESERVAR - ADMIN
+# PÁGINAS DO ADMIN
 # ------------------------------------------------------------
 
-@app.get("/reservar_admin")
-def reservar_admin(request: Request):
+@app.get("/home_admin")
+def home_admin(request: Request):
+    """Home do admin - protegida por sessão"""
     if "usuario_id" not in request.session:
         return RedirectResponse(url="/", status_code=302)
-    return FileResponse("templates/reservar_tela_adm.html")
+    return FileResponse("templates/paginainicialadm.html")
 
 
-# ------------------------------------------------------------
-# RESERVAS - ADMIN
-# ------------------------------------------------------------
-
-@app.get("/reservas_admin")
-def reservas_admin(request: Request):
+@app.get("/aprovar_reservas_adm")
+def aprovar_reservas_adm(request: Request):
+    """Tela do admin para aprovar ou recusar as reservas dos professores"""
     if "usuario_id" not in request.session:
         return RedirectResponse(url="/", status_code=302)
-    return FileResponse("templates/reservasadm.html")
+    return FileResponse("templates/aprovar_reservas_adm.html")
 
+
+@app.get("/professores_adm")
+def professores_adm(request: Request):
+    """Tela do admin para gerenciar os professores cadastrados"""
+    if "usuario_id" not in request.session:
+        return RedirectResponse(url="/", status_code=302)
+    return FileResponse("templates/professores_adm.html")
+
+
+@app.get("/gerenciar_salas_adm")
+def gerenciar_salas_adm(request: Request):
+    """Tela do admin para gerenciar as salas do campus"""
+    if "usuario_id" not in request.session:
+        return RedirectResponse(url="/", status_code=302)
+    return FileResponse("templates/gerenciar_salas_adm.html")
+
+
+@app.get("/configuracoes_adm")
+def configuracoes_adm(request: Request):
+    """Configurações da conta do administrador"""
+    if "usuario_id" not in request.session:
+        return RedirectResponse(url="/", status_code=302)
+    return FileResponse("templates/configuracoes_adm.html")
+
+
+# ------------------------------------------------------------
+# FLUXO DE RESERVA - PASSO 2 (ESCOLHER ITENS)
+# ------------------------------------------------------------
 
 @app.get("/passo2_reserva_prof")
 def passo2_reserva_prof(request: Request):
@@ -370,9 +320,10 @@ def passo002_reserva_prof(request: Request):
         return RedirectResponse(url="/", status_code=302)
     return FileResponse("templates/passo002reservaprof.html")
 
-# ============================================================
-# CONFIRMAÇÃO DE RESERVA
-# ============================================================
+
+# ------------------------------------------------------------
+# FLUXO DE RESERVA - PASSO 3 (CONFIRMAÇÃO)
+# ------------------------------------------------------------
 
 @app.get("/passo3_reserva_prof")
 def passo3_reserva_prof(request: Request):
@@ -393,6 +344,35 @@ def passo003_reserva_prof(request: Request):
     if "usuario_id" not in request.session:
         return RedirectResponse(url="/", status_code=302)
     return FileResponse("templates/passo003reservaprof.html")
+
+
+# ============================================================
+# ROTAS DE CONTEXTO
+# ============================================================
+# Não entregam HTML. Retornam dados em JSON para o frontend
+# consumir via fetch.
+
+
+# ------------------------------------------------------------
+# SESSÃO
+# ------------------------------------------------------------
+
+@app.get("/usuario-logado")
+async def usuario_logado(request: Request):
+    """Retorna os dados do usuário armazenados na sessão"""
+
+    nome = request.session.get("usuario_nome")
+
+    if not nome:
+        raise HTTPException(
+            status_code=401,
+            detail="Usuário não autenticado"
+        )
+
+    return {
+        "nome": nome
+    }
+
 
 # ============================================================
 # USUÁRIOS
