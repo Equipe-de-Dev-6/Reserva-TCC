@@ -9,8 +9,15 @@ async function cadastrar(event) {
 
     const nome = document.getElementById("nome").value;
     const email = document.getElementById("email").value;
+    const cargo = document.getElementById("cargo").value;
     const senha = document.getElementById("senha").value;
     const confirmarSenha = document.getElementById("confirmar-senha").value;
+
+    // Verifica se o cargo foi selecionado
+    if (!cargo) {
+        alert("Selecione o cargo!");
+        return;
+    }
 
     // Verifica se as senhas são iguais
     if (senha !== confirmarSenha) {
@@ -21,6 +28,7 @@ async function cadastrar(event) {
     const dados = {
         nome: nome,
         email: email,
+        cargo: cargo,
         senha: senha
     };
 
