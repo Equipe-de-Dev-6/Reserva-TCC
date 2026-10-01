@@ -1,4 +1,19 @@
-# Byte-compiled / optimized / DLL files
-__pycache__/
-static/css/avisosimportantesprof.css
+# Dependências
+node_modules/
+
+# Variáveis de ambiente e senhas
 .env
+
+# Arquivos de sistema operacional
+.DS_Store
+Thumbs.db
+
+# Logs e arquivos temporários
+*.log
+temp/
+
+# Pastas de build/compilação
+dist/
+build/
+venv
+__pycache__
