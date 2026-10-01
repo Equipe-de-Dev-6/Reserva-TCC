@@ -244,12 +244,6 @@ def avisos(request: Request):
         return RedirectResponse(url="/", status_code=302)
     return FileResponse("templates/avisos.html")
 
-@app.get("/avisos")
-def ajuda():
-    return FileResponse(
-        "templates/avisos.html"
-    )
-
 
 @app.get("/configuracoes")
 def configuracoes(request: Request):
@@ -268,20 +262,6 @@ def home_admin(request: Request):
     if "usuario_id" not in request.session:
         return RedirectResponse(url="/", status_code=302)
     return FileResponse("templates/paginainicialadm.html")
-
-
-@app.get("/reservar_admin")
-def reservar_admin(request: Request):
-    if "usuario_id" not in request.session:
-        return RedirectResponse(url="/", status_code=302)
-    return FileResponse("templates/reservar_tela_adm.html")
-
-
-@app.get("/reservas_admin")
-def reservas_admin(request: Request):
-    if "usuario_id" not in request.session:
-        return RedirectResponse(url="/", status_code=302)
-    return FileResponse("templates/reservasadm.html")
 
 
 @app.get("/aprovar_reservas_adm")
