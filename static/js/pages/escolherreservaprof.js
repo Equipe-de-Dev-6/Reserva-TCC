@@ -1,15 +1,12 @@
-// CONSULTA DE SALAS DO BANCO
-async function consultarSalas() {
-  const resposta = await fetch('/salas')
-  const salas = await resposta.json()
-  
-  
-}
-
-
-
-
+// ============================================================
 // ANIMAÇÕES E INTERAÇÃO
+//
+// A lista de salas, a busca e a seleção dos cards ficam em
+// /js/salas.js, que monta os cards a partir de GET /salas.
+// Aqui ficam apenas os comportamentos que não dependem da
+// lista: menu de perfil e menu mobile.
+// ============================================================
+
 document.addEventListener('DOMContentLoaded', () => {
 
   // Menu de Perfil
@@ -43,82 +40,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
   }
-
-  // Barra de pesquisa
-
-  const searchInput =
-    document.getElementById('search-input');
-
-  const itemsToSearch =
-    document.querySelectorAll('.searchable');
-
-  if (searchInput) {
-
-    searchInput.addEventListener('input', (e) => {
-
-      const searchTerm =
-        e.target.value
-          .toLowerCase()
-          .trim();
-
-      itemsToSearch.forEach((item) => {
-
-        const text =
-          item.textContent.toLowerCase();
-
-        item.style.display =
-          text.includes(searchTerm)
-            ? ''
-            : 'none';
-
-      });
-
-    });
-
-  }
-
-  // Seleção das salas
-
-  const roomCards =
-    document.querySelectorAll('.room-card');
-
-  roomCards.forEach((card) => {
-
-    card.addEventListener('click', (e) => {
-
-      // Salas negadas não avançam
-      if (card.dataset.status === 'negado') {
-
-        e.preventDefault();
-        return;
-
-      }
-
-      roomCards.forEach((c) => {
-        c.classList.remove('selected');
-      });
-
-      card.classList.add('selected');
-
-      // Guarda a sala escolhida
-      sessionStorage.setItem(
-        'salaSelecionada',
-        card.dataset.sala || ''
-      );
-
-      // Redireciona para o Passo 02
-      e.preventDefault();
-
-      setTimeout(() => {
-
-        window.location.href =
-          '/passo2_reserva_prof';
-
-      }, 300);
-
-    });
-
-  });
 
   // Menu mobile
 

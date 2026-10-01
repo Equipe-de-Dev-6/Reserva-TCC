@@ -201,134 +201,12 @@
 
           </div>
 
-          <!-- Lista de salas -->
-          <div class="rooms-list">
-
-            <a href="#" class="room-card searchable" data-sala="Sala de aula - A01" data-status="disponivel">
-
-              <div class="room-left">
-
-                <div class="room-thumb">
-
-                  <img src="/assets/icons/image.png" alt="Sala" width="20" height="20">
-
-                </div>
-
-                <div class="room-info">
-
-                  <h4>Sala de aula - A01</h4>
-                  <p>32 lugares</p>
-
-                </div>
-
-              </div>
-
-              <span class="status-badge status-available">
-                Disponível
-              </span>
-
-            </a>
-
-            <a href="#" class="room-card searchable selected" data-sala="Sala de aula - A02" data-status="negado">
-
-              <div class="room-left">
-
-                <div class="room-thumb">
-
-                  <img src="/assets/icons/image.png" alt="Sala" width="20" height="20">
-
-                </div>
-
-                <div class="room-info">
-
-                  <h4>Sala de aula - A02</h4>
-                  <p>32 lugares</p>
-
-                </div>
-
-              </div>
-
-              <span class="status-badge status-denied">
-                Negado
-              </span>
-
-            </a>
-
-            <a href="#" class="room-card searchable" data-sala="Sala de aula - A03" data-status="aguardando">
-
-              <div class="room-left">
-
-                <div class="room-thumb">
-
-                  <img src="/assets/icons/image.png" alt="Sala" width="20" height="20">
-
-                </div>
-
-                <div class="room-info">
-
-                  <h4>Sala de aula - A03</h4>
-                  <p>32 lugares</p>
-
-                </div>
-
-              </div>
-
-              <span class="status-badge status-waiting">
-                Aguardando
-              </span>
-
-            </a>
-
-            <a href="#" class="room-card searchable" data-sala="Sala de aula - A04" data-status="disponivel">
-
-              <div class="room-left">
-
-                <div class="room-thumb">
-
-                  <img src="/assets/icons/image.png" alt="Sala" width="20" height="20">
-
-                </div>
-
-                <div class="room-info">
-
-                  <h4>Sala de aula - A04</h4>
-                  <p>32 lugares</p>
-
-                </div>
-
-              </div>
-
-              <span class="status-badge status-available">
-                Disponível
-              </span>
-
-            </a>
-
-            <a href="#" class="room-card searchable" data-sala="Sala de aula - A05" data-status="aguardando">
-
-              <div class="room-left">
-
-                <div class="room-thumb">
-
-                  <img src="/assets/icons/image.png" alt="Sala" width="20" height="20">
-
-                </div>
-
-                <div class="room-info">
-
-                  <h4>Sala de aula - A05</h4>
-                  <p>32 lugares</p>
-
-                </div>
-
-              </div>
-
-              <span class="status-badge status-waiting">
-                Aguardando
-              </span>
-
-            </a>
-
+          <!-- Lista de salas: os cards são gerados por /js/salas.js
+               a partir de GET /salas. A categoria decide se a sala
+               aparece nesta tela ou na de laboratórios, e o próximo
+               passo é para onde o professor vai ao escolher. -->
+          <div class="rooms-list" data-lista-salas data-categoria="salas"
+            data-proximo="/passo2_reserva_prof">
           </div>
 
           <!-- Indicador de etapas -->
@@ -361,6 +239,7 @@
   </div>
 
   <script type="module" src="/js/usuario.js"></script>
+  <script type="module" src="/js/salas.js"></script>
   <script type="module" src="/js/pages/escolherreservaprof.js"></script>
 
 </body>
