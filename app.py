@@ -85,15 +85,20 @@ async def inicio(request: Request):
     return FileResponse("templates/login.html")
 
 
+# E-mail do administrador. É conferido aqui para escolher a home de
+# cada perfil; as rotas de administration usam a mesma constante em
+# exigir_admin.
+EMAIL_ADMIN = "lthiegue@sp.senai.br"
+
+
 @app.post('/login')
 async def login_post(request: Request):
     """Processa login do usuário"""
     dados = await request.form()
-    email = dados.get('email')
-    senha = dados.get('senha')
+    email = (dados.get('email') or '').strip().lower()
+    senha = dados.get('senha') or ''
 
-    # Busca o usuário no Supabase apenas pelo e-mail. A senha não participa
-    # da consulta porque ela é salva no banco como hash bcrypt.
+    # Busca o usuário no Supabase
     resposta = (
         supabase
         .table("usuarios")
@@ -104,27 +109,29 @@ async def login_post(request: Request):
 
     usuarios = resposta.data or []
 
-    # Retorna uma mensagem específica quando o e-mail não está cadastrado.
     if not usuarios:
         return {'erro': 'E-mail não encontrado'}
 
     usuario = usuarios[0]
 
-    # O bcrypt compara a senha enviada com o hash armazenado. A senha em
-    # texto plano nunca é comparada diretamente nem retornada pela API.
     if not verify_password(senha, usuario.get("senha", "")):
         return {'erro': 'Email ou senha incorretos'}
 
-    # Usuário autenticado - armazena somente os dados necessários na sessão.
+    # Armazena na sessão
     request.session["usuario_id"] = usuario["id"]
     request.session["usuario_email"] = usuario["email"]
     request.session["usuario_nome"] = usuario["nome"]
-    
-    # Verifica se é admin
-    if usuario["email"] == 'lthiegue@sp.senai.br':
+
+    # O login responde em JSON com o perfil, e não com um redirect:
+    # a tela de login chama a rota com fetch e só navega para a home
+    # depois de ler o campo "status". Um RedirectResponse aqui faria
+    # o fetch reenviar o POST para /home_admin, que só aceita GET.
+    # A comparação é feita em caixa baixa para não depender de como
+    # o e-mail foi gravado no banco.
+    if usuario["email"].strip().lower() == EMAIL_ADMIN:
         return {'status': 'adm'}
-    else:
-        return {'status': 'prof'}
+
+    return {'status': 'prof'}
 
 
 @app.post("/logout")
@@ -138,7 +145,7 @@ async def logout(request: Request):
         status_code=303
     )
 
-@app.get("/usuario-logado")
+
 @app.get("/usuario_logado")
 async def usuario_logado(request: Request):
     """Retorna os dados do usuário armazenados na sessão"""
