@@ -8,29 +8,18 @@ export async function carregarUsuario() {
   const nomeUsuario = document.getElementById('nomeUsuario');
   const nomePerfil = document.getElementById('nomePerfil');
 
-  try {
-    // A rota usa o mesmo cookie de sessão do backend.
-    const consulta = await fetch('/usuario_logado');
-    const consulta_json = consulta.json();
-    const nome = consulta_json.nome || 'Usuario';
+  // A rota usa o mesmo cookie de sessão do backend.
+  const consulta = await fetch('/usuario_logado');
+  const dados = await consulta.json();
+  const nome = dados.nome
 
-    if (nomeUsuario) {
-      nomeUsuario.textContent = `Olá ${nome}`;
-    }
+  if (nomeUsuario) {
+    nomeUsuario.textContent = `Olá ${nome}`;
+  }
 
-    if (nomePerfil) {
-      nomePerfil.textContent = `Olá ${nome}`;
-    }
-  } catch (erro) {
-    console.error('Erro ao carregar usuário:', erro);
+  if (nomePerfil) {
+    nomePerfil.textContent = `Olá ${nome}`;
   }
 }
 
-// Executa automaticamente quando este módulo é carregado pelo navegador.
-if (typeof document !== 'undefined') {
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', carregarUsuario, { once: true });
-  } else {
-    carregarUsuario();
-  }
-}
+carregarUsuario()

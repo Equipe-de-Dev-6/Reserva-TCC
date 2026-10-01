@@ -96,7 +96,6 @@ async def login_post(request: Request):
     dados = await request.form()
     email = (dados.get('email') or '').strip().lower()
     senha = dados.get('senha') or ''
-    cargo = dados.get('cargo') or ''
 
     # Busca o usuário no Supabase
     resposta = (
@@ -529,37 +528,6 @@ def listar_salas():
         )
 
     return salas
-
-
-# ============================================================
-# NOTEBOOKS
-# ============================================================
-
-# ------------------------------------------------------------
-# LISTAR NOTEBOOKS
-# ------------------------------------------------------------
-
-@app.get("/notebooks")
-def listar_notebooks():
-
-    resposta = (
-        supabase
-        .table("notebooks")
-        .select("*")
-        .execute()
-    )
-
-    notebooks = []
-
-    for dados in resposta.data:
-
-        notebook = Notebook.fromJson(dados)
-
-        notebooks.append(
-            notebook.toJson()
-        )
-
-    return notebooks
 
 
 # ============================================================

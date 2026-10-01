@@ -1,3 +1,4 @@
+// ANIMAÇÕES E INTERAÇÃO
 document.addEventListener('DOMContentLoaded', () => {
 
       // ======================================================
