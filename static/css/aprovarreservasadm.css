@@ -1,0 +1,316 @@
+/* ==========================================================
+   /css/aprovarreservasadm.css
+   ---------------------------------------------------------
+   Estilos da tela de Aprovar Reservas do administrador.
+
+   A base (sidebar, header, perfil, badges) é a mesma das
+   páginas do professor, importada de
+   /css/paginainicialprofessor.css. Aqui ficam só os estilos
+   próprios desta tela: filtro, busca, tabela e paginação.
+   ========================================================= */
+
+@import url('/css/paginainicialprofessor.css');
+
+/* ============ CABEÇALHO DA PÁGINA ============ */
+.adm-page-header {
+  margin-bottom: 18px;
+}
+
+.adm-page-header h2 {
+  font-size: 22px;
+  font-weight: 700;
+}
+
+.adm-page-header p {
+  font-size: 13px;
+  color: var(--text-gray);
+  margin-top: 4px;
+}
+
+/* ============ FILTRO E BUSCA ============ */
+.adm-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+}
+
+.adm-filter {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.adm-filter select {
+  appearance: none;
+  font-family: inherit;
+  font-size: 13px;
+  color: var(--text-dark);
+  background-color: var(--white);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 9px 38px 9px 14px;
+  cursor: pointer;
+  outline: none;
+}
+
+.adm-filter select:focus {
+  border-color: var(--senai-red);
+}
+
+.adm-filter-chevron {
+  position: absolute;
+  right: 12px;
+  color: var(--text-gray);
+  pointer-events: none;
+}
+
+.adm-search {
+  position: relative;
+  width: 300px;
+}
+
+.adm-search svg {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #9CA3AF;
+}
+
+.adm-search input {
+  width: 100%;
+  font-family: inherit;
+  font-size: 13px;
+  color: var(--text-dark);
+  background-color: var(--white);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 9px 14px 9px 36px;
+  outline: none;
+}
+
+.adm-search input:focus {
+  border-color: var(--senai-red);
+}
+
+/* ============ TABELA DE SOLICITAÇÕES ============ */
+.adm-table-wrapper {
+  background-color: var(--white);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+  overflow: hidden;
+}
+
+.adm-table-scroll {
+  overflow-x: auto;
+}
+
+.adm-table {
+  border-collapse: collapse;
+  width: 100%;
+  min-width: 860px;
+}
+
+.adm-table th,
+.adm-table td {
+  text-align: left;
+  font-size: 13px;
+  padding: 14px;
+  border-bottom: 1px solid var(--border-color);
+  vertical-align: middle;
+}
+
+.adm-table th {
+  background-color: #F9FAFB;
+  color: var(--text-gray);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.adm-table tbody tr:hover {
+  background-color: #FCFCFD;
+}
+
+.adm-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.adm-recurso {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.adm-recurso-icon {
+  width: 34px;
+  height: 34px;
+  border-radius: 8px;
+  background-color: var(--senai-red);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.adm-recurso-nome {
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.adm-recurso-curso {
+  font-size: 11px;
+  color: var(--text-gray);
+}
+
+.adm-col-texto {
+  color: var(--text-gray);
+  max-width: 200px;
+}
+
+/* ============ APROVAR E REJEITAR ============ */
+.adm-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.adm-action-btn {
+  width: 30px;
+  height: 30px;
+  border: none;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.adm-action-aprovar {
+  background-color: var(--green-bg);
+  color: var(--green-text);
+}
+
+.adm-action-aprovar:hover {
+  background-color: var(--green-text);
+  color: var(--white);
+}
+
+.adm-action-recusar {
+  background-color: var(--red-bg);
+  color: var(--red-text);
+}
+
+.adm-action-recusar:hover {
+  background-color: var(--red-text);
+  color: var(--white);
+}
+
+.adm-decisao {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-gray);
+  white-space: nowrap;
+}
+
+/* ============ PAGINAÇÃO ============ */
+.adm-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  padding: 14px 16px;
+  border-top: 1px solid var(--border-color);
+}
+
+.adm-contador {
+  font-size: 12px;
+  color: var(--text-gray);
+}
+
+.adm-paginacao {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.adm-page-btn {
+  min-width: 30px;
+  height: 30px;
+  padding: 0 8px;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  background-color: var(--white);
+  color: var(--text-dark);
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.adm-page-btn:hover:not(:disabled):not(.active) {
+  background-color: var(--bg-color);
+}
+
+.adm-page-btn.active {
+  background-color: var(--senai-red);
+  border-color: var(--senai-red);
+  color: var(--white);
+}
+
+.adm-page-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* ============ ESTADO VAZIO ============ */
+.adm-empty {
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 40px 20px;
+  text-align: center;
+  background-color: var(--white);
+  border: 1px dashed var(--border-color);
+  border-radius: 12px;
+  color: var(--text-gray);
+  font-size: 13px;
+}
+
+@media (max-width: 860px) {
+  .adm-search {
+    width: 240px;
+  }
+}
+
+@media (max-width: 600px) {
+  .adm-page-header h2 {
+    font-size: 18px;
+  }
+
+  .adm-search {
+    width: 100%;
+  }
+
+  .adm-filter,
+  .adm-filter select {
+    width: 100%;
+  }
+
+  .adm-pagination {
+    justify-content: center;
+  }
+}

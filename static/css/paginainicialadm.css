@@ -1,0 +1,12 @@
+/* ==========================================================
+   /css/paginainicialadm.css
+   ---------------------------------------------------------
+   Estilos da página inicial do administrador.
+
+   A tela reaproveita a mesma base das páginas do professor
+   (sidebar, header, cartões de reserva, calendário e avisos),
+   por isso este arquivo apenas importa
+   /css/paginainicialprofessor.css.
+   ========================================================= */
+
+@import url('/css/paginainicialprofessor.css');
