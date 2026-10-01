@@ -28,3 +28,56 @@ class Usuario(BaseModel):
             'senha': self.senha,
             'cargo': self.cargo
         }
+
+    from pydantic import BaseModel
+
+
+# ============================================================
+# MODELO: SALA
+# ============================================================
+
+class Sala(BaseModel):
+
+    nome: str
+    caracteristica: str
+    disponibilidade: bool
+    historico: dict
+
+    @classmethod
+    def fromJson(cls, json: dict):
+        return cls(
+            nome=json['nome'],
+            caracteristica=json['caracteristica']
+            disponibilidade=json['disponibilidade']
+            historico=json['historico']
+        )
+
+    def toJson(self):
+        return {
+            'nome': self.nome,
+            'bloco': self.bloco,
+            'capacidade': self.capacidade
+        }
+
+
+# ============================================================
+# MODELO: CARRINHO
+# ============================================================
+
+class Carrinho(BaseModel):
+
+    nome: str
+    disponibilidade: bool
+
+    @classmethod
+    def fromJson(cls, json: dict):
+        return cls(
+            nome=json['nome'],
+            disponibilidade=json['disponibilidade']
+        )
+
+    def toJson(self):
+        return {
+            'nome': self.nome,
+            'disponibilidade': self.disponibilidade
+        }
