@@ -1,0 +1,780 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Gerenciar Salas - Gestão de salas e equipamentos</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="https://www.flaticon.com/flaticon.css">
+  <link rel="stylesheet" href="/css/paginainicialprofessor.css">
+
+  <style>
+    .adm-section {
+      padding: 24px;
+    }
+
+    .adm-page-header {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+
+    .adm-page-header h2 {
+      font-size: 20px;
+      font-weight: 700;
+    }
+
+    .adm-page-header p {
+      color: var(--text-secondary, #6b7280);
+      font-size: 14px;
+      margin-top: 4px;
+    }
+
+    .adm-btn-cadastrar {
+      background: var(--primary-color, #b91c1c);
+      border: none;
+      border-radius: 8px;
+      color: #fff;
+      cursor: pointer;
+      font-family: inherit;
+      font-size: 13px;
+      font-weight: 600;
+      padding: 10px 16px;
+    }
+
+    .adm-cards {
+      display: grid;
+      gap: 12px;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    }
+
+    .adm-card {
+      background: var(--card-bg, #fff);
+      border: 1px solid var(--border-color, #e5e7eb);
+      border-radius: 12px;
+      padding: 16px 18px;
+    }
+
+    .adm-card h4 {
+      font-size: 15px;
+      font-weight: 700;
+    }
+
+    .adm-card p {
+      color: var(--text-secondary, #6b7280);
+      font-size: 13px;
+      margin-top: 2px;
+    }
+
+    .adm-card-actions {
+      display: flex;
+      gap: 8px;
+      margin-top: 14px;
+    }
+
+    .adm-btn {
+      border-radius: 8px;
+      cursor: pointer;
+      font-family: inherit;
+      font-size: 13px;
+      font-weight: 600;
+      padding: 8px 14px;
+    }
+
+    .adm-btn-editar {
+      background: transparent;
+      border: 1px solid var(--border-color, #e5e7eb);
+      color: var(--text-secondary, #6b7280);
+    }
+
+    .adm-btn-excluir {
+      background: transparent;
+      border: 1px solid var(--border-color, #e5e7eb);
+      color: var(--primary-color, #b91c1c);
+    }
+
+    .adm-empty {
+      align-items: center;
+      border: 1px dashed var(--border-color, #e5e7eb);
+      border-radius: 12px;
+      color: var(--text-secondary, #6b7280);
+      display: none;
+      flex-direction: column;
+      gap: 10px;
+      padding: 40px 20px;
+      text-align: center;
+    }
+
+    /* Formulário de sala */
+
+    .adm-form-card {
+      background: var(--card-bg, #fff);
+      border: 1px solid var(--border-color, #e5e7eb);
+      border-radius: 12px;
+      margin-bottom: 18px;
+      padding: 20px;
+    }
+
+    .adm-form-title {
+      font-size: 16px;
+      font-weight: 700;
+    }
+
+    .adm-form-subtitle {
+      color: var(--text-secondary, #6b7280);
+      font-size: 13px;
+      margin-top: 4px;
+    }
+
+    .adm-form {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      margin-top: 18px;
+    }
+
+    .adm-form-linha {
+      display: grid;
+      gap: 14px;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    }
+
+    .adm-form-campo {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .adm-form-campo label {
+      color: var(--text-secondary, #6b7280);
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .adm-form-campo input,
+    .adm-form-campo select,
+    .adm-form-campo textarea {
+      border: 1px solid var(--border-color, #e5e7eb);
+      border-radius: 8px;
+      font-family: inherit;
+      font-size: 13px;
+      padding: 9px 11px;
+    }
+
+    .adm-form-campo input:focus,
+    .adm-form-campo select:focus,
+    .adm-form-campo textarea:focus {
+      border-color: var(--primary-color, #b91c1c);
+      outline: none;
+    }
+
+    .adm-form-acoes {
+      display: flex;
+      gap: 8px;
+      justify-content: flex-end;
+    }
+
+    .adm-selo {
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 700;
+      margin-top: 6px;
+      padding: 3px 10px;
+    }
+
+    .adm-selo-disponivel {
+      background: #dcfce7;
+      color: #166534;
+    }
+
+    .adm-selo-indisponivel {
+      background: #fee2e2;
+      color: #991b1b;
+    }
+
+    .adm-btn:disabled {
+      cursor: not-allowed;
+      opacity: 0.55;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="app-container">
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+      <div class="sidebar-top">
+
+        <a href="/home_admin" class="logo">
+          <img src="/assets/img/Logo senai.png" alt="SENAI">
+        </a>
+
+        <nav class="nav-menu">
+
+          <a href="/aprovar_reservas_adm" class="nav-item">
+            <img src="/assets/icons/reserved.png" alt="" width="20" height="20">
+            Aprovar Reservas
+          </a>
+
+          <a href="/professores_adm" class="nav-item">
+            <img src="/assets/icons/user (3).png" alt="" width="20" height="20">
+            Professores
+          </a>
+
+          <a href="/gerenciar_salas_adm" class="nav-item active">
+            <img src="/assets/icons/classroom.png" alt="" width="20" height="20">
+            Gerenciar Salas
+          </a>
+
+          <a href="/configuracoes_adm" class="nav-item">
+            <img src="/assets/icons/gear.png" alt="" width="20" height="20">
+            Configurações
+          </a>
+
+        </nav>
+
+      </div>
+
+      <form method="POST" action="/logout" class="logout-form">
+        <button type="submit" class="btn-logout">
+          <img src="/assets/icons/exit.png" alt="" width="20" height="20">
+          Sair
+        </button>
+      </form>
+    </aside>
+
+    <!-- CONTEÚDO PRINCIPAL -->
+    <main class="main-content">
+
+      <header class="header">
+
+        <button class="menu-toggle" id="menuToggle" aria-label="Abrir menu">
+          <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+            viewBox="0 0 24 24">
+            <path d="M3 6h18M3 12h18M3 18h18"></path>
+          </svg>
+        </button>
+
+        <div class="greeting">
+          <h1>
+            Olá <span id="nomeUsuario">...</span>!
+          </h1>
+          <p>
+            Cadastre, edite e remova as salas disponíveis para reserva
+          </p>
+        </div>
+
+        <div class="header-actions">
+
+          <div class="search-container">
+            <svg width="18" height="18" fill="none" stroke="#6b7280" stroke-width="2" viewBox="0 0 24 24">
+              <path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+            </svg>
+
+            <input type="text" id="search-input" placeholder="Buscar sala por nome ou tipo...">
+          </div>
+
+          <a href="/notificacoes_prof" class="icon-btn">
+            <img src="/assets/icons/notification (2).png" alt="Notificações" width="20" height="20">
+          </a>
+
+          <div class="user-profile" id="userProfile">
+
+            <div class="avatar-link">
+              <div class="avatar">
+                <img src="/assets/icons/user (3).png" alt="Perfil do Usuário" width="28" height="28">
+              </div>
+            </div>
+
+            <div class="user-info">
+              <span class="name" id="nomePerfil">...</span>
+              <span class="role">Administrador</span>
+            </div>
+
+            <div class="user-dropdown" id="userDropdown">
+
+              <a href="/gerenciar_salas_adm" class="dropdown-item">
+                Gerenciar Salas
+              </a>
+
+              <a href="/configuracoes_adm" class="dropdown-item">
+                Configurações
+              </a>
+
+              <div class="dropdown-divider"></div>
+
+              <form method="POST" action="/logout">
+                <button type="submit">
+                  Sair
+                </button>
+              </form>
+
+            </div>
+          </div>
+
+        </div>
+      </header>
+
+      <!-- GERENCIAR SALAS -->
+      <section class="adm-section">
+
+        <div class="adm-page-header">
+          <div>
+            <h2>Salas do campus</h2>
+            <p>
+              Mantenha o cadastro das salas atualizado para que os professores vejam apenas o que está disponível
+            </p>
+          </div>
+        </div>
+
+        <button class="adm-btn-cadastrar" type="button" id="btnNovaSala">
+          + Cadastrar Sala
+        </button>
+      </div>
+
+      <!-- FORMULÁRIO - NOVA SALA / EDIÇÃO -->
+      <div class="adm-form-card" id="formSalaCard" style="display: none;">
+
+        <h3 class="adm-form-title" id="formSalaTitulo">Nova sala</h3>
+
+        <p class="adm-form-subtitle">
+          Preencha os dados abaixo. O campo "Descrição" alimenta a
+          lista de salas, os laboratórios e os gabinetes.
+        </p>
+
+        <form id="formSala" class="adm-form" novalidate>
+
+          <div class="adm-form-linha">
+            <div class="adm-form-campo">
+              <label for="salaNome">Nome da sala</label>
+              <input type="text" id="salaNome" name="nome" required
+                placeholder="Ex: C20">
+            </div>
+
+            <div class="adm-form-campo">
+              <label for="salaSetor">Setor</label>
+              <input type="text" id="salaSetor" name="setor"
+                placeholder="Ex: Elétrica">
+            </div>
+          </div>
+
+          <div class="adm-form-linha">
+            <div class="adm-form-campo">
+              <label for="salaQtd">Quantidade de alunos</label>
+              <input type="number" id="salaQtd" name="quantidade_alunos" min="0"
+                placeholder="Ex: 32">
+            </div>
+
+            <div class="adm-form-campo">
+              <label for="salaDisponibilidade">Disponibilidade</label>
+              <select id="salaDisponibilidade" name="disponibilidade">
+                <option value="true">Disponível</option>
+                <option value="false">Indisponível</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="adm-form-campo">
+            <label for="salaEquipamentos">Equipamentos</label>
+            <input type="text" id="salaEquipamentos" name="equipamentos"
+              placeholder="Separe por vírgula. Ex: Projetor, 30 carteiras">
+          </div>
+
+          <div class="adm-form-campo">
+            <label for="salaDescricao">Descrição</label>
+            <textarea id="salaDescricao" name="descricao" rows="2"
+              placeholder="Ex: Sala de aula com ar-condicionado"></textarea>
+          </div>
+
+          <div class="adm-form-acoes">
+            <button type="button" class="adm-btn adm-btn-editar" id="btnCancelarSala">
+              Cancelar
+            </button>
+
+            <button type="submit" class="adm-btn-cadastrar" id="btnSalvarSala">
+              Salvar Sala
+            </button>
+          </div>
+
+        </form>
+      </div>
+
+      <div class="adm-cards" id="listaSalas">
+        <!-- Renderizado dinamicamente via JS -->
+      </div>
+
+      <div class="adm-empty" id="listaVazia" style="display: none;">
+        <img src="/assets/icons/classroom.png" alt="" width="40" height="40">
+        <p>
+          Nenhuma sala cadastrada até o momento.
+        </p>
+      </div>
+
+      <div class="adm-empty" id="listaErro" style="display: none;">
+        <img src="/assets/icons/warning.png" alt="" width="40" height="40">
+        <p id="listaErroTexto">
+          Não foi possível carregar as salas.
+        </p>
+      </div>
+
+      </section>
+    </main>
+  </div>
+
+  <!-- JAVASCRIPT -->
+  <script type="module">
+    import {
+      listarSalasAdmin,
+      cadastrarSala,
+      atualizarSala,
+      excluirSala
+    } from '/js/api.js';
+
+    // ======================================================
+    // CARREGAR USUÁRIO LOGADO
+    // ======================================================
+    async function carregarUsuario() {
+      try {
+        const resposta = await fetch('/usuario-logado', {
+          method: 'GET',
+          credentials: 'same-origin'
+        });
+
+        if (resposta.status === 401) {
+          window.location.href = '/';
+          return;
+        }
+
+        if (!resposta.ok) {
+          throw new Error('Não foi possível carregar os dados do usuário.');
+        }
+
+        const usuario = await resposta.json();
+
+        const nomeUsuario = document.getElementById('nomeUsuario');
+        const nomePerfil = document.getElementById('nomePerfil');
+
+        if (nomeUsuario) {
+          nomeUsuario.textContent = usuario.nome || 'Usuário';
+        }
+
+        if (nomePerfil) {
+          nomePerfil.textContent = usuario.nome || 'Usuário';
+        }
+
+      } catch (erro) {
+        console.error('Erro ao carregar usuário:', erro);
+      }
+    }
+
+    // ======================================================
+    // TELA DE GERENCIAMENTO DE SALAS
+    // ======================================================
+    // As salas vêm de GET /admin/salas, que traz todas elas,
+    // inclusive as que não aparecem nas telas de reserva.
+
+    const listaSalas = document.getElementById('listaSalas');
+    const listaVazia = document.getElementById('listaVazia');
+    const listaErro = document.getElementById('listaErro');
+
+    const formCard = document.getElementById('formSalaCard');
+    const form = document.getElementById('formSala');
+    const formTitulo = document.getElementById('formSalaTitulo');
+    const btnNovaSala = document.getElementById('btnNovaSala');
+    const btnCancelarSala = document.getElementById('btnCancelarSala');
+
+    // Guarda a última lista para abrir o formulário de edição
+    // já com os dados da sala preenchidos.
+    let salas = [];
+    let salaEmEdicao = null;
+
+    /**
+     * Escapa o texto antes de colocá-lo no HTML, porque os
+     * dados vêm do banco e são montados com template string.
+     */
+    function escapar(texto) {
+      return String(texto ?? '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
+
+    function montarCard(sala) {
+      const contexto = sala.contexto || {};
+      const disponivel = !!sala.disponibilidade;
+
+      const linha = [
+        contexto.setor,
+        contexto.quantidade_alunos
+          ? `${contexto.quantidade_alunos} lugares`
+          : '',
+        contexto.descricao
+      ].filter(Boolean).join(' · ');
+
+      const equipamentos = (contexto.equipamentos || []);
+
+      return `
+        <div class="adm-card">
+          <h4>${escapar(sala.nome || 'Sala')}</h4>
+
+          <p>${escapar(linha)}</p>
+
+          <span class="adm-selo adm-selo-${disponivel ? 'disponivel' : 'indisponivel'}">
+            ${disponivel ? 'Disponível' : 'Indisponível'}
+          </span>
+
+          ${equipamentos.length ? `<p class="adm-detalhe">${escapar(equipamentos.join(', '))}</p>` : ''}
+
+          <div class="adm-card-actions">
+            <button class="adm-btn adm-btn-editar" data-acao="editar" data-id="${sala.id}">
+              Editar
+            </button>
+
+            <button class="adm-btn adm-btn-excluir" data-acao="excluir" data-id="${sala.id}">
+              Excluir
+            </button>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderSalas(lista) {
+      salas = lista || [];
+      listaErro.style.display = 'none';
+
+      if (salas.length === 0) {
+        listaSalas.innerHTML = '';
+        listaVazia.style.display = 'flex';
+        return;
+      }
+
+      listaVazia.style.display = 'none';
+      listaSalas.innerHTML = salas.map(montarCard).join('');
+    }
+
+    async function carregarSalas() {
+      try {
+        renderSalas(await listarSalasAdmin());
+
+      } catch (erro) {
+        console.error('Erro ao carregar as salas:', erro);
+
+        listaSalas.innerHTML = '';
+        listaVazia.style.display = 'none';
+        listaErro.style.display = 'flex';
+        document.getElementById('listaErroTexto').textContent =
+          erro.message || 'Não foi possível carregar as salas.';
+      }
+    }
+
+    // ======================================================
+    // FORMULÁRIO
+    // ======================================================
+
+    function abrirFormulario(sala) {
+      salaEmEdicao = sala || null;
+
+      formTitulo.textContent = sala
+        ? `Editar ${sala.nome}`
+        : 'Nova sala';
+
+      document.getElementById('salaNome').value = sala ? sala.nome : '';
+      document.getElementById('salaSetor').value = sala?.contexto?.setor || '';
+      document.getElementById('salaQtd').value = sala?.contexto?.quantidade_alunos || '';
+      document.getElementById('salaEquipamentos').value =
+        (sala?.contexto?.equipamentos || []).join(', ');
+      document.getElementById('salaDescricao').value = sala?.contexto?.descricao || '';
+      document.getElementById('salaDisponibilidade').value =
+        sala?.disponibilidade ? 'true' : 'false';
+
+      formCard.style.display = 'block';
+      document.getElementById('salaNome').focus();
+
+      formCard.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+
+    function fecharFormulario() {
+      salaEmEdicao = null;
+      form.reset();
+      formCard.style.display = 'none';
+    }
+
+    /**
+     * Monta o corpo da requisição a partir do formulário.
+     */
+    function lerFormulario() {
+      const quantidade = document.getElementById('salaQtd').value.trim();
+
+      return {
+        nome: document.getElementById('salaNome').value.trim(),
+        setor: document.getElementById('salaSetor').value.trim(),
+        // A API espera número ou null. O campo vazio vira null,
+        // e não 0, para não registrar "0 lugares".
+        quantidade_alunos: quantidade === '' ? null : Number(quantidade),
+        equipamentos: document.getElementById('salaEquipamentos').value
+          .split(',')
+          .map((item) => item.trim())
+          .filter(Boolean),
+        descricao: document.getElementById('salaDescricao').value.trim(),
+        disponibilidade: document.getElementById('salaDisponibilidade').value === 'true'
+      };
+    }
+
+    form.addEventListener('submit', async (evento) => {
+      evento.preventDefault();
+
+      if (!form.checkValidity()) {
+        form.reportValidity();
+        return;
+      }
+
+      const dados = lerFormulario();
+      const btn = document.getElementById('btnSalvarSala');
+
+      btn.disabled = true;
+
+      try {
+        if (salaEmEdicao) {
+          await atualizarSala(salaEmEdicao.id, dados);
+
+        } else {
+          await cadastrarSala(dados);
+        }
+
+        fecharFormulario();
+        await carregarSalas();
+
+      } catch (erro) {
+        console.error('Erro ao salvar a sala:', erro);
+        window.alert(erro.message || 'Não foi possível salvar a sala.');
+
+      } finally {
+        btn.disabled = false;
+      }
+    });
+
+    btnNovaSala.addEventListener('click', () => abrirFormulario(null));
+    btnCancelarSala.addEventListener('click', fecharFormulario);
+
+    // ======================================================
+    // EDITAR E EXCLUIR
+    // ======================================================
+
+    async function excluir(id, nome) {
+      const confirmar = window.confirm(
+        `Tem certeza que deseja excluir a sala "${nome}"?`
+      );
+
+      if (!confirmar) {
+        return;
+      }
+
+      try {
+        await excluirSala(id);
+        await carregarSalas();
+
+      } catch (erro) {
+        console.error('Erro ao excluir a sala:', erro);
+
+        // A API recusa a exclusão quando a sala tem reservas
+        // registradas. A mensagem chega preenchida.
+        window.alert(erro.message || 'Não foi possível excluir a sala.');
+      }
+    }
+
+    // Delegação de evento: os cards são recriados a cada busca.
+    listaSalas.addEventListener('click', (evento) => {
+      const botao = evento.target.closest('[data-acao]');
+
+      if (!botao) {
+        return;
+      }
+
+      const id = Number(botao.dataset.id);
+      const sala = salas.find((item) => item.id === id);
+
+      if (!sala) {
+        return;
+      }
+
+      if (botao.dataset.acao === 'editar') {
+        abrirFormulario(sala);
+
+      } else if (botao.dataset.acao === 'excluir') {
+        excluir(id, sala.nome);
+      }
+    });
+
+    // ======================================================
+    // BUSCA
+    // ======================================================
+    const searchInput = document.getElementById('search-input');
+
+    if (searchInput) {
+      searchInput.addEventListener('input', (e) => {
+        const termo = e.target.value.toLowerCase().trim();
+
+        listaSalas.querySelectorAll('.adm-card').forEach((card) => {
+          const texto = card.textContent.toLowerCase();
+
+          card.style.display = texto.includes(termo) ? '' : 'none';
+        });
+      });
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      carregarUsuario();
+      carregarSalas();
+
+      // ======================================================
+      // DROPDOWN DO USUÁRIO
+      // ======================================================
+      const userProfile = document.getElementById('userProfile');
+      const userDropdown = document.getElementById('userDropdown');
+
+      if (userProfile && userDropdown) {
+        userProfile.addEventListener('click', (e) => {
+          e.stopPropagation();
+          userDropdown.classList.toggle('active');
+        });
+
+        document.addEventListener('click', (e) => {
+          if (!userProfile.contains(e.target)) {
+            userDropdown.classList.remove('active');
+          }
+        });
+      }
+
+      // ======================================================
+      // MENU MOBILE
+      // ======================================================
+      const menuToggle = document.getElementById('menuToggle');
+      const sidebar = document.querySelector('.sidebar');
+      const sidebarOverlay = document.getElementById('sidebarOverlay');
+
+      if (menuToggle && sidebar && sidebarOverlay) {
+        menuToggle.addEventListener('click', () => {
+          sidebar.classList.toggle('open');
+          sidebarOverlay.classList.toggle('active');
+        });
+
+        sidebarOverlay.addEventListener('click', () => {
+          sidebar.classList.remove('open');
+          sidebarOverlay.classList.remove('active');
+        });
+      }
+    });
+  </script>
+</body>
+
+</html>

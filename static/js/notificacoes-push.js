@@ -54,33 +54,31 @@
     notificarAprovacao: false
   };
 
+  // As chaves continuam sendo usadas internamente, mas o dado
+  // fica em memória: o localStorage foi removido e não existe
+  // backend para o push. Cada recarregamento começa do zero.
   const KEYS = {
-    avisos: 'push.avisosVistos',
-    reservas: 'push.reservasEstado',
-    lembretes: 'push.lembretesEnviados',
-    iniciado: 'push.primeiraExecucao'
+    avisos: 'avisosVistos',
+    reservas: 'reservasEstado',
+    lembretes: 'lembretesEnviados',
+    iniciado: 'primeiraExecucao'
   };
+
+  const memoria = {};
 
 
   /* ======================================================
-     ARMAZENAMENTO (à prova de modo anônimo / storage cheio)
+     ESTADO EM MEMÓRIA (sem localStorage)
      ====================================================== */
 
   function ler(chave, padrao) {
-    try {
-      const bruto = localStorage.getItem(chave);
-      return bruto ? JSON.parse(bruto) : padrao;
-    } catch (e) {
-      return padrao;
-    }
+    return Object.prototype.hasOwnProperty.call(memoria, chave)
+      ? memoria[chave]
+      : padrao;
   }
 
   function salvar(chave, valor) {
-    try {
-      localStorage.setItem(chave, JSON.stringify(valor));
-    } catch (e) {
-      /* silencioso */
-    }
+    memoria[chave] = valor;
   }
 
 

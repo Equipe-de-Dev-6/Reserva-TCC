@@ -1,27 +1,52 @@
 /**
  * reservas.js
  *
- * Estado compartilhado das reservas do professor.
+ * Estado compartilhado das reservas.
  *
  * Persistência:
- * - localStorage
+<<<<<<< HEAD
+ * - no localStorage, para que a reserva continue existindo
+ *   depois de recarregar a página
  *
- * Sincronização entre páginas/abas:
+ * O localStorage guarda a lista no navegador. Quando existir o
+ * backend de reservas, basta trocar _read/_write pelas chamadas
+ * da API, como já está previsto neste arquivo.
+=======
+ * - no banco, através das rotas /reservas
+ *
+ * A reserva é criada pelo professor em POST /reservas e entra com
+ * o status "aguardando". Quem libera é o administrador, em
+ * PATCH /reservas/{id}/decisao.
+ *
+ * A lista que fica na tela é uma cópia em memória: a API continua
+ * sendo a fonte da verdade e carregar() busca de novo sempre que
+ * uma reserva muda.
+>>>>>>> main
+ *
+ * Sincronização entre abas:
  * - BroadcastChannel
- * - fallback para o evento "storage"
  *
- * Nenhuma tela precisa ser recarregada.
+ * Nenhuma tela precisa ser recarregada: a reserva criada pelo
+ * professor aparece na tela do administrador e a decisão do
+ * administrador volta para a tela do professor.
  */
+
+import {
+    listarReservas,
+    criarReserva,
+    cancelarReserva
+} from '/js/api.js';
 
 const ReservasApp = (() => {
   // =========================================================
-  // CONFIGURAÇÕES E CHAVES DE ARMAZENAMENTO
+  // CONFIGURAÇÕES E ESTADO EM MEMÓRIA
   // =========================================================
 
-  const STORAGE_KEY = 'senai_reservas_professor';
-  const TEMP_KEY = 'senai_nova_reserva';
-  const NOTIFICATIONS_KEY = 'senai_notificacoes_reservas';
+  // O sessionStorage é usado apenas para transportar a escolha
+  // entre as três páginas do agendamento (passo 01 -> 02 -> 03).
+  // Ele não guarda a lista de reservas e some ao fechar a aba.
   const SALA_KEY = 'salaSelecionada';
+  const TEMP_KEY = 'senai_nova_reserva';
 
   const CHANNEL_NAME = 'senai-reservas-sync';
 
@@ -31,6 +56,15 @@ const ReservasApp = (() => {
       : null;
 
   const listeners = [];
+
+  // =========================================================
+  // ESTADO
+  // =========================================================
+
+  // Recupera as listas que já estavam salvas no navegador.
+  // Assim, a reserva continua na tela mesmo depois de recarregar.
+  let reservas = _read('reservas', []);
+  let notificacoes = _read('notificacoes', []);
 
 
   // =========================================================
@@ -48,40 +82,66 @@ const ReservasApp = (() => {
 
 
   /**
-   * Lê dados do localStorage.
+   * Lê uma lista do estado.
+   *
+   * Busca no localStorage e, se não houver nada salvo ainda,
+   * devolve o valor padrão. É por aqui que a troca pela API
+   * será feita no futuro.
    */
   function _read(key, fallback = []) {
     try {
-      const raw = localStorage.getItem(key);
+      const bruto = localStorage.getItem(key);
 
-      return raw
-        ? JSON.parse(raw)
-        : fallback;
+      if (!bruto) {
+        return fallback;
+      }
+
+      const dados = JSON.parse(bruto);
+
+      return Array.isArray(dados) ? dados : fallback;
 
     } catch (e) {
-      console.error(`Erro ao ler ${key}:`, e);
+      console.error(
+        'Erro ao ler as reservas salvas:',
+        e
+      );
+
       return fallback;
     }
   }
 
 
   /**
-   * Salva dados no localStorage.
+   * Grava uma lista no estado e no localStorage.
+   *
+   * O valor é copiado para uma nova lista, evitando que a tela
+   * segure uma referência que muda por baixo dos panos.
    */
   function _write(key, value) {
+    const copia = Array.isArray(value) ? [...value] : value;
+
     try {
       localStorage.setItem(
         key,
-        JSON.stringify(value)
+        JSON.stringify(copia)
       );
 
-      return true;
-
     } catch (e) {
-      console.error(`Erro ao salvar ${key}:`, e);
-
-      return false;
+      console.warn(
+        'Não foi possível salvar as reservas:',
+        e
+      );
     }
+
+    if (key === 'reservas') {
+      reservas = copia;
+    }
+
+    if (key === 'notificacoes') {
+      notificacoes = copia;
+    }
+
+    return true;
   }
 
 
@@ -144,6 +204,67 @@ const ReservasApp = (() => {
   // =========================================================
 
   /**
+   * Aplica na lista desta aba a alteração que veio de outra.
+   *
+   * É o que faz a reserva criada na tela do professor aparecer
+   * na tela do administrador, e a decisão do administrador
+   * voltar para a tela do professor.
+   */
+  function _aplicarDeOutraAba(payload) {
+    const reserva = payload.reserva;
+
+    // Sem reserva não há o que aplicar. 'excluir-notificacao'
+    // e 'limpar-notificacoes' também passam por aqui.
+    if (!reserva || !reserva.id) {
+      return;
+    }
+
+    const lista = getReservas();
+
+    const existe = lista.some(
+      (item) => item.id === reserva.id
+    );
+
+    // Reserva nova feita em outra aba
+    if (payload.action === 'criar' && !existe) {
+      _write(
+        'reservas',
+        [reserva, ...lista]
+      );
+
+      return;
+    }
+
+    // Reserva excluída em outra aba
+    if (payload.action === 'excluir' && existe) {
+      _write(
+        'reservas',
+        lista.filter(
+          (item) => item.id !== reserva.id
+        )
+      );
+
+      return;
+    }
+
+    // Reserva editada, cancelada, aprovada ou rejeitada
+    // em outra aba
+    if (existe) {
+      _write(
+        'reservas',
+        lista.map((item) => {
+
+          return item.id === reserva.id
+            ? { ...item, ...reserva }
+            : item;
+
+        })
+      );
+    }
+  }
+
+
+  /**
    * BroadcastChannel:
    * sincroniza alterações entre abas abertas.
    */
@@ -151,7 +272,13 @@ const ReservasApp = (() => {
     channel.addEventListener(
       'message',
       (event) => {
-        _onChange(event.data || {});
+
+        const payload = event.data || {};
+
+        _aplicarDeOutraAba(payload);
+
+        _onChange(payload);
+
       }
     );
   }
@@ -160,21 +287,24 @@ const ReservasApp = (() => {
   /**
    * Fallback utilizando o evento storage.
    */
+  // O evento "storage" observa o localStorage compartilhado
+  // entre abas e cobre o caso de uma aba que estava fechada
+  // quando a reserva foi salva.
   window.addEventListener(
     'storage',
     (event) => {
-      const keysMonitoradas = [
-        STORAGE_KEY,
-        NOTIFICATIONS_KEY
-      ];
 
-      if (keysMonitoradas.includes(event.key)) {
-        _onChange({
-          action: 'sync',
-          reserva: null,
-          timestamp: new Date().toISOString()
-        });
+      if (!event.key || event.key !== 'reservas') {
+        return;
       }
+
+      _write(
+        'reservas',
+        _read('reservas')
+      );
+
+      _onChange({ action: 'sincronizar' });
+
     }
   );
 
@@ -213,12 +343,12 @@ const ReservasApp = (() => {
   // =========================================================
 
   function getReservas() {
-    return _read(STORAGE_KEY, []);
+    return reservas;
   }
 
 
   function getNotificacoes() {
-    return _read(NOTIFICATIONS_KEY, []);
+    return notificacoes;
   }
 
 
@@ -345,7 +475,7 @@ const ReservasApp = (() => {
 
     // Mantém no máximo 100 notificações
     _write(
-      NOTIFICATIONS_KEY,
+      'notificacoes',
       notificacoes.slice(0, 100)
     );
   }
@@ -354,8 +484,12 @@ const ReservasApp = (() => {
   /**
    * Exclui uma reserva definitivamente do armazenamento local.
    * As notificações ligadas a ela também são removidas.
+   *
+   * A reserva continua existindo no banco: o DELETE em
+   * /reservas/{id} marca o status como "cancelada", em vez de
+   * apagar o histórico. Só a cópia da tela sai da lista.
    */
-  function deleteReserva(id) {
+  async function deleteReserva(id) {
     const lista = getReservas();
     const existe = lista.some((reserva) => reserva.id === id);
 
@@ -363,21 +497,33 @@ const ReservasApp = (() => {
       return false;
     }
 
-    const salvou = _write(
-      STORAGE_KEY,
-      lista.filter((reserva) => reserva.id !== id)
-    );
 
-    if (!salvou) {
+    try {
+
+      const cancelada = await cancelarReserva(id);
+
+      reservas = getReservas().map((item) => (
+        item.id === id ? adaptarReserva(cancelada) : item
+      ));
+
+    } catch (erro) {
+
+      console.error(
+        'Erro ao cancelar a reserva:',
+        erro
+      );
+
       return false;
+
     }
 
+
     _write(
-      NOTIFICATIONS_KEY,
+      'notificacoes',
       getNotificacoes().filter((notificacao) => notificacao.reservaId !== id)
     );
 
-    _notify('excluir', { id });
+    _notify('cancelar', { id });
     return true;
   }
 
@@ -394,7 +540,7 @@ const ReservasApp = (() => {
     }
 
     const salvou = _write(
-      NOTIFICATIONS_KEY,
+      'notificacoes',
       notificacoes.filter((notificacao) => notificacao.id !== id)
     );
 
@@ -411,7 +557,7 @@ const ReservasApp = (() => {
    * Limpa todas as notificações persistidas.
    */
   function clearNotificacoes() {
-    if (!_write(NOTIFICATIONS_KEY, [])) {
+    if (!_write('notificacoes', [])) {
       return false;
     }
 
@@ -435,7 +581,7 @@ const ReservasApp = (() => {
     reserva
   ) {
     const salvou = _write(
-      STORAGE_KEY,
+      'reservas',
       lista
     );
 
@@ -465,6 +611,32 @@ const ReservasApp = (() => {
   // =========================================================
 
   /**
+   * Recupera a sala escolhida na tela anterior.
+   *
+   * A tela de escolha grava o json devolvido pela API
+   * ({ id, nome, contexto }). O nome é usado para exibir
+   * na reserva.
+   */
+  function lerSalaSelecionada() {
+    const bruto = sessionStorage.getItem(SALA_KEY);
+
+    if (!bruto) {
+      return '';
+    }
+
+    try {
+      const sala = JSON.parse(bruto);
+
+      return sala && sala.nome ? sala.nome : '';
+
+    } catch (e) {
+      // Formato antigo, em que era gravado apenas o nome.
+      return bruto;
+    }
+  }
+
+
+  /**
    * Armazena temporariamente os dados
    * do formulário antes de confirmar a reserva.
    */
@@ -479,9 +651,7 @@ const ReservasApp = (() => {
       : 'Reserva';
 
 
-    const item =
-      sessionStorage.getItem(SALA_KEY)
-      || categoria;
+    const item = lerSalaSelecionada() || categoria;
 
 
     /**
@@ -527,8 +697,12 @@ const ReservasApp = (() => {
   /**
    * Confirma e salva uma reserva
    * que estava armazenada temporariamente.
+   *
+   * A gravação acontece na API. O id e o status devolvidos pelo
+   * banco substituem os valores montados aqui, para que a tela
+   * passe a trabalhar com o registro que realmente foi salvo.
    */
-  function commitStagedReserva() {
+  async function commitStagedReserva() {
     const raw = sessionStorage.getItem(
       TEMP_KEY
     );
@@ -552,40 +726,132 @@ const ReservasApp = (() => {
     }
 
 
-    const reserva = {
-      ...rascunho,
+    // A sala escolhida na tela anterior é lida de novo, porque o
+    // id é o que a API usa para amarrar a reserva na sala.
+    const sala = _lerSalaSelecionada();
 
-      id: _uid(),
+    if (!sala || !sala.id) {
 
-      status: 'aguardando',
+      sessionStorage.removeItem(TEMP_KEY);
 
-      criadoEm: new Date().toISOString(),
+      return {
+        erro: 'Escolha uma sala antes de confirmar a reserva.'
+      };
 
-      atualizadoEm: new Date().toISOString()
-    };
-
-
-    const lista = getReservas();
-
-
-    // Adiciona a reserva no início da lista
-    lista.unshift(reserva);
+    }
 
 
-    _saveReservas(
-      lista,
-      'criar',
-      reserva
-    );
+    if (!rascunho.data) {
+
+      return {
+        erro: 'Informe a data da reserva.'
+      };
+
+    }
 
 
-    // Limpa os dados temporários
-    sessionStorage.removeItem(TEMP_KEY);
+    try {
 
-    sessionStorage.removeItem(SALA_KEY);
+      const criada = await criarReserva({
+        sala_id: sala.id,
+
+        // A data e os horários vão em campos separados: a API
+        // junta os dois em um único timestamp.
+        data_inicio: rascunho.data,
+        data_fim: rascunho.data,
+
+        hora_entrada: rascunho.horaEntrada || '',
+        hora_saida: rascunho.horaSaida || '',
+
+        categoria: rascunho.categoria || '',
+        item: rascunho.item || '',
+
+        professor: rascunho.professor || '',
+        curso: rascunho.curso || '',
+        motivo: rascunho.motivo || ''
+      });
 
 
-    return reserva;
+      const reserva = adaptarReserva(criada);
+
+
+      _registrarNotificacao(
+        'criar',
+        reserva
+      );
+
+
+      _notify(
+        'criar',
+        reserva
+      );
+
+
+      sessionStorage.removeItem(TEMP_KEY);
+      sessionStorage.removeItem(SALA_KEY);
+
+      return reserva;
+
+    } catch (erro) {
+
+      // A mensagem vem da API (sala indisponível, horário
+      // ocupado, dado inválido) e é mostrada na tela.
+      return {
+        erro: erro.message
+      };
+
+    }
+  }
+
+
+  /**
+   * Lê a sala escolhida, incluindo o id.
+   */
+  function _lerSalaSelecionada() {
+
+    const bruto = sessionStorage.getItem(SALA_KEY);
+
+    if (!bruto) {
+      return null;
+    }
+
+    try {
+      return JSON.parse(bruto);
+
+    } catch (e) {
+
+      return null;
+
+    }
+
+  }
+
+
+  /**
+   * Busca as reservas do usuário logado na API
+   * e guarda o resultado em memória para as telas.
+   */
+  async function carregar() {
+
+    try {
+
+      const lista = await listarReservas();
+
+      reservas = lista.map(adaptarReserva);
+
+      return reservas;
+
+    } catch (erro) {
+
+      console.error(
+        'Erro ao carregar as reservas:',
+        erro
+      );
+
+      return [];
+
+    }
+
   }
 
 
@@ -593,10 +859,19 @@ const ReservasApp = (() => {
   // EDIÇÃO DE RESERVAS
   // =========================================================
 
-  function updateReserva(
+  /**
+   * Altera uma reserva que ainda não foi respondida.
+   *
+   * Quem decide o status de uma reserva é o administrador,
+   * em /reservas/{id}/decisao. Esta função serve para os
+   * campos do professor (curso, motivo), que são corrigidos
+   * antes da aprovação.
+   */
+  async function updateReserva(
     id,
     alteracoes = {}
   ) {
+
     const lista = getReservas();
 
 
@@ -610,27 +885,37 @@ const ReservasApp = (() => {
     }
 
 
-    const reserva = {
-      ...lista[index],
+    const atual = lista[index];
 
-      ...alteracoes,
 
-      id,
+    // Reserva já respondida pelo administrador fica travada,
+    // porque o histórico da decisão não deve ser reescrito.
+    if (atual.status && atual.status !== 'aguardando') {
 
-      atualizadoEm: new Date().toISOString()
+      return {
+        erro: 'Esta reserva já foi respondida e não pode ser alterada.'
+      };
+
+    }
+
+
+    // A API não tem rota de edição parcial da reserva: o
+    // cancelamento é a única mudança de status permitida ao
+    // professor, então qualquer outro ajuste exige refazer
+    // o pedido pela tela de reserva.
+    if (alteracoes.status && alteracoes.status !== 'aguardando') {
+
+      return {
+        erro: 'Somente o administrador pode decidir uma reserva.'
+      };
+
+    }
+
+
+    return {
+      erro: 'Para corrigir uma reserva, cancele e faça um novo pedido.'
     };
 
-
-    lista[index] = reserva;
-
-
-    return _saveReservas(
-      lista,
-      'editar',
-      reserva
-    )
-      ? reserva
-      : null;
   }
 
 
@@ -638,39 +923,66 @@ const ReservasApp = (() => {
   // CANCELAMENTO
   // =========================================================
 
-  function cancelReserva(id) {
-    const lista = getReservas();
+  /**
+   * Cancela uma reserva que ainda não foi respondida.
+   *
+   * É o mesmo caminho de deleteReserva, que chama o DELETE
+   * em /reservas/{id} e marca o status no banco.
+   */
+  async function cancelReserva(id) {
+    return await deleteReserva(id);
+  }
 
 
-    const index = lista.findIndex(
-      (reserva) => reserva.id === id
-    );
+  // =========================================================
+  // ADAPTAÇÃO ENTRE O BANCO E A TELA
+  // =========================================================
 
+  /**
+   * Converte a reserva do banco no formato usado pelas telas.
+   *
+   * A API devolve data_inicio e data_fim em timestamp completo
+   * ("2026-09-10T08:00:00"), enquanto as telas esperam a data
+   * separada ("2026-09-10") e as horas em "horaEntrada" e
+   * "horaSaida". Esta função faz essa tradução, para que os
+   * cards, o calendário e as notificações continuem usando os
+   * mesmos campos de antes sem precisar mudar.
+   */
+  function adaptarReserva(reserva) {
 
-    if (index < 0) {
-      return false;
+    if (!reserva) {
+      return null;
     }
 
 
-    const reserva = {
-      ...lista[index],
+    const inicio = String(
+      reserva.data_inicio || reserva.data || ''
+    );
 
-      status: 'cancelada',
+    const fim = String(
+      reserva.data_fim || ''
+    );
 
-      canceladoEm: new Date().toISOString(),
 
-      atualizadoEm: new Date().toISOString()
+    return {
+      ...reserva,
+
+      // A data vem do início da reserva. Sem data_inicio, cai
+      // no campo "data", que é o formato do rascunho local.
+      data: inicio ? inicio.slice(0, 10) : '',
+
+      // "2026-09-10T08:00:00" vira "08:00".
+      horaEntrada: inicio.length >= 16 ? inicio.slice(11, 16) : '',
+
+      horaSaida: fim.length >= 16 ? fim.slice(11, 16) : '',
+
+      // O banco chama de sala_id; as telas esperam o nome.
+      item: reserva.item || reserva.sala_nome || '',
+
+      criadoEm: reserva.criado_em || reserva.criadoEm || '',
+      atualizadoEm: reserva.atualizado_em || reserva.atualizadoEm || ''
     };
 
-
-    lista[index] = reserva;
-
-
-    return _saveReservas(
-      lista,
-      'cancelar',
-      reserva
-    );
   }
 
 
@@ -689,7 +1001,7 @@ const ReservasApp = (() => {
 
       case 'negado':
         return {
-          label: 'Negado',
+          label: 'Negada',
           badgeClass: 'badge-red'
         };
 
@@ -994,6 +1306,7 @@ const ReservasApp = (() => {
     subscribe,
 
     // Reservas
+    carregar,
     stageReserva,
     commitStagedReserva,
     updateReserva,

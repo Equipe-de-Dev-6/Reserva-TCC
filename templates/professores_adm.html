@@ -1,0 +1,682 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Professores - Gestão de salas e equipamentos</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="https://www.flaticon.com/flaticon.css">
+  <link rel="stylesheet" href="/css/paginainicialprofessor.css">
+
+  <style>
+    .adm-section {
+      padding: 24px;
+    }
+
+    .adm-page-header {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+
+    .adm-page-header h2 {
+      font-size: 20px;
+      font-weight: 700;
+    }
+
+    .adm-page-header p {
+      color: var(--text-secondary, #6b7280);
+      font-size: 14px;
+      margin-top: 4px;
+    }
+
+    .adm-table-wrapper {
+      background: var(--card-bg, #fff);
+      border: 1px solid var(--border-color, #e5e7eb);
+      border-radius: 12px;
+      overflow: hidden;
+    }
+
+    .adm-table {
+      border-collapse: collapse;
+      width: 100%;
+    }
+
+    .adm-table th,
+    .adm-table td {
+      border-bottom: 1px solid var(--border-color, #e5e7eb);
+      font-size: 14px;
+      padding: 14px 18px;
+      text-align: left;
+    }
+
+    .adm-table th {
+      background: var(--bg-color, #f9fafb);
+      color: var(--text-secondary, #6b7280);
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    .adm-table tr:last-child td {
+      border-bottom: none;
+    }
+
+    .adm-empty {
+      align-items: center;
+      color: var(--text-secondary, #6b7280);
+      display: none;
+      flex-direction: column;
+      gap: 10px;
+      padding: 40px 20px;
+      text-align: center;
+    }
+
+    .adm-acoes {
+      display: flex;
+      gap: 6px;
+    }
+
+    .adm-btn-adm {
+      border: 1px solid var(--border-color, #e5e7eb);
+      border-radius: 8px;
+      cursor: pointer;
+      font-family: inherit;
+      font-size: 12px;
+      font-weight: 600;
+      padding: 7px 12px;
+    }
+
+    .adm-btn-adm.salvar {
+      background: var(--primary-color, #b91c1c);
+      border-color: var(--primary-color, #b91c1c);
+      color: #fff;
+    }
+
+    .adm-btn-adm.excluir {
+      color: #991b1b;
+    }
+
+    .adm-btn-adm:disabled {
+      cursor: not-allowed;
+      opacity: 0.55;
+    }
+
+    /* Modal de edição */
+
+    .adm-modal {
+      align-items: center;
+      background: rgba(17, 24, 39, 0.45);
+      display: flex;
+      inset: 0;
+      justify-content: center;
+      padding: 20px;
+      position: fixed;
+      z-index: 50;
+    }
+
+    .adm-modal-caixa {
+      background: var(--card-bg, #fff);
+      border-radius: 14px;
+      max-width: 420px;
+      padding: 24px;
+      width: 100%;
+    }
+
+    .adm-modal-caixa h3 {
+      font-size: 17px;
+      font-weight: 700;
+    }
+
+    .adm-modal-subtitulo {
+      color: var(--text-secondary, #6b7280);
+      font-size: 12px;
+      margin-top: 6px;
+    }
+
+    .adm-form {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      margin-top: 18px;
+    }
+
+    .adm-form-campo {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .adm-form-campo label {
+      color: var(--text-secondary, #6b7280);
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .adm-form-campo input {
+      border: 1px solid var(--border-color, #e5e7eb);
+      border-radius: 8px;
+      font-family: inherit;
+      font-size: 13px;
+      padding: 9px 11px;
+    }
+
+    .adm-form-campo input:focus {
+      border-color: var(--primary-color, #b91c1c);
+      outline: none;
+    }
+
+    .adm-form-acoes {
+      display: flex;
+      gap: 8px;
+      justify-content: flex-end;
+      margin-top: 4px;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="app-container">
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+      <div class="sidebar-top">
+
+        <a href="/home_admin" class="logo">
+          <img src="/assets/img/Logo senai.png" alt="SENAI">
+        </a>
+
+        <nav class="nav-menu">
+
+          <a href="/aprovar_reservas_adm" class="nav-item">
+            <img src="/assets/icons/reserved.png" alt="" width="20" height="20">
+            Aprovar Reservas
+          </a>
+
+          <a href="/professores_adm" class="nav-item active">
+            <img src="/assets/icons/user (3).png" alt="" width="20" height="20">
+            Professores
+          </a>
+
+          <a href="/gerenciar_salas_adm" class="nav-item">
+            <img src="/assets/icons/classroom.png" alt="" width="20" height="20">
+            Gerenciar Salas
+          </a>
+
+          <a href="/configuracoes_adm" class="nav-item">
+            <img src="/assets/icons/gear.png" alt="" width="20" height="20">
+            Configurações
+          </a>
+
+        </nav>
+
+      </div>
+
+      <form method="POST" action="/logout" class="logout-form">
+        <button type="submit" class="btn-logout">
+          <img src="/assets/icons/exit.png" alt="" width="20" height="20">
+          Sair
+        </button>
+      </form>
+    </aside>
+
+    <!-- CONTEÚDO PRINCIPAL -->
+    <main class="main-content">
+
+      <header class="header">
+
+        <button class="menu-toggle" id="menuToggle" aria-label="Abrir menu">
+          <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+            viewBox="0 0 24 24">
+            <path d="M3 6h18M3 12h18M3 18h18"></path>
+          </svg>
+        </button>
+
+        <div class="greeting">
+          <h1>
+            Olá <span id="nomeUsuario">...</span>!
+          </h1>
+          <p>
+            Gerencie os professores cadastrados e os acessos ao sistema
+          </p>
+        </div>
+
+        <div class="header-actions">
+
+          <div class="search-container">
+            <svg width="18" height="18" fill="none" stroke="#6b7280" stroke-width="2" viewBox="0 0 24 24">
+              <path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+            </svg>
+
+            <input type="text" id="search-input" placeholder="Buscar professor por nome ou e-mail...">
+          </div>
+
+          <a href="/notificacoes_prof" class="icon-btn">
+            <img src="/assets/icons/notification (2).png" alt="Notificações" width="20" height="20">
+          </a>
+
+          <div class="user-profile" id="userProfile">
+
+            <div class="avatar-link">
+              <div class="avatar">
+                <img src="/assets/icons/user (3).png" alt="Perfil do Usuário" width="28" height="28">
+              </div>
+            </div>
+
+            <div class="user-info">
+              <span class="name" id="nomePerfil">...</span>
+              <span class="role">Administrador</span>
+            </div>
+
+            <div class="user-dropdown" id="userDropdown">
+
+              <a href="/professores_adm" class="dropdown-item">
+                Professores
+              </a>
+
+              <a href="/configuracoes_adm" class="dropdown-item">
+                Configurações
+              </a>
+
+              <div class="dropdown-divider"></div>
+
+              <form method="POST" action="/logout">
+                <button type="submit">
+                  Sair
+                </button>
+              </form>
+
+            </div>
+          </div>
+
+        </div>
+      </header>
+
+      <!-- PROFESSORES -->
+      <section class="adm-section">
+
+        <div class="adm-page-header">
+          <div>
+            <h2>Professores cadastrados</h2>
+            <p>
+              Consulte os usuários registrados e mantenha os dados atualizados
+            </p>
+          </div>
+        </div>
+
+        <div class="adm-table-wrapper" id="tabelaProfessores">
+          <table class="adm-table">
+            <thead>
+              <tr>
+                <th>Nome</th>
+                <th>E-mail</th>
+                <th>Ações</th>
+              </tr>
+            </thead>
+
+            <tbody id="listaProfessores">
+              <!-- Renderizado dinamicamente via JS -->
+            </tbody>
+          </table>
+        </div>
+
+        <div class="adm-empty" id="listaVazia" style="display: none;">
+          <img src="/assets/icons/user (3).png" alt="" width="40" height="40">
+          <p>
+            Nenhum professor encontrado.
+          </p>
+        </div>
+
+        <div class="adm-empty" id="listaErro" style="display: none;">
+          <img src="/assets/icons/warning.png" alt="" width="40" height="40">
+          <p id="listaErroTexto">
+            Não foi possível carregar os professores.
+          </p>
+        </div>
+
+      </section>
+    </main>
+  </div>
+
+  <!-- MODAL - EDITAR PROFESSOR -->
+  <div class="adm-modal" id="modalEditar" style="display: none;">
+
+    <div class="adm-modal-caixa">
+
+      <h3>Editar professor</h3>
+
+      <p class="adm-modal-subtitulo">
+        A senha não é alterada por aqui. O professor troca a própria senha na tela de configurações.
+      </p>
+
+      <form id="formProfessor" class="adm-form" novalidate>
+
+        <div class="adm-form-campo">
+          <label for="profNome">Nome completo</label>
+          <input type="text" id="profNome" name="nome" required>
+        </div>
+
+        <div class="adm-form-campo">
+          <label for="profEmail">E-mail institucional</label>
+          <input type="email" id="profEmail" name="email" required>
+        </div>
+
+        <div class="adm-form-acoes">
+          <button type="button" class="adm-btn-adm editar" id="btnCancelarProfessor">
+            Cancelar
+          </button>
+
+          <button type="submit" class="adm-btn-adm salvar" id="btnSalvarProfessor">
+            Salvar
+          </button>
+        </div>
+
+      </form>
+
+    </div>
+  </div>
+
+  <!-- JAVASCRIPT -->
+  <script type="module">
+    import {
+      listarUsuarios,
+      atualizarUsuario,
+      excluirUsuario
+    } from '/js/api.js';
+
+    // ======================================================
+    // CARREGAR USUÁRIO LOGADO
+    // ======================================================
+    async function carregarUsuario() {
+      try {
+        const resposta = await fetch('/usuario-logado', {
+          method: 'GET',
+          credentials: 'same-origin'
+        });
+
+        if (resposta.status === 401) {
+          window.location.href = '/';
+          return;
+        }
+
+        if (!resposta.ok) {
+          throw new Error('Não foi possível carregar os dados do usuário.');
+        }
+
+        const usuario = await resposta.json();
+
+        const nomeUsuario = document.getElementById('nomeUsuario');
+        const nomePerfil = document.getElementById('nomePerfil');
+
+        if (nomeUsuario) {
+          nomeUsuario.textContent = usuario.nome || 'Usuário';
+        }
+
+        if (nomePerfil) {
+          nomePerfil.textContent = usuario.nome || 'Usuário';
+        }
+
+      } catch (erro) {
+        console.error('Erro ao carregar usuário:', erro);
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      carregarUsuario();
+
+      // ======================================================
+      // DROPDOWN DO USUÁRIO
+      // ======================================================
+      const userProfile = document.getElementById('userProfile');
+      const userDropdown = document.getElementById('userDropdown');
+
+      if (userProfile && userDropdown) {
+        userProfile.addEventListener('click', (e) => {
+          e.stopPropagation();
+          userDropdown.classList.toggle('active');
+        });
+
+        document.addEventListener('click', (e) => {
+          if (!userProfile.contains(e.target)) {
+            userDropdown.classList.remove('active');
+          }
+        });
+      }
+
+      // ======================================================
+      // MENU MOBILE
+      // ======================================================
+      const menuToggle = document.getElementById('menuToggle');
+      const sidebar = document.querySelector('.sidebar');
+      const sidebarOverlay = document.getElementById('sidebarOverlay');
+
+      if (menuToggle && sidebar && sidebarOverlay) {
+        menuToggle.addEventListener('click', () => {
+          sidebar.classList.toggle('open');
+          sidebarOverlay.classList.toggle('active');
+        });
+
+        sidebarOverlay.addEventListener('click', () => {
+          sidebar.classList.remove('open');
+          sidebarOverlay.classList.remove('active');
+        });
+      }
+
+      // ======================================================
+      // LISTA DE PROFESSORES
+      // ======================================================
+      // Os Professores vêm de GET /usuarios. A senha nunca
+      // chega ao frontend: a API a remove da resposta.
+
+      const listaProfessores = document.getElementById('listaProfessores');
+      const tabelaProfessores = document.getElementById('tabelaProfessores');
+      const listaVazia = document.getElementById('listaVazia');
+      const listaErro = document.getElementById('listaErro');
+
+      const modal = document.getElementById('modalEditar');
+      const formProfessor = document.getElementById('formProfessor');
+
+      let professores = [];
+      let professorEmEdicao = null;
+
+      /**
+       * Escapa o texto antes de colocá-lo no HTML, porque os
+       * dados vêm do banco e são montados com template string.
+       */
+      function escapar(texto) {
+        return String(texto ?? '')
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+          .replace(/"/g, '&quot;')
+          .replace(/'/g, '&#39;');
+      }
+
+      function renderProfessores(lista) {
+        professores = lista || [];
+        listaErro.style.display = 'none';
+
+        if (professores.length === 0) {
+          listaProfessores.innerHTML = '';
+          tabelaProfessores.style.display = 'none';
+          listaVazia.style.display = 'flex';
+          return;
+        }
+
+        tabelaProfessores.style.display = '';
+        listaVazia.style.display = 'none';
+
+        listaProfessores.innerHTML = professores.map((professor) => `
+          <tr>
+            <td>${escapar(professor.nome)}</td>
+            <td>${escapar(professor.email)}</td>
+            <td class="adm-acoes">
+              <button class="adm-btn-adm editar" type="button" data-acao="editar" data-id="${professor.id}">
+                Editar
+              </button>
+
+              <button class="adm-btn-adm excluir" type="button" data-acao="excluir" data-id="${professor.id}">
+                Excluir
+              </button>
+            </td>
+          </tr>
+        `).join('');
+      }
+
+      async function carregarProfessores() {
+        try {
+          renderProfessores(await listarUsuarios());
+
+        } catch (erro) {
+          console.error('Erro ao carregar os professores:', erro);
+
+          listaProfessores.innerHTML = '';
+          tabelaProfessores.style.display = 'none';
+          listaVazia.style.display = 'none';
+          listaErro.style.display = 'flex';
+          document.getElementById('listaErroTexto').textContent =
+            erro.message || 'Não foi possível carregar os professores.';
+        }
+      }
+
+      // ======================================================
+      // MODAL DE EDIÇÃO
+      // ======================================================
+
+      function abrirModal(professor) {
+        professorEmEdicao = professor;
+
+        document.getElementById('profNome').value = professor.nome || '';
+        document.getElementById('profEmail').value = professor.email || '';
+
+        modal.style.display = 'flex';
+        document.getElementById('profNome').focus();
+      }
+
+      function fecharModal() {
+        professorEmEdicao = null;
+        formProfessor.reset();
+        modal.style.display = 'none';
+      }
+
+      document.getElementById('btnCancelarProfessor').addEventListener('click', fecharModal);
+
+      // Clicar fora da caixa fecha o modal.
+      modal.addEventListener('click', (evento) => {
+        if (evento.target === modal) {
+          fecharModal();
+        }
+      });
+
+      formProfessor.addEventListener('submit', async (evento) => {
+        evento.preventDefault();
+
+        if (!formProfessor.checkValidity()) {
+          formProfessor.reportValidity();
+          return;
+        }
+
+        if (!professorEmEdicao) {
+          return;
+        }
+
+        const btn = document.getElementById('btnSalvarProfessor');
+        btn.disabled = true;
+
+        try {
+          await atualizarUsuario(professorEmEdicao.id, {
+            nome: document.getElementById('profNome').value.trim(),
+            email: document.getElementById('profEmail').value.trim()
+          });
+
+          fecharModal();
+          await carregarProfessores();
+
+        } catch (erro) {
+          console.error('Erro ao salvar o professor:', erro);
+          window.alert(erro.message || 'Não foi possível salvar o professor.');
+
+        } finally {
+          btn.disabled = false;
+        }
+      });
+
+      // ======================================================
+      // EXCLUIR
+      // ======================================================
+
+      async function excluir(id, nome) {
+        const confirmar = window.confirm(
+          `Tem certeza que deseja excluir o professor "${nome}"?`
+        );
+
+        if (!confirmar) {
+          return;
+        }
+
+        try {
+          await excluirUsuario(id);
+          await carregarProfessores();
+
+        } catch (erro) {
+          console.error('Erro ao excluir o professor:', erro);
+
+          // A API recusa a exclusão quando o professor tem
+          // reservas aguardando. A mensagem chega preenchida.
+          window.alert(erro.message || 'Não foi possível excluir o professor.');
+        }
+      }
+
+      // Delegação de evento: as linhas são recriadas a cada busca.
+      listaProfessores.addEventListener('click', (evento) => {
+        const botao = evento.target.closest('[data-acao]');
+
+        if (!botao) {
+          return;
+        }
+
+        const id = Number(botao.dataset.id);
+        const professor = professores.find((item) => item.id === id);
+
+        if (!professor) {
+          return;
+        }
+
+        if (botao.dataset.acao === 'editar') {
+          abrirModal(professor);
+
+        } else if (botao.dataset.acao === 'excluir') {
+          excluir(id, professor.nome);
+        }
+      });
+
+      // ======================================================
+      // BUSCA
+      // ======================================================
+      const searchInput = document.getElementById('search-input');
+
+      if (searchInput) {
+        searchInput.addEventListener('input', (e) => {
+          const termo = e.target.value.toLowerCase().trim();
+
+          document.querySelectorAll('#listaProfessores tr').forEach((linha) => {
+            const texto = linha.textContent.toLowerCase();
+            linha.style.display = texto.includes(termo) ? '' : 'none';
+          });
+        });
+      }
+
+      carregarProfessores();
+    });
+  </script>
+</body>
+
+</html>

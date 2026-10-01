@@ -29,7 +29,9 @@ CREATE TABLE caracteristicas (
 );
 -- ---------------------------------------------------------------------------
 
--- Relacionamento entra Tabelas Salas e Características 
+-- ---------------------------------------------------------------------------
+-- Relacionamento entre Tabelas Salas e Características
+-- ---------------------------------------------------------------------------
 
 CREATE TABLE sala_caracteristicas (
     sala_id INTEGER NOT NULL,
@@ -69,17 +71,38 @@ CREATE TABLE reservas (
     usuario_id INTEGER NOT NULL,
     sala_id INTEGER,
     notebooks_id INTEGER,
-    carrinhos_id INTEGER,
-    data_inico TIMESTAMP NOT NULL,
-    data_final TIMESTAMP NOT NULL,
-    status VARCHAR(30) NOT NULL DEFAULT 'reservada',
+    carrinho_id INTEGER,
+    data_inicio TIMESTAMP NOT NULL,
+    data_fim TIMESTAMP NOT NULL,
+    status VARCHAR(30) NOT NULL DEFAULT 'aguardando',
+    categoria VARCHAR(60),
+    item VARCHAR(100),
+    professor VARCHAR(60),
+    curso VARCHAR(100),
+    motivo TEXT,
+    criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    atualizado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (usuario_id)
         REFERENCES usuarios(id),
     FOREIGN KEY (sala_id)
         REFERENCES salas(id),
     FOREIGN KEY (notebooks_id)
         REFERENCES notebooks(id),
-    FOREIGN KEY (carrinhos_id)
+    FOREIGN KEY (carrinho_id)
         REFERENCES carrinhos(id)
 );
+-- ---------------------------------------------------------------------------
+-- Migração: colunas que a API de reservas utiliza.
+-- Rode este bloco apenas se a tabela "reservas" já existir
+-- em um banco que ainda não tenha estas colunas.
+-- ---------------------------------------------------------------------------
+
+ALTER TABLE reservas
+    ADD COLUMN IF NOT EXISTS categoria VARCHAR(60),
+    ADD COLUMN IF NOT EXISTS item VARCHAR(100),
+    ADD COLUMN IF NOT EXISTS professor VARCHAR(60),
+    ADD COLUMN IF NOT EXISTS curso VARCHAR(100),
+    ADD COLUMN IF NOT EXISTS motivo TEXT,
+    ADD COLUMN IF NOT EXISTS criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    ADD COLUMN IF NOT EXISTS atualizado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
 -- ---------------------------------------------------------------------------
