@@ -350,6 +350,54 @@ def reservas_admin(request: Request):
     return FileResponse("templates/reservasadm.html")
 
 
+# ------------------------------------------------------------
+# APROVAR RESERVAS - ADMIN
+# ------------------------------------------------------------
+
+@app.get("/aprovar_reservas_adm")
+def aprovar_reservas_adm(request: Request):
+    """Tela do admin para aprovar ou recusar as reservas dos professores"""
+    if "usuario_id" not in request.session:
+        return RedirectResponse(url="/", status_code=302)
+    return FileResponse("templates/aprovar_reservas_adm.html")
+
+
+# ------------------------------------------------------------
+# PROFESSORES - ADMIN
+# ------------------------------------------------------------
+
+@app.get("/professores_adm")
+def professores_adm(request: Request):
+    """Tela do admin para gerenciar os professores cadastrados"""
+    if "usuario_id" not in request.session:
+        return RedirectResponse(url="/", status_code=302)
+    return FileResponse("templates/professores_adm.html")
+
+
+# ------------------------------------------------------------
+# GERENCIAR SALAS - ADMIN
+# ------------------------------------------------------------
+
+@app.get("/gerenciar_salas_adm")
+def gerenciar_salas_adm(request: Request):
+    """Tela do admin para gerenciar as salas do campus"""
+    if "usuario_id" not in request.session:
+        return RedirectResponse(url="/", status_code=302)
+    return FileResponse("templates/gerenciar_salas_adm.html")
+
+
+# ------------------------------------------------------------
+# CONFIGURAÇÕES - ADMIN
+# ------------------------------------------------------------
+
+@app.get("/configuracoes_adm")
+def configuracoes_adm(request: Request):
+    """Configurações da conta do administrador"""
+    if "usuario_id" not in request.session:
+        return RedirectResponse(url="/", status_code=302)
+    return FileResponse("templates/configuracoes_adm.html")
+
+
 @app.get("/passo2_reserva_prof")
 def passo2_reserva_prof(request: Request):
     if "usuario_id" not in request.session:

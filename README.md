@@ -262,6 +262,10 @@ As senhas nunca são armazenadas em texto plano.
 | `GET` | `/salas/{id}` | Detalhes de uma sala |
 | `GET` | `/home` | Página inicial do professor |
 | `GET` | `/home_admin` | Página inicial da administração |
+| `GET` | `/aprovar_reservas_adm` | Aprovação de reservas pelos professores |
+| `GET` | `/professores_adm` | Gerenciamento dos professores |
+| `GET` | `/gerenciar_salas_adm` | Gerenciamento das salas do campus |
+| `GET` | `/configuracoes_adm` | Configurações da conta do administrador |
 | `GET` | `/ajuda` | Central de ajuda |
 
 ## Estrutura do projeto
