@@ -9,46 +9,67 @@
 
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap"
     rel="stylesheet">
-  <link rel="stylesheet" href="https://www.flaticon.com/flaticon.css">
-  <link rel="stylesheet" href="/static/css/gerenciar_salas_adm.css">
 
+  <link rel="stylesheet" href="/static/css/gerenciar_salas_adm.css">
 </head>
 
 <body>
+
   <div class="app-container">
+
     <div class="sidebar-overlay" id="sidebarOverlay"></div>
 
-    <!-- SIDEBAR -->
+    <!-- =========================================================
+         SIDEBAR
+    ========================================================== -->
     <aside class="sidebar">
+
       <div class="sidebar-top">
 
-        <a href="/home_admin" class="logo">
-          <img src="/static/assets/img/Logo senai.png" alt="SENAI">
+        <a href="/gerenciar_salas" class="logo">
+          <img src="/static/assets/img/Logo senai.png" alt="Logo SENAI">
         </a>
 
         <nav class="nav-menu">
 
-          <a href="/aprovar_reservas_adm" class="nav-item">
+          <a href="/aprovar_reservas" class="nav-item">
             <img src="/static/assets/icons/reserved.png" alt="" width="20" height="20">
             Aprovar Reservas
           </a>
 
-          <a href="/professores_adm" class="nav-item">
+          <a href="/professores" class="nav-item">
             <img src="/static/assets/icons/user (3).png" alt="" width="20" height="20">
             Professores
           </a>
 
-          <a href="/gerenciar_salas_adm" class="nav-item active">
+          <a href="/gerenciar_salas" class="nav-item active">
             <img src="/static/assets/icons/porta.png" alt="" width="20" height="20">
-            Gerenciar Salas
+            Gerenciar salas
           </a>
 
-          <a href="/configuracoes_adm" class="nav-item">
+          <a href="/historico" class="nav-item">
+            <img src="/static/assets/icons/calendar.png" alt="" width="20" height="20">
+            Histórico
+          </a>
+
+          <a href="/notificacoes_coord" class="nav-item">
+            <img src="/static/assets/icons/notification.png" alt="" width="20" height="20">
+            Notificações
+          </a>
+
+          <a href="/configuracoes" class="nav-item">
             <img src="/static/assets/icons/gear.png" alt="" width="20" height="20">
             Configurações
           </a>
 
         </nav>
+
+        <div class="divider"></div>
+
+        <a href="/ajuda" class="nav-item">
+          <img src="/static/assets/icons/interrogation.png" alt="" width="20" height="20">
+          Ajuda
+        </a>
 
       </div>
 
@@ -58,9 +79,12 @@
           Sair
         </button>
       </form>
+
     </aside>
 
-    <!-- CONTEÚDO PRINCIPAL -->
+    <!-- =========================================================
+         CONTEÚDO PRINCIPAL
+    ========================================================== -->
     <main class="main-content">
 
       <header class="header">
@@ -73,12 +97,8 @@
         </button>
 
         <div class="greeting">
-          <h1>
-            Olá <span id="nomeUsuario">...</span>!
-          </h1>
-          <p>
-            Cadastre, edite e remova as salas disponíveis para reserva
-          </p>
+          <h1>Olá Thiegui!</h1>
+          <p>Gerencie o gerenciamento das salas e equipamentos</p>
         </div>
 
         <div class="header-actions">
@@ -87,11 +107,10 @@
             <svg width="18" height="18" fill="none" stroke="#6b7280" stroke-width="2" viewBox="0 0 24 24">
               <path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
             </svg>
-
-            <input type="text" id="search-input" placeholder="Buscar sala por nome ou tipo...">
+            <input type="text" id="search-input" placeholder="Buscar salas, carrinhos, laboratórios...">
           </div>
 
-          <a href="/notificacoes_prof" class="icon-btn">
+          <a href="/notificacoes_coord" class="icon-btn">
             <img src="/static/assets/icons/notification (2).png" alt="Notificações" width="20" height="20">
           </a>
 
@@ -104,486 +123,257 @@
             </div>
 
             <div class="user-info">
-              <span class="name" id="nomePerfil">...</span>
-              <span class="role">Administrador</span>
+              <span class="name">Coordenador</span>
+              <span class="role">Gestão Geral</span>
             </div>
 
             <div class="user-dropdown" id="userDropdown">
 
-              <a href="/gerenciar_salas_adm" class="dropdown-item">
-                Gerenciar Salas
-              </a>
-
-              <a href="/configuracoes_adm" class="dropdown-item">
+              <a href="/configuracoes" class="dropdown-item">
                 Configurações
               </a>
 
               <div class="dropdown-divider"></div>
 
-              <form method="POST" action="/logout">
-                <button type="submit">
-                  Sair
-                </button>
-              </form>
+              <a href="/" class="dropdown-item logout">
+                Sair
+              </a>
 
             </div>
+
           </div>
 
         </div>
+
       </header>
 
-      <!-- GERENCIAR SALAS -->
-      <section class="adm-section">
+      <!-- =======================================================
+           TÍTULO DA PÁGINA
+      ======================================================== -->
+      <section class="page-title">
+        <h2>Salas</h2>
+        <p>Adicione, remova e gerencie as salas cadastradas no sistema.</p>
+      </section>
 
-        <div class="adm-page-header">
-          <div>
-            <h2>Salas do campus</h2>
-            <p>
-              Mantenha o cadastro das salas atualizado para que os professores vejam apenas o que está disponível
-            </p>
-          </div>
+      <!-- =======================================================
+           BARRA DE FERRAMENTAS
+      ======================================================== -->
+      <div class="toolbar">
+
+        <div class="table-search">
+          <svg width="16" height="16" fill="none" stroke="#6b7280" stroke-width="2" viewBox="0 0 24 24">
+            <path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+          </svg>
+          <input type="text" id="tableSearch" placeholder="Buscar sala por nome ou código...">
         </div>
 
-        <button class="adm-btn-cadastrar" type="button" id="btnNovaSala">
-          + Cadastrar Sala
-        </button>
+        <a href="/adicionar_sala" class="btn-add">
+          <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"
+            viewBox="0 0 24 24">
+            <path d="M12 5v14M5 12h14"></path>
+          </svg>
+          Adicionar Sala
+        </a>
+
       </div>
 
-      <!-- FORMULÁRIO - NOVA SALA / EDIÇÃO -->
-      <div class="adm-form-card" id="formSalaCard" style="display: none;">
+      <!-- =======================================================
+           TABELA DE SALAS
+      ======================================================== -->
+      <section class="table-card">
 
-        <h3 class="adm-form-title" id="formSalaTitulo">Nova sala</h3>
+        <div class="table-scroll">
 
-        <p class="adm-form-subtitle">
-          Preencha os dados abaixo. O campo "Descrição" alimenta a
-          lista de salas, os laboratórios e os gabinetes.
+          <table class="rooms-table">
+
+            <thead>
+              <tr>
+                <th>Nome da Sala</th>
+                <th>Tipo</th>
+                <th>Capacidade</th>
+                <th>Bloco/Andar</th>
+                <th>Status</th>
+                <th class="col-actions">Ações</th>
+              </tr>
+            </thead>
+
+            <tbody id="roomsBody">
+
+              <tr>
+                <td data-label="Sala">
+                  <div class="room-name">
+                    <div class="room-icon"><img src="/static/assets/icons/classroom.png" alt="" width="16" height="16"></div>
+                    <span>Sala de Aula A01</span>
+                  </div>
+                </td>
+                <td data-label="Tipo">Sala de Aula</td>
+                <td data-label="Capacidade">40 lugares</td>
+                <td data-label="Bloco/Andar">Bloco A - 1º Andar</td>
+                <td data-label="Status"><span class="badge-green">Ativo</span></td>
+                <td data-label="Ações">
+                  <div class="row-actions">
+                    <a href="/editar_sala/1" class="btn-icon" aria-label="Editar Sala de Aula A01">
+                      <img src="/static/assets/icons/edit.png" alt="">
+                    </a>
+                    <button type="button" class="btn-icon danger" data-delete-id="1"
+                      aria-label="Excluir Sala de Aula A01">
+                      <img src="/static/assets/icons/trash.png" alt="">
+                    </button>
+                  </div>
+                </td>
+              </tr>
+
+              <tr>
+                <td data-label="Sala">
+                  <div class="room-name">
+                    <div class="room-icon"><img src="/static/assets/icons/classroom.png" alt="" width="16" height="16"></div>
+                    <span>Laboratório de Informática B3</span>
+                  </div>
+                </td>
+                <td data-label="Tipo">Laboratório</td>
+                <td data-label="Capacidade">30 lugares</td>
+                <td data-label="Bloco/Andar">Bloco B - 3º Andar</td>
+                <td data-label="Status"><span class="badge-green">Ativo</span></td>
+                <td data-label="Ações">
+                  <div class="row-actions">
+                    <a href="/editar_sala/2" class="btn-icon" aria-label="Editar Laboratório de Informática B3">
+                      <img src="/static/assets/icons/edit.png" alt="">
+                    </a>
+                    <button type="button" class="btn-icon danger" data-delete-id="2"
+                      aria-label="Excluir Laboratório de Informática B3">
+                      <img src="/static/assets/icons/trash.png" alt="">
+                    </button>
+                  </div>
+                </td>
+              </tr>
+
+              <tr>
+                <td data-label="Sala">
+                  <div class="room-name">
+                    <div class="room-icon"><img src="/static/assets/icons/classroom.png" alt="" width="16" height="16"></div>
+                    <span>Sala de Reuniões C02</span>
+                  </div>
+                </td>
+                <td data-label="Tipo">Reunião</td>
+                <td data-label="Capacidade">12 lugares</td>
+                <td data-label="Bloco/Andar">Bloco C - 2º Andar</td>
+                <td data-label="Status"><span class="badge-green">Ativo</span></td>
+                <td data-label="Ações">
+                  <div class="row-actions">
+                    <a href="/editar_sala/3" class="btn-icon" aria-label="Editar Sala de Reuniões C02">
+                      <img src="/static/assets/icons/edit.png" alt="">
+                    </a>
+                    <button type="button" class="btn-icon danger" data-delete-id="3"
+                      aria-label="Excluir Sala de Reuniões C02">
+                      <img src="/static/assets/icons/trash.png" alt="">
+                    </button>
+                  </div>
+                </td>
+              </tr>
+
+              <tr>
+                <td data-label="Sala">
+                  <div class="room-name">
+                    <div class="room-icon"><img src="/static/assets/icons/classroom.png" alt="" width="16" height="16"></div>
+                    <span>Laboratório de Automação D10</span>
+                  </div>
+                </td>
+                <td data-label="Tipo">Laboratório</td>
+                <td data-label="Capacidade">25 lugares</td>
+                <td data-label="Bloco/Andar">Bloco D - 1º Andar</td>
+                <td data-label="Status"><span class="badge-yellow">Manutenção</span></td>
+                <td data-label="Ações">
+                  <div class="row-actions">
+                    <a href="/editar_sala/4" class="btn-icon" aria-label="Editar Laboratório de Automação D10">
+                      <img src="/static/assets/icons/edit.png" alt="">
+                    </a>
+                    <button type="button" class="btn-icon danger" data-delete-id="4"
+                      aria-label="Excluir Laboratório de Automação D10">
+                      <img src="/static/assets/icons/trash.png" alt="">
+                    </button>
+                  </div>
+                </td>
+              </tr>
+
+              <tr>
+                <td data-label="Sala">
+                  <div class="room-name">
+                    <div class="room-icon"><img src="/static/assets/icons/classroom.png" alt="" width="16" height="16"></div>
+                    <span>Sala de Treinamento E05</span>
+                  </div>
+                </td>
+                <td data-label="Tipo">Treinamento</td>
+                <td data-label="Capacidade">20 lugares</td>
+                <td data-label="Bloco/Andar">Bloco E - Térreo</td>
+                <td data-label="Status"><span class="badge-red">Inativo</span></td>
+                <td data-label="Ações">
+                  <div class="row-actions">
+                    <a href="/editar_sala/5" class="btn-icon" aria-label="Editar Sala de Treinamento E05">
+                      <img src="/static/assets/icons/edit.png" alt="">
+                    </a>
+                    <button type="button" class="btn-icon danger" data-delete-id="5"
+                      aria-label="Excluir Sala de Treinamento E05">
+                      <img src="/static/assets/icons/trash.png" alt="">
+                    </button>
+                  </div>
+                </td>
+              </tr>
+
+              <tr>
+                <td data-label="Sala">
+                  <div class="room-name">
+                    <div class="room-icon"><img src="/static/assets/icons/classroom.png" alt="" width="16" height="16"></div>
+                    <span>Auditório Principal</span>
+                  </div>
+                </td>
+                <td data-label="Tipo">Auditório</td>
+                <td data-label="Capacidade">200 lugares</td>
+                <td data-label="Bloco/Andar">Bloco A - Térreo</td>
+                <td data-label="Status"><span class="badge-green">Ativo</span></td>
+                <td data-label="Ações">
+                  <div class="row-actions">
+                    <a href="/editar_sala/6" class="btn-icon" aria-label="Editar Auditório Principal">
+                      <img src="/static/assets/icons/edit.png" alt="">
+                    </a>
+                    <button type="button" class="btn-icon danger" data-delete-id="6"
+                      aria-label="Excluir Auditório Principal">
+                      <img src="/static/assets/icons/trash.png" alt="">
+                    </button>
+                  </div>
+                </td>
+              </tr>
+
+            </tbody>
+
+          </table>
+
+        </div>
+
+        <p class="table-empty" id="tableEmpty">
+          Nenhuma sala encontrada. Tente buscar por outro nome ou código.
         </p>
 
-        <form id="formSala" class="adm-form" novalidate>
+        <div class="table-footer">
 
-          <div class="adm-form-linha">
-            <div class="adm-form-campo">
-              <label for="salaNome">Nome da sala</label>
-              <input type="text" id="salaNome" name="nome" required
-                placeholder="Ex: C20">
-            </div>
+          <p id="countLabel">Mostrando 6 de 6 salas cadastradas</p>
 
-            <div class="adm-form-campo">
-              <label for="salaSetor">Setor</label>
-              <input type="text" id="salaSetor" name="setor"
-                placeholder="Ex: Elétrica">
-            </div>
+          <div class="pagination">
+            <a href="?pagina=1" class="page-btn active">1</a>
+            <a href="?pagina=2" class="page-btn">2</a>
+            <a href="?pagina=3" class="page-btn">3</a>
+            <a href="?pagina=2" class="page-btn" aria-label="Próxima página">&rsaquo;</a>
           </div>
 
-          <div class="adm-form-linha">
-            <div class="adm-form-campo">
-              <label for="salaQtd">Quantidade de alunos</label>
-              <input type="number" id="salaQtd" name="quantidade_alunos" min="0"
-                placeholder="Ex: 32">
-            </div>
-
-            <div class="adm-form-campo">
-              <label for="salaDisponibilidade">Disponibilidade</label>
-              <select id="salaDisponibilidade" name="disponibilidade">
-                <option value="true">Disponível</option>
-                <option value="false">Indisponível</option>
-              </select>
-            </div>
-          </div>
-
-          <div class="adm-form-campo">
-            <label for="salaEquipamentos">Equipamentos</label>
-            <input type="text" id="salaEquipamentos" name="equipamentos"
-              placeholder="Separe por vírgula. Ex: Projetor, 30 carteiras">
-          </div>
-
-          <div class="adm-form-campo">
-            <label for="salaDescricao">Descrição</label>
-            <textarea id="salaDescricao" name="descricao" rows="2"
-              placeholder="Ex: Sala de aula com ar-condicionado"></textarea>
-          </div>
-
-          <div class="adm-form-acoes">
-            <button type="button" class="adm-btn adm-btn-editar" id="btnCancelarSala">
-              Cancelar
-            </button>
-
-            <button type="submit" class="adm-btn-cadastrar" id="btnSalvarSala">
-              Salvar Sala
-            </button>
-          </div>
-
-        </form>
-      </div>
-
-      <div class="adm-cards" id="listaSalas">
-        <!-- Renderizado dinamicamente via JS -->
-      </div>
-
-      <div class="adm-empty" id="listaVazia" style="display: none;">
-        <img src="/static/assets/icons/classroom.png" alt="" width="40" height="40">
-        <p>
-          Nenhuma sala cadastrada até o momento.
-        </p>
-      </div>
-
-      <div class="adm-empty" id="listaErro" style="display: none;">
-        <img src="/static/assets/icons/warning.png" alt="" width="40" height="40">
-        <p id="listaErroTexto">
-          Não foi possível carregar as salas.
-        </p>
-      </div>
+        </div>
 
       </section>
+
     </main>
+
   </div>
 
-  <!-- JAVASCRIPT -->
-  <script type="module">
-    import {
-      listarSalasAdmin,
-      cadastrarSala,
-      atualizarSala,
-      excluirSala
-    } from '/js/api.js';
+  <script src="/static/js/gerenciar_salas.js"></script>
 
-    // ======================================================
-    // CARREGAR USUÁRIO LOGADO
-    // ======================================================
-    async function carregarUsuario() {
-      try {
-        const resposta = await fetch('/usuario-logado', {
-          method: 'GET',
-          credentials: 'same-origin'
-        });
-
-        if (resposta.status === 401) {
-          window.location.href = '/';
-          return;
-        }
-
-        if (!resposta.ok) {
-          throw new Error('Não foi possível carregar os dados do usuário.');
-        }
-
-        const usuario = await resposta.json();
-
-        const nomeUsuario = document.getElementById('nomeUsuario');
-        const nomePerfil = document.getElementById('nomePerfil');
-
-        if (nomeUsuario) {
-          nomeUsuario.textContent = usuario.nome || 'Usuário';
-        }
-
-        if (nomePerfil) {
-          nomePerfil.textContent = usuario.nome || 'Usuário';
-        }
-
-      } catch (erro) {
-        console.error('Erro ao carregar usuário:', erro);
-      }
-    }
-
-    // ======================================================
-    // TELA DE GERENCIAMENTO DE SALAS
-    // ======================================================
-    // As salas vêm de GET /admin/salas, que traz todas elas,
-    // inclusive as que não aparecem nas telas de reserva.
-
-    const listaSalas = document.getElementById('listaSalas');
-    const listaVazia = document.getElementById('listaVazia');
-    const listaErro = document.getElementById('listaErro');
-
-    const formCard = document.getElementById('formSalaCard');
-    const form = document.getElementById('formSala');
-    const formTitulo = document.getElementById('formSalaTitulo');
-    const btnNovaSala = document.getElementById('btnNovaSala');
-    const btnCancelarSala = document.getElementById('btnCancelarSala');
-
-    // Guarda a última lista para abrir o formulário de edição
-    // já com os dados da sala preenchidos.
-    let salas = [];
-    let salaEmEdicao = null;
-
-    /**
-     * Escapa o texto antes de colocá-lo no HTML, porque os
-     * dados vêm do banco e são montados com template string.
-     */
-    function escapar(texto) {
-      return String(texto ?? '')
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;')
-        .replace(/'/g, '&#39;');
-    }
-
-    function montarCard(sala) {
-      const contexto = sala.contexto || {};
-      const disponivel = !!sala.disponibilidade;
-
-      const linha = [
-        contexto.setor,
-        contexto.quantidade_alunos
-          ? `${contexto.quantidade_alunos} lugares`
-          : '',
-        contexto.descricao
-      ].filter(Boolean).join(' · ');
-
-      const equipamentos = (contexto.equipamentos || []);
-
-      return `
-        <div class="adm-card">
-          <h4>${escapar(sala.nome || 'Sala')}</h4>
-
-          <p>${escapar(linha)}</p>
-
-          <span class="adm-selo adm-selo-${disponivel ? 'disponivel' : 'indisponivel'}">
-            ${disponivel ? 'Disponível' : 'Indisponível'}
-          </span>
-
-          ${equipamentos.length ? `<p class="adm-detalhe">${escapar(equipamentos.join(', '))}</p>` : ''}
-
-          <div class="adm-card-actions">
-            <button class="adm-btn adm-btn-editar" data-acao="editar" data-id="${sala.id}">
-              Editar
-            </button>
-
-            <button class="adm-btn adm-btn-excluir" data-acao="excluir" data-id="${sala.id}">
-              Excluir
-            </button>
-          </div>
-        </div>
-      `;
-    }
-
-    function renderSalas(lista) {
-      salas = lista || [];
-      listaErro.style.display = 'none';
-
-      if (salas.length === 0) {
-        listaSalas.innerHTML = '';
-        listaVazia.style.display = 'flex';
-        return;
-      }
-
-      listaVazia.style.display = 'none';
-      listaSalas.innerHTML = salas.map(montarCard).join('');
-    }
-
-    async function carregarSalas() {
-      try {
-        renderSalas(await listarSalasAdmin());
-
-      } catch (erro) {
-        console.error('Erro ao carregar as salas:', erro);
-
-        listaSalas.innerHTML = '';
-        listaVazia.style.display = 'none';
-        listaErro.style.display = 'flex';
-        document.getElementById('listaErroTexto').textContent =
-          erro.message || 'Não foi possível carregar as salas.';
-      }
-    }
-
-    // ======================================================
-    // FORMULÁRIO
-    // ======================================================
-
-    function abrirFormulario(sala) {
-      salaEmEdicao = sala || null;
-
-      formTitulo.textContent = sala
-        ? `Editar ${sala.nome}`
-        : 'Nova sala';
-
-      document.getElementById('salaNome').value = sala ? sala.nome : '';
-      document.getElementById('salaSetor').value = sala?.contexto?.setor || '';
-      document.getElementById('salaQtd').value = sala?.contexto?.quantidade_alunos || '';
-      document.getElementById('salaEquipamentos').value =
-        (sala?.contexto?.equipamentos || []).join(', ');
-      document.getElementById('salaDescricao').value = sala?.contexto?.descricao || '';
-      document.getElementById('salaDisponibilidade').value =
-        sala?.disponibilidade ? 'true' : 'false';
-
-      formCard.style.display = 'block';
-      document.getElementById('salaNome').focus();
-
-      formCard.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-    }
-
-    function fecharFormulario() {
-      salaEmEdicao = null;
-      form.reset();
-      formCard.style.display = 'none';
-    }
-
-    /**
-     * Monta o corpo da requisição a partir do formulário.
-     */
-    function lerFormulario() {
-      const quantidade = document.getElementById('salaQtd').value.trim();
-
-      return {
-        nome: document.getElementById('salaNome').value.trim(),
-        setor: document.getElementById('salaSetor').value.trim(),
-        // A API espera número ou null. O campo vazio vira null,
-        // e não 0, para não registrar "0 lugares".
-        quantidade_alunos: quantidade === '' ? null : Number(quantidade),
-        equipamentos: document.getElementById('salaEquipamentos').value
-          .split(',')
-          .map((item) => item.trim())
-          .filter(Boolean),
-        descricao: document.getElementById('salaDescricao').value.trim(),
-        disponibilidade: document.getElementById('salaDisponibilidade').value === 'true'
-      };
-    }
-
-    form.addEventListener('submit', async (evento) => {
-      evento.preventDefault();
-
-      if (!form.checkValidity()) {
-        form.reportValidity();
-        return;
-      }
-
-      const dados = lerFormulario();
-      const btn = document.getElementById('btnSalvarSala');
-
-      btn.disabled = true;
-
-      try {
-        if (salaEmEdicao) {
-          await atualizarSala(salaEmEdicao.id, dados);
-
-        } else {
-          await cadastrarSala(dados);
-        }
-
-        fecharFormulario();
-        await carregarSalas();
-
-      } catch (erro) {
-        console.error('Erro ao salvar a sala:', erro);
-        window.alert(erro.message || 'Não foi possível salvar a sala.');
-
-      } finally {
-        btn.disabled = false;
-      }
-    });
-
-    btnNovaSala.addEventListener('click', () => abrirFormulario(null));
-    btnCancelarSala.addEventListener('click', fecharFormulario);
-
-    // ======================================================
-    // EDITAR E EXCLUIR
-    // ======================================================
-
-    async function excluir(id, nome) {
-      const confirmar = window.confirm(
-        `Tem certeza que deseja excluir a sala "${nome}"?`
-      );
-
-      if (!confirmar) {
-        return;
-      }
-
-      try {
-        await excluirSala(id);
-        await carregarSalas();
-
-      } catch (erro) {
-        console.error('Erro ao excluir a sala:', erro);
-
-        // A API recusa a exclusão quando a sala tem reservas
-        // registradas. A mensagem chega preenchida.
-        window.alert(erro.message || 'Não foi possível excluir a sala.');
-      }
-    }
-
-    // Delegação de evento: os cards são recriados a cada busca.
-    listaSalas.addEventListener('click', (evento) => {
-      const botao = evento.target.closest('[data-acao]');
-
-      if (!botao) {
-        return;
-      }
-
-      const id = Number(botao.dataset.id);
-      const sala = salas.find((item) => item.id === id);
-
-      if (!sala) {
-        return;
-      }
-
-      if (botao.dataset.acao === 'editar') {
-        abrirFormulario(sala);
-
-      } else if (botao.dataset.acao === 'excluir') {
-        excluir(id, sala.nome);
-      }
-    });
-
-    // ======================================================
-    // BUSCA
-    // ======================================================
-    const searchInput = document.getElementById('search-input');
-
-    if (searchInput) {
-      searchInput.addEventListener('input', (e) => {
-        const termo = e.target.value.toLowerCase().trim();
-
-        listaSalas.querySelectorAll('.adm-card').forEach((card) => {
-          const texto = card.textContent.toLowerCase();
-
-          card.style.display = texto.includes(termo) ? '' : 'none';
-        });
-      });
-    }
-
-    document.addEventListener('DOMContentLoaded', () => {
-      carregarUsuario();
-      carregarSalas();
-
-      // ======================================================
-      // DROPDOWN DO USUÁRIO
-      // ======================================================
-      const userProfile = document.getElementById('userProfile');
-      const userDropdown = document.getElementById('userDropdown');
-
-      if (userProfile && userDropdown) {
-        userProfile.addEventListener('click', (e) => {
-          e.stopPropagation();
-          userDropdown.classList.toggle('active');
-        });
-
-        document.addEventListener('click', (e) => {
-          if (!userProfile.contains(e.target)) {
-            userDropdown.classList.remove('active');
-          }
-        });
-      }
-
-      // ======================================================
-      // MENU MOBILE
-      // ======================================================
-      const menuToggle = document.getElementById('menuToggle');
-      const sidebar = document.querySelector('.sidebar');
-      const sidebarOverlay = document.getElementById('sidebarOverlay');
-
-      if (menuToggle && sidebar && sidebarOverlay) {
-        menuToggle.addEventListener('click', () => {
-          sidebar.classList.toggle('open');
-          sidebarOverlay.classList.toggle('active');
-        });
-
-        sidebarOverlay.addEventListener('click', () => {
-          sidebar.classList.remove('open');
-          sidebarOverlay.classList.remove('active');
-        });
-      }
-    });
-  </script>
 </body>
 
 </html>
