@@ -2,914 +2,588 @@
 <html lang="pt-BR">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>Gerenciar salas - Gestão de salas e equipamentos</title>
+  <title>Gerenciar Salas - Gestão de salas e equipamentos</title>
 
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap"
-        rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="https://www.flaticon.com/flaticon.css">
+  <link rel="stylesheet" href="/static/css/gerenciar_salas_adm.css">
 
-    <link rel="stylesheet" href="/static/css/gerenciar_salas_adm.css">
 </head>
 
 <body>
+  <div class="app-container">
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
 
-    <div class="app-container">
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+      <div class="sidebar-top">
 
-        <div class="sidebar-overlay" id="sidebarOverlay"></div>
+        <a href="/home_admin" class="logo">
+          <img src="/static/assets/img/Logo senai.png" alt="SENAI">
+        </a>
 
-        <!-- SIDEBAR -->
-        <aside class="sidebar">
+        <nav class="nav-menu">
 
-            <div class="sidebar-top">
+          <a href="/aprovar_reservas_adm" class="nav-item">
+            <img src="/static/assets/icons/reserved.png" alt="" width="20" height="20">
+            Aprovar Reservas
+          </a>
 
-                <!-- Logo -->
-                <a href="/home_admin" class="logo">
-                    <img src="/static/assets/img/Logo senai.png" alt="SENAI">
-                </a>
+          <a href="/professores_adm" class="nav-item">
+            <img src="/static/assets/icons/user (3).png" alt="" width="20" height="20">
+            Professores
+          </a>
 
-                <!-- Menu -->
-                <nav class="nav-menu">
+          <a href="/gerenciar_salas_adm" class="nav-item active">
+            <img src="/static/assets/icons/porta.png" alt="" width="20" height="20">
+            Gerenciar Salas
+          </a>
 
-                    <a href="/reservas_admin" class="nav-item">
-                        <img src="/static/assets/icons/reserved.png" alt="" width="20" height="20">
-                        Aprovar Reservas
-                    </a>
+          <a href="/configuracoes_adm" class="nav-item">
+            <img src="/static/assets/icons/gear.png" alt="" width="20" height="20">
+            Configurações
+          </a>
 
-                    <a href="/usuarios" class="nav-item">
-                        <img src="/static/assets/icons/user (3).png" alt="" width="20" height="20">
-                        Professores
-                    </a>
+        </nav>
 
-                    <a href="/gerenciar_salas" class="nav-item active">
-                        <img src="/static/assets/icons/porta.png" alt="" width="20" height="20">
-                        Gerenciar salas
-                    </a>
+      </div>
 
-                    <a href="/historico" class="nav-item">
-                        <img src="/static/assets/icons/history.png" alt="" width="20" height="20">
-                        Histórico
-                    </a>
+      <form method="POST" action="/logout" class="logout-form">
+        <button type="submit" class="btn-logout">
+          <img src="/static/assets/icons/exit.png" alt="" width="20" height="20">
+          Sair
+        </button>
+      </form>
+    </aside>
 
-                    <a href="/notificacoes_prof" class="nav-item">
-                        <img src="/static/assets/icons/notification.png" alt="" width="20" height="20">
-                        Notificações
-                    </a>
+    <!-- CONTEÚDO PRINCIPAL -->
+    <main class="main-content">
 
-                    <a href="/configuracoes" class="nav-item">
-                        <img src="/static/static/assets/icons/gear.png" alt="" width="20" height="20">
-                        Configurações
-                    </a>
+      <header class="header">
 
-                </nav>
+        <button class="menu-toggle" id="menuToggle" aria-label="Abrir menu">
+          <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+            viewBox="0 0 24 24">
+            <path d="M3 6h18M3 12h18M3 18h18"></path>
+          </svg>
+        </button>
 
-                <div class="divider"></div>
+        <div class="greeting">
+          <h1>
+            Olá <span id="nomeUsuario">...</span>!
+          </h1>
+          <p>
+            Cadastre, edite e remova as salas disponíveis para reserva
+          </p>
+        </div>
 
-                <!-- Ajuda -->
-                <a href="/ajuda" class="nav-item">
-                    <img src="/static/assets/icons/interrogation.png" alt="" width="20" height="20">
-                    Ajuda
-                </a>
+        <div class="header-actions">
 
+          <div class="search-container">
+            <svg width="18" height="18" fill="none" stroke="#6b7280" stroke-width="2" viewBox="0 0 24 24">
+              <path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+            </svg>
+
+            <input type="text" id="search-input" placeholder="Buscar sala por nome ou tipo...">
+          </div>
+
+          <a href="/notificacoes_prof" class="icon-btn">
+            <img src="/static/assets/icons/notification (2).png" alt="Notificações" width="20" height="20">
+          </a>
+
+          <div class="user-profile" id="userProfile">
+
+            <div class="avatar-link">
+              <div class="avatar">
+                <img src="/static/assets/icons/user (3).png" alt="Perfil do Usuário" width="28" height="28">
+              </div>
             </div>
 
-            <!-- Sair -->
-            <form method="POST" action="/logout" class="logout-form">
+            <div class="user-info">
+              <span class="name" id="nomePerfil">...</span>
+              <span class="role">Administrador</span>
+            </div>
 
-                <button type="submit" class="btn-logout">
-                    <img src="/static/assets/icons/exit.png" alt="" width="20" height="20">
-                    Sair
+            <div class="user-dropdown" id="userDropdown">
+
+              <a href="/gerenciar_salas_adm" class="dropdown-item">
+                Gerenciar Salas
+              </a>
+
+              <a href="/configuracoes_adm" class="dropdown-item">
+                Configurações
+              </a>
+
+              <div class="dropdown-divider"></div>
+
+              <form method="POST" action="/logout">
+                <button type="submit">
+                  Sair
                 </button>
-
-            </form>
-
-        </aside>
-
-        <!-- CONTEÚDO PRINCIPAL -->
-        <main class="main-content">
-
-            <!-- HEADER -->
-            <header class="header">
-
-                <button class="menu-toggle" id="menuToggle" aria-label="Abrir menu">
-                    <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2"
-                        stroke-linecap="round" viewBox="0 0 24 24">
-                        <path d="M3 6h18M3 12h18M3 18h18"></path>
-                    </svg>
-                </button>
-
-                <div class="greeting">
-
-                    <h1>
-                        Olá <span id="nomeUsuario"></span>
-                    </h1>
-
-                    <p>
-                        Gerencie o gerenciamento das salas e equipamentos
-                    </p>
-
-                </div>
-
-                <div class="header-actions">
-
-                    <!-- Pesquisa -->
-                    <div class="search-container">
-
-                        <svg width="18" height="18" fill="none" stroke="#6b7280" stroke-width="2" viewBox="0 0 24 24">
-                            <path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-                        </svg>
-
-                        <input type="text" id="search-input" placeholder="Buscar salas, carrinhos, laboratórios...">
-
-                    </div>
-
-                    <!-- Notificações -->
-                    <a href="/notificacoes_prof" class="icon-btn">
-                        <img src="/static/assets/icons/notification (2).png" alt="Notificações" width="20" height="20">
-                    </a>
-
-                    <!-- Perfil -->
-                    <div class="user-profile" id="userProfile">
-
-                        <div class="avatar-link">
-
-                            <div class="avatar">
-                                <img src="/static/assets/icons/user (3).png" alt="Perfil do Usuário" width="28" height="28">
-                            </div>
-
-                        </div>
-
-                        <div class="user-info">
-
-                            <span class="name" id="nomePerfil"></span>
-
-                            <span class="role">
-                                Coordenador
-                            </span>
-
-                        </div>
-
-                        <!-- Dropdown -->
-                        <div class="user-dropdown" id="userDropdown">
-
-                            <a href="/gerenciar_salas" class="dropdown-item">
-                                Gerenciar salas
-                            </a>
-
-                            <a href="/configuracoes" class="dropdown-item">
-                                Configurações
-                            </a>
-
-                            <div class="dropdown-divider"></div>
-
-                            <form method="POST" action="/logout">
-                                <button type="submit">
-                                    Sair
-                                </button>
-                            </form>
-
-                        </div>
-
-                    </div>
-
-                </div>
-
-            </header>
-
-
-            <!-- CONTEÚDO DAS SALAS -->
-
-            <section class="rooms-section">
-
-                <!-- CABEÇALHO DA PÁGINA -->
-                <div class="page-heading">
-
-                    <h2>
-                        Salas
-                    </h2>
-
-                    <p>
-                        Adicione, remova e gerencie as salas cadastradas no sistema.
-                    </p>
-
-                </div>
-
-
-                <!-- BARRA DE FERRAMENTAS -->
-                <div class="rooms-toolbar">
-
-                    <!-- Filtro da tabela -->
-                    <div class="table-search">
-
-                        <svg width="16" height="16" fill="none" stroke="#9CA3AF" stroke-width="2" stroke-linecap="round"
-                            viewBox="0 0 24 24">
-                            <path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-                        </svg>
-
-                        <input type="search" id="filtroSalas" placeholder="Buscar sala por nome ou código..."
-                            aria-label="Buscar sala por nome ou código">
-
-                    </div>
-
-                    <!-- Adicionar sala -->
-                    <button type="button" class="btn-add-room" id="btnAdicionarSala">
-
-                        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5"
-                            stroke-linecap="round" viewBox="0 0 24 24">
-                            <path d="M12 5v14M5 12h14"></path>
-                        </svg>
-
-                        Adicionar Sala
-
-                    </button>
-
-                </div>
-
-
-                <!-- TABELA DE SALAS -->
-                <div class="table-card">
-
-                    <div class="table-wrapper">
-
-                        <table class="rooms-table">
-
-                            <thead>
-
-                                <tr>
-
-                                    <th scope="col" class="col-nome">
-                                        Nome da Sala
-                                    </th>
-
-                                    <th scope="col">
-                                        Tipo
-                                    </th>
-
-                                    <th scope="col">
-                                        Capacidade
-                                    </th>
-
-                                    <th scope="col">
-                                        Bloco/Andar
-                                    </th>
-
-                                    <th scope="col">
-                                        Status
-                                    </th>
-
-                                    <th scope="col" class="col-acoes">
-                                        Ações
-                                    </th>
-
-                                </tr>
-
-                            </thead>
-
-                            <tbody id="salasTableBody" class="searchable">
-
-                                <tr class="room-row searchable" data-nome="Sala de Aula A01" data-codigo="A01">
-
-                                    <td class="col-nome">
-
-                                        <div class="room-name">
-
-                                            <span class="room-icon">
-                                                <img src="/static/assets/icons/classroom.png" alt="" width="18" height="18">
-                                            </span>
-
-                                            <span class="room-label">
-                                                Sala de Aula A01
-                                            </span>
-
-                                        </div>
-
-                                    </td>
-
-                                    <td>
-                                        Sala de Aula
-                                    </td>
-
-                                    <td>
-                                        40 lugares
-                                    </td>
-
-                                    <td>
-                                        Bloco A - 1º Andar
-                                    </td>
-
-                                    <td>
-                                        <span class="badge badge-green">Ativo</span>
-                                    </td>
-
-                                    <td class="col-acoes">
-
-                                        <div class="row-actions">
-
-                                            <button type="button" class="icon-action" title="Editar sala"
-                                                aria-label="Editar Sala de Aula A01">
-                                                <svg width="16" height="16" fill="none" stroke="currentColor"
-                                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                                                    viewBox="0 0 24 24">
-                                                    <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"></path>
-                                                    <path d="M18.5 2.5a2.12 2.12 0 013 3L12 15l-4 1 1-4 9.5-9.5z"></path>
-                                                </svg>
-                                            </button>
-
-                                            <button type="button" class="icon-action icon-action-danger"
-                                                title="Remover sala" aria-label="Remover Sala de Aula A01">
-                                                <svg width="16" height="16" fill="none" stroke="currentColor"
-                                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                                                    viewBox="0 0 24 24">
-                                                    <path d="M3 6h18M8 6V4a1 1 0 011-1h6a1 1 0 011 1v2m3 0v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6"></path>
-                                                    <path d="M10 11v6M14 11v6"></path>
-                                                </svg>
-                                            </button>
-
-                                        </div>
-
-                                    </td>
-
-                                </tr>
-
-                                <tr class="room-row searchable" data-nome="Laboratório de Informática B3" data-codigo="B3">
-
-                                    <td class="col-nome">
-
-                                        <div class="room-name">
-
-                                            <span class="room-icon">
-                                                <img src="/static/assets/icons/computer.png" alt="" width="18" height="18">
-                                            </span>
-
-                                            <span class="room-label">
-                                                Laboratório de Informática B3
-                                            </span>
-
-                                        </div>
-
-                                    </td>
-
-                                    <td>
-                                        Laboratório
-                                    </td>
-
-                                    <td>
-                                        30 lugares
-                                    </td>
-
-                                    <td>
-                                        Bloco B - 3º Andar
-                                    </td>
-
-                                    <td>
-                                        <span class="badge badge-green">Ativo</span>
-                                    </td>
-
-                                    <td class="col-acoes">
-
-                                        <div class="row-actions">
-
-                                            <button type="button" class="icon-action" title="Editar sala"
-                                                aria-label="Editar Laboratório de Informática B3">
-                                                <svg width="16" height="16" fill="none" stroke="currentColor"
-                                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                                                    viewBox="0 0 24 24">
-                                                    <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"></path>
-                                                    <path d="M18.5 2.5a2.12 2.12 0 013 3L12 15l-4 1 1-4 9.5-9.5z"></path>
-                                                </svg>
-                                            </button>
-
-                                            <button type="button" class="icon-action icon-action-danger"
-                                                title="Remover sala" aria-label="Remover Laboratório de Informática B3">
-                                                <svg width="16" height="16" fill="none" stroke="currentColor"
-                                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                                                    viewBox="0 0 24 24">
-                                                    <path d="M3 6h18M8 6V4a1 1 0 011-1h6a1 1 0 011 1v2m3 0v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6"></path>
-                                                    <path d="M10 11v6M14 11v6"></path>
-                                                </svg>
-                                            </button>
-
-                                        </div>
-
-                                    </td>
-
-                                </tr>
-
-                                <tr class="room-row searchable" data-nome="Sala de Reuniões C02" data-codigo="C02">
-
-                                    <td class="col-nome">
-
-                                        <div class="room-name">
-
-                                            <span class="room-icon">
-                                                <img src="/static/assets/icons/classroom.png" alt="" width="18" height="18">
-                                            </span>
-
-                                            <span class="room-label">
-                                                Sala de Reuniões C02
-                                            </span>
-
-                                        </div>
-
-                                    </td>
-
-                                    <td>
-                                        Reunião
-                                    </td>
-
-                                    <td>
-                                        12 lugares
-                                    </td>
-
-                                    <td>
-                                        Bloco C - 2º Andar
-                                    </td>
-
-                                    <td>
-                                        <span class="badge badge-green">Ativo</span>
-                                    </td>
-
-                                    <td class="col-acoes">
-
-                                        <div class="row-actions">
-
-                                            <button type="button" class="icon-action" title="Editar sala"
-                                                aria-label="Editar Sala de Reuniões C02">
-                                                <svg width="16" height="16" fill="none" stroke="currentColor"
-                                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                                                    viewBox="0 0 24 24">
-                                                    <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"></path>
-                                                    <path d="M18.5 2.5a2.12 2.12 0 013 3L12 15l-4 1 1-4 9.5-9.5z"></path>
-                                                </svg>
-                                            </button>
-
-                                            <button type="button" class="icon-action icon-action-danger"
-                                                title="Remover sala" aria-label="Remover Sala de Reuniões C02">
-                                                <svg width="16" height="16" fill="none" stroke="currentColor"
-                                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                                                    viewBox="0 0 24 24">
-                                                    <path d="M3 6h18M8 6V4a1 1 0 011-1h6a1 1 0 011 1v2m3 0v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6"></path>
-                                                    <path d="M10 11v6M14 11v6"></path>
-                                                </svg>
-                                            </button>
-
-                                        </div>
-
-                                    </td>
-
-                                </tr>
-
-                                <tr class="room-row searchable" data-nome="Laboratório de Automação D10" data-codigo="D10">
-
-                                    <td class="col-nome">
-
-                                        <div class="room-name">
-
-                                            <span class="room-icon">
-                                                <img src="/static/assets/icons/computer.png" alt="" width="18" height="18">
-                                            </span>
-
-                                            <span class="room-label">
-                                                Laboratório de Automação D10
-                                            </span>
-
-                                        </div>
-
-                                    </td>
-
-                                    <td>
-                                        Laboratório
-                                    </td>
-
-                                    <td>
-                                        25 lugares
-                                    </td>
-
-                                    <td>
-                                        Bloco D - 1º Andar
-                                    </td>
-
-                                    <td>
-                                        <span class="badge badge-yellow">Manutenção</span>
-                                    </td>
-
-                                    <td class="col-acoes">
-
-                                        <div class="row-actions">
-
-                                            <button type="button" class="icon-action" title="Editar sala"
-                                                aria-label="Editar Laboratório de Automação D10">
-                                                <svg width="16" height="16" fill="none" stroke="currentColor"
-                                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                                                    viewBox="0 0 24 24">
-                                                    <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"></path>
-                                                    <path d="M18.5 2.5a2.12 2.12 0 013 3L12 15l-4 1 1-4 9.5-9.5z"></path>
-                                                </svg>
-                                            </button>
-
-                                            <button type="button" class="icon-action icon-action-danger"
-                                                title="Remover sala" aria-label="Remover Laboratório de Automação D10">
-                                                <svg width="16" height="16" fill="none" stroke="currentColor"
-                                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                                                    viewBox="0 0 24 24">
-                                                    <path d="M3 6h18M8 6V4a1 1 0 011-1h6a1 1 0 011 1v2m3 0v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6"></path>
-                                                    <path d="M10 11v6M14 11v6"></path>
-                                                </svg>
-                                            </button>
-
-                                        </div>
-
-                                    </td>
-
-                                </tr>
-
-                                <tr class="room-row searchable" data-nome="Sala de Treinamento E05" data-codigo="E05">
-
-                                    <td class="col-nome">
-
-                                        <div class="room-name">
-
-                                            <span class="room-icon">
-                                                <img src="/static/assets/icons/classroom.png" alt="" width="18" height="18">
-                                            </span>
-
-                                            <span class="room-label">
-                                                Sala de Treinamento E05
-                                            </span>
-
-                                        </div>
-
-                                    </td>
-
-                                    <td>
-                                        Treinamento
-                                    </td>
-
-                                    <td>
-                                        20 lugares
-                                    </td>
-
-                                    <td>
-                                        Bloco E - Térreo
-                                    </td>
-
-                                    <td>
-                                        <span class="badge badge-red">Inativo</span>
-                                    </td>
-
-                                    <td class="col-acoes">
-
-                                        <div class="row-actions">
-
-                                            <button type="button" class="icon-action" title="Editar sala"
-                                                aria-label="Editar Sala de Treinamento E05">
-                                                <svg width="16" height="16" fill="none" stroke="currentColor"
-                                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                                                    viewBox="0 0 24 24">
-                                                    <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"></path>
-                                                    <path d="M18.5 2.5a2.12 2.12 0 013 3L12 15l-4 1 1-4 9.5-9.5z"></path>
-                                                </svg>
-                                            </button>
-
-                                            <button type="button" class="icon-action icon-action-danger"
-                                                title="Remover sala" aria-label="Remover Sala de Treinamento E05">
-                                                <svg width="16" height="16" fill="none" stroke="currentColor"
-                                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                                                    viewBox="0 0 24 24">
-                                                    <path d="M3 6h18M8 6V4a1 1 0 011-1h6a1 1 0 011 1v2m3 0v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6"></path>
-                                                    <path d="M10 11v6M14 11v6"></path>
-                                                </svg>
-                                            </button>
-
-                                        </div>
-
-                                    </td>
-
-                                </tr>
-
-                                <tr class="room-row searchable" data-nome="Auditório Principal" data-codigo="AUD-01">
-
-                                    <td class="col-nome">
-
-                                        <div class="room-name">
-
-                                            <span class="room-icon">
-                                                <img src="/static/assets/icons/classroom.png" alt="" width="18" height="18">
-                                            </span>
-
-                                            <span class="room-label">
-                                                Auditório Principal
-                                            </span>
-
-                                        </div>
-
-                                    </td>
-
-                                    <td>
-                                        Auditório
-                                    </td>
-
-                                    <td>
-                                        200 lugares
-                                    </td>
-
-                                    <td>
-                                        Bloco A - Térreo
-                                    </td>
-
-                                    <td>
-                                        <span class="badge badge-green">Ativo</span>
-                                    </td>
-
-                                    <td class="col-acoes">
-
-                                        <div class="row-actions">
-
-                                            <button type="button" class="icon-action" title="Editar sala"
-                                                aria-label="Editar Auditório Principal">
-                                                <svg width="16" height="16" fill="none" stroke="currentColor"
-                                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                                                    viewBox="0 0 24 24">
-                                                    <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"></path>
-                                                    <path d="M18.5 2.5a2.12 2.12 0 013 3L12 15l-4 1 1-4 9.5-9.5z"></path>
-                                                </svg>
-                                            </button>
-
-                                            <button type="button" class="icon-action icon-action-danger"
-                                                title="Remover sala" aria-label="Remover Auditório Principal">
-                                                <svg width="16" height="16" fill="none" stroke="currentColor"
-                                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                                                    viewBox="0 0 24 24">
-                                                    <path d="M3 6h18M8 6V4a1 1 0 011-1h6a1 1 0 011 1v2m3 0v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6"></path>
-                                                    <path d="M10 11v6M14 11v6"></path>
-                                                </svg>
-                                            </button>
-
-                                        </div>
-
-                                    </td>
-
-                                </tr>
-
-                            </tbody>
-
-                        </table>
-
-                    </div>
-
-
-                    <!-- TABELA VAZIA -->
-                    <div class="empty-state" id="salasEmpty" hidden>
-
-                        <img src="/static/assets/icons/classroom.png" alt="" width="40" height="40">
-
-                        <p>
-                            Nenhuma sala encontrada.
-                        </p>
-
-                    </div>
-
-
-                    <!-- RODAPÉ DA TABELA -->
-                    <div class="table-footer">
-
-                        <p class="table-count" id="salasContagem">
-                            Mostrando 6 de 6 salas cadastradas
-                        </p>
-
-                        <nav class="pagination" aria-label="Paginação das salas">
-
-                            <ul class="pagination-list">
-
-                                <li>
-                                    <button type="button" class="page-btn active" aria-current="page">1</button>
-                                </li>
-
-                                <li>
-                                    <button type="button" class="page-btn">2</button>
-                                </li>
-
-                                <li>
-                                    <button type="button" class="page-btn">3</button>
-                                </li>
-
-                                <li>
-                                    <button type="button" class="page-btn page-next" aria-label="Próxima página">›</button>
-                                </li>
-
-                            </ul>
-
-                        </nav>
-
-                    </div>
-
-                </div>
-
-            </section>
-
-        </main>
-
-    </div>
-
-
-    <script>
-
-        document.addEventListener("DOMContentLoaded", () => {
-
-            // ==================================================
-            // CARREGAR NOME DO USUÁRIO PELA SESSÃO
-            // ==================================================
-
-            async function carregarUsuarioLogado() {
-
-                try {
-
-                    const resposta = await fetch("/usuario-logado", {
-                        method: "GET",
-                        credentials: "same-origin"
-                    });
-
-                    // Se não estiver autenticado, volta ao login
-                    if (resposta.status === 401) {
-                        window.location.href = "/";
-                        return;
-                    }
-
-                    if (!resposta.ok) {
-                        throw new Error("Erro ao buscar usuário.");
-                    }
-
-                    const usuario = await resposta.json();
-
-                    // Nome no cabeçalho
-                    const nomeUsuario = document.getElementById("nomeUsuario");
-
-                    if (nomeUsuario) {
-                        nomeUsuario.textContent = usuario.nome || "";
-                    }
-
-                    // Nome no perfil
-                    const nomePerfil = document.getElementById("nomePerfil");
-
-                    if (nomePerfil) {
-                        nomePerfil.textContent = usuario.nome || "";
-                    }
-
-                } catch (erro) {
-
-                    console.error(
-                        "Erro ao carregar usuário:",
-                        erro
-                    );
-
-                }
-
-            }
-
-            carregarUsuarioLogado();
-
-
-            // ==================================================
-            // DROPDOWN DO USUÁRIO
-            // ==================================================
-
-            const userProfile =
-                document.getElementById("userProfile");
-
-            const userDropdown =
-                document.getElementById("userDropdown");
-
-            if (userProfile && userDropdown) {
-
-                userProfile.addEventListener("click", (e) => {
-
-                    e.stopPropagation();
-
-                    if (userDropdown.contains(e.target)) {
-                        return;
-                    }
-
-                    userDropdown.classList.toggle("active");
-
-                });
-
-                document.addEventListener("click", (e) => {
-
-                    if (!userProfile.contains(e.target)) {
-                        userDropdown.classList.remove("active");
-                    }
-
-                });
-
-            }
-
-
-            // ==================================================
-            // MENU MOBILE
-            // ==================================================
-
-            const menuToggle =
-                document.getElementById("menuToggle");
-
-            const sidebar =
-                document.querySelector(".sidebar");
-
-            const sidebarOverlay =
-                document.getElementById("sidebarOverlay");
-
-            if (menuToggle && sidebar && sidebarOverlay) {
-
-                menuToggle.addEventListener("click", () => {
-
-                    sidebar.classList.toggle("open");
-                    sidebarOverlay.classList.toggle("active");
-
-                });
-
-                sidebarOverlay.addEventListener("click", () => {
-
-                    sidebar.classList.remove("open");
-                    sidebarOverlay.classList.remove("active");
-
-                });
-
-            }
-
-
-            // ==================================================
-            // FILTRAR SALAS POR NOME OU CÓDIGO
-            // ==================================================
-
-            const filtroSalas =
-                document.getElementById("filtroSalas");
-
-            const linhasSala =
-                document.querySelectorAll(".room-row");
-
-            const salasEmpty =
-                document.getElementById("salasEmpty");
-
-            const salasContagem =
-                document.getElementById("salasContagem");
-
-            function atualizarContagem(visiveis, total) {
-
-                if (!salasContagem) return;
-
-                salasContagem.textContent =
-                    `Mostrando ${visiveis} de ${total} salas cadastradas`;
-
-            }
-
-            if (filtroSalas) {
-
-                filtroSalas.addEventListener("input", (e) => {
-
-                    const termo =
-                        e.target.value.toLowerCase().trim();
-
-                    let visiveis = 0;
-
-                    linhasSala.forEach(linha => {
-
-                        const nome =
-                            (linha.dataset.nome || "").toLowerCase();
-
-                        const codigo =
-                            (linha.dataset.codigo || "").toLowerCase();
-
-                        const corresponde =
-                            nome.includes(termo) ||
-                            codigo.includes(termo);
-
-                        linha.style.display =
-                            corresponde ? "" : "none";
-
-                        if (corresponde) {
-                            visiveis += 1;
-                        }
-
-                    });
-
-                    // Mensagem para quando nada é encontrado
-                    if (salasEmpty) {
-                        salasEmpty.hidden = visiveis > 0;
-                    }
-
-                    atualizarContagem(
-                        visiveis,
-                        linhasSala.length
-                    );
-
-                });
-
-            }
-
+              </form>
+
+            </div>
+          </div>
+
+        </div>
+      </header>
+
+      <!-- GERENCIAR SALAS -->
+      <section class="adm-section">
+
+        <div class="adm-page-header">
+          <div>
+            <h2>Salas do campus</h2>
+            <p>
+              Mantenha o cadastro das salas atualizado para que os professores vejam apenas o que está disponível
+            </p>
+          </div>
+        </div>
+
+        <button class="adm-btn-cadastrar" type="button" id="btnNovaSala">
+          + Cadastrar Sala
+        </button>
+      </div>
+
+      <!-- FORMULÁRIO - NOVA SALA / EDIÇÃO -->
+      <div class="adm-form-card" id="formSalaCard" style="display: none;">
+
+        <h3 class="adm-form-title" id="formSalaTitulo">Nova sala</h3>
+
+        <p class="adm-form-subtitle">
+          Preencha os dados abaixo. O campo "Descrição" alimenta a
+          lista de salas, os laboratórios e os gabinetes.
+        </p>
+
+        <form id="formSala" class="adm-form" novalidate>
+
+          <div class="adm-form-linha">
+            <div class="adm-form-campo">
+              <label for="salaNome">Nome da sala</label>
+              <input type="text" id="salaNome" name="nome" required
+                placeholder="Ex: C20">
+            </div>
+
+            <div class="adm-form-campo">
+              <label for="salaSetor">Setor</label>
+              <input type="text" id="salaSetor" name="setor"
+                placeholder="Ex: Elétrica">
+            </div>
+          </div>
+
+          <div class="adm-form-linha">
+            <div class="adm-form-campo">
+              <label for="salaQtd">Quantidade de alunos</label>
+              <input type="number" id="salaQtd" name="quantidade_alunos" min="0"
+                placeholder="Ex: 32">
+            </div>
+
+            <div class="adm-form-campo">
+              <label for="salaDisponibilidade">Disponibilidade</label>
+              <select id="salaDisponibilidade" name="disponibilidade">
+                <option value="true">Disponível</option>
+                <option value="false">Indisponível</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="adm-form-campo">
+            <label for="salaEquipamentos">Equipamentos</label>
+            <input type="text" id="salaEquipamentos" name="equipamentos"
+              placeholder="Separe por vírgula. Ex: Projetor, 30 carteiras">
+          </div>
+
+          <div class="adm-form-campo">
+            <label for="salaDescricao">Descrição</label>
+            <textarea id="salaDescricao" name="descricao" rows="2"
+              placeholder="Ex: Sala de aula com ar-condicionado"></textarea>
+          </div>
+
+          <div class="adm-form-acoes">
+            <button type="button" class="adm-btn adm-btn-editar" id="btnCancelarSala">
+              Cancelar
+            </button>
+
+            <button type="submit" class="adm-btn-cadastrar" id="btnSalvarSala">
+              Salvar Sala
+            </button>
+          </div>
+
+        </form>
+      </div>
+
+      <div class="adm-cards" id="listaSalas">
+        <!-- Renderizado dinamicamente via JS -->
+      </div>
+
+      <div class="adm-empty" id="listaVazia" style="display: none;">
+        <img src="/static/assets/icons/classroom.png" alt="" width="40" height="40">
+        <p>
+          Nenhuma sala cadastrada até o momento.
+        </p>
+      </div>
+
+      <div class="adm-empty" id="listaErro" style="display: none;">
+        <img src="/static/assets/icons/warning.png" alt="" width="40" height="40">
+        <p id="listaErroTexto">
+          Não foi possível carregar as salas.
+        </p>
+      </div>
+
+      </section>
+    </main>
+  </div>
+
+  <!-- JAVASCRIPT -->
+  <script type="module">
+    import {
+      listarSalasAdmin,
+      cadastrarSala,
+      atualizarSala,
+      excluirSala
+    } from '/js/api.js';
+
+    // ======================================================
+    // CARREGAR USUÁRIO LOGADO
+    // ======================================================
+    async function carregarUsuario() {
+      try {
+        const resposta = await fetch('/usuario-logado', {
+          method: 'GET',
+          credentials: 'same-origin'
         });
 
-    </script>
+        if (resposta.status === 401) {
+          window.location.href = '/';
+          return;
+        }
 
+        if (!resposta.ok) {
+          throw new Error('Não foi possível carregar os dados do usuário.');
+        }
+
+        const usuario = await resposta.json();
+
+        const nomeUsuario = document.getElementById('nomeUsuario');
+        const nomePerfil = document.getElementById('nomePerfil');
+
+        if (nomeUsuario) {
+          nomeUsuario.textContent = usuario.nome || 'Usuário';
+        }
+
+        if (nomePerfil) {
+          nomePerfil.textContent = usuario.nome || 'Usuário';
+        }
+
+      } catch (erro) {
+        console.error('Erro ao carregar usuário:', erro);
+      }
+    }
+
+    // ======================================================
+    // TELA DE GERENCIAMENTO DE SALAS
+    // ======================================================
+    // As salas vêm de GET /admin/salas, que traz todas elas,
+    // inclusive as que não aparecem nas telas de reserva.
+
+    const listaSalas = document.getElementById('listaSalas');
+    const listaVazia = document.getElementById('listaVazia');
+    const listaErro = document.getElementById('listaErro');
+
+    const formCard = document.getElementById('formSalaCard');
+    const form = document.getElementById('formSala');
+    const formTitulo = document.getElementById('formSalaTitulo');
+    const btnNovaSala = document.getElementById('btnNovaSala');
+    const btnCancelarSala = document.getElementById('btnCancelarSala');
+
+    // Guarda a última lista para abrir o formulário de edição
+    // já com os dados da sala preenchidos.
+    let salas = [];
+    let salaEmEdicao = null;
+
+    /**
+     * Escapa o texto antes de colocá-lo no HTML, porque os
+     * dados vêm do banco e são montados com template string.
+     */
+    function escapar(texto) {
+      return String(texto ?? '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
+
+    function montarCard(sala) {
+      const contexto = sala.contexto || {};
+      const disponivel = !!sala.disponibilidade;
+
+      const linha = [
+        contexto.setor,
+        contexto.quantidade_alunos
+          ? `${contexto.quantidade_alunos} lugares`
+          : '',
+        contexto.descricao
+      ].filter(Boolean).join(' · ');
+
+      const equipamentos = (contexto.equipamentos || []);
+
+      return `
+        <div class="adm-card">
+          <h4>${escapar(sala.nome || 'Sala')}</h4>
+
+          <p>${escapar(linha)}</p>
+
+          <span class="adm-selo adm-selo-${disponivel ? 'disponivel' : 'indisponivel'}">
+            ${disponivel ? 'Disponível' : 'Indisponível'}
+          </span>
+
+          ${equipamentos.length ? `<p class="adm-detalhe">${escapar(equipamentos.join(', '))}</p>` : ''}
+
+          <div class="adm-card-actions">
+            <button class="adm-btn adm-btn-editar" data-acao="editar" data-id="${sala.id}">
+              Editar
+            </button>
+
+            <button class="adm-btn adm-btn-excluir" data-acao="excluir" data-id="${sala.id}">
+              Excluir
+            </button>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderSalas(lista) {
+      salas = lista || [];
+      listaErro.style.display = 'none';
+
+      if (salas.length === 0) {
+        listaSalas.innerHTML = '';
+        listaVazia.style.display = 'flex';
+        return;
+      }
+
+      listaVazia.style.display = 'none';
+      listaSalas.innerHTML = salas.map(montarCard).join('');
+    }
+
+    async function carregarSalas() {
+      try {
+        renderSalas(await listarSalasAdmin());
+
+      } catch (erro) {
+        console.error('Erro ao carregar as salas:', erro);
+
+        listaSalas.innerHTML = '';
+        listaVazia.style.display = 'none';
+        listaErro.style.display = 'flex';
+        document.getElementById('listaErroTexto').textContent =
+          erro.message || 'Não foi possível carregar as salas.';
+      }
+    }
+
+    // ======================================================
+    // FORMULÁRIO
+    // ======================================================
+
+    function abrirFormulario(sala) {
+      salaEmEdicao = sala || null;
+
+      formTitulo.textContent = sala
+        ? `Editar ${sala.nome}`
+        : 'Nova sala';
+
+      document.getElementById('salaNome').value = sala ? sala.nome : '';
+      document.getElementById('salaSetor').value = sala?.contexto?.setor || '';
+      document.getElementById('salaQtd').value = sala?.contexto?.quantidade_alunos || '';
+      document.getElementById('salaEquipamentos').value =
+        (sala?.contexto?.equipamentos || []).join(', ');
+      document.getElementById('salaDescricao').value = sala?.contexto?.descricao || '';
+      document.getElementById('salaDisponibilidade').value =
+        sala?.disponibilidade ? 'true' : 'false';
+
+      formCard.style.display = 'block';
+      document.getElementById('salaNome').focus();
+
+      formCard.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+
+    function fecharFormulario() {
+      salaEmEdicao = null;
+      form.reset();
+      formCard.style.display = 'none';
+    }
+
+    /**
+     * Monta o corpo da requisição a partir do formulário.
+     */
+    function lerFormulario() {
+      const quantidade = document.getElementById('salaQtd').value.trim();
+
+      return {
+        nome: document.getElementById('salaNome').value.trim(),
+        setor: document.getElementById('salaSetor').value.trim(),
+        // A API espera número ou null. O campo vazio vira null,
+        // e não 0, para não registrar "0 lugares".
+        quantidade_alunos: quantidade === '' ? null : Number(quantidade),
+        equipamentos: document.getElementById('salaEquipamentos').value
+          .split(',')
+          .map((item) => item.trim())
+          .filter(Boolean),
+        descricao: document.getElementById('salaDescricao').value.trim(),
+        disponibilidade: document.getElementById('salaDisponibilidade').value === 'true'
+      };
+    }
+
+    form.addEventListener('submit', async (evento) => {
+      evento.preventDefault();
+
+      if (!form.checkValidity()) {
+        form.reportValidity();
+        return;
+      }
+
+      const dados = lerFormulario();
+      const btn = document.getElementById('btnSalvarSala');
+
+      btn.disabled = true;
+
+      try {
+        if (salaEmEdicao) {
+          await atualizarSala(salaEmEdicao.id, dados);
+
+        } else {
+          await cadastrarSala(dados);
+        }
+
+        fecharFormulario();
+        await carregarSalas();
+
+      } catch (erro) {
+        console.error('Erro ao salvar a sala:', erro);
+        window.alert(erro.message || 'Não foi possível salvar a sala.');
+
+      } finally {
+        btn.disabled = false;
+      }
+    });
+
+    btnNovaSala.addEventListener('click', () => abrirFormulario(null));
+    btnCancelarSala.addEventListener('click', fecharFormulario);
+
+    // ======================================================
+    // EDITAR E EXCLUIR
+    // ======================================================
+
+    async function excluir(id, nome) {
+      const confirmar = window.confirm(
+        `Tem certeza que deseja excluir a sala "${nome}"?`
+      );
+
+      if (!confirmar) {
+        return;
+      }
+
+      try {
+        await excluirSala(id);
+        await carregarSalas();
+
+      } catch (erro) {
+        console.error('Erro ao excluir a sala:', erro);
+
+        // A API recusa a exclusão quando a sala tem reservas
+        // registradas. A mensagem chega preenchida.
+        window.alert(erro.message || 'Não foi possível excluir a sala.');
+      }
+    }
+
+    // Delegação de evento: os cards são recriados a cada busca.
+    listaSalas.addEventListener('click', (evento) => {
+      const botao = evento.target.closest('[data-acao]');
+
+      if (!botao) {
+        return;
+      }
+
+      const id = Number(botao.dataset.id);
+      const sala = salas.find((item) => item.id === id);
+
+      if (!sala) {
+        return;
+      }
+
+      if (botao.dataset.acao === 'editar') {
+        abrirFormulario(sala);
+
+      } else if (botao.dataset.acao === 'excluir') {
+        excluir(id, sala.nome);
+      }
+    });
+
+    // ======================================================
+    // BUSCA
+    // ======================================================
+    const searchInput = document.getElementById('search-input');
+
+    if (searchInput) {
+      searchInput.addEventListener('input', (e) => {
+        const termo = e.target.value.toLowerCase().trim();
+
+        listaSalas.querySelectorAll('.adm-card').forEach((card) => {
+          const texto = card.textContent.toLowerCase();
+
+          card.style.display = texto.includes(termo) ? '' : 'none';
+        });
+      });
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      carregarUsuario();
+      carregarSalas();
+
+      // ======================================================
+      // DROPDOWN DO USUÁRIO
+      // ======================================================
+      const userProfile = document.getElementById('userProfile');
+      const userDropdown = document.getElementById('userDropdown');
+
+      if (userProfile && userDropdown) {
+        userProfile.addEventListener('click', (e) => {
+          e.stopPropagation();
+          userDropdown.classList.toggle('active');
+        });
+
+        document.addEventListener('click', (e) => {
+          if (!userProfile.contains(e.target)) {
+            userDropdown.classList.remove('active');
+          }
+        });
+      }
+
+      // ======================================================
+      // MENU MOBILE
+      // ======================================================
+      const menuToggle = document.getElementById('menuToggle');
+      const sidebar = document.querySelector('.sidebar');
+      const sidebarOverlay = document.getElementById('sidebarOverlay');
+
+      if (menuToggle && sidebar && sidebarOverlay) {
+        menuToggle.addEventListener('click', () => {
+          sidebar.classList.toggle('open');
+          sidebarOverlay.classList.toggle('active');
+        });
+
+        sidebarOverlay.addEventListener('click', () => {
+          sidebar.classList.remove('open');
+          sidebarOverlay.classList.remove('active');
+        });
+      }
+    });
+  </script>
 </body>
 
 </html>
