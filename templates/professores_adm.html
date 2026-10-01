@@ -78,6 +78,107 @@
       padding: 40px 20px;
       text-align: center;
     }
+
+    .adm-acoes {
+      display: flex;
+      gap: 6px;
+    }
+
+    .adm-btn-adm {
+      border: 1px solid var(--border-color, #e5e7eb);
+      border-radius: 8px;
+      cursor: pointer;
+      font-family: inherit;
+      font-size: 12px;
+      font-weight: 600;
+      padding: 7px 12px;
+    }
+
+    .adm-btn-adm.salvar {
+      background: var(--primary-color, #b91c1c);
+      border-color: var(--primary-color, #b91c1c);
+      color: #fff;
+    }
+
+    .adm-btn-adm.excluir {
+      color: #991b1b;
+    }
+
+    .adm-btn-adm:disabled {
+      cursor: not-allowed;
+      opacity: 0.55;
+    }
+
+    /* Modal de edição */
+
+    .adm-modal {
+      align-items: center;
+      background: rgba(17, 24, 39, 0.45);
+      display: flex;
+      inset: 0;
+      justify-content: center;
+      padding: 20px;
+      position: fixed;
+      z-index: 50;
+    }
+
+    .adm-modal-caixa {
+      background: var(--card-bg, #fff);
+      border-radius: 14px;
+      max-width: 420px;
+      padding: 24px;
+      width: 100%;
+    }
+
+    .adm-modal-caixa h3 {
+      font-size: 17px;
+      font-weight: 700;
+    }
+
+    .adm-modal-subtitulo {
+      color: var(--text-secondary, #6b7280);
+      font-size: 12px;
+      margin-top: 6px;
+    }
+
+    .adm-form {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      margin-top: 18px;
+    }
+
+    .adm-form-campo {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .adm-form-campo label {
+      color: var(--text-secondary, #6b7280);
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .adm-form-campo input {
+      border: 1px solid var(--border-color, #e5e7eb);
+      border-radius: 8px;
+      font-family: inherit;
+      font-size: 13px;
+      padding: 9px 11px;
+    }
+
+    .adm-form-campo input:focus {
+      border-color: var(--primary-color, #b91c1c);
+      outline: none;
+    }
+
+    .adm-form-acoes {
+      display: flex;
+      gap: 8px;
+      justify-content: flex-end;
+      margin-top: 4px;
+    }
   </style>
 </head>
 
@@ -227,10 +328,17 @@
           </table>
         </div>
 
-        <div class="adm-empty" id="listaVazia">
+        <div class="adm-empty" id="listaVazia" style="display: none;">
           <img src="/assets/icons/user (3).png" alt="" width="40" height="40">
           <p>
             Nenhum professor encontrado.
+          </p>
+        </div>
+
+        <div class="adm-empty" id="listaErro" style="display: none;">
+          <img src="/assets/icons/warning.png" alt="" width="40" height="40">
+          <p id="listaErroTexto">
+            Não foi possível carregar os professores.
           </p>
         </div>
 
@@ -238,8 +346,52 @@
     </main>
   </div>
 
+  <!-- MODAL - EDITAR PROFESSOR -->
+  <div class="adm-modal" id="modalEditar" style="display: none;">
+
+    <div class="adm-modal-caixa">
+
+      <h3>Editar professor</h3>
+
+      <p class="adm-modal-subtitulo">
+        A senha não é alterada por aqui. O professor troca a própria senha na tela de configurações.
+      </p>
+
+      <form id="formProfessor" class="adm-form" novalidate>
+
+        <div class="adm-form-campo">
+          <label for="profNome">Nome completo</label>
+          <input type="text" id="profNome" name="nome" required>
+        </div>
+
+        <div class="adm-form-campo">
+          <label for="profEmail">E-mail institucional</label>
+          <input type="email" id="profEmail" name="email" required>
+        </div>
+
+        <div class="adm-form-acoes">
+          <button type="button" class="adm-btn-adm editar" id="btnCancelarProfessor">
+            Cancelar
+          </button>
+
+          <button type="submit" class="adm-btn-adm salvar" id="btnSalvarProfessor">
+            Salvar
+          </button>
+        </div>
+
+      </form>
+
+    </div>
+  </div>
+
   <!-- JAVASCRIPT -->
-  <script>
+  <script type="module">
+    import {
+      listarUsuarios,
+      atualizarUsuario,
+      excluirUsuario
+    } from '/js/api.js';
+
     // ======================================================
     // CARREGAR USUÁRIO LOGADO
     // ======================================================
@@ -321,12 +473,38 @@
       // ======================================================
       // LISTA DE PROFESSORES
       // ======================================================
+      // Os Professores vêm de GET /usuarios. A senha nunca
+      // chega ao frontend: a API a remove da resposta.
+
       const listaProfessores = document.getElementById('listaProfessores');
       const tabelaProfessores = document.getElementById('tabelaProfessores');
       const listaVazia = document.getElementById('listaVazia');
+      const listaErro = document.getElementById('listaErro');
 
-      function renderProfessores(professores) {
-        if (!professores || professores.length === 0) {
+      const modal = document.getElementById('modalEditar');
+      const formProfessor = document.getElementById('formProfessor');
+
+      let professores = [];
+      let professorEmEdicao = null;
+
+      /**
+       * Escapa o texto antes de colocá-lo no HTML, porque os
+       * dados vêm do banco e são montados com template string.
+       */
+      function escapar(texto) {
+        return String(texto ?? '')
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+          .replace(/"/g, '&quot;')
+          .replace(/'/g, '&#39;');
+      }
+
+      function renderProfessores(lista) {
+        professores = lista || [];
+        listaErro.style.display = 'none';
+
+        if (professores.length === 0) {
           listaProfessores.innerHTML = '';
           tabelaProfessores.style.display = 'none';
           listaVazia.style.display = 'flex';
@@ -338,14 +516,147 @@
 
         listaProfessores.innerHTML = professores.map((professor) => `
           <tr>
-            <td>${professor.nome || ''}</td>
-            <td>${professor.email || ''}</td>
-            <td>
-              <a href="/configuracoes_adm" class="adm-btn-recusar">Editar</a>
+            <td>${escapar(professor.nome)}</td>
+            <td>${escapar(professor.email)}</td>
+            <td class="adm-acoes">
+              <button class="adm-btn-adm editar" type="button" data-acao="editar" data-id="${professor.id}">
+                Editar
+              </button>
+
+              <button class="adm-btn-adm excluir" type="button" data-acao="excluir" data-id="${professor.id}">
+                Excluir
+              </button>
             </td>
           </tr>
         `).join('');
       }
+
+      async function carregarProfessores() {
+        try {
+          renderProfessores(await listarUsuarios());
+
+        } catch (erro) {
+          console.error('Erro ao carregar os professores:', erro);
+
+          listaProfessores.innerHTML = '';
+          tabelaProfessores.style.display = 'none';
+          listaVazia.style.display = 'none';
+          listaErro.style.display = 'flex';
+          document.getElementById('listaErroTexto').textContent =
+            erro.message || 'Não foi possível carregar os professores.';
+        }
+      }
+
+      // ======================================================
+      // MODAL DE EDIÇÃO
+      // ======================================================
+
+      function abrirModal(professor) {
+        professorEmEdicao = professor;
+
+        document.getElementById('profNome').value = professor.nome || '';
+        document.getElementById('profEmail').value = professor.email || '';
+
+        modal.style.display = 'flex';
+        document.getElementById('profNome').focus();
+      }
+
+      function fecharModal() {
+        professorEmEdicao = null;
+        formProfessor.reset();
+        modal.style.display = 'none';
+      }
+
+      document.getElementById('btnCancelarProfessor').addEventListener('click', fecharModal);
+
+      // Clicar fora da caixa fecha o modal.
+      modal.addEventListener('click', (evento) => {
+        if (evento.target === modal) {
+          fecharModal();
+        }
+      });
+
+      formProfessor.addEventListener('submit', async (evento) => {
+        evento.preventDefault();
+
+        if (!formProfessor.checkValidity()) {
+          formProfessor.reportValidity();
+          return;
+        }
+
+        if (!professorEmEdicao) {
+          return;
+        }
+
+        const btn = document.getElementById('btnSalvarProfessor');
+        btn.disabled = true;
+
+        try {
+          await atualizarUsuario(professorEmEdicao.id, {
+            nome: document.getElementById('profNome').value.trim(),
+            email: document.getElementById('profEmail').value.trim()
+          });
+
+          fecharModal();
+          await carregarProfessores();
+
+        } catch (erro) {
+          console.error('Erro ao salvar o professor:', erro);
+          window.alert(erro.message || 'Não foi possível salvar o professor.');
+
+        } finally {
+          btn.disabled = false;
+        }
+      });
+
+      // ======================================================
+      // EXCLUIR
+      // ======================================================
+
+      async function excluir(id, nome) {
+        const confirmar = window.confirm(
+          `Tem certeza que deseja excluir o professor "${nome}"?`
+        );
+
+        if (!confirmar) {
+          return;
+        }
+
+        try {
+          await excluirUsuario(id);
+          await carregarProfessores();
+
+        } catch (erro) {
+          console.error('Erro ao excluir o professor:', erro);
+
+          // A API recusa a exclusão quando o professor tem
+          // reservas aguardando. A mensagem chega preenchida.
+          window.alert(erro.message || 'Não foi possível excluir o professor.');
+        }
+      }
+
+      // Delegação de evento: as linhas são recriadas a cada busca.
+      listaProfessores.addEventListener('click', (evento) => {
+        const botao = evento.target.closest('[data-acao]');
+
+        if (!botao) {
+          return;
+        }
+
+        const id = Number(botao.dataset.id);
+        const professor = professores.find((item) => item.id === id);
+
+        if (!professor) {
+          return;
+        }
+
+        if (botao.dataset.acao === 'editar') {
+          abrirModal(professor);
+
+        } else if (botao.dataset.acao === 'excluir') {
+          excluir(id, professor.nome);
+        }
+      });
 
       // ======================================================
       // BUSCA
@@ -363,7 +674,7 @@
         });
       }
 
-      renderProfessores([]);
+      carregarProfessores();
     });
   </script>
 </body>

@@ -297,10 +297,32 @@
 
     document.addEventListener('DOMContentLoaded', () => {
 
-      // Confirma a reserva rascunhada no Passo 02
-      // e adiciona à lista definitiva de reservas
-      // com status "Aguardando".
-      ReservasApp.commitStagedReserva();
+      // Confirma a reserva rascunhada no Passo 02.
+      // A gravação acontece na API: a reserva entra no banco
+      // com o status "aguardando" e fica parada até o
+      // administrador aprovar. Quando a API recusa, a motivo
+      // volta em { erro } e a tela avisa em vez de fingir
+      // que deu certo.
+      ReservasApp.commitStagedReserva().then((resultado) => {
+
+        if (!resultado) {
+          return;
+        }
+
+        if (resultado.erro) {
+
+          window.alert(
+            'Não foi possível criar a reserva: ' + resultado.erro
+          );
+
+          // Volta para o passo anterior para o professor
+          // corrigir o que a API recusou.
+          window.location.href = '/passo2_reserva_prof';
+
+          return;
+        }
+
+      });
 
 
       // =====================================================

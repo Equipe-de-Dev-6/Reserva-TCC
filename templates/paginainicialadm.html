@@ -947,10 +947,18 @@
 
 
       // ======================================================
-      // INICIALIZA CALENDÁRIO
+      // INICIALIZA CALENDÁRIO E RESERVAS
       // ======================================================
 
-      renderCalendarioWidget();
+      // O administrador enxerga todas as reservas do campus,
+      // então a lista e os marcadores do calendário são
+      // desenhados só depois que a API responde.
+      ReservasApp.carregar().then(() => {
+
+        renderProximasReservas();
+        renderCalendarioWidget();
+
+      });
 
     });
 

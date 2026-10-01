@@ -1,4 +1,95 @@
-const API_URL = "http://127.0.0.1:8000";
+/**
+ * Endereço da API.
+ *
+ * A URL é relativa de propósito. Se fosse absoluta
+ * ("http://127.0.0.1:8000"), o navegador trataria a chamada como
+ * de outra origem ao abrir o site em "localhost" ou em outra
+ * porta, e o cookie de sessão não seria enviado: as rotas que
+ * exigem login responderiam 401 mesmo com o usuário logado.
+ * Usando o caminho, a chamada sempre sai para o mesmo servidor
+ * que entregou a página.
+ */
+const API_URL = "";
+
+/**
+ * Lê a mensagem de erro enviada pela API.
+ *
+ * A API responde com {"detail": "..."} nos erros do FastAPI.
+ * Quando a resposta não traz esse campo, devolve null para o
+ * chamador exibir uma mensagem genérica.
+ */
+async function lerErro(resposta) {
+
+    try {
+
+        const corpo = await resposta.json();
+
+        return corpo && corpo.detail ? corpo.detail : null;
+
+    } catch (e) {
+
+        return null;
+
+    }
+
+}
+
+/**
+ * Executa a requisição e devolve o json.
+ *
+ * Concentrar o tratamento de erro em um único lugar evita
+ * repetir o mesmo bloco em todas as funções do arquivo. A
+ * mensagem da API chega intacta em "erro.mensagem", para a
+ * tela poder mostrar o motivo real (sala indisponível,
+ * reserva duplicada, e-mail já cadastrado, e assim por diante).
+ */
+async function requisitar(caminho, opcoes = {}) {
+
+    const resposta = await fetch(`${API_URL}${caminho}`, {
+
+        method: opcoes.method || "GET",
+
+        headers: opcoes.corpo !== undefined
+            ? { "Content-Type": "application/json" }
+            : undefined,
+
+        // O cookie de sessão viaja junto nas chamadas de escrita,
+        // porque é ele que diz à API quem está logado.
+        credentials: "same-origin",
+
+        body: opcoes.corpo !== undefined
+            ? JSON.stringify(opcoes.corpo)
+            : undefined
+    });
+
+    if (resposta.status === 401) {
+
+        window.location.href = "/";
+
+        throw new Error("Sessão expirada");
+
+    }
+
+    if (!resposta.ok) {
+
+        throw new Error(
+            (await lerErro(resposta)) || "Não foi possível concluir a operação"
+        );
+
+    }
+
+    // O DELETE de salas e de usuários responde 200 com corpo,
+    // mas o cancelamento de reserva pode responder sem corpo.
+    if (resposta.status === 204) {
+
+        return null;
+
+    }
+
+    return await resposta.json();
+
+}
+
 
 // ============================================================
 // USUÁRIOS
@@ -6,37 +97,34 @@ const API_URL = "http://127.0.0.1:8000";
 
 async function listarUsuarios() {
 
-    const resposta = await fetch(`${API_URL}/usuarios`);
+    return await requisitar("/usuarios");
 
-    if (!resposta.ok) {
-        throw new Error("Erro ao buscar usuários");
-    }
-
-    return await resposta.json();
 }
-
-// ------------------------------------------------------------
-// CADASTRAR USUÁRIO
-// ------------------------------------------------------------
 
 async function cadastrarUsuario(dados) {
 
-    const resposta = await fetch(`${API_URL}/usuarios`, {
-
+    return await requisitar("/usuarios", {
         method: "POST",
-
-        headers: {
-            "Content-Type": "application/json"
-        },
-
-        body: JSON.stringify(dados)
+        corpo: dados
     });
 
-    if (!resposta.ok) {
-        throw new Error("Erro ao cadastrar usuário");
-    }
+}
 
-    return await resposta.json();
+async function atualizarUsuario(id, dados) {
+
+    return await requisitar(`/usuarios/${id}`, {
+        method: "PUT",
+        corpo: dados
+    });
+
+}
+
+async function excluirUsuario(id) {
+
+    return await requisitar(`/usuarios/${id}`, {
+        method: "DELETE"
+    });
+
 }
 
 // ============================================================
@@ -45,82 +133,118 @@ async function cadastrarUsuario(dados) {
 
 async function listarSalas() {
 
-    const resposta = await fetch(`${API_URL}/salas`);
+    return await requisitar("/salas");
 
-    if (!resposta.ok) {
-        throw new Error("Erro ao buscar salas");
-    }
-
-    return await resposta.json();
 }
 
 
 async function buscarSala(id) {
 
-    const resposta = await fetch(`${API_URL}/salas/${id}`);
+    return await requisitar(`/salas/${id}`);
 
-    if (!resposta.ok) {
-        throw new Error("Sala não encontrada");
-    }
+}
 
-    return await resposta.json();
+
+/**
+ * Lista todas as salas, incluindo as que não aparecem nas
+ * telas de reserva. É a rota usada pela tela de Gerenciar
+ * Salas do administrador.
+ */
+async function listarSalasAdmin() {
+
+    return await requisitar("/admin/salas");
+
 }
 
 
 async function cadastrarSala(dados) {
 
-    const resposta = await fetch(`${API_URL}/salas`, {
-
+    return await requisitar("/salas", {
         method: "POST",
-
-        headers: {
-            "Content-Type": "application/json"
-        },
-
-        body: JSON.stringify(dados)
+        corpo: dados
     });
 
-    if (!resposta.ok) {
-        throw new Error("Erro ao cadastrar sala");
-    }
-
-    return await resposta.json();
 }
 
 
 async function atualizarSala(id, dados) {
 
-    const resposta = await fetch(`${API_URL}/salas/${id}`, {
-
+    return await requisitar(`/salas/${id}`, {
         method: "PUT",
-
-        headers: {
-            "Content-Type": "application/json"
-        },
-
-        body: JSON.stringify(dados)
+        corpo: dados
     });
 
-    if (!resposta.ok) {
-        throw new Error("Erro ao atualizar sala");
-    }
-
-    return await resposta.json();
 }
 
 
 async function excluirSala(id) {
 
-    const resposta = await fetch(`${API_URL}/salas/${id}`, {
-
+    return await requisitar(`/salas/${id}`, {
         method: "DELETE"
     });
 
-    if (!resposta.ok) {
-        throw new Error("Erro ao excluir sala");
-    }
+}
 
-    return await resposta.json();
+
+// ============================================================
+// RESERVAS
+// ============================================================
+
+async function listarReservas(status) {
+
+    const caminho = status
+        ? `/reservas?status=${encodeURIComponent(status)}`
+        : "/reservas";
+
+    return await requisitar(caminho);
+
+}
+
+
+async function buscarReserva(id) {
+
+    return await requisitar(`/reservas/${id}`);
+
+}
+
+
+/**
+ * Envia o pedido de reserva. A reserva entra como
+ * "aguardando" e quem aprova é o administrador.
+ */
+async function criarReserva(dados) {
+
+    return await requisitar("/reservas", {
+        method: "POST",
+        corpo: dados
+    });
+
+}
+
+
+/**
+ * Aprova, nega ou cancela uma reserva. Só o administrador
+ * usa esta função.
+ */
+async function decidirReserva(id, status) {
+
+    return await requisitar(`/reservas/${id}/decisao`, {
+        method: "PATCH",
+        corpo: { status }
+    });
+
+}
+
+
+/**
+ * Cancela uma reserva que ainda não foi respondida.
+ */
+async function cancelarReserva(id) {
+
+    return await requisitar(`/reservas/${id}`, {
+        method: "DELETE"
+    });
+
 }
 
 
@@ -304,12 +428,21 @@ export {
 
     listarUsuarios,
     cadastrarUsuario,
+    atualizarUsuario,
+    excluirUsuario,
 
     listarSalas,
     buscarSala,
+    listarSalasAdmin,
     cadastrarSala,
     atualizarSala,
     excluirSala,
+
+    listarReservas,
+    buscarReserva,
+    criarReserva,
+    decidirReserva,
+    cancelarReserva,
 
     listarNotebooks,
     buscarNotebook,
