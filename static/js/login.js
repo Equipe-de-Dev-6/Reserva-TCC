@@ -1,4 +1,3 @@
-
 async function entrar(event) {
     event.preventDefault();
 
@@ -7,7 +6,6 @@ async function entrar(event) {
 
     try {
         const formData = new FormData();
-
         formData.append("email", email);
         formData.append("senha", senha);
 
@@ -18,13 +16,11 @@ async function entrar(event) {
 
         const dados = await resposta.json();
 
-        // Verifica se a API retornou algum erro
         if (!resposta.ok || dados.erro) {
             alert(dados.erro || "Erro ao fazer login.");
             return;
         }
 
-        // Redireciona conforme o tipo de usuário
         if (dados.cargo === "coordenador") {
             window.location.href = "/home_admin";
         } else if (dados.cargo === "prof") {
@@ -39,7 +35,6 @@ async function entrar(event) {
     }
 }
 
-// Conecta a função ao formulário
 document.addEventListener("DOMContentLoaded", function () {
     const formulario = document.querySelector("form");
 
