@@ -29,8 +29,6 @@ class Usuario(BaseModel):
             'cargo': self.cargo
         }
 
-    from pydantic import BaseModel
-
 
 # ============================================================
 # MODELO: SALA
@@ -47,16 +45,17 @@ class Sala(BaseModel):
     def fromJson(cls, json: dict):
         return cls(
             nome=json['nome'],
-            caracteristica=json['caracteristica']
-            disponibilidade=json['disponibilidade']
+            caracteristica=json['caracteristica'],
+            disponibilidade=json['disponibilidade'],
             historico=json['historico']
         )
 
     def toJson(self):
         return {
             'nome': self.nome,
-            'bloco': self.bloco,
-            'capacidade': self.capacidade
+            'caracteristica': self.caracteristica,
+            'disponibilidade': self.disponibilidade,
+            'historico': self.historico
         }
 
 
