@@ -3,7 +3,7 @@ const API_URL = "http://127.0.0.1:8000";
 // ============================================================
 // USUÁRIOS
 // ============================================================
-
+console.log("Iniciando Api...")
 async function listarUsuarios() {
 
     const resposta = await fetch(`${API_URL}/usuarios`);

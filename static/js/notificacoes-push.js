@@ -24,7 +24,7 @@
   /* ======================================================
      CONFIGURAÇÃO
      ====================================================== */
-
+  console.log("Iniciando notificações...")
   const CONFIG = {
 
     // Caminho do service worker (precisa estar na raiz)

@@ -1,5 +1,7 @@
 document.addEventListener('DOMContentLoaded', () => {
 
+  console.log("Iniciando Gerenciar Salas...")
+
   // ======================================================
   // DROPDOWN DO USUÁRIO
   // ======================================================

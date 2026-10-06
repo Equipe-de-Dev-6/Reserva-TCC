@@ -1,5 +1,7 @@
 import { cadastrarUsuario, listarUsuarios } from "./api.js";
 
+console.log("Iniciando Cadastros...")
+
 const formulario = document.querySelector("form");
 
 async function cadastrar(event) {

@@ -2,7 +2,7 @@
 
 import bcrypt
 
-
+print("Carregando módulo de criptografia...")
 # O bcrypt aceita no máximo 72 bytes por senha.
 _MAX_PASSWORD_BYTES = 72
 

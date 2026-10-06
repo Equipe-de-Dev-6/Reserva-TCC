@@ -5,7 +5,7 @@
    (ex.: public/sw.js  ->  https://seusite.com/sw.js).
    Se ficar dentro de /js, o escopo dele não cobre o site todo.
    ========================================================= */
-
+console.log("Iniciando SW...")
 self.addEventListener('install', () => {
   self.skipWaiting();
 });

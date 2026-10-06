@@ -10,7 +10,7 @@ from supabase import create_client
 # ============================================================
 
 load_dotenv()
-
+print("Carregando variáveis de ambiente...")
 SUPABASE_URL = os.getenv("SUPABASE_URL")
 SUPABASE_KEY = os.getenv("SUPABASE_KEY")
 

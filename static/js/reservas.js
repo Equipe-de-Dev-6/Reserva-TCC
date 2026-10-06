@@ -17,7 +17,7 @@ const ReservasApp = (() => {
   // =========================================================
   // CONFIGURAÇÕES E CHAVES DE ARMAZENAMENTO
   // =========================================================
-
+  console.log("Iniciando Reservas...")
   const STORAGE_KEY = 'senai_reservas_professor';
   const TEMP_KEY = 'senai_nova_reserva';
   const NOTIFICATIONS_KEY = 'senai_notificacoes_reservas';

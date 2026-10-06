@@ -16,6 +16,15 @@
   --yellow-text: #B45309;
 }
 
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Inter', sans-serif;
+}
+
+
 * {
   margin: 0;
   padding: 0;

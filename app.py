@@ -9,6 +9,8 @@ from criptografia import hash_password, verify_password
 from dotenv import load_dotenv
 import os
 
+
+print("Iniciando a API...")
 from db import supabase
 from model import (
     Usuario,

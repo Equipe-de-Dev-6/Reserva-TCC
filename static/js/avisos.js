@@ -22,6 +22,8 @@
 //
 // ==========================================================
 
+console.log("Iniciando Avisos...")
+
 const AvisosApp = (() => {
 
   const STORAGE_KEY = 'senai_avisos_professor';

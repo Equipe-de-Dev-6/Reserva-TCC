@@ -2,6 +2,8 @@
 async function entrar(event) {
     event.preventDefault();
 
+    console.log("Iniciando Login...")
+    
     const email = document.getElementById("email").value.trim();
     const senha = document.getElementById("senha").value;
 
