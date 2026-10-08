@@ -25,8 +25,12 @@
 
   <title>{% block titulo %}Acesso{% endblock %} - Gestão de salas e equipamentos</title>
 
-  {#- As telas de acesso não usam o menu, e por isso não precisam
-      nem da fonte Inter nem do flaticon.
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap"
+    rel="stylesheet">
+
+  {#- As telas de acesso não usam o menu, e por isso não precisam do
+      flaticon. A fonte Inter sim: é a mesma das telas com menu, e sem
+      ela o texto saía na Times New Roman.
 
       O que as quatro telas de acesso têm em comum — o cartão, o logo,
       o campo com ícone, o botão e o separador "ou" — está em

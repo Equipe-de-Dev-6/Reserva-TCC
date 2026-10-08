@@ -35,6 +35,7 @@
               <tr>
                 <th>Nome</th>
                 <th>E-mail</th>
+                <th>Função</th>
                 <th>Ações</th>
               </tr>
             </thead>
@@ -59,6 +60,64 @@
           </p>
         </div>
 
+        <!-- ======================================================
+             CAIXA DE EDIÇÃO
+
+             O script desta tela já falava com #modalEditar,
+             #formProfessor, #profNome, #profEmail,
+             #btnSalvarProfessor e #btnCancelarProfessor, e o CSS
+             das classes abaixo já existia em
+             static/css/admin-professores.css. O que nunca esteve
+             aqui era o HTML, e por isso o botão "Editar" das linhas
+             não tinha onde abrir.
+
+             As classes seguem as do formulário de sala, em
+             gerenciar_salas.html.
+             ====================================================== -->
+
+        <div class="adm-modal" id="modalEditar" style="display: none;">
+          <div class="adm-modal-caixa">
+
+            <h3>Editar professor</h3>
+
+            <p class="adm-modal-subtitulo">
+              O e-mail é o login da pessoa. Trocá-lo tira o acesso
+              com o endereço antigo.
+            </p>
+
+            <form id="formProfessor" class="adm-form">
+
+              <div class="adm-form-campo">
+                <label for="profNome">Nome</label>
+                <input type="text" id="profNome" name="nome" required
+                  autocomplete="off">
+              </div>
+
+              <div class="adm-form-campo">
+                <label for="profEmail">E-mail</label>
+                <input type="email" id="profEmail" name="email" required
+                  autocomplete="off">
+              </div>
+
+              <div class="adm-form-campo">
+                <label for="profCargo">Cargo</label>
+                <input type="text" id="profCargo" name="cargo" required
+                  autocomplete="off">
+              </div>
+
+              <div class="adm-form-acoes">
+                <button class="adm-btn-adm salvar" type="submit"
+                  id="btnSalvarProfessor">Salvar</button>
+
+                <button class="adm-btn-adm" type="button"
+                  id="btnCancelarProfessor">Cancelar</button>
+              </div>
+
+            </form>
+
+          </div>
+        </div>
+
       </section>
 {% endblock %}
 
@@ -70,45 +129,7 @@
       excluirUsuario
     } from '/js/api.js';
 
-    // ======================================================
-    // CARREGAR USUÁRIO LOGADO
-    // ======================================================
-    async function carregarUsuario() {
-      try {
-        const resposta = await fetch('/usuario_logado', {
-          method: 'GET',
-          credentials: 'same-origin'
-        });
-
-        if (resposta.status === 401) {
-          window.location.href = '/';
-          return;
-        }
-
-        if (!resposta.ok) {
-          throw new Error('Não foi possível carregar os dados do usuário.');
-        }
-
-        const usuario = await resposta.json();
-
-        const nomeUsuario = document.getElementById('nomeUsuario');
-        const nomePerfil = document.getElementById('nomePerfil');
-
-        if (nomeUsuario) {
-          nomeUsuario.textContent = usuario.nome || 'Usuário';
-        }
-
-        if (nomePerfil) {
-          nomePerfil.textContent = usuario.nome || 'Usuário';
-        }
-
-      } catch (erro) {
-        console.error('Erro ao carregar usuário:', erro);
-      }
-    }
-
     document.addEventListener('DOMContentLoaded', () => {
-      carregarUsuario();
 
       // ======================================================
       // DROPDOWN DO USUÁRIO
@@ -196,6 +217,7 @@
           <tr>
             <td>${escapar(professor.nome)}</td>
             <td>${escapar(professor.email)}</td>
+            <td>${escapar(professor.cargo)}</td>
             <td class="adm-acoes">
               <button class="adm-btn-adm editar" type="button" data-acao="editar" data-id="${professor.id}">
                 Editar
@@ -238,6 +260,7 @@
 
         document.getElementById('profNome').value = professor.nome || '';
         document.getElementById('profEmail').value = professor.email || '';
+        document.getElementById('profCargo').value = professor.cargo || '';
 
         modal.style.display = 'flex';
         document.getElementById('profNome').focus();
@@ -293,7 +316,8 @@
         try {
           await atualizarUsuario(professorEmEdicao.id, {
             nome: document.getElementById('profNome').value.trim(),
-            email: document.getElementById('profEmail').value.trim()
+            email: document.getElementById('profEmail').value.trim(),
+            cargo: document.getElementById('profCargo').value.trim()
           });
 
           fecharModal();

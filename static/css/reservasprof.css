@@ -5,10 +5,6 @@
  * base.css; aqui fica so o que e desta tela.
  * ============================================================ */
 
-  button {
-  font-family: 'Inter', sans-serif;
-  }
-
   .nav-item {
   transition: all 0.2s;
   }
@@ -275,120 +271,51 @@
   background-color: #CC0000;
   }
 
-@media (max-width: 1024px) {
-  .search-container {
-  width: 220px;
-  }
-
-  .user-info {
-  display: none;
-  }
-
-  .main-content {
-  padding: 0 20px 20px;
-  }
-}
-
-@media (max-width: 860px) {
-  body, html {
-  height: auto;
-  overflow: visible;
-  }
-
-  .app-container {
-  height: auto;
-  min-height: 100vh;
-  }
-
-  .main-content {
-  height: auto;
-  overflow: visible;
-  }
-
-  .sidebar {
-  position: fixed;
-  left: 0;
-  top: 0;
-  transform: translateX(-100%);
-  box-shadow: 4px 0 16px rgba(0, 0, 0, 0.1);
-  z-index: 300;
-  }
-
-  .sidebar.open {
-  transform: translateX(0);
-  }
-
-  .menu-toggle {
-  display: flex;
-  }
-
-  .search-container {
-  display: none;
-  }
-}
-
 @media (max-width: 600px) {
-  .main-content {
-  padding: 0 16px 16px;
-  }
 
-  .header {
-  flex-wrap: wrap;
-  }
-
-  .header-actions {
-  width: 100%;
-  justify-content: flex-end;
-  margin-top: 12px;
-  gap: 12px;
-  }
-
-  .greeting h1 {
+.greeting h1 {
   font-size: 20px;
   }
 
-  .greeting p {
+.greeting p {
   font-size: 12px;
   }
 
-  .avatar {
+.avatar {
   width: 40px;
   height: 40px;
   }
 
-  .reservas-header h2 {
+.reservas-header h2 {
   font-size: 14px;
   }
 
-  .filter-tabs {
+.filter-tabs {
   width: 100%;
   overflow-x: auto;
   }
 
-  .reserva-card {
+.reserva-card {
   flex-wrap: wrap;
   }
 
-  .reserva-right {
+.reserva-right {
   width: 100%;
   justify-content: space-between;
   }
 
-  .reserva-info h4, .reserva-info p {
+.reserva-info h4, .reserva-info p {
   white-space: normal;
   }
 }
 
 @media (max-width: 380px) {
-  .sidebar {
-  width: 220px;
-  }
 
-  .greeting h1 {
+.greeting h1 {
   font-size: 18px;
   }
 
-  .user-dropdown {
+.user-dropdown {
   width: 160px;
   }
 }

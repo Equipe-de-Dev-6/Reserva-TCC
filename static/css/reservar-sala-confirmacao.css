@@ -21,35 +21,6 @@
   --yellow-text: #B45309;
   }
 
-  * {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-  font-family: 'Inter', sans-serif;
-  }
-
-  html {
-  -webkit-text-size-adjust: 100%;
-  scrollbar-gutter: stable;
-  }
-
-  html, body {
-  height: 100vh;
-  width: 100vw;
-  overflow: hidden;
-  background-color: var(--bg-color);
-  color: var(--text-dark);
-  }
-
-  a {
-  text-decoration: none;
-  color: inherit;
-  }
-
-  img {
-  max-width: 100%;
-  }
-
   .sidebar {
   overflow-y: auto;
   }
@@ -271,82 +242,36 @@
   }
 
 @media (max-width: 1024px) {
-  .search-container {
-  width: 220px;
-  }
 
-  .user-info {
-  display: none;
-  }
-
-  .main-content {
-  padding: 0 20px 20px;
-  }
-
-  .booking-layout {
+.booking-layout {
   grid-template-columns: 240px 1fr 56px;
   gap: 16px;
   }
 
-  .category-icon {
+.category-icon {
   width: 130px;
   height: 150px;
   }
 
-  .category-icon img {
+.category-icon img {
   width: 70px;
   }
 
-  .success-card {
+.success-card {
   padding: 36px 28px;
   }
 }
 
 @media (max-width: 860px) {
-  body, html {
-  height: auto;
-  overflow: visible;
-  }
 
-  .app-container {
-  height: auto;
-  min-height: 100vh;
-  }
-
-  .main-content {
-  height: auto;
-  overflow: visible;
-  }
-
-  .sidebar {
-  position: fixed;
-  left: 0;
-  top: 0;
-  transform: translateX(-100%);
-  box-shadow: 4px 0 16px rgba(0,0,0,0.1);
-  z-index: 300;
-  }
-
-  .sidebar.open {
-  transform: translateX(0);
-  }
-
-  .menu-toggle {
-  display: flex;
-  }
-
-  .search-container {
-  display: none;
-  }
-
-  .booking-layout {
+.booking-layout {
   grid-template-columns: 1fr;
   grid-template-areas: "steps"
       "category"
       "success";
   }
 
-  .category-card {
+.category-card {
   grid-area: category;
   flex-direction: row;
   text-align: left;
@@ -354,28 +279,28 @@
   gap: 20px;
   }
 
-  .category-icon {
+.category-icon {
   width: 90px;
   height: 90px;
   flex-shrink: 0;
   }
 
-  .category-icon img {
+.category-icon img {
   width: 48px;
   }
 
-  .success-card {
+.success-card {
   grid-area: success;
   }
 
-  .step-indicator {
+.step-indicator {
   grid-area: steps;
   flex-direction: row;
   justify-content: center;
   gap: 0;
   }
 
-  .step-line {
+.step-line {
   width: auto;
   height: 2px;
   min-width: 32px;
@@ -384,82 +309,65 @@
 }
 
 @media (max-width: 600px) {
-  .main-content {
-  padding: 0 16px 16px;
-  }
 
-  .header {
-  flex-wrap: wrap;
-  }
-
-  .header-actions {
-  width: 100%;
-  justify-content: flex-end;
-  margin-top: 12px;
-  gap: 12px;
-  }
-
-  .greeting h1 {
+.greeting h1 {
   font-size: 20px;
   }
 
-  .greeting p {
+.greeting p {
   font-size: 12px;
   }
 
-  .avatar {
+.avatar {
   width: 40px;
   height: 40px;
   }
 
-  .category-card {
+.category-card {
   flex-direction: column;
   text-align: center;
   }
 
-  .category-icon {
+.category-icon {
   width: 130px;
   height: 130px;
   }
 
-  .category-icon img {
+.category-icon img {
   width: 64px;
   }
 
-  .success-card {
+.success-card {
   padding: 28px 20px;
   }
 
-  .success-icon {
+.success-icon {
   width: 96px;
   height: 96px;
   }
 
-  .success-actions {
+.success-actions {
   flex-direction: column;
   width: 100%;
   }
 
-  .btn-inicio, .btn-ver-reservas {
+.btn-inicio, .btn-ver-reservas {
   width: 100%;
   text-align: center;
   }
 }
 
 @media (max-width: 380px) {
-  .sidebar {
-  width: 220px;
-  }
 
-  .greeting h1 {
+.greeting h1 {
   font-size: 18px;
   }
 
-  .user-dropdown {
+.user-dropdown {
   width: 160px;
   }
 
-  .step {
+.step {
   width: 36px;
   height: 36px;
   font-size: 11px;

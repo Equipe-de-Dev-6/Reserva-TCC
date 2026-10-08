@@ -14,6 +14,24 @@
  * Seletor com texto diferente em cada tela entra aqui so com
  * as declaracoes iguais; o que sobra fica no CSS da tela.
  * ============================================================ */
+  /* A fonte de toda tela com menu. Antes nao havia nenhuma
+     declaracao de font-family no body em lugar nenhum do projeto: a
+     Inter estava so em "button" e em "*", em parte dos arquivos. O
+     menu lateral e o cabecalho saiam na Times New Roman, a fonte
+     padrao do navegador. */
+
+  body, html {
+  font-family: 'Inter', sans-serif;
+  }
+  /* Campo de formulario nao herda a fonte: o navegador da a ele a
+     propria, que no Chrome e Arial. Por isso isto esta aqui e nao
+     so no body. Antes eram seis copias de "button { font-family }",
+     uma por arquivo, e os input, select e textarea ficavam de
+     fora. */
+
+  button, input, select, textarea {
+  font-family: 'Inter', sans-serif;
+  }
 
   .app-container {
   display: flex;
@@ -269,3 +287,173 @@
   background-color: var(--border-color);
   margin: 6px 0;
   }
+
+  /* ============================================================
+   * ESQUELETO DEPOIS DA CONFIGURACOES
+   *
+   * Estes blocos vieram do configuracoes.css, que a tela de
+   * configuracoes do Coordenador usava. E o que ela tem de melhor:
+   * a casca de aplicativo — a barra lateral e o cabecalho ficam
+   * parados e so o conteudo rola — e o ponto de quebra em 1000px,
+   * em que o menu ja vira botao.
+   *
+   * Antes disso o mesmo esqueleto estava copiado em nove arquivos de
+   * tela, em seis versoes diferentes, e quatro deles ainda nao
+   * declaravam body, html: caiam no padrao do navegador e a pagina
+   * inteira rolava, levando a barra lateral junto.
+   * ============================================================ */
+
+:root {
+  --senai-red: #E30613;
+  --bg-color: #F4F5F7;
+  --white: #FFFFFF;
+  --text-dark: #1F2937;
+  --text-gray: #6B7280;
+  --border-color: #E5E7EB;
+  --green-bg: #D1FAE5;
+  --green-text: #059669;
+  --red-bg: #FEE2E2;
+  --red-text: #DC2626;
+  --yellow-bg: #FEF3C7;
+  --yellow-text: #B45309;
+  }
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  }
+
+html {
+  -webkit-text-size-adjust: 100%;
+  scrollbar-gutter: stable;
+  }
+
+body, html {
+  height: 100vh;
+  width: 100vw;
+  overflow: hidden;
+  background-color: var(--bg-color);
+  color: var(--text-dark);
+  }
+
+a {
+  text-decoration: none;
+  color: inherit;
+  }
+
+img {
+  max-width: 100%;
+  }
+
+.nav-item {
+  transition: all 0.2s;
+  }
+
+.btn-logout {
+  transition: 0.2s;
+  }
+
+.menu-toggle {
+  width: 42px;
+  height: 42px;
+  border: 1px solid #D1D5DB;
+  background: #ffffff;
+  border-radius: 6px;
+  }
+
+@media (max-width: 1000px) {
+
+  /* Daqui para baixo a tela estreita: a barra sai da tela e o
+     botao de menu aparece. */
+
+  .sidebar {
+  transform: translateX(-100%);
+  transition: 0.3s;
+  position: fixed;
+  left: 0;
+  top: 0;
+  }
+  .sidebar.open {
+  transform: translateX(0);
+  }
+  .main-content {
+  width: 100%;
+  margin-left: 0;
+  padding: 25px;
+  }
+
+  /* Estas tres nao estavam no de 860px dos arquivos de tela, e sem
+     elas a tela fica presa: o body continua com overflow hidden e o
+     .main-content com height 100vh - que sao dois rolagens, um
+     dentro do outro, e o rodape da tela de salas fica inalcancavel. */
+
+  body, html {
+  height: auto;
+  overflow: visible;
+  }
+
+  .app-container {
+  height: auto;
+  min-height: 100vh;
+  }
+
+  .main-content {
+  height: auto;
+  overflow: visible;
+  }
+  .menu-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  }
+  .header {
+  gap: 20px;
+  }
+  .greeting {
+  flex: 1;
+  }
+  .search-container {
+  width: 250px;
+  }
+  .sidebar-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.3);
+  z-index: 999;
+  }
+  .sidebar-overlay.active {
+  display: block;
+  }
+}
+
+@media (max-width: 700px) {
+
+  /* Tela bem estreita: o cabecalho quebra em duas linhas e o nome
+     do usuario sai. */
+
+  .header {
+  flex-wrap: wrap;
+  }
+  .header-actions {
+  width: 100%;
+  }
+  .search-container {
+  flex: 1;
+  width: auto;
+  }
+  .user-info {
+  display: none;
+  }
+}
+
+@media (max-width: 500px) {
+
+  /* Celular. */
+
+  .main-content {
+  padding: 20px;
+  }
+}
+

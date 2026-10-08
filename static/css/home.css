@@ -5,10 +5,6 @@
  * base.css; aqui fica so o que e desta tela.
  * ============================================================ */
 
-  button {
-  font-family: 'Inter', sans-serif;
-  }
-
   .nav-item {
   transition: all 0.2s;
   }
@@ -448,151 +444,85 @@
   }
 
 @media (max-width: 1024px) {
-  .dashboard-split {
+
+.dashboard-split {
   grid-template-columns: 1fr 280px;
   gap: 16px;
-  }
-
-  .search-container {
-  width: 220px;
-  }
-
-  .user-info {
-  display: none;
-  }
-
-  .main-content {
-  padding: 0 20px 20px;
   }
 }
 
 @media (max-width: 860px) {
-  body, html {
-  height: auto;
-  overflow: visible;
-  }
 
-  .app-container {
-  height: auto;
-  min-height: 100vh;
-  }
-
-  .main-content {
-  height: auto;
-  overflow: visible;
-  }
-
-  .sidebar {
-  position: fixed;
-  left: 0;
-  top: 0;
-  transform: translateX(-100%);
-  box-shadow: 4px 0 16px rgba(0, 0, 0, 0.1);
-  z-index: 300;
-  }
-
-  .sidebar.open {
-  transform: translateX(0);
-  }
-
-  .menu-toggle {
-  display: flex;
-  }
-
-  .dashboard-split {
+.dashboard-split {
   grid-template-columns: 1fr;
   }
 
-  .cards-grid {
+.cards-grid {
   grid-template-columns: repeat(2, 1fr);
-  }
-
-  .search-container {
-  display: none;
   }
 }
 
 @media (max-width: 600px) {
-  .main-content {
-  padding: 0 16px 16px;
-  }
 
-  .header {
-  flex-wrap: wrap;
-  }
-
-  .header-actions {
-  width: 100%;
-  justify-content: flex-end;
-  margin-top: 12px;
-  }
-
-  .greeting h1 {
+.greeting h1 {
   font-size: 20px;
   }
 
-  .greeting p {
+.greeting p {
   font-size: 12px;
   }
 
-  .header-actions {
-  gap: 12px;
-  }
-
-  .avatar {
+.avatar {
   width: 40px;
   height: 40px;
   }
 
-  .cards-grid {
+.cards-grid {
   grid-template-columns: 1fr;
   }
 
-  .quick-actions-section h2 {
+.quick-actions-section h2 {
   font-size: 14px;
   }
 
-  .res-card {
+.res-card {
   flex-wrap: wrap;
   }
 
-  .res-right {
+.res-right {
   width: 100%;
   justify-content: space-between;
   }
 
-  .res-info h4 {
+.res-info h4 {
   white-space: normal;
   }
 
-  .cal-grid {
+.cal-grid {
   row-gap: 6px;
   }
 
-  .day-num {
+.day-num {
   font-size: 11px;
   padding: 4px 0;
   }
 
-  .notice-card p {
+.notice-card p {
   font-size: 10px;
   }
 }
 
 @media (max-width: 380px) {
-  .sidebar {
-  width: 220px;
-  }
 
-  .greeting h1 {
+.greeting h1 {
   font-size: 18px;
   }
 
-  .user-dropdown {
+.user-dropdown {
   width: 160px;
   }
 
-  .icon-box {
+.icon-box {
   width: 34px;
   height: 34px;
   }
