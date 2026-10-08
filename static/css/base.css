@@ -373,35 +373,48 @@ img {
   position: fixed;
   left: 0;
   top: 0;
-
   }
   .sidebar.open {
   transform: translateX(0);
-
   }
   .main-content {
   width: 100%;
   margin-left: 0;
   padding: 25px;
+  }
 
+  /* Estas tres nao estavam no de 860px dos arquivos de tela, e sem
+     elas a tela fica presa: o body continua com overflow hidden e o
+     .main-content com height 100vh - que sao dois rolagens, um
+     dentro do outro, e o rodape da tela de salas fica inalcancavel. */
+
+  body, html {
+  height: auto;
+  overflow: visible;
+  }
+
+  .app-container {
+  height: auto;
+  min-height: 100vh;
+  }
+
+  .main-content {
+  height: auto;
+  overflow: visible;
   }
   .menu-toggle {
   display: flex;
   align-items: center;
   justify-content: center;
-
   }
   .header {
   gap: 20px;
-
   }
   .greeting {
   flex: 1;
-
   }
   .search-container {
   width: 250px;
-
   }
   .sidebar-overlay {
   display: none;
@@ -409,11 +422,9 @@ img {
   inset: 0;
   background: rgba(0, 0, 0, 0.3);
   z-index: 999;
-
   }
   .sidebar-overlay.active {
   display: block;
-
   }
 }
 
@@ -424,20 +435,16 @@ img {
 
   .header {
   flex-wrap: wrap;
-
   }
   .header-actions {
   width: 100%;
-
   }
   .search-container {
   flex: 1;
   width: auto;
-
   }
   .user-info {
   display: none;
-
   }
 }
 
@@ -447,7 +454,6 @@ img {
 
   .main-content {
   padding: 20px;
-
   }
 }
 
