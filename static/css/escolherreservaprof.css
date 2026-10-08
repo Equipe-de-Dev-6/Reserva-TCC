@@ -1,112 +1,28 @@
+/* ============================================================
+ * Estilo de escolherreservaprof.css.
+ * 
+ * O esqueleto comum a todas as telas com menu esta em
+ * base.css; aqui fica so o que e desta tela.
+ * ============================================================ */
+
 @import url('https://fonts.googleapis.com/css2?family=Manrope:wght@200..800&family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap');
 
-.app-container {
-  display: flex;
-  height: 100vh;
-  width: 100%;
-  position: relative;
-}
-
-.sidebar {
-  width: 250px;
-  height: 100vh;
-  background-color: var(--white);
-  border-right: 1px solid var(--border-color);
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  padding: 24px 16px;
-  flex-shrink: 0;
-  position: sticky;
-  top: 0;
-  z-index: 200;
-  transition: transform 0.3s ease;
-}
-
-.logo {
-  display: block;
-  margin-bottom: 24px;
-  text-align: center;
-}
-
-.logo img {
-  max-width: 150px;
-  width: 100%;
-  height: auto;
-  display: block;
-  margin: 0 auto;
-}
-
-.nav-menu {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-.nav-item {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 10px 16px;
-  font-size: 14px;
-  font-weight: 500;
-  color: var(--text-gray);
-  border-radius: 8px;
+  .nav-item {
   transition: all 0.2s;
-}
+  }
 
-.nav-item:hover {
-  background-color: #F9FAFB;
-  color: var(--text-dark);
-}
-
-.nav-item.active {
-  background-color: #FEE2E2;
-  color: var(--text-dark);
-  font-weight: 600;
-  border-left: 4px solid var(--senai-red);
-  border-top-left-radius: 4px;
-  border-bottom-left-radius: 4px;
-}
-
-.divider {
-  height: 1px;
-  background-color: var(--border-color);
-  margin: 12px 0;
-}
-
-.btn-logout {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  padding: 10px;
-  border: 1px solid var(--border-color);
-  border-radius: 8px;
-  font-size: 14px;
-  font-weight: 600;
-  color: var(--text-dark);
+  .btn-logout {
   transition: 0.2s;
-}
+  }
 
-.btn-logout:hover {
-  background-color: #F9FAFB;
-}
-
-.sidebar-overlay {
-  display: none;
+  .sidebar-overlay {
   position: fixed;
   inset: 0;
   background: rgba(17, 24, 39, 0.45);
   z-index: 150;
-}
+  }
 
-.sidebar-overlay.active {
-  display: block;
-}
-
-.menu-toggle {
-  display: none;
+  .menu-toggle {
   align-items: center;
   justify-content: center;
   width: 40px;
@@ -115,179 +31,27 @@
   background-color: var(--white);
   border-radius: 8px;
   color: var(--text-dark);
-  cursor: pointer;
   flex-shrink: 0;
-}
+  }
 
-.main-content {
-  flex: 1;
-  height: 100vh;
-  display: flex;
-  flex-direction: column;
-  padding: 0 32px 24px;
-  overflow-y: auto;
-  scrollbar-gutter: stable;
-  min-width: 0;
-}
-
-.header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 16px;
+  .quick-actions-section {
   margin-bottom: 24px;
-  position: sticky;
-  top: 0;
-  z-index: 100;
-  background-color: var(--bg-color);
-  padding: 12px 0;
-  flex-shrink: 0;
-}
+  }
 
-.greeting {
-  min-width: 0;
-}
-
-.greeting h1 {
-  font-size: 26px;
-  font-weight: 700;
-}
-
-.greeting p {
-  font-size: 14px;
-  color: var(--text-gray);
-  margin-top: 4px;
-}
-
-.header-actions {
-  display: flex;
-  align-items: center;
-  gap: 20px;
-}
-
-.search-container {
-  position: relative;
-  width: 320px;
-}
-
-.search-container input {
-  width: 100%;
-  padding: 10px 16px 10px 40px;
-  border: 1px solid var(--senai-red);
-  border-radius: 24px;
-  font-size: 13px;
-  outline: none;
-}
-
-.search-container svg {
-  position: absolute;
-  left: 14px;
-  top: 50%;
-  transform: translateY(-50%);
-}
-
-.icon-btn {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-}
-
-.user-profile {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  position: relative;
-  cursor: pointer;
-  user-select: none;
-  flex-shrink: 0;
-}
-
-.avatar {
-  width: 60px;
-  height: 60px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.user-info {
-  display: flex;
-  flex-direction: column;
-}
-
-.user-info .name {
-  font-size: 14px;
-  font-weight: 700;
-  line-height: 1.2;
-}
-
-.user-info .role {
-  font-size: 12px;
-  color: var(--text-gray);
-}
-
-.user-dropdown {
-  display: none;
-  position: absolute;
-  top: calc(100% + 8px);
-  right: 0;
-  background-color: var(--white);
-  border: 1px solid var(--border-color);
-  border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-  width: 180px;
-  padding: 6px 0;
-  z-index: 1000;
-}
-
-.user-dropdown.active {
-  display: block;
-}
-
-.dropdown-item {
-  display: block;
-  padding: 8px 16px;
-  font-size: 13px;
-  font-weight: 500;
-  color: var(--text-dark);
-  transition: background-color 0.2s;
-}
-
-.dropdown-item:hover {
-  background-color: var(--bg-color);
-}
-
-.dropdown-item.logout {
-  color: var(--senai-red);
-  font-weight: 600;
-}
-
-.dropdown-divider {
-  height: 1px;
-  background-color: var(--border-color);
-  margin: 6px 0;
-}
-
-.quick-actions-section {
-  margin-bottom: 24px;
-}
-
-.quick-actions-section h2 {
+  .quick-actions-section h2 {
   font-size: 16px;
   font-weight: 700;
   margin-bottom: 16px;
-}
+  }
 
-.booking-layout {
+  .booking-layout {
   display: grid;
   grid-template-columns: 300px 1fr 80px;
   gap: 24px;
   align-items: start;
-}
+  }
 
-.category-card {
+  .category-card {
   background-color: var(--white);
   border: 1px solid var(--border-color);
   border-radius: 12px;
@@ -297,9 +61,9 @@
   align-items: center;
   text-align: center;
   gap: 16px;
-}
+  }
 
-.category-icon {
+  .category-icon {
   width: 170px;
   height: 190px;
   background-color: var(--senai-red);
@@ -308,30 +72,30 @@
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-}
+  }
 
-.category-icon img {
+  .category-icon img {
   width: 90px;
   height: auto;
   object-fit: contain;
   filter: brightness(0) invert(1);
-}
+  }
 
-.category-card h3 {
+  .category-card h3 {
   font-size: 16px;
   font-weight: 700;
   color: var(--text-dark);
   line-height: 1.35;
-}
+  }
 
-.rooms-list {
+  .rooms-list {
   display: flex;
   flex-direction: column;
   gap: 12px;
   min-width: 0;
-}
+  }
 
-.room-card {
+  .room-card {
   background-color: var(--white);
   border: 2px solid transparent;
   border-radius: 12px;
@@ -342,24 +106,24 @@
   gap: 12px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
   transition: transform 0.15s, border-color 0.15s;
-}
+  }
 
-.room-card:hover {
+  .room-card:hover {
   transform: translateY(-2px);
-}
+  }
 
-.room-card.selected {
+  .room-card.selected {
   border-color: var(--senai-blue);
-}
+  }
 
-.room-left {
+  .room-left {
   display: flex;
   align-items: center;
   gap: 14px;
   min-width: 0;
-}
+  }
 
-.room-thumb {
+  .room-thumb {
   width: 44px;
   height: 40px;
   background-color: var(--bg-color);
@@ -369,55 +133,51 @@
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-}
+  }
 
-.room-info {
+  .room-info {
   min-width: 0;
-}
+  }
 
-.room-info h4 {
+  .room-info h4 {
   font-size: 14px;
   font-weight: 700;
   margin-bottom: 2px;
-
-  /* O título segue o padrão "nome - descrição" e pode ficar
-     longo. Quebrar em duas linhas mantém o texto legível, enquanto
-     o reticências esconderia a descrição. */
   line-height: 1.3;
   white-space: normal;
   overflow-wrap: break-word;
-}
+  }
 
-.room-info p {
+  .room-info p {
   font-size: 12px;
   color: var(--text-gray);
-}
+  }
 
-.status-badge {
+  .status-badge {
   padding: 4px 12px;
   border-radius: 12px;
   font-size: 11px;
   font-weight: 600;
   flex-shrink: 0;
   white-space: nowrap;
-}
+  }
 
-.status-available {
+  .status-available {
   background-color: var(--green-bg);
   color: var(--green-text);
-}
+  }
 
-.status-denied {
+  .status-denied {
   background-color: var(--red-bg);
   color: var(--red-text);
-}
+  }
 
-.status-waiting {
+  .status-waiting {
   background-color: var(--yellow-bg);
   color: var(--yellow-text);
-}
+  }
 
-.step-indicator {
+  .step-indicator {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -427,9 +187,9 @@
   height: fit-content;
   position: sticky;
   top: 12px;
-}
+  }
 
-.step {
+  .step {
   width: 44px;
   height: 44px;
   border-radius: 50%;
@@ -441,19 +201,26 @@
   background-color: #E5E7EB;
   color: #9CA3AF;
   flex-shrink: 0;
-}
+  }
 
-.step.active {
+  .step.active {
   background-color: var(--senai-red);
   color: var(--white);
-}
+  }
 
-.step-line {
+  .step-line {
   width: 2px;
   flex: 1;
   min-height: 32px;
   background-color: var(--border-color);
-}
+  }
+
+  .rooms-empty {
+  color: #6b7280;
+  font-size: 14px;
+  padding: 16px;
+  text-align: center;
+  }
 
 @media (max-width: 1024px) {
   .search-container {
@@ -641,12 +408,4 @@
     height: 36px;
     font-size: 11px;
   }
-}
-
-/* Mensagem exibida quando a API não devolve salas para a categoria. */
-.rooms-empty {
-  color: #6b7280;
-  font-size: 14px;
-  padding: 16px;
-  text-align: center;
 }
