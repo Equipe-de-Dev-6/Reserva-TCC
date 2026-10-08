@@ -111,7 +111,7 @@ document.addEventListener('DOMContentLoaded', () => {
           setTimeout(() => {
 
             window.location.href =
-              '/passo02_reserva_prof';
+              '/passo2_reserva_prof';
 
           }, 300);
 

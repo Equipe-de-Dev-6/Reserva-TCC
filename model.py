@@ -136,19 +136,65 @@ class Sala(BaseModel):
 
 
 class SalaEdicao(BaseModel):
-    """Cadastro e edição de sala, pela tela de gerenciamento."""
+    """Cadastro e edição de sala, pela tela de gerenciamento.
+
+    A tela envia os campos separados (setor, capacidade, equipamentos,
+    descrição), porque é assim que o formulário é preenchido. O banco,
+    por outro lado, guarda tudo em uma única coluna de texto
+    "caracteristica". Montar o texto aqui evita que a API receba campos
+    que não conhece e devolva uma sala sem característica.
+    """
 
     model_config = ConfigDict(str_strip_whitespace=True)
 
     nome: str = Field(min_length=1, max_length=60)
-    caracteristica: str = Field(default='', max_length=1000)
+    setor: str = Field(default='', max_length=100)
+    quantidade_alunos: int | None = Field(default=None, ge=0, le=999)
+    equipamentos: list[str] = Field(default_factory=list, max_length=50)
+    descricao: str = Field(default='', max_length=500)
     disponibilidade: bool = True
+
+    # Define se a sala aparece nas telas de reserva. O padrão é False
+    # para que uma sala nova só entre na oferta depois de alguém
+    # marcar a caixa de propósito.
+    reservavel: bool = False
+
+    def caracteristica(self) -> str:
+        """Monta o texto da coluna "caracteristica".
+
+        O formato é o mesmo que o cadastro do campus produziu, e é o
+        que a leitura (ler_contexto) sabe desmontar:
+        "Quantidade de alunos: 32; Setor: TSI; Equipamentos: Projetor;
+        Descrição: Sala de aula".
+        """
+        partes = []
+
+        if self.quantidade_alunos is not None:
+            partes.append(f"Quantidade de alunos: {self.quantidade_alunos}")
+
+        if self.setor:
+            partes.append(f"Setor: {self.setor}")
+
+        equipamentos = [
+            item.strip()
+            for item in self.equipamentos
+            if item and item.strip()
+        ]
+
+        if equipamentos:
+            partes.append(f"Equipamentos: {', '.join(equipamentos)}")
+
+        if self.descricao:
+            partes.append(f"Descrição: {self.descricao}")
+
+        return '; '.join(partes)
 
     def toJson(self):
         return {
             'nome': self.nome,
-            'caracteristica': self.caracteristica,
-            'disponibilidade': self.disponibilidade
+            'caracteristica': self.caracteristica(),
+            'disponibilidade': self.disponibilidade,
+            'reservavel': self.reservavel
         }
 
 
@@ -234,3 +280,46 @@ CHAVE_DESCRICAO = 'descricao'
 
 # Quantos alunos a sala comporta, lido de "Quantidade de alunos: 32".
 RE_QUANTIDADE = re.compile(r'^\d+$')
+
+
+# ============================================================
+# CATEGORIA DA SALA
+# ============================================================
+
+# Onde uma sala aparece nas telas de reserva. A classificação sai da
+# própria descrição cadastrada ("Laboratório de informática",
+# "Gabinete de notebooks", "Sala de aula"), e é feita aqui para que o
+# navegador, o calendário e a reserva leiam o mesmo valor.
+#
+# A chave de busca é o começo da palavra, "laborat", e não o nome
+# inteiro: a descrição vem com acento ("Laboratório") e o texto é lido em
+# caixa baixa, então "laboratorio" nunca casaria. O valor de cada item é
+# (identificador usado na filtragem, rótulo exibido).
+#
+# A ordem importa: "laborat" é testado antes de "sala" para que uma
+# descrição como "sala de laboratórios" caia na tela de laboratórios.
+CATEGORIAS = {
+    'laborat': ('laboratorio', 'Laboratório'),
+    'gabinete': ('gabinete', 'Gabinete'),
+    'sala': ('sala', 'Sala'),
+}
+
+CATEGORIA_PADRAO = 'sala'
+
+
+def categoria_da_sala(caracteristica: str) -> tuple[str, str]:
+    """Classifica a sala e devolve (identificador, rótulo).
+
+    O identificador ("laboratorio") é o que a tela usa para filtrar a
+    lista; o rótulo ("Laboratório") é o que aparece no cartão e na
+    reserva. Uma sala sem nenhuma palavra conhecida cai em "sala".
+    """
+    texto = str(caracteristica or '').lower()
+
+    for trecho, (chave, rotulo) in CATEGORIAS.items():
+
+        if trecho in texto:
+
+            return chave, rotulo
+
+    return CATEGORIA_PADRAO, CATEGORIAS[CATEGORIA_PADRAO][1]

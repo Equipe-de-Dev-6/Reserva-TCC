@@ -382,6 +382,14 @@
                 <option value="false">Indisponível</option>
               </select>
             </div>
+
+            <div class="adm-form-campo">
+              <label for="salaReservavel">Aparece na reserva</label>
+              <select id="salaReservavel" name="reservavel">
+                <option value="false">Não aparece</option>
+                <option value="true">Aparece</option>
+              </select>
+            </div>
           </div>
 
           <div class="adm-form-campo">
@@ -598,6 +606,8 @@
       document.getElementById('salaDescricao').value = sala?.contexto?.descricao || '';
       document.getElementById('salaDisponibilidade').value =
         sala?.disponibilidade ? 'true' : 'false';
+      document.getElementById('salaReservavel').value =
+        sala?.reservavel ? 'true' : 'false';
 
       formCard.style.display = 'block';
       document.getElementById('salaNome').focus();
@@ -628,7 +638,8 @@
           .map((item) => item.trim())
           .filter(Boolean),
         descricao: document.getElementById('salaDescricao').value.trim(),
-        disponibilidade: document.getElementById('salaDisponibilidade').value === 'true'
+        disponibilidade: document.getElementById('salaDisponibilidade').value === 'true',
+        reservavel: document.getElementById('salaReservavel').value === 'true'
       };
     }
 

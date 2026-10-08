@@ -72,12 +72,13 @@ const ReservasApp = (() => {
 
   // Categorias reconhecidas na tela de reservas.
   //
-  // A comparação usa o começo da palavra ("laborat") em vez do nome
-  // inteiro, porque o nome da sala vem com acento ("Laboratório") e
-  // a busca é feita no texto em caixa baixa. É a mesma conta que as
-  // telas fazem para escolher o ícone.
+  // A classificação é feita pelo servidor (app.py decide a partir da
+  // descrição da sala) e chega aqui pronta, no campo "categoria" do
+  // recurso escolhido. Estas constantes servem só como lista de
+  // fallback para quando a tela de escolha gravou o nome sem
+  // categoria.
   const CATEGORIAS = [
-    { chave: 'laborat', rotulo: 'Laboratório' },
+    { chave: 'laboratorio', rotulo: 'Laboratório' },
     { chave: 'gabinete', rotulo: 'Gabinete' },
     { chave: 'sala', rotulo: 'Sala' }
   ];
@@ -199,7 +200,7 @@ const ReservasApp = (() => {
 
       if (!bruto) {
 
-        return { nome: '', id: null, descricao: '' };
+        return { nome: '', id: null, categoria: '' };
 
       }
 
@@ -210,16 +211,16 @@ const ReservasApp = (() => {
         return {
           nome: sala.nome || '',
           id: sala.id === undefined ? null : sala.id,
-          descricao: (sala.contexto || {}).descricao || ''
+          categoria: sala.categoria || ''
         };
 
       }
 
-      return { nome: bruto, id: null, descricao: '' };
+      return { nome: bruto, id: null, categoria: '' };
 
     } catch (e) {
 
-      return { nome: '', id: null, descricao: '' };
+      return { nome: '', id: null, categoria: '' };
 
     }
 
@@ -508,18 +509,16 @@ const ReservasApp = (() => {
 
   function _categoriaDoRecurso(recurso) {
 
-    // O nome cadastrado no banco é curto ("C16", "C20"), e é na
-    // descrição que aparece a palavra que diz o que a sala é
-    // ("Laboratório de informática"). Por isso os dois textos são
-    // procurados.
-    const texto = [recurso.nome, recurso.descricao]
-      .filter(Boolean)
-      .join(' ')
-      .toLowerCase();
+    // A tela de escolha ja gravou a categoria, classificada pelo
+    // servidor. Nao ha mais conta a fazer a partir do texto da sala:
+    // quando o recurso vem sem categoria, o padrao e Sala.
+    if (recurso.categoria) {
 
-    const achada = CATEGORIAS.find((c) => texto.includes(c.chave));
+      return recurso.categoria;
 
-    return achada ? achada.rotulo : 'Sala';
+    }
+
+    return CATEGORIAS.find((c) => c.chave === 'sala').rotulo;
 
   }
 
@@ -1011,3 +1010,16 @@ const ReservasApp = (() => {
 // A promessa fica guardada em "ReservasApp.sincronizacao" para que
 // um teste ou uma tela possa esperar o resultado.
 ReservasApp.sincronizacao = ReservasApp.sincronizar().catch(() => false);
+
+
+// ============================================================
+// GLOBAL
+// ============================================================
+//
+// O "const" do topo de um script cria um binding no escopo léxico
+// global, e não uma propriedade de "window". Quem chama por
+// "window.ReservasApp" — como o "notificacoes-push.js" faz para
+// conferir se o módulo está carregado — receberia "undefined" e
+// desligaria a notificação silenciosamente. Por isso o global é
+// publicado explicitamente aqui, e não fica só no const.
+window.ReservasApp = ReservasApp;

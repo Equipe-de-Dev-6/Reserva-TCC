@@ -21,32 +21,19 @@ import { listarSalas, buscarSala } from '/js/api.js';
 // ============================================================
 
 /**
- * Uma sala é laboratório quando a própria descrição diz
- * "Laboratório". Salas de prática sem essa palavra no texto
- * (Sala de TI, Metrologia, salas de eletrônica) continuam
- * sendo tratadas como salas.
- */
-const PALAVRA_LABORATORIO = 'laborat';
-
-
-/**
- * Descobre em qual das telas a sala deve aparecer.
+ * Em qual tela a sala aparece.
  *
- * A API já entrega somente as salas reserváveis, então aqui
- * basta decidir entre a tela de Salas e a de Laboratórios.
+ * A classificação é feita no servidor: o campo "categoria" de
+ * GET /salas já vem decidido pelo app.py, a partir da descrição
+ * cadastrada ("Laboratório de informática" vai para a tela de
+ * laboratórios, "Gabinete..." para a de gabinetes).
+ *
+ * Antes cada tela repetia essa conta por conta própria, e uma sala que
+ * mudasse de categoria Depending umas telas e outras não.
  */
 function categorizar(sala) {
 
-  const contexto = sala.contexto || {};
-
-  const descricao = String(contexto.descricao || '')
-    .toLowerCase()
-    .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '');
-
-  return descricao.includes(PALAVRA_LABORATORIO)
-    ? 'laboratorios'
-    : 'salas';
+  return sala.categoria || 'sala';
 }
 
 
@@ -201,12 +188,16 @@ async function selecionarSala(salaId, proximoPasso) {
 
     const sala = await buscarSala(salaId);
 
+    // A categoria vem pronta do servidor. O "reservas.js" usa esse
+    // rótulo para classificar a reserva, sem precisar repetir a conta
+    // a partir do texto da sala.
     sessionStorage.setItem(
       'salaSelecionada',
       JSON.stringify({
         id: sala.id,
         nome: sala.nome,
-        contexto: sala.contexto
+        contexto: sala.contexto,
+        categoria: sala.categoriaRotulo || 'Sala'
       })
     );
 

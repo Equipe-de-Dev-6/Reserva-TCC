@@ -300,6 +300,65 @@ ALTER TABLE public.usuarios
 
 
 -- ===========================================================================
+-- 9. Quais salas podem ser reservadas vira dado do banco
+-- ===========================================================================
+--
+-- A lista de salas reserváveis vivia escrita em Python (a constante
+-- SALAS_RESERVAVEIS), e mudar a oferta de salas da escola exigia
+-- alterar e republicar o código. Com a coluna, quem muda é o
+-- Coordenador, na tela de gerenciamento de salas.
+--
+-- A coluna nasce marcada com os mesmos ids que a lista antiga aceitava,
+-- para que a migração não mude o comportamento de quem já usa.
+--
+ALTER TABLE public.salas
+    ADD COLUMN IF NOT EXISTS reservavel BOOLEAN;
+
+UPDATE public.salas
+    SET reservavel = TRUE
+    WHERE id IN (1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16,
+                 17, 18, 19, 24, 25, 55, 56, 57, 89, 90, 91);
+
+-- Sala nova não entra na oferta sozinha: alguém marca a caixa de
+-- propósito na tela de gerenciamento.
+ALTER TABLE public.salas
+    ALTER COLUMN reservavel SET DEFAULT FALSE;
+
+UPDATE public.salas
+    SET reservavel = FALSE
+    WHERE reservavel IS NULL;
+
+ALTER TABLE public.salas
+    ALTER COLUMN reservavel SET NOT NULL;
+
+CREATE INDEX IF NOT EXISTS idx_salas_reservavel
+    ON public.salas (reservavel);
+
+
+-- ===========================================================================
+-- 10. Tentativas de login
+-- ===========================================================================
+--
+-- O limite de tentativas ficava na memória do processo. Com mais de uma
+-- instância da aplicação (uvicorn --workers), cada uma contaria por conta
+-- própria e o limite valeria só para quem caísse nela. Guardando no banco,
+-- a contagem é a mesma para todo mundo.
+--
+-- Só entram as tentativas que falharam: uma entrada correta não gasta cota.
+--
+CREATE TABLE IF NOT EXISTS public.login_tentativas (
+    id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    endereco TEXT NOT NULL,
+    tentativa TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+-- A consulta do login filtra por endereço e conta o que está na janela de
+-- cinco minutos; este índice é o que faz essa contagem sair barato.
+CREATE INDEX IF NOT EXISTS idx_login_tentativas_endereco
+    ON public.login_tentativas (endereco, tentativa DESC);
+
+
+-- ===========================================================================
 -- 8. Excluir uma sala não pode deixar reserva órfã
 -- ===========================================================================
 --

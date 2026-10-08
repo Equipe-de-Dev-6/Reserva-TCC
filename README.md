@@ -225,7 +225,7 @@ Rode, no SQL Editor do Supabase, os arquivos abaixo **nesta ordem**:
 |---|---|
 | `reserva-Tcc.sql` | Esquema de referência. O próprio arquivo avisa que não deve ser executado; ele documenta as tabelas como estão. |
 | `migracao_reservas.sql` | Acrescenta as colunas que o formulário de reserva preenche. |
-| `migracao_schema.sql` | Ajustes que o código exige: status controlado, índices, `sala_id` opcional, trava de horário sobreposto, entre outros. |
+| `migracao_schema.sql` | Ajustes que o código exige: status controlado, índices, `sala_id` opcional, trava de horário sobreposto, coluna `reservavel` e tabela de tentativas de login. |
 | `migracao_rls.sql` | Liga a Row Level Security, que fecha o acesso anônimo direto ao banco. |
 
 Todos os arquivos podem ser rodados mais de uma vez.
@@ -271,11 +271,16 @@ http://127.0.0.1:8000
   com `hash_password()` e o banco recebe somente o hash bcrypt.
 - O login chama `verify_password()`, que compara a senha com o hash.
 - Nem a senha nem o hash aparecem em nenhuma resposta da API.
-- O cookie de sessão é assinado com `SECRET_KEY`, uma chave separada da
-  chave do banco, e é renovado a cada login.
+- O cookie de sessão é **criptografado** com `SECRET_KEY` (Fernet), uma chave
+  separada da chave do banco: quem abrir o DevTools não lê o e-mail, o nome e
+  o cargo de quem está logado, e não consegue forjar um cookie sem a chave.
+- A sessão é renovada a cada login e expira em 8 horas.
 - E-mail inexistente e senha errada recebem a mesma resposta, para não
   revelar quem tem conta no sistema.
-- O login aceita 8 tentativas por endereço a cada 5 minutos.
+- O login aceita 8 tentativas **por endereço** a cada 5 minutos. A contagem
+  fica no banco (`login_tentativas`), e não na memória do processo, para
+  valer igual em todas as instâncias; só tentativas que falham entram na
+  conta, e um login certo zera a contagem.
 - Quem é administrador sai do `cargo` gravado no banco (`Coordenador`),
   e não de um e-mail escrito no código.
 - As rotas de dados exigem sessão; as de administração exigem o cargo de
@@ -295,7 +300,7 @@ http://127.0.0.1:8000
 | `POST` | `/usuarios` | coordenador | Cadastro de usuário |
 | `PUT` | `/usuarios/{id}` | coordenador | Edita usuário |
 | `DELETE` | `/usuarios/{id}` | coordenador | Exclui usuário |
-| `GET` | `/salas` | sessão | Salas reserváveis, com `contexto` |
+| `GET` | `/salas` | sessão | Salas reserváveis, com `contexto` e `categoria` |
 | `GET` | `/salas/{id}` | sessão | Uma sala |
 | `GET` | `/admin/salas` | coordenador | Todas as salas |
 | `POST` | `/salas` | coordenador | Cadastra sala |
@@ -315,6 +320,25 @@ http://127.0.0.1:8000
 Os status de uma reserva são `aguardando`, `aprovada`, `negada` e
 `cancelada`. Uma reserva que colide com outra da mesma sala no mesmo
 horário é recusada com `409`.
+
+## 🧪 Testes
+
+```bash
+python tests/run.py
+```
+
+Ou um por vez:
+
+```bash
+python tests/test_api.py      # rotas, sessão, autorização, reservas
+node tests/test_reservas.js   # módulo de reservas no navegador
+node tests/test_avisos.js     # módulo de avisos no navegador
+node tests/check_wiring.js    # rotas chamadas pelas telas que existem
+```
+
+Nenhum teste toca o banco de verdade: o cliente do Supabase é trocado por
+um dublê que registra as consultas, e o do navegador por equivalentes em
+JavaScript. Não é preciso instalar `pytest`.
 
 ## 🧩 Arquitetura JavaScript
 
@@ -349,7 +373,8 @@ static/js/
 
 ```text
 .
-├── app.py                 # FastAPI: sessão, autorização, páginas e rotas
+├── app.py                 # FastAPI: autorização, páginas e rotas
+├── sessao.py              # Cookie de sessão criptografado (Fernet)
 ├── criptografia.py        # Hash e verificação de senhas com bcrypt
 ├── model.py               # Modelos e validações da aplicação
 ├── db.py                  # Conexão com o Supabase
@@ -364,6 +389,7 @@ static/js/
 │   ├── js/                # Interações do frontend
 │   └── assets/            # Imagens e ícones
 ├── templates/             # Templates HTML
+├── tests/                 # Testes (ver abaixo)
 ├── .env.example           # Modelo das variáveis de ambiente
 ├── .env                   # Variáveis de ambiente (não versionado)
 └── requirements.txt       # Dependências do projeto

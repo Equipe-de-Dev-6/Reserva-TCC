@@ -14,13 +14,15 @@ from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
-from starlette.middleware.sessions import SessionMiddleware
+from starlette.requests import Request
 from starlette.responses import JSONResponse
 import os
+import random
 
 from criptografia import hash_password, verify_password
 from consulta_salas import salas_para_tela
 from db import supabase
+from sessao import SessaoMiddleware
 from model import (
     CHAVE_DESCRICAO,
     CHAVE_EQUIPAMENTOS,
@@ -33,7 +35,8 @@ from model import (
     Sala,
     SalaEdicao,
     Usuario,
-    UsuarioAtualizacao
+    UsuarioAtualizacao,
+    categoria_da_sala
 )
 
 
@@ -111,10 +114,14 @@ if ORIGENS:
 # SESSÃO
 # ============================================================
 #
-# A assinatura do cookie de sessão usa uma chave própria (SECRET_KEY).
-# Usar a chave do Supabase para isso misturava dois segredos de naturezas
-# diferentes: rotacionar a chave do banco derrubava todas as sessões, e
-# vazar uma abria as duas coisas ao mesmo tempo.
+# A sessão é um cookie **criptografado** (sessao.py), não apenas
+# assinado: quem abrir o DevTools não lê o e-mail, o nome e o cargo de
+# quem está logado, e não consegue forjar um cookie sem a chave.
+#
+# A chave vem de SECRET_KEY, separada da chave do banco. Usar a
+# SUPABASE_KEY para os dois misturava segredos de naturezas diferentes:
+# rotacionar a chave do banco derrubava todas as sessões, e vazar uma
+# abria as duas coisas de uma vez.
 #
 CHAVE_SECRETA = os.getenv("SECRET_KEY")
 
@@ -126,10 +133,18 @@ if not CHAVE_SECRETA:
         "Defina no .env antes de iniciar a aplicação."
     )
 
+# Oito horas de sessão. Depois disso o cookie expira e o usuário entra
+# de novo.
+TABELA_DE_TENTATIVAS = "login_tentativas"
+
+DURACAO_DA_SESSAO = int(
+    os.getenv("SESSION_HOURS", "8")
+) * 60 * 60
+
 app.add_middleware(
-    SessionMiddleware,
-    secret_key=CHAVE_SECRETA,
-    same_site="lax",
+    SessaoMiddleware,
+    segredo=CHAVE_SECRETA,
+    max_age=DURACAO_DA_SESSAO,
     https_only=os.getenv("COOKIE_HTTPS", "").lower() in ("1", "true", "yes")
 )
 
@@ -139,51 +154,86 @@ app.add_middleware(
 # ============================================================
 
 # O login é a única porta de entrada, então precisa de limite de
-# tentativas. A contagem é por endereço IP e fica na memória do
-# processo: em mais de uma instância, cada uma contaria por conta
-# própria (o limite ideal ficaria no banco ou em cache compartilhado).
+# tentativas. A contagem é por endereço IP e fica na tabela
+# "login_tentativas", e não na memória do processo: com mais de uma
+# instância da aplicação (uvicorn --workers), a memória seria uma por
+# instância e o limite valeria só para quem caísse nela.
+#
+# Só as tentativas que falharam entram na conta. Uma entrada correta
+# não gasta cota e ainda zera a contagem do endereço: quem erra a
+# senha duas vezes e acerta na terceira não é tratado como ataque.
 TENTATIVAS_POR_ENDERECO = 8
 JANELA_DE_TENTATIVAS = timedelta(minutes=5)
 
-_tentativas: dict[str, list[datetime]] = {}
 
-
-def _registrar_tentativa(endereco: str) -> None:
-    """Conta uma tentativa de login para o endereço informado."""
-    global _tentativas
-
-    agora = datetime.now()
-    janela = agora - JANELA_DE_TENTATIVAS
-
-    registros = [
-        momento
-        for momento in _tentativas.get(endereco, [])
-        if momento > janela
-    ]
-
-    registros.append(agora)
-    _tentativas[endereco] = registros
-
-    # Endereços que não tentam mais ha um tempo saem do dicionario.
-    # Sem esta limpeza, cada origem que tentasse login uma vez ficaria
-    # guardada para sempre.
-    _tentativas = {
-        chave: momentos
-        for chave, momentos in _tentativas.items()
-        if any(momento > janela for momento in momentos)
-    }
+def _janela_de_tentativas() -> str:
+    """O instante que separa as tentativas que ainda contam."""
+    return (datetime.now() - JANELA_DE_TENTATIVAS).isoformat()
 
 
 def _tentativas_restantes(endereco: str) -> int:
     """Quantas tentativas ainda restam para o endereço."""
-    agora = datetime.now()
-    janela = agora - JANELA_DE_TENTATIVAS
+    try:
+        resposta = (
+            supabase
+            .table(TABELA_DE_TENTATIVAS)
+            .select("tentativa")
+            .eq("endereco", endereco)
+            .gte("tentativa", _janela_de_tentativas())
+            .execute()
+        )
+    except Exception:  # noqa: BLE001
+        # Se o banco não responder, o login continua funcionando:
+        # travar o acesso de todo mundo por causa de uma falha na
+        # contagem seria pior do que deixar passar.
+        return TENTATIVAS_POR_ENDERECO
 
-    return TENTATIVAS_POR_ENDERECO - len([
-        momento
-        for momento in _tentativas.get(endereco, [])
-        if momento > janela
-    ])
+    return TENTATIVAS_POR_ENDERECO - len(resposta.data or [])
+
+
+def _registrar_tentativa(endereco: str) -> None:
+    """Registra uma tentativa que falhou."""
+    try:
+        (
+            supabase
+            .table(TABELA_DE_TENTATIVAS)
+            .insert({
+                "endereco": endereco,
+                "tentativa": datetime.now().isoformat()
+            })
+            .execute()
+        )
+    except Exception:  # noqa: BLE001
+        return
+
+    # As tentativas vencidas não entram na conta e só ocupariam espaço
+    # para sempre. A limpeza é occasional, para não custar uma consulta
+    # a cada tentativa.
+    if random.random() < 0.05:
+        try:
+            (
+                supabase
+                .table(TABELA_DE_TENTATIVAS)
+                .delete()
+                .lt("tentativa", _janela_de_tentativas())
+                .execute()
+            )
+        except Exception:  # noqa: BLE001
+            return
+
+
+def _limpar_tentativas(endereco: str) -> None:
+    """Zera a contagem do endereço, depois de um login bem-sucedido."""
+    try:
+        (
+            supabase
+            .table(TABELA_DE_TENTATIVAS)
+            .delete()
+            .eq("endereco", endereco)
+            .execute()
+        )
+    except Exception:  # noqa: BLE001
+        return
 
 
 def _endereco_de(request: Request) -> str:
@@ -309,15 +359,20 @@ def sala_para_json(dados: dict) -> dict:
 
     Além dos campos guardados, devolve "contexto", que é o texto de
     "caracteristica" separado em setor, capacidade, equipamentos e
-    descrição. É esse formato que o "salas.js" e a tela de
-    gerenciamento esperam.
+    descrição, e a categoria da sala, classificada no servidor para
+    que o navegador não precise repetir a conta.
     """
     sala = Sala.fromJson(dados)
+
+    categoria, rotulo = categoria_da_sala(sala.caracteristica)
 
     return {
         "id": dados.get("id"),
         **sala.toJson(),
-        "contexto": ler_contexto(sala.caracteristica)
+        "reservavel": bool(dados.get("reservavel", False)),
+        "contexto": ler_contexto(sala.caracteristica),
+        "categoria": categoria,
+        "categoriaRotulo": rotulo
     }
 
 
@@ -378,9 +433,15 @@ def reserva_para_json(dados: dict) -> dict:
     telas do professor leem "data", "horaEntrada" e "horaSaida"; a tela
     de aprovação lê os timestamps crus. A resposta traz as duas formas
     para que nenhuma tela precise recortar o texto por conta própria.
+
+    "sala_nome" vem do próprio cadastro da sala (a consulta embute
+    "salas(nome)"), e não da coluna "item", que é uma cópia do nome
+    feita no momento da reserva: renomear a sala deixaria as reservas
+    antigas mostrando o nome velho.
     """
     inicio = str(dados.get("data_inicio") or "")
     fim = str(dados.get("data_fim") or "")
+    sala = dados.get("salas") or {}
 
     return {
         "id": dados.get("id"),
@@ -392,6 +453,8 @@ def reserva_para_json(dados: dict) -> dict:
         "status": dados.get("status") or STATUS_AGUARDANDO,
         "categoria": dados.get("categoria") or "",
         "item": dados.get("item") or "",
+        "sala_nome": (sala.get("nome") if isinstance(sala, dict) else None)
+        or dados.get("item") or "",
         "professor": dados.get("professor") or "",
         "curso": dados.get("curso") or "",
         "motivo": dados.get("motivo") or "",
@@ -458,8 +521,6 @@ async def login_post(request: Request):
     email = (dados.get('email') or '').strip().lower()
     senha = dados.get('senha') or ''
 
-    _registrar_tentativa(endereco)
-
     resposta = (
         supabase
         .table("usuarios")
@@ -471,6 +532,8 @@ async def login_post(request: Request):
     usuarios = resposta.data or []
 
     if not usuarios:
+        _registrar_tentativa(endereco)
+
         # Mesma resposta da senha errada, para não revelar quais
         # e-mails existem.
         return _falha_de_login(request)
@@ -478,7 +541,12 @@ async def login_post(request: Request):
     usuario = usuarios[0]
 
     if not verify_password(senha, usuario.get("senha") or ""):
+        _registrar_tentativa(endereco)
+
         return _falha_de_login(request)
+
+    # Login certo: a contagem de tentativas do endereço é zerada.
+    _limpar_tentativas(endereco)
 
     # Sessão nova a cada entrada: sem isso, um cookie que sobrou de uma
     # sessão anterior continuaria valendo depois do login.
@@ -617,11 +685,7 @@ PAGINAS_DO_PROFESSOR = {
     "/configuracoes": "configuracoes.html",
     "/reservas_prof": "reservasprof.html",
     "/passo2_reserva_prof": "passo2reservaprof.html",
-    "/passo02_reserva_prof": "passo02reservaprof.html",
-    "/passo002_reserva_prof": "passo002reservaprof.html",
     "/passo3_reserva_prof": "passo3reservaprof.html",
-    "/passo03_reserva_prof": "passo03reservaprof.html",
-    "/passo003_reserva_prof": "passo003reservaprof.html",
 }
 
 
@@ -1084,7 +1148,10 @@ def listar_reservas(request: Request, status: str | None = None):
     consulta = (
         supabase
         .table("reservas")
-        .select("*")
+        # A sala vem embutida para que o nome exibido na tela de
+        # aprovação seja o do cadastro, e não a cópia guardada no
+        # momento da reserva.
+        .select("*, salas(nome)")
         .order("data_inicio", desc=True)
     )
 
