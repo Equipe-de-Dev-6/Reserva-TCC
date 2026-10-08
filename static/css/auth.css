@@ -1,0 +1,144 @@
+/* ============================================================
+ * Estilo comum as telas de acesso.
+ * 
+ * Login, cadastro, redefinir senha e recuperar senha
+ * compartilham o cartao, o logo, o campo com icone, o botao e
+ * o separador "ou".
+ * 
+ * Seletor com texto diferente em cada tela entra aqui so com
+ * as declaracoes iguais; o que sobra fica no CSS da tela.
+ * 
+ * Entra pelo base_auth.html, antes do CSS da tela, para uma
+ * propriedade continuar sendo decidida pelo mesmo lugar.
+ * ============================================================ */
+
+  .container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  max-width: 400px;
+  padding: 60px 40px;
+  }
+
+  .logo {
+  margin-bottom: 30px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  }
+
+  .logo img {
+  width: 320px;
+  height: auto;
+  }
+
+  .hr {
+  width: 100%;
+  height: 2px;
+  background-color: var(--cor-texto);
+  margin-bottom: 30px;
+  }
+
+  .form-container {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  }
+
+  form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  }
+
+  .input-container i {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--cor-fundo);
+  font-size: 24px;
+  flex-shrink: 0;
+  }
+
+  .input-container input::placeholder {
+  color: rgba(255, 255, 255, 0.9);
+  }
+
+  .input-container:focus-within {
+  background-color: var(--cor-hover);
+  }
+
+  button[type="submit"]:hover {
+  background-color: var(--cor-hover);
+  }
+
+  button[type="submit"]:active {
+  background-color: var(--cor-ativa);
+  transform: scale(0.98);
+  }
+
+  .links a {
+  color: var(--cor-texto);
+  font-weight: 600;
+  transition: color 0.3s ease,
+        text-decoration 0.3s ease;
+  }
+
+  .links a:hover {
+  color: var(--cor-principal);
+  text-decoration: underline;
+  }
+
+  .form-container h2 {
+  font-size: 19px;
+  font-weight: 600;
+  text-align: center;
+  margin-bottom: 20px;
+  }
+
+  .input-container {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  height: 52px;
+  padding: 0 16px;
+  gap: 12px;
+  background-color: var(--cor-principal);
+  border-radius: var(--border-radius);
+  transition: background-color 0.3s ease;
+  }
+
+  .input-container input {
+  width: 100%;
+  border: none;
+  outline: none;
+  background: transparent;
+  color: var(--cor-fundo);
+  font-size: 14px;
+  }
+
+  button[type="submit"] {
+  width: 100%;
+  padding: 14px 16px;
+  border: none;
+  border-radius: var(--border-radius);
+  background-color: var(--cor-texto);
+  color: var(--cor-fundo);
+  font-size: 14px;
+  cursor: pointer;
+  transition: background-color 0.3s ease,
+        transform 0.2s ease;
+  }
+
+  .links {
+  display: flex;
+  flex-direction: column;
+  text-align: center;
+  }
+
+  .links p {
+  font-weight: 600;
+  margin: 0;
+  }

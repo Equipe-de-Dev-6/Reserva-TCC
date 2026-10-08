@@ -26,8 +26,17 @@
   <title>{% block titulo %}Acesso{% endblock %} - Gestão de salas e equipamentos</title>
 
   {#- As telas de acesso não usam o menu, e por isso não precisam
-      nem da fonte Inter nem do flaticon: cada uma tem o seu CSS em
-      static/css. -#}
+      nem da fonte Inter nem do flaticon.
+
+      O que as quatro telas de acesso têm em comum — o cartão, o logo,
+      o campo com ícone, o botão e o separador "ou" — está em
+      auth.css, uma vez só. Ele vem ANTES do {% block head_extra %} de
+      propósito: assim, uma tela que ajuste uma dessas propriedades
+      no próprio CSS continua vencendo, que é como era quando cada
+      uma carregava o seu arquivo com tudo dentro. -#}
+  <link rel="stylesheet" href="/css/auth.css">
+
+  {#- O que é só desta tela. -#}
   {% block head_extra %}{% endblock %}
 
   {% block style %}{% endblock %}

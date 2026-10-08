@@ -1,186 +1,28 @@
+/* ============================================================
+ * Estilo proprio de login.css.
+ * 
+ * O que as quatro telas de acesso tem em comum esta em
+ * auth.css; aqui fica so o que e desta tela.
+ * ============================================================ */
 
-/* =========================
-   CONTAINER
-========================= */
-.container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    width: 100%;
-    max-width: 400px;
-    padding: 60px 40px;
-}
+  .form-container h2 {
+  color: var(--cor-texto);
+  }
 
-/* =========================
-   LOGO
-========================= */
-.logo {
-    margin-bottom: 30px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
+  button[type="submit"] {
+  font-weight: 600;
+  margin-top: 8px;
+  }
 
-.logo img {
-    width: 320px;
-    height: auto;
-}
+  .links {
+  gap: 8px;
+  margin-top: 15px;
+  }
 
-/* =========================
-   LINHA
-========================= */
-.hr {
-    width: 100%;
-    height: 2px;
-    background-color: var(--cor-texto);
-    margin-bottom: 30px;
-}
+  .links p {
+  font-size: 13px;
+  }
 
-/* =========================
-   FORMULÁRIO
-========================= */
-.form-container {
-    display: flex;
-    flex-direction: column;
-    width: 100%;
-}
-
-.form-container h2 {
-    font-size: 19px;
-    font-weight: 600;
-    color: var(--cor-texto);
-    text-align: center;
-    margin-bottom: 20px;
-}
-
-/* =========================
-   FORM
-========================= */
-form {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-}
-
-/* =========================
-   INPUT CONTAINER
-========================= */
-.input-container {
-    display: flex;
-    align-items: center;
-    width: 100%;
-    height: 52px;
-    padding: 0 16px;
-    gap: 12px;
-    background-color: var(--cor-principal);
-    border-radius: var(--border-radius);
-    transition: background-color 0.3s ease;
-}
-
-/* =========================
-   ÍCONES
-========================= */
-.input-container i {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: var(--cor-fundo);
-    font-size: 24px;
-    flex-shrink: 0;
-}
-
-/* =========================
-   INPUT
-========================= */
-.input-container input {
-    width: 100%;
-    border: none;
-    outline: none;
-    background: transparent;
-    color: var(--cor-fundo);
-    font-size: 14px;
-}
-
-/* =========================
-   PLACEHOLDER
-========================= */
-.input-container input::placeholder {
-    color: rgba(255, 255, 255, 0.9);
-}
-
-/* =========================
-   FOCO
-========================= */
-.input-container:focus-within {
-    background-color: var(--cor-hover);
-}
-
-/* =========================
-   BOTÃO ENTRAR
-========================= */
-button[type="submit"] {
-    width: 100%;
-    padding: 14px 16px;
-    border: none;
-    border-radius: var(--border-radius);
-    background-color: var(--cor-texto);
-    color: var(--cor-fundo);
-    font-size: 14px;
-    font-weight: 600;
-    cursor: pointer;
-    transition:
-        background-color 0.3s ease,
-        transform 0.2s ease;
-    margin-top: 8px;
-}
-
-button[type="submit"]:hover {
-    background-color: var(--cor-hover);
-}
-
-button[type="submit"]:active {
-    background-color: var(--cor-ativa);
-    transform: scale(0.98);
-}
-
-/* =========================
-   LINKS
-========================= */
-.links {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    text-align: center;
-    margin-top: 15px;
-}
-
-.links p {
-    font-size: 13px;
-    font-weight: 600;
-    margin: 0;
-}
-
-.links a {
-    color: var(--cor-texto);
-    font-weight: 600;
-    transition:
-        color 0.3s ease,
-        text-decoration 0.3s ease;
-}
-
-.links a:hover {
-    color: var(--cor-principal);
-    text-decoration: underline;
-}
-
-/* =========================
-   DIVISOR "OU"
-========================= */
-
-/* =========================
-   RESPONSIVO
-========================= */
 @media (max-width: 600px) {
     body {
         padding: 20px;
