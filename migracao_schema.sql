@@ -117,16 +117,6 @@ ALTER TABLE public.reservas
     )
     WHERE (status IN ('aguardando', 'aprovada'));
 
--- Converte o que já estava gravado sem fuso para o mesmo instante em
--- UTC, que é como o restante da coluna é lido.
-UPDATE public.reservas
-    SET data_inicio = data_inicio AT TIME ZONE 'UTC'
-    WHERE data_inicio IS NOT NULL;
-
-UPDATE public.reservas
-    SET data_fim = data_fim AT TIME ZONE 'UTC'
-    WHERE data_fim IS NOT NULL;
-
 
 -- ===========================================================================
 -- 3. "atualizado_em" se manter sozinho
@@ -319,15 +309,22 @@ ALTER TABLE public.usuarios
 -- informação. O padrão é negar, e a API trata a recusa como erro
 -- legível.
 --
-ALTER TABLE public.salas
-    DROP CONSTRAINT IF EXISTS reservas_sala_id_fkey,
+-- As duas constraints vivem em public.reservas, que é onde estão as
+-- colunas sala_id e usuario_id.
+--
+ALTER TABLE public.reservas
+    DROP CONSTRAINT IF EXISTS reservas_sala_id_fkey;
+
+ALTER TABLE public.reservas
     ADD CONSTRAINT reservas_sala_id_fkey
         FOREIGN KEY (sala_id) REFERENCES public.salas(id)
         ON DELETE RESTRICT
         ON UPDATE CASCADE;
 
-ALTER TABLE public.usuarios
-    DROP CONSTRAINT IF EXISTS reservas_usuario_id_fkey,
+ALTER TABLE public.reservas
+    DROP CONSTRAINT IF EXISTS reservas_usuario_id_fkey;
+
+ALTER TABLE public.reservas
     ADD CONSTRAINT reservas_usuario_id_fkey
         FOREIGN KEY (usuario_id) REFERENCES public.usuarios(id)
         ON DELETE RESTRICT
