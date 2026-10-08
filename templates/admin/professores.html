@@ -35,6 +35,7 @@
               <tr>
                 <th>Nome</th>
                 <th>E-mail</th>
+                <th>Função</th>
                 <th>Ações</th>
               </tr>
             </thead>
@@ -95,6 +96,12 @@
               <div class="adm-form-campo">
                 <label for="profEmail">E-mail</label>
                 <input type="email" id="profEmail" name="email" required
+                  autocomplete="off">
+              </div>
+
+              <div class="adm-form-campo">
+                <label for="profCargo">Cargo</label>
+                <input type="text" id="profCargo" name="cargo" required
                   autocomplete="off">
               </div>
 
@@ -210,6 +217,7 @@
           <tr>
             <td>${escapar(professor.nome)}</td>
             <td>${escapar(professor.email)}</td>
+            <td>${escapar(professor.cargo)}</td>
             <td class="adm-acoes">
               <button class="adm-btn-adm editar" type="button" data-acao="editar" data-id="${professor.id}">
                 Editar
@@ -252,6 +260,7 @@
 
         document.getElementById('profNome').value = professor.nome || '';
         document.getElementById('profEmail').value = professor.email || '';
+        document.getElementById('profCargo').value = professor.cargo || '';
 
         modal.style.display = 'flex';
         document.getElementById('profNome').focus();
@@ -307,7 +316,8 @@
         try {
           await atualizarUsuario(professorEmEdicao.id, {
             nome: document.getElementById('profNome').value.trim(),
-            email: document.getElementById('profEmail').value.trim()
+            email: document.getElementById('profEmail').value.trim(),
+            cargo: document.getElementById('profCargo').value.trim()
           });
 
           fecharModal();
