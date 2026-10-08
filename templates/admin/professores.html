@@ -230,6 +230,10 @@
       // ======================================================
 
       function abrirModal(professor) {
+        if (!modal || !formProfessor) {
+          return;
+        }
+
         professorEmEdicao = professor;
 
         document.getElementById('profNome').value = professor.nome || '';
@@ -245,7 +249,24 @@
         modal.style.display = 'none';
       }
 
-      document.getElementById('btnCancelarProfessor').addEventListener('click', fecharModal);
+      // A caixa de edicao nao tem HTML nesta tela: modalEditar,
+      // formProfessor, profNome, profEmail e os botoes sao procurados
+      // aqui e nao existem no template. Sem o bloco isolado, a linha
+      // "modal.addEventListener" estourava um TypeError na carga, a
+      // excecao parava o script no meio, e a busca e o resto da tela
+      // ficavam sem registro. O botao "editar" das linhas tambem
+      // quebrava.
+      //
+      // Nao se inventa a caixa aqui: o conteudo dela e decisao de
+      // tela. O bloco fica isolado e pronto para quando o markup
+      // existir.
+      if (modal && formProfessor) {
+      const btnCancelarProfessor =
+          document.getElementById('btnCancelarProfessor');
+
+      if (btnCancelarProfessor) {
+          btnCancelarProfessor.addEventListener('click', fecharModal);
+      }
 
       // Clicar fora da caixa fecha o modal.
       modal.addEventListener('click', (evento) => {
@@ -286,6 +307,7 @@
           btn.disabled = false;
         }
       });
+      }
 
       // ======================================================
       // EXCLUIR

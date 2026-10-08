@@ -121,39 +121,29 @@ function escapeHtml(value) {
                     }).join('')
                     : '<p class="notification-empty">Nenhuma notificação de reserva.</p>';
 
-                configurarBusca();
+                // ======================================================
+                // BUSCA
+                // ======================================================
 
-                
+                // A busca em si mora no app.js: ele escuta o campo e
+                // filtra os itens marcados com "searchable". Aqui so
+                // falta reaplicar o filtro quando a lista e redesenhada
+                // com o campo ja preenchido — senao o texto digitado
+                // some da tela ate a pessoa digitar de novo.
+                //
+                // Esta tela tinha uma segunda busca, igual a do app.js, e
+                // ela declarava o campo duas vezes. Na limpeza do JS as
+                // duas declaracoes sairam e os usos ficaram pendurados:
+                // "searchInput is not defined", e a tela parava de
+                // renderizar assim que a lista era desenhada.
+                const campo = document.getElementById('search-input');
 
-                if (searchInput && searchInput.value.trim()) {
-                    searchInput.dispatchEvent(new Event('input'));
+                if (campo && campo.value.trim()) {
+                    campo.dispatchEvent(new Event('input'));
                 }
             }
 
-            function configurarBusca() {
-                
-
-                if (!searchInput || searchInput.dataset.bound) {
-                    return;
-                }
-
-                searchInput.dataset.bound = 'true';
-
-                searchInput.addEventListener('input', (e) => {
-                    const term = e.target.value.toLowerCase().trim();
-
-                    document
-                        .querySelectorAll('#notificationsList .searchable')
-                        .forEach((item) => {
-                            item.style.display =
-                                item.textContent.toLowerCase().includes(term)
-                                    ? ''
-                                    : 'none';
-                        });
-                });
-            }
-
-            // Renderiza as notificações.
+// Renderiza as notificações.
             renderNotificacoes();
 
             // Atualiza quando houver alterações.
