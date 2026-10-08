@@ -66,11 +66,17 @@ ALTER TABLE public.reservas
 -- Só estas quatro respostas existem. Sem esta trava, um INSERT direto
 -- pelo painel do Supabase grava um status que nenhuma tela reconhece e a
 -- reserva some dos filtros.
+--
+-- Os dois nomes aparecem no DROP porque uma versão anterior deste
+-- arquivo criou a constraint com o nome em inglês
+-- ("reservations_status_check"). Sem o DROP dos dois, quem já rodou a
+-- versão antiga receberia "constraint already exists" na segunda vez.
 ALTER TABLE public.reservas
-    DROP CONSTRAINT IF EXISTS reservas_status_check;
+    DROP CONSTRAINT IF EXISTS reservas_status_check,
+    DROP CONSTRAINT IF EXISTS reservations_status_check;
 
 ALTER TABLE public.reservas
-    ADD CONSTRAINT reservations_status_check
+    ADD CONSTRAINT reservas_status_check
     CHECK (status IN ('aguardando', 'aprovada', 'negada', 'cancelada'));
 
 
@@ -172,37 +178,58 @@ CREATE INDEX IF NOT EXISTS idx_sala_caracteristicas_sala
 
 
 -- ===========================================================================
--- 5. A tabela de junção sala x característica não recebia linhas
+-- 5. A tabela de junção sala x característica
 -- ===========================================================================
 --
--- sala_caracteristicas.sala_id é parte da chave primária composta e
--- estava declarada como GENERATED ALWAYS AS IDENTITY. Uma coluna de
--- identidade não aceita valor informado, então não existia INSERT
--- possível: ou se informava a sala e o banco recusava, ou o banco
--- gerava um id que não correspondia a nenhuma sala. Uma coluna de
--- junção é um id comum da outra tabela, não um número gerado aqui.
+-- sala_caracteristicas.sala_id é parte da chave primária composta, ou
+-- seja, um id comum vindo de public.salas. Se a coluna estivesse
+-- declarada como identity, não existiria INSERT possível: a identidade
+-- recusa valor informado e geraria um número que não corresponde a
+-- nenhuma sala.
 --
--- A coluna só pode ser trocada por id comum se ainda não houver linhas:
--- o id gerado automaticamente não tem correspondência em public.salas.
+-- O arquivo reserva-Tcc.sql mostra a coluna como identity, mas ele é
+-- uma referência ("não deve ser executado") e não sempre bate com o
+-- banco real. Por isso esta seção pergunta ao catálogo em vez de
+-- assumir: se a coluna já for comum, não há o que fazer.
+--
 DO $$
 DECLARE
+    tem_identidade boolean;
+    tem_padrao boolean;
     linhas_existentes bigint;
 BEGIN
+    SELECT
+        (a.attidentity <> ''),
+        (a.atthasdef)
+    INTO tem_identidade, tem_padrao
+    FROM pg_attribute a
+    WHERE a.attrelid = 'public.sala_caracteristicas'::regclass
+      AND a.attname = 'sala_id'
+      AND NOT a.attisdropped;
+
     SELECT COUNT(*) INTO linhas_existentes FROM public.sala_caracteristicas;
 
-    IF linhas_existentes > 0 THEN
-        RAISE EXCEPTION
-            'sala_caracteristicas tem % linha(s). Confira se a coluna sala_id não tem identity antes de continuar.', linhas_existentes;
+    IF NOT tem_identidade AND NOT tem_padrao THEN
+        -- Já é uma coluna comum, que é o formato correto para uma
+        -- tabela de junção. Nada a fazer.
+        RAISE NOTICE 'sala_caracteristicas.sala_id já é uma coluna comum.';
+
+    ELSE
+        IF linhas_existentes > 0 THEN
+            RAISE EXCEPTION
+                'sala_caracteristicas tem % linha(s) e a coluna sala_id é gerada automaticamente. Confira as linhas antes de continuar.', linhas_existentes;
+        END IF;
+
+        IF tem_identidade THEN
+            ALTER TABLE public.sala_caracteristicas
+                ALTER COLUMN sala_id DROP IDENTITY;
+        END IF;
+
+        -- identity deixa uma sequência junto, que também tem de sair.
+        ALTER TABLE public.sala_caracteristicas
+            ALTER COLUMN sala_id DROP DEFAULT;
     END IF;
 END $$;
-
-ALTER TABLE public.sala_caracteristicas
-    ALTER COLUMN sala_id DROP IDENTITY;
-
--- Remove a identidade implícita (quando vier de uma serial, e não de
--- identity), para o id não continuar sendo gerado sozinho.
-ALTER TABLE public.sala_caracteristicas
-    ALTER COLUMN sala_id DROP DEFAULT;
 
 ALTER TABLE public.sala_caracteristicas
     ALTER COLUMN sala_id SET NOT NULL;

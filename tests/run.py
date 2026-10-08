@@ -4,6 +4,7 @@
 #     node tests/test_reservas.js
 #     node tests/test_avisos.js
 #     node tests/check_wiring.js
+#     node tests/check_migrations.js
 #
 # Ou tudo de uma vez, com o venv ativado:
 #
@@ -31,6 +32,7 @@ SUITES_NODE = [
     os.path.join(RAIZ, "tests", "test_reservas.js"),
     os.path.join(RAIZ, "tests", "test_avisos.js"),
     os.path.join(RAIZ, "tests", "check_wiring.js"),
+    os.path.join(RAIZ, "tests", "check_migrations.js"),
 ]
 
 
