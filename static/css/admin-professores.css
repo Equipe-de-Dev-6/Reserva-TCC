@@ -1,0 +1,118 @@
+/* ============================================================
+ * Estilo proprio de admin/professores.html.
+ * 
+ * Saiu do <style> que estava dentro do template. As regras
+ * comuns as telas do Coordinator estao em admin.css.
+ * ============================================================ */
+
+  .adm-table-wrapper {
+  background: var(--card-bg, #fff);
+  border: 1px solid var(--border-color, #e5e7eb);
+  border-radius: 12px;
+  overflow: hidden;
+  }
+
+  .adm-table {
+  border-collapse: collapse;
+  width: 100%;
+  }
+
+  .adm-table th,
+    .adm-table td {
+  border-bottom: 1px solid var(--border-color, #e5e7eb);
+  font-size: 14px;
+  padding: 14px 18px;
+  text-align: left;
+  }
+
+  .adm-table th {
+  background: var(--bg-color, #f9fafb);
+  color: var(--text-secondary, #6b7280);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  }
+
+  .adm-table tr:last-child td {
+  border-bottom: none;
+  }
+
+  .adm-acoes {
+  display: flex;
+  gap: 6px;
+  }
+
+  .adm-btn-adm {
+  border: 1px solid var(--border-color, #e5e7eb);
+  border-radius: 8px;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 7px 12px;
+  }
+
+  .adm-btn-adm.salvar {
+  background: var(--primary-color, #b91c1c);
+  border-color: var(--primary-color, #b91c1c);
+  color: #fff;
+  }
+
+  .adm-btn-adm.excluir {
+  color: #991b1b;
+  }
+
+  .adm-btn-adm:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+  }
+
+  /* Modal de edição */
+
+    .adm-modal {
+  align-items: center;
+  background: rgba(17, 24, 39, 0.45);
+  display: flex;
+  inset: 0;
+  justify-content: center;
+  padding: 20px;
+  position: fixed;
+  z-index: 50;
+  }
+
+  .adm-modal-caixa {
+  background: var(--card-bg, #fff);
+  border-radius: 14px;
+  max-width: 420px;
+  padding: 24px;
+  width: 100%;
+  }
+
+  .adm-modal-caixa h3 {
+  font-size: 17px;
+  font-weight: 700;
+  }
+
+  .adm-modal-subtitulo {
+  color: var(--text-secondary, #6b7280);
+  font-size: 12px;
+  margin-top: 6px;
+  }
+
+  .adm-form-campo input {
+  border: 1px solid var(--border-color, #e5e7eb);
+  border-radius: 8px;
+  font-family: inherit;
+  font-size: 13px;
+  padding: 9px 11px;
+  }
+
+  .adm-form-campo input:focus {
+  border-color: var(--primary-color, #b91c1c);
+  outline: none;
+  }
+
+  .adm-form-acoes {
+  margin-top: 4px;
+  }

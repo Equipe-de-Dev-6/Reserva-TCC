@@ -1,0 +1,70 @@
+/* ============================================================
+ * Estilo comum as telas do Coordenador.
+ * 
+ * O cabecalho da pagina, o cartao do formulario e a caixa de
+ * "nada por aqui" aparecem em mais de uma tela admin. Antes
+ * estavam repetidos dentro de cada template.
+ * 
+ * Seletor com texto diferente em cada tela entra aqui so com
+ * as declaracoes iguais; o que sobra fica no CSS da tela.
+ * ============================================================ */
+
+  .adm-section {
+  padding: 24px;
+  }
+
+  .adm-page-header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 20px;
+  }
+
+  .adm-page-header h2 {
+  font-size: 20px;
+  font-weight: 700;
+  }
+
+  .adm-page-header p {
+  color: var(--text-secondary, #6b7280);
+  font-size: 14px;
+  margin-top: 4px;
+  }
+
+  .adm-form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin-top: 18px;
+  }
+
+  .adm-form-campo {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  }
+
+  .adm-form-campo label {
+  color: var(--text-secondary, #6b7280);
+  font-size: 12px;
+  font-weight: 600;
+  }
+
+  .adm-empty {
+  align-items: center;
+  color: var(--text-secondary, #6b7280);
+  display: none;
+  flex-direction: column;
+  gap: 10px;
+  padding: 40px 20px;
+  text-align: center;
+  }
+
+
+
+  .adm-form-acoes {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+  }
