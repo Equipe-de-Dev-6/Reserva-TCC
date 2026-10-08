@@ -135,6 +135,86 @@ if (alvosQuebrados.length) {
 const componentes = fs.readdirSync(path.join('templates', 'components'));
 console.log(`\nComponentes: ${componentes.join(', ')}`);
 
+// 5) O estilo de cada tela.
+//
+// Um <link> para um CSS que nao existe nao da erro nenhum: o
+// navegador so ignora. A tela abre sem nenhuma regra e parece um
+// problema de layout. Foi o que aconteceu com 7 telas quando os
+// templates foram renomeados (reservar-sala.html) e os arquivos de
+// CSS ficaram com o nome antigo (escolherreservaprof.css).
+//
+// Aqui a tela e conferida contra os dois lados: todo link aponta para
+// um arquivo que existe, e todo CSS em disco tem pelo menos uma tela
+// que o usa.
+console.log('\nEstilo das telas:');
+
+const cssEmDisco = fs.readdirSync(path.join('static', 'css'))
+  .filter(n => n.endsWith('.css'));
+
+const cssUsados = new Set();
+const linksQuebrados = [];
+const telasSemEstilo = [];
+
+// base.html, base_auth.html e os componentes nao tem estilo proprio:
+// eles nao sao telas, sao o esqueleto que as telas estendem.
+const NAO_E_TELA = new Set([
+  'base.html',
+  'auth/base_auth.html',
+  'components/_header.html',
+  'components/_sidebar.html',
+]);
+
+for (const arq of varrerHtml('templates')) {
+  const rel = path.relative('templates', arq).replace(/\\/g, '/');
+  const bruto = fs.readFileSync(arq, 'utf8');
+
+  // Comentario Jinja e documentacao, com exemplo de link que nao
+  // existe de proposito. Ler como se fosse link real daria falso
+  // positivo.
+  const txt = bruto.replace(/\{#[\s\S]*?#\}/g, '');
+
+  const links = [...txt.matchAll(/href=["'][^"']*\/css\/([^"']+)["']/g)].map(m => m[1]);
+
+  const ruins = [];
+  for (const css of links) {
+    cssUsados.add(css);
+    if (!cssEmDisco.includes(css)) ruins.push(css);
+  }
+
+  if (links.length) {
+    console.log(`  ${ruins.length ? 'QUEBRADO' : 'ok      '} ${rel}: ${[...new Set(links)].join(', ')}`);
+  }
+
+  if (ruins.length) linksQuebrados.push(`${rel} -> ${ruins.join(', ')}`);
+
+  // A tela precisa de estilo de algum lugar: link proprio, CSS
+  // dentro do proprio HTML, ou o esqueleto que ela estende.
+  const temLink = links.some(c => cssEmDisco.includes(c));
+  const temInline = /<style[\s>]/.test(txt);
+  const herdaBase = /{%\s*extends\s+["']base(_auth)?\.html["']/.test(txt);
+
+  if (!temLink && !temInline && !herdaBase && !NAO_E_TELA.has(rel)) {
+    telasSemEstilo.push(rel);
+  }
+}
+
+const cssSemDono = cssEmDisco.filter(c => !cssUsados.has(c));
+
+if (telasSemEstilo.length) {
+  console.log('  telas sem nenhum estilo:');
+  for (const t of telasSemEstilo) console.log(`    ${t}`);
+}
+
+if (cssSemDono.length) {
+  console.log('  CSS em disco que nenhuma tela usa:');
+  for (const c of cssSemDono) console.log(`    ${c}`);
+}
+
+console.log(`  -> ${cssEmDisco.length - cssSemDono.length}/${cssEmDisco.length} CSS em uso, ` +
+            `${linksQuebrados.length} link(s) quebrado(s), ${telasSemEstilo.length} tela(s) sem estilo`);
+
 if (alvosQuebrados.length) process.exit(1);
 
 if (problemas || quebradas.length || semArquivo.length) process.exit(1);
+
+if (linksQuebrados.length || cssSemDono.length || telasSemEstilo.length) process.exit(1);
