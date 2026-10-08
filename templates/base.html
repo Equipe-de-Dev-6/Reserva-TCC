@@ -38,13 +38,19 @@
       cabeçalho, o campo de busca e o cartão de perfil.
 
       Este arquivo entra ANTES do CSS da tela de propósito. Uma
-      propriedade continua sendo decided pelo mesmo lugar que antes:
+      propriedade continua sendo decidida pelo mesmo lugar que antes:
       quando cada tela trazia uma cópia do esqueleto no próprio CSS,
       essa cópia vinha antes das regras dela. -#}
   <link rel="stylesheet" href="/css/base.css">
 
-  {#- O que a home do Professor tem de próprio. -#}
-  <link rel="stylesheet" href="/css/paginainicialprofessor.css">
+  {#- O que sobrou do CSS da home do Professor. Continua em todas as
+      telas porque ainda carrega regras que outras usam: "button
+      { font-family: Inter }", a cor do botão de menu e o padding do
+      conteúdo. Essas não têm cópia no base.css, e tirá-lo daqui fez
+      onze telas voltarem para a Arial — o retrato de estilo
+      computado pegou. Extrair essas regras é trabalho próprio, e as
+      telas divergem justamente nelas. -#}
+  <link rel="stylesheet" href="/css/home.css">
 
   {#- Estilo específico da tela. -#}
   {% block head_extra %}{% endblock %}
