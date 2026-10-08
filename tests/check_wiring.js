@@ -15,6 +15,16 @@ const varrerHtml = (d) => fs.readdirSync(d, { withFileTypes: true }).flatMap(e =
     ? varrerHtml(path.join(d, e.name))
     : (e.name.endsWith('.html') ? [path.join(d, e.name)] : []));
 
+// Os CSS podem estar em subpasta. Devolve o caminho relativo a
+// static/css, que e como o <link> escreve: href="/css/base/header.css".
+const varrerCss = (d, prefix) => fs.readdirSync(d, { withFileTypes: true }).flatMap(e => {
+  const nome = prefix ? prefix + '/' + e.name : e.name;
+
+  if (e.isDirectory()) return varrerCss(path.join(d, e.name), nome);
+
+  return e.name.endsWith('.css') ? [nome] : [];
+});
+
 const texto = fs.readFileSync(__dirname + '/../static/js/api.js', 'utf8');
 const nomes = [...texto.matchAll(/export\s+(?:async\s+)?function\s+(\w+)/g)].map(m => m[1]);
 const tab = new Set(nomes);
@@ -148,8 +158,11 @@ console.log(`\nComponentes: ${componentes.join(', ')}`);
 // que o usa.
 console.log('\nEstilo das telas:');
 
-const cssEmDisco = fs.readdirSync(path.join('static', 'css'))
-  .filter(n => n.endsWith('.css'));
+// A lista de CSS em disco precisa descer nas subpastas. Uma versao
+// anterior lia so a raiz, e oito arquivos parados em
+// static/css/base/ e static/css/components/ — de uma tentativa
+// antiga de separar o CSS — passaram sem ninguem reclamar.
+const cssEmDisco = varrerCss(path.join('static', 'css'));
 
 const cssUsados = new Set();
 const linksQuebrados = [];
@@ -180,7 +193,6 @@ for (const arq of varrerHtml('templates')) {
     cssUsados.add(css);
     if (!cssEmDisco.includes(css)) ruins.push(css);
   }
-
   if (links.length) {
     console.log(`  ${ruins.length ? 'QUEBRADO' : 'ok      '} ${rel}: ${[...new Set(links)].join(', ')}`);
   }
