@@ -1,51 +1,44 @@
-import { listarUsuarios } from "./api.js";
-
-const formulario = document.querySelector("form");
-
 async function entrar(event) {
-
     event.preventDefault();
 
-    const email = document.getElementById("email").value;
+    const email = document.getElementById("email").value.trim();
     const senha = document.getElementById("senha").value;
 
     try {
+        const formData = new FormData();
+        formData.append("email", email);
+        formData.append("senha", senha);
 
-        const usuarios = await listarUsuarios();
+        const resposta = await fetch("/login", {
+            method: "POST",
+            body: formData
+        });
 
-        const usuario = usuarios.find(
-            usuario =>
-                usuario.email === email &&
-                usuario.senha === senha
-        );
+        const dados = await resposta.json();
 
-
-        // Usuário não encontrado
-        if (!usuario) {
-
-            alert("Email ou senha incorretos!");
-
+        if (!resposta.ok || dados.erro) {
+            alert(dados.erro || "Erro ao fazer login.");
             return;
         }
 
-
-        // Login realizado
-        alert("Login realizado com sucesso!");
-
-        if (email === 'lthiegue@sp.senai.br') {
-            window.location.href = 'http://127.0.0.1:8000/home_admin'
+        if (dados.cargo === "coordenador") {
+            window.location.href = "/home_admin";
+        } else if (dados.cargo === "prof") {
+            window.location.href = "/home";
+        } else {
+            alert("Resposta inesperada do servidor.");
         }
-        else {
-            window.location.href = "http://127.0.0.1:8000/home";
-        }
-
 
     } catch (erro) {
-
-        console.log(erro);
-        alert("Erro ao realizar login!");
-
+        console.error("Erro ao fazer login:", erro);
+        alert("Não foi possível conectar ao servidor.");
     }
 }
 
-formulario.addEventListener("submit", entrar);
+document.addEventListener("DOMContentLoaded", function () {
+    const formulario = document.querySelector("form");
+
+    if (formulario) {
+        formulario.addEventListener("submit", entrar);
+    }
+});

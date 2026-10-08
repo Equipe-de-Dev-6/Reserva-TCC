@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
-
 <head>
 
   <meta charset="UTF-8">
@@ -58,10 +57,10 @@
             Notificações
           </a>
 
-          <!-- Recursos -->
-          <a href="/recursos_prof" class="nav-item">
-            <img src="/assets/icons/box.png" alt="" width="20" height="20">
-            Recursos
+          <!-- Avisos -->
+          <a href="/avisos" class="nav-item">
+            <img src="/assets/icons/warning.png" alt="" width="20" height="20">
+            Avisos
           </a>
 
           <!-- Configurações -->
@@ -82,10 +81,12 @@
 
       </div>
 
-      <a href="/" class="btn-logout">
-        <img src="/assets/icons/exit.png" alt="" width="20" height="20">
-        Sair
-      </a>
+      <form method="POST" action="/logout" class="logout-form">
+        <button type="submit" class="btn-logout">
+          <img src="/assets/icons/exit.png" alt="" width="20" height="20">
+          Sair
+        </button>
+      </form>
 
     </aside>
 
@@ -106,7 +107,7 @@
 
         <div class="greeting">
 
-          <h1>Olá Thiago!</h1>
+          <h1><span id="nomeUsuario"></span></h1>
 
           <p>
             Gerencie suas reservas e faça novos agendamentos
@@ -200,134 +201,14 @@
           </div>
 
           <!-- Lista de salas -->
-          <div class="rooms-list">
+          <div class="rooms-list"
+             data-lista-salas
+             data-categoria="sala"
+             data-proximo="/passo2_reserva_prof">
 
-            <a href="#" class="room-card searchable" data-sala="Sala de aula - A01" data-status="disponivel">
-
-              <div class="room-left">
-
-                <div class="room-thumb">
-
-                  <img src="/assets/icons/image.png" alt="Sala" width="20" height="20">
-
-                </div>
-
-                <div class="room-info">
-
-                  <h4>Sala de aula - A01</h4>
-                  <p>32 lugares</p>
-
-                </div>
-
-              </div>
-
-              <span class="status-badge status-available">
-                Disponível
-              </span>
-
-            </a>
-
-            <a href="#" class="room-card searchable selected" data-sala="Sala de aula - A02" data-status="negado">
-
-              <div class="room-left">
-
-                <div class="room-thumb">
-
-                  <img src="/assets/icons/image.png" alt="Sala" width="20" height="20">
-
-                </div>
-
-                <div class="room-info">
-
-                  <h4>Sala de aula - A02</h4>
-                  <p>32 lugares</p>
-
-                </div>
-
-              </div>
-
-              <span class="status-badge status-denied">
-                Negado
-              </span>
-
-            </a>
-
-            <a href="#" class="room-card searchable" data-sala="Sala de aula - A03" data-status="aguardando">
-
-              <div class="room-left">
-
-                <div class="room-thumb">
-
-                  <img src="/assets/icons/image.png" alt="Sala" width="20" height="20">
-
-                </div>
-
-                <div class="room-info">
-
-                  <h4>Sala de aula - A03</h4>
-                  <p>32 lugares</p>
-
-                </div>
-
-              </div>
-
-              <span class="status-badge status-waiting">
-                Aguardando
-              </span>
-
-            </a>
-
-            <a href="#" class="room-card searchable" data-sala="Sala de aula - A04" data-status="disponivel">
-
-              <div class="room-left">
-
-                <div class="room-thumb">
-
-                  <img src="/assets/icons/image.png" alt="Sala" width="20" height="20">
-
-                </div>
-
-                <div class="room-info">
-
-                  <h4>Sala de aula - A04</h4>
-                  <p>32 lugares</p>
-
-                </div>
-
-              </div>
-
-              <span class="status-badge status-available">
-                Disponível
-              </span>
-
-            </a>
-
-            <a href="#" class="room-card searchable" data-sala="Sala de aula - A05" data-status="aguardando">
-
-              <div class="room-left">
-
-                <div class="room-thumb">
-
-                  <img src="/assets/icons/image.png" alt="Sala" width="20" height="20">
-
-                </div>
-
-                <div class="room-info">
-
-                  <h4>Sala de aula - A05</h4>
-                  <p>32 lugares</p>
-
-                </div>
-
-              </div>
-
-              <span class="status-badge status-waiting">
-                Aguardando
-              </span>
-
-            </a>
-
-          </div>
+              <!-- Os cards sao gerados pelo /js/salas.js a partir
+                   de GET /salas. Os que estavam escritos aqui a mao
+                   traziam nomes de sala que nao existem no banco. --></div>
 
           <!-- Indicador de etapas -->
           <div class="step-indicator">
@@ -358,152 +239,8 @@
 
   </div>
 
-  <script>
-
-    document.addEventListener('DOMContentLoaded', () => {
-
-      // Menu de Perfil
-
-      const userProfile =
-        document.getElementById('userProfile');
-
-      const userDropdown =
-        document.getElementById('userDropdown');
-
-      if (userProfile && userDropdown) {
-
-        userProfile.addEventListener('click', (e) => {
-
-          e.stopPropagation();
-
-          if (userDropdown.contains(e.target)) {
-            return;
-          }
-
-          userDropdown.classList.toggle('active');
-
-        });
-
-        document.addEventListener('click', (e) => {
-
-          if (!userProfile.contains(e.target)) {
-            userDropdown.classList.remove('active');
-          }
-
-        });
-
-      }
-
-      // Barra de pesquisa
-
-      const searchInput =
-        document.getElementById('search-input');
-
-      const itemsToSearch =
-        document.querySelectorAll('.searchable');
-
-      if (searchInput) {
-
-        searchInput.addEventListener('input', (e) => {
-
-          const searchTerm =
-            e.target.value
-              .toLowerCase()
-              .trim();
-
-          itemsToSearch.forEach((item) => {
-
-            const text =
-              item.textContent.toLowerCase();
-
-            item.style.display =
-              text.includes(searchTerm)
-                ? ''
-                : 'none';
-
-          });
-
-        });
-
-      }
-
-      // Seleção das salas
-
-      const roomCards =
-        document.querySelectorAll('.room-card');
-
-      roomCards.forEach((card) => {
-
-        card.addEventListener('click', (e) => {
-
-          // Salas negadas não avançam
-          if (card.dataset.status === 'negado') {
-
-            e.preventDefault();
-            return;
-
-          }
-
-          roomCards.forEach((c) => {
-            c.classList.remove('selected');
-          });
-
-          card.classList.add('selected');
-
-          // Guarda a sala escolhida
-          sessionStorage.setItem(
-            'salaSelecionada',
-            card.dataset.sala || ''
-          );
-
-          // Redireciona para o Passo 02
-          e.preventDefault();
-
-          setTimeout(() => {
-
-            window.location.href =
-              '/passo2_reserva_prof';
-
-          }, 300);
-
-        });
-
-      });
-
-      // Menu mobile
-
-      const menuToggle =
-        document.getElementById('menuToggle');
-
-      const sidebar =
-        document.querySelector('.sidebar');
-
-      const sidebarOverlay =
-        document.getElementById('sidebarOverlay');
-
-      if (menuToggle && sidebar && sidebarOverlay) {
-
-        menuToggle.addEventListener('click', () => {
-
-          sidebar.classList.toggle('open');
-
-          sidebarOverlay.classList.toggle('active');
-
-        });
-
-        sidebarOverlay.addEventListener('click', () => {
-
-          sidebar.classList.remove('open');
-
-          sidebarOverlay.classList.remove('active');
-
-        });
-
-      }
-
-    });
-
-  </script>
+  <script type="module" src="/js/usuario.js"></script>
+  <script type="module" src="/js/pages/escolherreservaprof.js"></script>
 
 </body>
 

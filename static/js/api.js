@@ -1,211 +1,175 @@
-const API_URL = "http://127.0.0.1:8000";
-
 // ============================================================
-// USUÁRIOS
+// API
+// ============================================================
+//
+// Comunicação com o backend. Todas as funções devolvem os dados já
+// convertidos (json) e levantam um erro quando a rota responde com
+// falha, para que a tela treat o erro em um lugar só.
+//
+// As rotas chamadas aqui são as que existem no app.py. Endpoint que
+// não existe voltaria 404 em silêncio nas telas, por isso esta lista
+// acompanha a API de perto.
+//
 // ============================================================
 
-async function listarUsuarios() {
-
-    const resposta = await fetch(`${API_URL}/usuarios`);
-
-    if (!resposta.ok) {
-        throw new Error("Erro ao buscar usuários");
-    }
-
-    return await resposta.json();
-}
 
 // ------------------------------------------------------------
-// CADASTRAR USUÁRIO
+// AUXILIARES
 // ------------------------------------------------------------
 
-async function cadastrarUsuario(dados) {
+/**
+ * Executa a requisição e devolve o corpo em json.
+ *
+ * A mensagem do erro vem do campo "detail" do FastAPI quando existe,
+ * que é onde a rota explica o que aconteceu ("Sala não encontrada",
+ * "E-mail ou senha inválidos"). Sem isso, a tela mostraria sempre
+ * "erro na requisição", que não ajuda ninguém a entender.
+ */
+async function pedir(url, opcoes = {}) {
 
-    const resposta = await fetch(`${API_URL}/usuarios`, {
+  const resposta = await fetch(url, opcoes);
 
-        method: "POST",
+  let corpo = null;
 
-        headers: {
-            "Content-Type": "application/json"
-        },
+  try {
 
-        body: JSON.stringify(dados)
-    });
+    corpo = await resposta.json();
 
-    if (!resposta.ok) {
-        throw new Error("Erro ao cadastrar usuário");
-    }
+  } catch (erro) {
 
-    return await resposta.json();
+    // Resposta sem corpo (204, ou página de erro do servidor).
+    corpo = null;
+
+  }
+
+  if (!resposta.ok) {
+
+    const detalhe =
+      corpo && (corpo.detail || corpo.erro || corpo.mensagem);
+
+    const erro = new Error(
+      typeof detalhe === 'string'
+        ? detalhe
+        : `Falha na requisição (${resposta.status}).`
+    );
+
+    erro.status = resposta.status;
+    erro.detalhe = corpo;
+
+    throw erro;
+
+  }
+
+  return corpo;
+
 }
+
+
+/**
+ * Monta o corpo de uma requisição JSON.
+ */
+function corpoJson(dados) {
+
+  return {
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(dados)
+  };
+
+}
+
+
+// ============================================================
+// SESSÃO
+// ============================================================
+
+/**
+ * Dados do usuário autenticado.
+ *
+ * A rota é /usuario_logado, com sublinhado: as telas que usavam o
+ * hífen recebiam 404 e caíam no "Usuário" genérico do cabeçalho.
+ */
+export async function usuarioLogado() {
+
+  return pedir('/usuario_logado');
+
+}
+
+
+// ============================================================
+// LOGIN
+// ============================================================
+
+/**
+ * Autentica e devolve { cargo: 'prof' | 'coordenador' }.
+ */
+export async function entrar(email, senha) {
+
+  const dados = new FormData();
+
+  dados.append('email', email);
+  dados.append('senha', senha);
+
+  return pedir('/login', {
+    method: 'POST',
+    body: dados
+  });
+
+}
+
 
 // ============================================================
 // SALAS
 // ============================================================
 
-async function listarSalas() {
+/**
+ * Salas reserváveis (as que aparecem nas telas de reserva).
+ */
+export async function listarSalas() {
 
-    const resposta = await fetch(`${API_URL}/salas`);
+  return pedir('/salas');
 
-    if (!resposta.ok) {
-        throw new Error("Erro ao buscar salas");
-    }
-
-    return await resposta.json();
 }
 
+/**
+ * Todas as salas, inclusive as que não são reserváveis.
+ * Restrito ao coordenador.
+ */
+export async function listarSalasAdmin() {
 
-async function buscarSala(id) {
+  return pedir('/admin/salas');
 
-    const resposta = await fetch(`${API_URL}/salas/${id}`);
-
-    if (!resposta.ok) {
-        throw new Error("Sala não encontrada");
-    }
-
-    return await resposta.json();
 }
 
+export async function buscarSala(id) {
 
-async function cadastrarSala(dados) {
+  return pedir(`/salas/${id}`);
 
-    const resposta = await fetch(`${API_URL}/salas`, {
-
-        method: "POST",
-
-        headers: {
-            "Content-Type": "application/json"
-        },
-
-        body: JSON.stringify(dados)
-    });
-
-    if (!resposta.ok) {
-        throw new Error("Erro ao cadastrar sala");
-    }
-
-    return await resposta.json();
 }
 
+export async function cadastrarSala(dados) {
 
-async function atualizarSala(id, dados) {
+  return pedir('/salas', {
+    method: 'POST',
+    ...corpoJson(dados)
+  });
 
-    const resposta = await fetch(`${API_URL}/salas/${id}`, {
-
-        method: "PUT",
-
-        headers: {
-            "Content-Type": "application/json"
-        },
-
-        body: JSON.stringify(dados)
-    });
-
-    if (!resposta.ok) {
-        throw new Error("Erro ao atualizar sala");
-    }
-
-    return await resposta.json();
 }
 
+export async function atualizarSala(id, dados) {
 
-async function excluirSala(id) {
+  return pedir(`/salas/${id}`, {
+    method: 'PUT',
+    ...corpoJson(dados)
+  });
 
-    const resposta = await fetch(`${API_URL}/salas/${id}`, {
-
-        method: "DELETE"
-    });
-
-    if (!resposta.ok) {
-        throw new Error("Erro ao excluir sala");
-    }
-
-    return await resposta.json();
 }
 
+export async function excluirSala(id) {
 
-// ============================================================
-// NOTEBOOKS
-// ============================================================
+  return pedir(`/salas/${id}`, {
+    method: 'DELETE'
+  });
 
-async function listarNotebooks() {
-
-    const resposta = await fetch(`${API_URL}/notebooks`);
-
-    if (!resposta.ok) {
-        throw new Error("Erro ao buscar notebooks");
-    }
-
-    return await resposta.json();
-}
-
-
-async function buscarNotebook(id) {
-
-    const resposta = await fetch(`${API_URL}/notebooks/${id}`);
-
-    if (!resposta.ok) {
-        throw new Error("Notebook não encontrado");
-    }
-
-    return await resposta.json();
-}
-
-
-async function cadastrarNotebook(dados) {
-
-    const resposta = await fetch(`${API_URL}/notebooks`, {
-
-        method: "POST",
-
-        headers: {
-            "Content-Type": "application/json"
-        },
-
-        body: JSON.stringify(dados)
-    });
-
-    if (!resposta.ok) {
-        throw new Error("Erro ao cadastrar notebook");
-    }
-
-    return await resposta.json();
-}
-
-
-async function atualizarNotebook(id, dados) {
-
-    const resposta = await fetch(`${API_URL}/notebooks/${id}`, {
-
-        method: "PUT",
-
-        headers: {
-            "Content-Type": "application/json"
-        },
-
-        body: JSON.stringify(dados)
-    });
-
-    if (!resposta.ok) {
-        throw new Error("Erro ao atualizar notebook");
-    }
-
-    return await resposta.json();
-}
-
-
-async function excluirNotebook(id) {
-
-    const resposta = await fetch(`${API_URL}/notebooks/${id}`, {
-
-        method: "DELETE"
-    });
-
-    if (!resposta.ok) {
-        throw new Error("Erro ao excluir notebook");
-    }
-
-    return await resposta.json();
 }
 
 
@@ -213,114 +177,94 @@ async function excluirNotebook(id) {
 // CARRINHOS
 // ============================================================
 
-async function listarCarrinhos() {
+export async function listarCarrinhos() {
 
-    const resposta = await fetch(`${API_URL}/carrinhos`);
+  return pedir('/carrinhos');
 
-    if (!resposta.ok) {
-        throw new Error("Erro ao buscar carrinhos");
-    }
-
-    return await resposta.json();
 }
-
-
-async function buscarCarrinho(id) {
-
-    const resposta = await fetch(`${API_URL}/carrinhos/${id}`);
-
-    if (!resposta.ok) {
-        throw new Error("Carrinho não encontrado");
-    }
-
-    return await resposta.json();
-}
-
-
-async function cadastrarCarrinho(dados) {
-
-    const resposta = await fetch(`${API_URL}/carrinhos`, {
-
-        method: "POST",
-
-        headers: {
-            "Content-Type": "application/json"
-        },
-
-        body: JSON.stringify(dados)
-    });
-
-    if (!resposta.ok) {
-        throw new Error("Erro ao cadastrar carrinho");
-    }
-
-    return await resposta.json();
-}
-
-
-async function atualizarCarrinho(id, dados) {
-
-    const resposta = await fetch(`${API_URL}/carrinhos/${id}`, {
-
-        method: "PUT",
-
-        headers: {
-            "Content-Type": "application/json"
-        },
-
-        body: JSON.stringify(dados)
-    });
-
-    if (!resposta.ok) {
-        throw new Error("Erro ao atualizar carrinho");
-    }
-
-    return await resposta.json();
-}
-
-
-async function excluirCarrinho(id) {
-
-    const resposta = await fetch(`${API_URL}/carrinhos/${id}`, {
-
-        method: "DELETE"
-    });
-
-    if (!resposta.ok) {
-        throw new Error("Erro ao excluir carrinho");
-    }
-
-    return await resposta.json();
-}
-
-
 
 
 // ============================================================
-// EXPORTAÇÕES
+// USUÁRIOS
 // ============================================================
 
-export {
+/**
+ * Lista de usuários, para a tela de professores. Restrito ao
+ * coordenador, e a resposta nunca traz o hash da senha.
+ */
+export async function listarUsuarios() {
 
-    listarUsuarios,
-    cadastrarUsuario,
+  return pedir('/usuarios');
 
-    listarSalas,
-    buscarSala,
-    cadastrarSala,
-    atualizarSala,
-    excluirSala,
+}
 
-    listarNotebooks,
-    buscarNotebook,
-    cadastrarNotebook,
-    atualizarNotebook,
-    excluirNotebook,
+export async function cadastrarUsuario(dados) {
 
-    listarCarrinhos,
-    buscarCarrinho,
-    cadastrarCarrinho,
-    atualizarCarrinho,
-    excluirCarrinho
+  return pedir('/usuarios', {
+    method: 'POST',
+    ...corpoJson(dados)
+  });
 
-};
+}
+
+export async function atualizarUsuario(id, dados) {
+
+  return pedir(`/usuarios/${id}`, {
+    method: 'PUT',
+    ...corpoJson(dados)
+  });
+
+}
+
+export async function excluirUsuario(id) {
+
+  return pedir(`/usuarios/${id}`, {
+    method: 'DELETE'
+  });
+
+}
+
+
+// ============================================================
+// RESERVAS
+// ============================================================
+
+/**
+ * Reservas. Sem argumento, o backend devolve as do professor
+ * logado; o coordenador recebe as de todo mundo. O filtro de
+ * status é opcional ("aguardando", "aprovada", "negada",
+ * "cancelada") e casa com as abas da tela de aprovação.
+ */
+export async function listarReservas(status) {
+
+  const consulta = status
+    ? `?status=${encodeURIComponent(status)}`
+    : '';
+
+  return pedir(`/reservas${consulta}`);
+
+}
+
+export async function criarReserva(dados) {
+
+  return pedir('/reservas', {
+    method: 'POST',
+    ...corpoJson(dados)
+  });
+
+}
+
+/**
+ * Aprova, recusa ou cancela uma reserva.
+ *
+ * "aprovada" e "negada" são exclusivas do coordenador; o professor
+ * só consegue cancelar o próprio pedido.
+ */
+export async function decidirReserva(id, decisao) {
+
+  return pedir(`/reservas/${id}/decisao`, {
+    method: 'PATCH',
+    ...corpoJson({ decisao: decisao })
+  });
+
+}

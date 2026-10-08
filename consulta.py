@@ -39,15 +39,20 @@ supabase = create_client(
 # ============================================================
 
 def consultar_usuarios():
-
+    """Retorna todos os usuários"""
     resposta = (
         supabase
         .table(TABELA)
         .select("*")
         .execute()
     )
-
     return resposta.data
+
+
+# Não existe consulta por "e-mail e senha" aqui de propósito: a senha
+# guardada é um hash bcrypt, que não pode ser comparado com a senha
+# digitada. A verificação acontece com bcrypt.checkpw, em
+# criptografia.verify_password, chamada pela rota /login.
 
 
 # ============================================================
@@ -55,71 +60,17 @@ def consultar_usuarios():
 # ============================================================
 
 def mostrar_usuarios(usuarios):
-
     print("USUÁRIOS\n")
-
+    
+    # Se receber o objeto resposta, pega .data
+    if hasattr(usuarios, 'data'):
+        usuarios = usuarios.data
+    
     for usuario in usuarios:
-
         print(
             f"{usuario['id']} - "
             f"{usuario['nome']} | "
             f"{usuario['email']}"
         )
-
+    
     print(f"\nTotal: {len(usuarios)}")
-
-
-# ============================================================
-# INICIALIZAÇÃO
-# ============================================================
-
-usuarios = consultar_usuarios()
-
-os.system("cls")
-
-mostrar_usuarios(usuarios)
-
-
-# ============================================================
-# MONITORAMENTO
-# ============================================================
-
-while True:
-
-    try:
-
-        novos_usuarios = consultar_usuarios()
-
-        ids_atuais = {
-            usuario["id"]
-            for usuario in usuarios
-        }
-
-        usuario_novo = any(
-            usuario["id"] not in ids_atuais
-            for usuario in novos_usuarios
-        )
-
-        # Só atualiza se houver usuário novo
-        if usuario_novo:
-
-            usuarios = novos_usuarios
-
-            os.system("cls")
-
-            mostrar_usuarios(usuarios)
-
-        time.sleep(INTERVALO)
-
-    except KeyboardInterrupt:
-
-        os.system("cls")
-        print("Programa encerrado.")
-
-        break
-
-    except Exception as erro:
-
-        print(f"\nErro: {erro}")
-
-        time.sleep(INTERVALO)

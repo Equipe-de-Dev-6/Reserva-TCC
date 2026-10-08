@@ -1,3 +1,8 @@
 fastapi[standard]
 supabase
 python-dotenv
+python-multipart
+bcrypt>=4.0,<6.0
+
+# Cifra o cookie de sessão (sessao.py).
+cryptography>=42.0

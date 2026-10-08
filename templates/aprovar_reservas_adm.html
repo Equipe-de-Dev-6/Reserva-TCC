@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Aprovar Reservas - Gestão de salas e equipamentos</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="https://www.flaticon.com/flaticon.css">
+  <link rel="stylesheet" href="/css/paginainicialprofessor.css">
+  <link rel="stylesheet" href="/css/aprovar_reservas_adm.css">
+
+</head>
+
+<body>
+  <div class="app-container">
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+      <div class="sidebar-top">
+
+        <a href="/home_admin" class="logo">
+          <img src="/assets/img/Logo senai.png" alt="SENAI">
+        </a>
+
+        <nav class="nav-menu">
+
+          <a href="/aprovar_reservas_adm" class="nav-item active">
+            <img src="/assets/icons/reserved.png" alt="" width="20" height="20">
+            Aprovar Reservas
+          </a>
+
+          <a href="/professores_adm" class="nav-item">
+            <img src="/assets/icons/user (3).png" alt="" width="20" height="20">
+            Professores
+          </a>
+
+          <a href="/gerenciar_salas_adm" class="nav-item">
+            <img src="/assets/icons/classroom.png" alt="" width="20" height="20">
+            Gerenciar Salas
+          </a>
+
+          <a href="/configuracoes_adm" class="nav-item">
+            <img src="/assets/icons/gear.png" alt="" width="20" height="20">
+            Configurações
+          </a>
+
+        </nav>
+
+      </div>
+
+      <form method="POST" action="/logout" class="logout-form">
+        <button type="submit" class="btn-logout">
+          <img src="/assets/icons/exit.png" alt="" width="20" height="20">
+          Sair
+        </button>
+      </form>
+    </aside>
+
+    <!-- CONTEÚDO PRINCIPAL -->
+    <main class="main-content">
+
+      <header class="header">
+
+        <button class="menu-toggle" id="menuToggle" aria-label="Abrir menu">
+          <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+            viewBox="0 0 24 24">
+            <path d="M3 6h18M3 12h18M3 18h18"></path>
+          </svg>
+        </button>
+
+        <div class="greeting">
+          <h1>
+            Olá <span id="nomeUsuario">...</span>!
+          </h1>
+          <p>
+            Aprove ou recuse as reservas solicitadas pelos professores
+          </p>
+        </div>
+
+        <div class="header-actions">
+
+          <a href="/notificacoes_prof" class="icon-btn">
+            <img src="/assets/icons/notification (2).png" alt="Notificações" width="20" height="20">
+          </a>
+
+          <div class="user-profile" id="userProfile">
+
+            <div class="avatar-link">
+              <div class="avatar">
+                <img src="/assets/icons/user (3).png" alt="Perfil do Usuário" width="28" height="28">
+              </div>
+            </div>
+
+            <div class="user-info">
+              <span class="name" id="nomePerfil">...</span>
+              <span class="role">Administrador</span>
+            </div>
+
+            <div class="user-dropdown" id="userDropdown">
+
+              <a href="/aprovar_reservas_adm" class="dropdown-item">
+                Aprovar Reservas
+              </a>
+
+              <a href="/configuracoes_adm" class="dropdown-item">
+                Configurações
+              </a>
+
+              <div class="dropdown-divider"></div>
+
+              <form method="POST" action="/logout">
+                <button type="submit">
+                  Sair
+                </button>
+              </form>
+
+            </div>
+          </div>
+
+        </div>
+      </header>
+
+      <!-- APROVAR RESERVAS -->
+      <section class="adm-section">
+
+        <div class="adm-page-header">
+          <div>
+            <h2>Reservas dos professores</h2>
+            <p>
+              Confira os pedidos feitos pelos professores e defina o que será liberado
+            </p>
+          </div>
+
+          <div class="adm-filtros">
+            <button class="adm-filtro ativo" type="button" data-status="aguardando">
+              Aguardando
+            </button>
+
+            <button class="adm-filtro" type="button" data-status="aprovada">
+              Aprovadas
+            </button>
+
+            <button class="adm-filtro" type="button" data-status="negada">
+              Recusadas
+            </button>
+
+            <button class="adm-filtro" type="button" data-status="cancelada">
+              Canceladas
+            </button>
+          </div>
+        </div>
+
+        <div class="adm-list" id="listaAprovacoes">
+          <!-- Renderizado dinamicamente via JS -->
+        </div>
+
+        <div class="adm-empty" id="listaVazia" style="display: none;">
+          <img src="/assets/icons/reserved.png" alt="" width="40" height="40">
+          <p id="listaVaziaTexto">
+            Nenhuma reserva aguardando aprovação no momento.
+          </p>
+        </div>
+
+        <div class="adm-empty" id="listaErro" style="display: none;">
+          <img src="/assets/icons/warning.png" alt="" width="40" height="40">
+          <p id="listaErroTexto">
+            Não foi possível carregar as reservas.
+          </p>
+        </div>
+
+      </section>
+    </main>
+  </div>
+
+  <!-- JAVASCRIPT -->
+  <script type="module">
+    import {
+      listarReservas,
+      decidirReserva
+    } from '/js/api.js';
+
+    // ======================================================
+    // CARREGAR USUÁRIO LOGADO
+    // ======================================================
+    async function carregarUsuario() {
+      try {
+        const resposta = await fetch('/usuario_logado', {
+          method: 'GET',
+          credentials: 'same-origin'
+        });
+
+        if (resposta.status === 401) {
+          window.location.href = '/';
+          return;
+        }
+
+        if (!resposta.ok) {
+          throw new Error('Não foi possível carregar os dados do usuário.');
+        }
+
+        const usuario = await resposta.json();
+
+        const nomeUsuario = document.getElementById('nomeUsuario');
+        const nomePerfil = document.getElementById('nomePerfil');
+
+        if (nomeUsuario) {
+          nomeUsuario.textContent = usuario.nome || 'Usuário';
+        }
+
+        if (nomePerfil) {
+          nomePerfil.textContent = usuario.nome || 'Usuário';
+        }
+
+      } catch (erro) {
+        console.error('Erro ao carregar usuário:', erro);
+      }
+    }
+
+    // ======================================================
+    // LISTA DE RESERVAS PARA APROVAÇÃO
+    // ======================================================
+    // As reservas vêm de GET /reservas. O administrador vê
+    // todas, e o filtro da tela escolhe o status exibido.
+
+    const listaAprovacoes = document.getElementById('listaAprovacoes');
+    const listaVazia = document.getElementById('listaVazia');
+    const listaErro = document.getElementById('listaErro');
+
+    let filtroAtual = 'aguardando';
+
+    const ROTULOS = {
+      aguardando: 'Aguardando',
+      aprovada: 'Aprovada',
+      negada: 'Recusada',
+      cancelada: 'Cancelada'
+    };
+
+    const VAZIOS = {
+      aguardando: 'Nenhuma reserva aguardando aprovação no momento.',
+      aprovada: 'Nenhuma reserva aprovada até agora.',
+      negada: 'Nenhuma reserva recusada até agora.',
+      cancelada: 'Nenhuma reserva cancelada até agora.'
+    };
+
+    /**
+     * Escapa o texto antes de colocá-lo no HTML.
+     *
+     * Os dados vêm do banco e são montados com template string.
+     * Sem escapar, um nome com "<" quebraria a tela ou
+     * permitiria injecting código vindo do formulário do
+     * professor.
+     */
+    function escapar(texto) {
+      return String(texto ?? '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
+
+    /**
+     * "2026-09-10T08:00:00" vira "10/09/2026".
+     */
+    function formatarData(timestamp) {
+      const data = String(timestamp || '').slice(0, 10);
+
+      if (!data) {
+        return 'Data não informada';
+      }
+
+      const [ano, mes, dia] = data.split('-');
+
+      return `${dia}/${mes}/${ano}`;
+    }
+
+    /**
+     * Extrai "08:00 - 09:00" do par de timestamps.
+     */
+    function formatarHorario(reserva) {
+      const inicio = String(reserva.data_inicio || '').slice(11, 16);
+      const fim = String(reserva.data_fim || '').slice(11, 16);
+
+      if (!inicio) {
+        return '';
+      }
+
+      return `${inicio} às ${fim || '--:--'}`;
+    }
+
+    function montarCard(reserva) {
+      const status = reserva.status || 'aguardando';
+
+      const detalhes = [
+        reserva.professor ? `Professor: ${reserva.professor}` : '',
+        reserva.curso ? `Curso: ${reserva.curso}` : '',
+        formatarHorario(reserva) ? `Horário: ${formatarHorario(reserva)}` : ''
+      ].filter(Boolean);
+
+      // Só a reserva que ainda espera resposta tem os botões.
+      const podeDecidir = status === 'aguardando';
+
+      return `
+        <div class="adm-card">
+          <div class="adm-card-topo">
+            <div>
+              <h4>${escapar(reserva.sala_nome || reserva.item || 'Reserva')}</h4>
+
+              <div class="adm-detalhes">
+                <span class="adm-detalhe">${escapar(formatarData(reserva.data_inicio))}</span>
+
+                ${detalhes.map((texto) => `<span class="adm-detalhe">${escapar(texto)}</span>`).join('')}
+              </div>
+            </div>
+
+            <span class="adm-selo adm-selo-${escapar(status)}">
+              ${escapar(ROTULOS[status] || status)}
+            </span>
+          </div>
+
+          ${reserva.motivo ? `<p class="adm-motivo">${escapar(reserva.motivo)}</p>` : ''}
+
+          ${podeDecidir ? `
+            <div class="adm-card-actions">
+              <button class="adm-btn adm-btn-aprovar" data-acao="aprovada" data-id="${reserva.id}">
+                Aprovar
+              </button>
+
+              <button class="adm-btn adm-btn-recusar" data-acao="negada" data-id="${reserva.id}">
+                Recusar
+              </button>
+            </div>
+          ` : ''}
+        </div>
+      `;
+    }
+
+    function renderAprovacoes(reservas) {
+      listaErro.style.display = 'none';
+
+      if (!reservas || reservas.length === 0) {
+        listaAprovacoes.innerHTML = '';
+        listaVazia.style.display = 'flex';
+        document.getElementById('listaVaziaTexto').textContent = VAZIOS[filtroAtual];
+        return;
+      }
+
+      listaVazia.style.display = 'none';
+      listaAprovacoes.innerHTML = reservas.map(montarCard).join('');
+    }
+
+    function mostrarErro(mensagem) {
+      listaAprovacoes.innerHTML = '';
+      listaVazia.style.display = 'none';
+      listaErro.style.display = 'flex';
+      document.getElementById('listaErroTexto').textContent = mensagem;
+    }
+
+    /**
+     * Busca as reservas do filtro atual e desenha a lista.
+     */
+    async function carregarReservas() {
+      try {
+        const reservas = await listarReservas(filtroAtual);
+        renderAprovacoes(reservas);
+
+      } catch (erro) {
+        console.error('Erro ao carregar as reservas:', erro);
+        mostrarErro(erro.message || 'Não foi possível carregar as reservas.');
+      }
+    }
+
+    /**
+     * Aprova ou recusa uma reserva.
+     *
+     * A decisão vai para PATCH /reservas/{id}/decisao. Os botões
+     * são desativados durante a chamada para impedir que a mesma
+     * reserva seja respondida duas vezes, o que a API recusaria
+     * com 409.
+     */
+    async function decidir(id, status, botao) {
+      const rotulo = status === 'aprovada' ? 'aprovar' : 'recusar';
+
+      const confirmar = window.confirm(
+        `Tem certeza que deseja ${rotulo} esta reserva?`
+      );
+
+      if (!confirmar) {
+        return;
+      }
+
+      const botoes = listaAprovacoes.querySelectorAll('button');
+      botoes.forEach((b) => { b.disabled = true; });
+
+      try {
+        await decidirReserva(id, status);
+        await carregarReservas();
+
+      } catch (erro) {
+        console.error('Erro ao decidir a reserva:', erro);
+
+        window.alert(erro.message || 'Não foi possível salvar a decisão.');
+
+        botoes.forEach((b) => { b.disabled = false; });
+      }
+    }
+
+    // A decisão é resolvida por delegação de evento, porque os
+    // cards são recriados a cada busca.
+    listaAprovacoes.addEventListener('click', (evento) => {
+      const botao = evento.target.closest('[data-acao]');
+
+      if (!botao) {
+        return;
+      }
+
+      decidir(botao.dataset.id, botao.dataset.acao, botao);
+    });
+
+    /**
+     * Troca o filtro e recarrega a lista.
+     */
+    document.querySelectorAll('.adm-filtro').forEach((botao) => {
+      botao.addEventListener('click', () => {
+        document.querySelectorAll('.adm-filtro').forEach((b) => {
+          b.classList.remove('ativo');
+        });
+
+        botao.classList.add('ativo');
+        filtroAtual = botao.dataset.status;
+
+        carregarReservas();
+      });
+    });
+
+    document.addEventListener('DOMContentLoaded', () => {
+      carregarUsuario();
+
+      // ======================================================
+      // DROPDOWN DO USUÁRIO
+      // ======================================================
+      const userProfile = document.getElementById('userProfile');
+      const userDropdown = document.getElementById('userDropdown');
+
+      if (userProfile && userDropdown) {
+        userProfile.addEventListener('click', (e) => {
+          e.stopPropagation();
+          userDropdown.classList.toggle('active');
+        });
+
+        document.addEventListener('click', (e) => {
+          if (!userProfile.contains(e.target)) {
+            userDropdown.classList.remove('active');
+          }
+        });
+      }
+
+      // ======================================================
+      // MENU MOBILE
+      // ======================================================
+      const menuToggle = document.getElementById('menuToggle');
+      const sidebar = document.querySelector('.sidebar');
+      const sidebarOverlay = document.getElementById('sidebarOverlay');
+
+      if (menuToggle && sidebar && sidebarOverlay) {
+        menuToggle.addEventListener('click', () => {
+          sidebar.classList.toggle('open');
+          sidebarOverlay.classList.toggle('active');
+        });
+
+        sidebarOverlay.addEventListener('click', () => {
+          sidebar.classList.remove('open');
+          sidebarOverlay.classList.remove('active');
+        });
+      }
+
+      carregarReservas();
+    });
+  </script>
+</body>
+
+</html>
