@@ -80,3 +80,35 @@ class Carrinho(BaseModel):
             'nome': self.nome,
             'disponibilidade': self.disponibilidade
         }
+
+
+# ============================================================
+# MODELO: RESERVA
+# ============================================================
+
+class Reserva(BaseModel):
+    """Dados preenchidos pelo professor no formulário de reserva.
+
+    Os nomes dos campos são iguais aos que o "reservas.js" envia,
+    para que a reserva gravada no banco e a exibida nas telas
+    usem exatamente os mesmos nomes.
+    """
+
+    data: str
+    horaEntrada: str
+    horaSaida: str
+    professor: str
+    curso: str
+    motivo: str = ""
+    categoria: str = ""
+    item: str = ""
+
+
+# ============================================================
+# MODELO: DECISÃO DA RESERVA
+# ============================================================
+
+class DecisaoReserva(BaseModel):
+    """Resposta do administrador sobre uma reserva pendente."""
+
+    decisao: str

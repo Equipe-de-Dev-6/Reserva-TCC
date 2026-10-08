@@ -256,11 +256,20 @@ As senhas nunca são armazenadas em texto plano.
 |---|---|---|
 | `GET` | `/` | Página de login |
 | `POST` | `/login` | Autenticação do usuário |
+| `POST` | `/logout` | Encerra a sessão |
+| `GET` | `/usuario_logado` | Dados do usuário da sessão |
 | `POST` | `/usuarios` | Cadastro de usuário |
 | `GET` | `/usuarios` | Listagem de usuários |
 | `GET` | `/salas` | Listagem de salas |
+| `GET` | `/carrinhos` | Listagem de carrinhos |
+| `GET` | `/reservas` | Reservas do professor (todas, se for admin) |
+| `POST` | `/reservas` | Registra uma reserva como `aguardando` |
+| `PATCH` | `/reservas/{id}/decisao` | Admin aprova/nega; o dono cancela |
 | `GET` | `/home` | Página inicial do professor |
 | `GET` | `/home_admin` | Página inicial da administração |
+| `GET` | `/aprovar_reservas_adm` | Aprovação de reservas |
+| `GET` | `/gerenciar_salas_adm` | Gestão de salas |
+| `GET` | `/professores_adm` | Gestão de professores |
 | `GET` | `/ajuda` | Central de ajuda |
 
 ## 🧩 Arquitetura JavaScript
@@ -270,16 +279,20 @@ A camada JavaScript foi separada em módulos para facilitar manutenção e teste
 ```text
 static/js/
 ├── api.js                 # Comunicação com a API
-├── app.js                 # Orquestração dos módulos comuns
+├── reservas.js            # Estado, sincronização e notificações das reservas
 ├── usuario.js             # Dados do usuário autenticado
 ├── menu.js                # Menu de perfil e menu mobile
 ├── faq.js                 # Acordeão de perguntas frequentes
 ├── search.js              # Utilitário de busca
-├── reservas.js            # Estado e persistência das reservas
 ├── avisos.js              # Estado dos avisos
 ├── notificacoes-push.js   # Notificações do navegador
 └── pages/                 # Lógica específica de cada página
 ```
+
+- `reservas.js` guarda as reservas no Supabase, pela rota `/reservas`, e
+  mantém uma cópia no navegador para a tela abrir rápido e continuar
+  funcionando sem internet. As leituras são síncronas, para os renders
+  atuais não precisarem esperar a API.
 
 - `app.js` inicializa os módulos comuns.
 - `usuario.js` executa `carregarUsuario()` ao ser carregado.
