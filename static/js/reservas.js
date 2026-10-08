@@ -58,7 +58,7 @@ const ReservasApp = (() => {
 
   const STATUS_AGUARDANDO = 'aguardando';
   const STATUS_APROVADA = 'aprovada';
-  const STATUS_NEGADO = 'negado';
+  const STATUS_NEGADA = 'negada';
   const STATUS_CANCELADA = 'cancelada';
 
   // Rótulo e cor de cada status. As classes são as que existem em
@@ -66,7 +66,7 @@ const ReservasApp = (() => {
   const STATUS = {
     [STATUS_AGUARDANDO]: { label: 'Aguardando', badgeClass: 'badge-yellow' },
     [STATUS_APROVADA]: { label: 'Aprovada', badgeClass: 'badge-green' },
-    [STATUS_NEGADO]: { label: 'Negado', badgeClass: 'badge-red' },
+    [STATUS_NEGADA]: { label: 'Recusada', badgeClass: 'badge-red' },
     [STATUS_CANCELADA]: { label: 'Cancelada', badgeClass: 'badge-red' }
   };
 
@@ -185,15 +185,41 @@ const ReservasApp = (() => {
   }
 
 
+  // A sala escolhida é gravada por telas diferentes, e cada uma usa um
+  // formato: o "salas.js" (telas de salas e laboratórios) grava um
+  // objeto com id, nome e contexto, porque o card vem do banco; a tela
+  // de gabinetes grava só o nome, porque ainda não há gabinetes
+  // cadastrados. As duas formas são aceitas aqui para que o passo 02
+  // funcione nas duas.
   function _lerSalaEscolhida() {
 
     try {
 
-      return sessionStorage.getItem(CHAVE_SALA) || '';
+      const bruto = sessionStorage.getItem(CHAVE_SALA) || '';
+
+      if (!bruto) {
+
+        return { nome: '', id: null, descricao: '' };
+
+      }
+
+      if (bruto.trimStart().startsWith('{')) {
+
+        const sala = JSON.parse(bruto);
+
+        return {
+          nome: sala.nome || '',
+          id: sala.id === undefined ? null : sala.id,
+          descricao: (sala.contexto || {}).descricao || ''
+        };
+
+      }
+
+      return { nome: bruto, id: null, descricao: '' };
 
     } catch (e) {
 
-      return '';
+      return { nome: '', id: null, descricao: '' };
 
     }
 
@@ -271,7 +297,8 @@ const ReservasApp = (() => {
       curso: reserva.curso || '',
       motivo: reserva.motivo || '',
       categoria: reserva.categoria || '',
-      item: reserva.item || ''
+      item: reserva.item || '',
+      salaId: reserva.salaId === undefined ? null : reserva.salaId
     };
 
   }
@@ -481,9 +508,16 @@ const ReservasApp = (() => {
 
   function _categoriaDoRecurso(recurso) {
 
-    const nome = String(recurso || '').toLowerCase();
+    // O nome cadastrado no banco é curto ("C16", "C20"), e é na
+    // descrição que aparece a palavra que diz o que a sala é
+    // ("Laboratório de informática"). Por isso os dois textos são
+    // procurados.
+    const texto = [recurso.nome, recurso.descricao]
+      .filter(Boolean)
+      .join(' ')
+      .toLowerCase();
 
-    const achada = CATEGORIAS.find((c) => nome.includes(c.chave));
+    const achada = CATEGORIAS.find((c) => texto.includes(c.chave));
 
     return achada ? achada.rotulo : 'Sala';
 
@@ -513,8 +547,9 @@ const ReservasApp = (() => {
     };
 
     const rascunho = {
-      item: recurso,
+      item: recurso.nome,
       categoria: _categoriaDoRecurso(recurso),
+      salaId: recurso.id,
       professor: valor('nomeProfessor'),
       curso: valor('curso'),
       motivo: valor('motivo'),
@@ -569,6 +604,10 @@ const ReservasApp = (() => {
       status: STATUS_AGUARDANDO,
       categoria: rascunho.categoria,
       item: rascunho.item,
+      // Vem nulo quando a tela de escolha gravou só o nome (gabinetes).
+      // A API usa o id para vincular a reserva à sala e passar a valer a
+      // trava de horário do banco.
+      salaId: rascunho.salaId === undefined ? null : rascunho.salaId,
       professor: rascunho.professor,
       curso: rascunho.curso,
       motivo: rascunho.motivo,

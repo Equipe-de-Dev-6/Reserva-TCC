@@ -1,3 +1,9 @@
+"""Consulta das salas que aparecem nas telas de reserva.
+
+O filtro das salas acontece aqui, na consulta ao banco, e não depois no
+navegador: assim o browser só recebe o que pode ser reservado.
+"""
+
 from db import supabase
 
 
@@ -30,15 +36,17 @@ PALAVRA_LABORATORIO = "laborat"
 # CONSULTA
 # ============================================================
 
-def consultar_salas_reservaveis():
+def salas_para_tela(supabase_cliente=None):
     """Retorna somente as salas que aparecem nas telas de reserva.
 
     O filtro acontece na consulta ao banco (cláusula IN), e não
     depois no frontend, para que o navegador receba apenas as
     salas reserváveis.
     """
+    cliente = supabase_cliente or supabase
+
     resposta = (
-        supabase
+        cliente
         .table("salas")
         .select("*")
         .in_("id", SALAS_RESERVAVEIS)

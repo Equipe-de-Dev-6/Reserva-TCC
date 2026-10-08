@@ -217,18 +217,43 @@ source venv/bin/activate
 pip install -r requirements.txt
 ```
 
-### 4. Configure as variáveis de ambiente
+### 4. Prepare o banco
 
-Crie um arquivo `.env` na raiz do projeto:
+Rode, no SQL Editor do Supabase, os arquivos abaixo **nesta ordem**:
+
+| Arquivo | O que faz |
+|---|---|
+| `reserva-Tcc.sql` | Esquema de referência. O próprio arquivo avisa que não deve ser executado; ele documenta as tabelas como estão. |
+| `migracao_reservas.sql` | Acrescenta as colunas que o formulário de reserva preenche. |
+| `migracao_schema.sql` | Ajustes que o código exige: status controlado, índices, `sala_id` opcional, trava de horário sobreposto, entre outros. |
+| `migracao_rls.sql` | Liga a Row Level Security, que fecha o acesso anônimo direto ao banco. |
+
+Todos os arquivos podem ser rodados mais de uma vez.
+
+### 5. Configure as variáveis de ambiente
+
+Copie o `.env.example` para `.env` e preencha:
+
+```bash
+copy .env.example .env
+```
 
 ```env
 SUPABASE_URL=https://seu-projeto.supabase.co
-SUPABASE_KEY=sua-chave-do-supabase
+
+# Chave secreta do projeto (Project Settings -> API).
+SUPABASE_KEY=sua-chave-secreta
+
+# Chave usada para assinar o cookie de sessão.
+# Gere com: python -c "import secrets; print(secrets.token_urlsafe(48))"
+SECRET_KEY=uma-chave-aleatoria-longa
 ```
 
-> **Importante:** o arquivo `.env` não deve ser enviado para o GitHub.
+> **Importante:** o arquivo `.env` não deve ser enviado para o GitHub, e a
+> `SECRET_KEY` precisa ser diferente da `SUPABASE_KEY`. Sem `SECRET_KEY` a
+> aplicação não inicia.
 
-### 5. Inicie a aplicação
+### 6. Inicie a aplicação
 
 ```bash
 uvicorn app:app --reload
@@ -242,35 +267,54 @@ http://127.0.0.1:8000
 
 ## 🔐 Segurança
 
-As senhas nunca são armazenadas em texto plano.
-
-- Durante o cadastro, a senha é processada por `hash_password()`.
-- O banco recebe somente o hash bcrypt.
-- Durante o login, `verify_password()` compara a senha com o hash armazenado.
-- A senha original não é retornada pela API.
-- O hash não é retornado nas respostas de listagem ou cadastro.
+- As senhas nunca são armazenadas em texto plano: o cadastro gera o hash
+  com `hash_password()` e o banco recebe somente o hash bcrypt.
+- O login chama `verify_password()`, que compara a senha com o hash.
+- Nem a senha nem o hash aparecem em nenhuma resposta da API.
+- O cookie de sessão é assinado com `SECRET_KEY`, uma chave separada da
+  chave do banco, e é renovado a cada login.
+- E-mail inexistente e senha errada recebem a mesma resposta, para não
+  revelar quem tem conta no sistema.
+- O login aceita 8 tentativas por endereço a cada 5 minutos.
+- Quem é administrador sai do `cargo` gravado no banco (`Coordenador`),
+  e não de um e-mail escrito no código.
+- As rotas de dados exigem sessão; as de administração exigem o cargo de
+  Coordenador, e o professor que abrir uma delas volta para a home dele.
+- O RLS ligado no banco nega o acesso direto pelo PostgREST com a chave
+  anônima, que é pública.
 
 ## 📡 Endpoints principais
 
-| Método | Rota | Descrição |
-|---|---|---|
-| `GET` | `/` | Página de login |
-| `POST` | `/login` | Autenticação do usuário |
-| `POST` | `/logout` | Encerra a sessão |
-| `GET` | `/usuario_logado` | Dados do usuário da sessão |
-| `POST` | `/usuarios` | Cadastro de usuário |
-| `GET` | `/usuarios` | Listagem de usuários |
-| `GET` | `/salas` | Listagem de salas |
-| `GET` | `/carrinhos` | Listagem de carrinhos |
-| `GET` | `/reservas` | Reservas do professor (todas, se for admin) |
-| `POST` | `/reservas` | Registra uma reserva como `aguardando` |
-| `PATCH` | `/reservas/{id}/decisao` | Admin aprova/nega; o dono cancela |
-| `GET` | `/home` | Página inicial do professor |
-| `GET` | `/home_admin` | Página inicial da administração |
-| `GET` | `/aprovar_reservas_adm` | Aprovação de reservas |
-| `GET` | `/gerenciar_salas_adm` | Gestão de salas |
-| `GET` | `/professores_adm` | Gestão de professores |
-| `GET` | `/ajuda` | Central de ajuda |
+| Método | Rota | Acesso | Descrição |
+|---|---|---|---|
+| `GET` | `/` | público | Página de login |
+| `POST` | `/login` | público | Autenticação |
+| `POST` | `/logout` | sessão | Encerra a sessão |
+| `GET` | `/usuario_logado` | sessão | Dados do usuário da sessão |
+| `GET` | `/usuarios` | coordenador | Listagem de usuários |
+| `POST` | `/usuarios` | coordenador | Cadastro de usuário |
+| `PUT` | `/usuarios/{id}` | coordenador | Edita usuário |
+| `DELETE` | `/usuarios/{id}` | coordenador | Exclui usuário |
+| `GET` | `/salas` | sessão | Salas reserváveis, com `contexto` |
+| `GET` | `/salas/{id}` | sessão | Uma sala |
+| `GET` | `/admin/salas` | coordenador | Todas as salas |
+| `POST` | `/salas` | coordenador | Cadastra sala |
+| `PUT` | `/salas/{id}` | coordenador | Edita sala |
+| `DELETE` | `/salas/{id}` | coordenador | Exclui sala |
+| `GET` | `/carrinhos` | sessão | Listagem de carrinhos |
+| `GET` | `/reservas` | sessão | Reservas do professor (todas, se for coordenador) |
+| `POST` | `/reservas` | sessão | Registra uma reserva como `aguardando` |
+| `PATCH` | `/reservas/{id}/decisao` | dono ou coordenador | Aprovar/recusar (coordenador) ou cancelar (dono) |
+| `GET` | `/home` | sessão | Início do professor |
+| `GET` | `/home_admin` | coordenador | Início da administração |
+| `GET` | `/aprovar_reservas_adm` | coordenador | Aprovação de reservas |
+| `GET` | `/gerenciar_salas_adm` | coordenador | Gestão de salas |
+| `GET` | `/professores_adm` | coordenador | Gestão de professores |
+| `GET` | `/ajuda` | sessão | Central de ajuda |
+
+Os status de uma reserva são `aguardando`, `aprovada`, `negada` e
+`cancelada`. Uma reserva que colide com outra da mesma sala no mesmo
+horário é recusada com `409`.
 
 ## 🧩 Arquitetura JavaScript
 
@@ -294,26 +338,33 @@ static/js/
   funcionando sem internet. As leituras são síncronas, para os renders
   atuais não precisarem esperar a API.
 
-- `app.js` inicializa os módulos comuns.
-- `usuario.js` executa `carregarUsuario()` ao ser carregado.
+- `usuario.js` exporta `carregarUsuario()`, chamada pelo módulo compartilhado.
 - `pages/` contém apenas a lógica específica de cada tela.
+- `salas.js` monta os cards das telas de escolha a partir de `GET /salas`.
 - Os módulos compartilhados são carregados antes dos módulos de página.
-- Os HTMLs não possuem scripts inline.
+- As telas do Coordenador ainda têm scripts inline, dentro do
+  `<script type="module">` do fim do arquivo.
 
 ## Estrutura do projeto
 
 ```text
 .
-├── app.py                 # Configuração do FastAPI e rotas
-├── security.py            # Hash e verificação de senhas com bcrypt
-├── model.py               # Modelos de dados da aplicação
-├── consulta.py            # Consultas auxiliares no Supabase
+├── app.py                 # FastAPI: sessão, autorização, páginas e rotas
+├── criptografia.py        # Hash e verificação de senhas com bcrypt
+├── model.py               # Modelos e validações da aplicação
 ├── db.py                  # Conexão com o Supabase
+├── consulta.py            # Consulta auxiliar de usuários
+├── consulta_salas.py      # Filtro das salas que aparecem na reserva
+├── migracao_reservas.sql  # Colunas usadas pelo formulário de reserva
+├── migracao_schema.sql    # Ajustes de esquema exigidos pelo código
+├── migracao_rls.sql       # Row Level Security
+├── reserva-Tcc.sql        # Esquema de referência (não executar)
 ├── static/
 │   ├── css/               # Estilos das páginas
 │   ├── js/                # Interações do frontend
 │   └── assets/            # Imagens e ícones
 ├── templates/             # Templates HTML
+├── .env.example           # Modelo das variáveis de ambiente
 ├── .env                   # Variáveis de ambiente (não versionado)
 └── requirements.txt       # Dependências do projeto
 ```

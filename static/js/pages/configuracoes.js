@@ -8,7 +8,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
                 try {
 
-                    const resposta = await fetch("/usuario-logado", {
+                    const resposta = await fetch("/usuario_logado", {
                         method: "GET",
                         credentials: "same-origin"
                     });

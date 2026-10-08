@@ -1,0 +1,334 @@
+-- ============================================================================
+-- MIGRAÇÃO: ajustes de esquema exigidos pelo código da aplicação
+-- ============================================================================
+--
+-- Este arquivo reúne em um lugar só as correções de estrutura que o
+-- código (app.py, model.py, reservas.js e as telas) já exige, mas
+-- que o esquema original não garante.
+--
+-- Rode no SQL Editor do Supabase (pode rodar mais de uma vez: todas as
+-- instruções checam o estado antes de mudar).
+--
+-- O que cada bloco corrige:
+--
+--   1. reservas: colunas que o formulário preenche  (migracao_reservas.sql
+--      continua existindo, mas este bloco já traz o mesmo efeito)
+--   2. reservas: sala_id deixa de ser obrigatório, porque a reserva pode
+--      ser de um laboratório, gabinete, carrinho ou notebook
+--   3. reservas: status, data_inicio e data_fim passam a ser obrigatórios
+--      e aceitam só os valores que as telas conhecem
+--   4. reservas: atualizado_em passa a se atualizar sozinho
+--   5. reservas: índice para a ordenação das telas
+--   6. sala_caracteristicas: sala_id deixa de ser identidade, o que
+--      impedia a tabela de junção de receber qualquer linha
+--   7. usuarios: cargo passa a ter valores controlados
+--   8. salas e carrinhos: colunas que a API lê sem aceitar nulo
+--
+-- ============================================================================
+
+
+-- ===========================================================================
+-- 1. Colunas usadas pelo formulário de reserva
+-- ===========================================================================
+
+ALTER TABLE public.reservas
+    ADD COLUMN IF NOT EXISTS categoria VARCHAR(60),
+    ADD COLUMN IF NOT EXISTS item VARCHAR(100),
+    ADD COLUMN IF NOT EXISTS professor VARCHAR(60),
+    ADD COLUMN IF NOT EXISTS curso VARCHAR(100),
+    ADD COLUMN IF NOT EXISTS motivo TEXT,
+    ADD COLUMN IF NOT EXISTS criado_em TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
+    ADD COLUMN IF NOT EXISTS atualizado_em TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP;
+
+-- Registros antigos não podem ficar sem dono de status nem sem horário,
+-- por isso o DEFAULT só vale para linhas novas: o UPDATE abaixo é o que
+-- preenche as que já existiam.
+ALTER TABLE public.reservas
+    ALTER COLUMN status SET DEFAULT 'aguardando';
+
+UPDATE public.reservas
+    SET status = 'aguardando'
+    WHERE status IS NULL;
+
+ALTER TABLE public.reservas
+    ALTER COLUMN status SET NOT NULL;
+
+-- O mesmo para as datas: nenhuma tela sabe exibir uma reserva sem data.
+UPDATE public.reservas
+    SET data_inicio = COALESCE(data_inicio, criado_em, NOW()),
+        data_fim = COALESCE(data_fim, data_inicio, criado_em, NOW())
+    WHERE data_inicio IS NULL OR data_fim IS NULL;
+
+ALTER TABLE public.reservas
+    ALTER COLUMN data_inicio SET NOT NULL,
+    ALTER COLUMN data_fim SET NOT NULL;
+
+-- Só estas quatro respostas existem. Sem esta trava, um INSERT direto
+-- pelo painel do Supabase grava um status que nenhuma tela reconhece e a
+-- reserva some dos filtros.
+ALTER TABLE public.reservas
+    DROP CONSTRAINT IF EXISTS reservas_status_check;
+
+ALTER TABLE public.reservas
+    ADD CONSTRAINT reservations_status_check
+    CHECK (status IN ('aguardando', 'aprovada', 'negada', 'cancelada'));
+
+
+-- ===========================================================================
+-- 2. A reserva não é obrigatoriamente de uma sala
+-- ===========================================================================
+--
+-- A tela de escolha oferece sala, laboratório, gabinete, carrinho e
+-- notebook. Com sala_id NOT NULL, qualquer reserva desses outros tipos
+-- era rejeitada pelo banco.
+--
+-- A trava abaixo impede o absurdo (os três recursos na mesma reserva),
+-- mas não exige sala_id: gabinete e carrinho ainda não têm cadastro
+-- próprio, e a reserva guarda o nome escolhido em "item". Quando essas
+-- telas passarem a enviar o id, basta trocar o <= 1 por um = 1.
+--
+ALTER TABLE public.reservas
+    ALTER COLUMN sala_id DROP NOT NULL;
+
+ALTER TABLE public.reservas
+    DROP CONSTRAINT IF EXISTS reservas_recurso_check;
+
+ALTER TABLE public.reservas
+    ADD CONSTRAINT reservas_recurso_check
+    CHECK (
+        (sala_id IS NOT NULL)::int
+      + (notebooks_id IS NOT NULL)::int
+      + (carrinho_id IS NOT NULL)::int <= 1
+    );
+
+-- Uma mesma sala não aceita duas reservas com horário sobreposto. O
+-- EXCLUDE só considera as reservas que ainda valem; as canceladas e as
+-- recusadas liberam o horário para outro professor.
+CREATE EXTENSION IF NOT EXISTS btree_gist;
+
+ALTER TABLE public.reservas
+    DROP CONSTRAINT IF EXISTS reservas_sem_choque;
+
+ALTER TABLE public.reservas
+    ADD CONSTRAINT reservas_sem_choque
+    EXCLUDE USING gist (
+        sala_id WITH =,
+        tstzrange(data_inicio, data_fim) WITH &&
+    )
+    WHERE (status IN ('aguardando', 'aprovada'));
+
+-- Converte o que já estava gravado sem fuso para o mesmo instante em
+-- UTC, que é como o restante da coluna é lido.
+UPDATE public.reservas
+    SET data_inicio = data_inicio AT TIME ZONE 'UTC'
+    WHERE data_inicio IS NOT NULL;
+
+UPDATE public.reservas
+    SET data_fim = data_fim AT TIME ZONE 'UTC'
+    WHERE data_fim IS NOT NULL;
+
+
+-- ===========================================================================
+-- 3. "atualizado_em" se manter sozinho
+-- ===========================================================================
+--
+-- DEFAULT CURRENT_TIMESTAMP só vale na inserção. Quem edita a reserva pelo
+-- painel do Supabase deixaria a data da criação, e é essa data que a tela
+-- de aprovação mostra. O trigger resolve para qualquer autor.
+--
+CREATE OR REPLACE FUNCTION public.marcar_reserva_atualizada()
+RETURNS trigger
+LANGUAGE plpgsql
+AS $$
+BEGIN
+    NEW.atualizado_em := NOW();
+    RETURN NEW;
+END;
+$$;
+
+DROP TRIGGER IF EXISTS reservas_atualizada_em ON public.reservas;
+
+CREATE TRIGGER reservas_atualizada_em
+    BEFORE UPDATE ON public.reservas
+    FOR EACH ROW
+    EXECUTE FUNCTION public.marcar_reserva_atualizada();
+
+
+-- ===========================================================================
+-- 4. Índices
+-- ===========================================================================
+--
+-- A tela de reservas ordena por data_inicio e a de aprovação filtra por
+-- status: sem estes índices, cada carregamento vira varredura da tabela.
+-- Postgres não cria índice sozinho em coluna de chave estrangeira.
+--
+CREATE INDEX IF NOT EXISTS idx_reservas_data_inicio
+    ON public.reservas (data_inicio DESC);
+
+CREATE INDEX IF NOT EXISTS idx_reservas_status
+    ON public.reservas (status);
+
+CREATE INDEX IF NOT EXISTS idx_reservas_usuario
+    ON public.reservas (usuario_id);
+
+CREATE INDEX IF NOT EXISTS idx_reservas_sala
+    ON public.reservas (sala_id);
+
+CREATE INDEX IF NOT EXISTS idx_reservas_criado_em
+    ON public.reservas (criado_em DESC);
+
+CREATE INDEX IF NOT EXISTS idx_sala_caracteristicas_sala
+    ON public.sala_caracteristicas (sala_id);
+
+
+-- ===========================================================================
+-- 5. A tabela de junção sala x característica não recebia linhas
+-- ===========================================================================
+--
+-- sala_caracteristicas.sala_id é parte da chave primária composta e
+-- estava declarada como GENERATED ALWAYS AS IDENTITY. Uma coluna de
+-- identidade não aceita valor informado, então não existia INSERT
+-- possível: ou se informava a sala e o banco recusava, ou o banco
+-- gerava um id que não correspondia a nenhuma sala. Uma coluna de
+-- junção é um id comum da outra tabela, não um número gerado aqui.
+--
+-- A coluna só pode ser trocada por id comum se ainda não houver linhas:
+-- o id gerado automaticamente não tem correspondência em public.salas.
+DO $$
+DECLARE
+    linhas_existentes bigint;
+BEGIN
+    SELECT COUNT(*) INTO linhas_existentes FROM public.sala_caracteristicas;
+
+    IF linhas_existentes > 0 THEN
+        RAISE EXCEPTION
+            'sala_caracteristicas tem % linha(s). Confira se a coluna sala_id não tem identity antes de continuar.', linhas_existentes;
+    END IF;
+END $$;
+
+ALTER TABLE public.sala_caracteristicas
+    ALTER COLUMN sala_id DROP IDENTITY;
+
+-- Remove a identidade implícita (quando vier de uma serial, e não de
+-- identity), para o id não continuar sendo gerado sozinho.
+ALTER TABLE public.sala_caracteristicas
+    ALTER COLUMN sala_id DROP DEFAULT;
+
+ALTER TABLE public.sala_caracteristicas
+    ALTER COLUMN sala_id SET NOT NULL;
+
+
+-- ===========================================================================
+-- 6. Cargo com valores controlados
+-- ===========================================================================
+--
+-- O banco guarda 'Professor' e 'Coordenador' (com inicial maiúscula),
+-- que são os valores que a tela de cadastro oferece.
+--
+UPDATE public.usuarios
+    SET cargo = 'Professor'
+    WHERE cargo IS NULL
+       OR lower(btrim(cargo)) NOT IN ('professor', 'coordenador');
+
+ALTER TABLE public.usuarios
+    ALTER COLUMN cargo SET DEFAULT 'Professor';
+
+ALTER TABLE public.usuarios
+    DROP CONSTRAINT IF EXISTS usuarios_cargo_check;
+
+ALTER TABLE public.usuarios
+    ADD CONSTRAINT usuarios_cargo_check
+    CHECK (cargo IN ('Professor', 'Coordenador'));
+
+-- O login confere o e-mail depois de normalizar, e a busca de duplicidade
+-- também. Gravar o e-mail já normalizado evita duas contas que diferem
+-- só por maiúsculas ou espaços.
+CREATE UNIQUE INDEX IF NOT EXISTS idx_usuarios_email_normalizado
+    ON public.usuarios (lower(btrim(email)));
+
+
+-- ===========================================================================
+-- 7. Colunas que a API lê sem aceitar nulo
+-- ===========================================================================
+--
+-- model.Sala e model.Carrinho exigem nome, disponibilidade e, na sala,
+-- característica e histórico. Um único NULL nestas colunas transformava
+-- GET /salas em erro 500.
+--
+UPDATE public.salas SET nome = 'Sem nome' WHERE nome IS NULL;
+UPDATE public.salas SET caracteristica = '' WHERE caracteristica IS NULL;
+UPDATE public.salas SET disponibilidade = TRUE WHERE disponibilidade IS NULL;
+UPDATE public.salas SET historico = '{}'::json WHERE historico IS NULL;
+
+ALTER TABLE public.salas
+    ALTER COLUMN nome SET NOT NULL,
+    ALTER COLUMN caracteristica SET NOT NULL,
+    ALTER COLUMN disponibilidade SET NOT NULL,
+    ALTER COLUMN historico SET NOT NULL;
+
+ALTER TABLE public.salas
+    ALTER COLUMN disponibilidade SET DEFAULT TRUE;
+
+-- O histórico fica em "{}" quando a sala nunca foi usada, que é o que a
+-- API já esperava; a coluna só precisa deixar de aceitar nulo.
+ALTER TABLE public.salas
+    ALTER COLUMN historico SET DEFAULT '{}'::json;
+
+UPDATE public.carrinhos SET nome = 'Sem nome' WHERE nome IS NULL;
+UPDATE public.carrinhos SET disponibilidade = TRUE WHERE disponibilidade IS NULL;
+
+ALTER TABLE public.carrinhos
+    ALTER COLUMN nome SET NOT NULL,
+    ALTER COLUMN disponibilidade SET NOT NULL,
+    ALTER COLUMN disponibilidade SET DEFAULT TRUE;
+
+-- O bcrypt sempre gera 60 caracteres, então 150 só ocupava espaço.
+ALTER TABLE public.usuarios
+    DROP CONSTRAINT IF EXISTS usuarios_senha_check;
+
+ALTER TABLE public.usuarios
+    ADD CONSTRAINT usuarios_senha_check
+    CHECK (senha IS NULL OR char_length(senha) BETWEEN 59 AND 61);
+
+-- NOT NULL depois do UPDATE, para a trava não atrapalhar a limpeza acima.
+ALTER TABLE public.usuarios
+    ALTER COLUMN nome SET NOT NULL,
+    ALTER COLUMN email SET NOT NULL;
+
+-- E-mail com formato mínimo e sem espaço nas pontas, que é como o login
+-- normaliza antes de procurar.
+ALTER TABLE public.usuarios
+    DROP CONSTRAINT IF EXISTS usuarios_email_formato;
+
+ALTER TABLE public.usuarios
+    ADD CONSTRAINT usuarios_email_formato
+    CHECK (
+        email = btrim(email)
+        AND email LIKE '%_@_%._%'
+        AND char_length(email) <= 100
+    );
+
+
+-- ===========================================================================
+-- 8. Excluir uma sala não pode deixar reserva órfã
+-- ===========================================================================
+--
+-- Sem ON DELETE, apagar uma sala que tem histórico falha com erro de
+-- chave estrangeira. Nenhuma das duas opções é silenciosa: deixar as
+-- reservas órfãs quebra a tela de aprovação; apagar o histórico perde
+-- informação. O padrão é negar, e a API trata a recusa como erro
+-- legível.
+--
+ALTER TABLE public.salas
+    DROP CONSTRAINT IF EXISTS reservas_sala_id_fkey,
+    ADD CONSTRAINT reservas_sala_id_fkey
+        FOREIGN KEY (sala_id) REFERENCES public.salas(id)
+        ON DELETE RESTRICT
+        ON UPDATE CASCADE;
+
+ALTER TABLE public.usuarios
+    DROP CONSTRAINT IF EXISTS reservas_usuario_id_fkey,
+    ADD CONSTRAINT reservas_usuario_id_fkey
+        FOREIGN KEY (usuario_id) REFERENCES public.usuarios(id)
+        ON DELETE RESTRICT
+        ON UPDATE CASCADE;
