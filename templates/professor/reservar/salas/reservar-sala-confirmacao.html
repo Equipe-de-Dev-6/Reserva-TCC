@@ -1,0 +1,106 @@
+{#- Esqueleto herdado de base.html; aqui fica so o que e proprio
+      desta tela. -#}
+{% extends "base.html" %}
+
+{% block head_extra %}
+  <link rel="stylesheet" href="/css/reservar-sala-confirmacao.css">
+{% endblock %}
+
+{% block titulo %}Solicitação Enviada{% endblock %}
+
+{% block busca_placeholder %}Buscar salas, carrinhos, laboratórios...{% endblock %}
+
+{% block conteudo %}
+
+      <!-- Conteúdo -->
+      <section class="quick-actions-section">
+
+        <div class="booking-layout">
+
+          <!-- Categoria -->
+          <div class="category-card">
+
+            <div class="category-icon">
+
+              <img src="/assets/icons/classroom.png" alt="Salas">
+
+            </div>
+
+            <h3>
+              Salas de aula, reuniões e treinamentos
+            </h3>
+
+          </div>
+
+          <!-- Sucesso -->
+          <div class="success-card">
+
+            <div class="success-icon">
+
+              <img src="/assets/icons/start-up.png" alt="Sucesso">
+
+            </div>
+
+            <p class="success-text">
+
+              Sua solicitação de agendamento foi enviada
+              com sucesso! Aguarde algum dos coordenadores
+              aprovarem seu pedido. Se aprovado, ele será
+              confirmado na aba
+
+              <a href="/reservas_prof" class="link-highlight">
+                “Reservas”
+              </a>.
+
+            </p>
+
+            <div class="success-actions">
+
+              <a href="/reservas_prof" class="btn-ver-reservas">
+                Ver minhas reservas
+              </a>
+
+              <a href="/home" class="btn-inicio">
+                Voltar ao início
+              </a>
+
+            </div>
+
+          </div>
+
+          <!-- Indicador de etapas -->
+          <div class="step-indicator">
+
+            <div class="step active">
+              01
+            </div>
+
+            <div class="step-line active-line"></div>
+
+            <div class="step active">
+              02
+            </div>
+
+            <div class="step-line active-line"></div>
+
+            <div class="step active">
+              03
+            </div>
+
+          </div>
+
+        </div>
+
+      </section>
+
+{% endblock %}
+
+{% block scripts %}
+  <script src="/js/reservas.js"></script>
+
+  <script type="module" src="/js/pages/passo3reservaprof.js"></script>
+
+</body>
+
+</html>
+{% endblock %}

@@ -2,24 +2,22 @@
 // avisos.js
 // ==========================================================
 //
-// Lógica compartilhada dos "Avisos Importantes".
+// Logica compartilhada dos "Avisos Importantes".
 //
-// Como funciona (sem backend):
+// Como funciona:
 //
-// 1. Na página "Avisos" (/avisos_prof), o professor preenche o
-//    formulário e clica em "Publicar Aviso". O aviso é guardado
-//    em memória, no próprio navegador.
+// 1. Na pagina "Avisos" (/avisos), o professor preenche o formulario e
+//    clica em "Publicar Aviso". O aviso fica guardado no navegador, em
+//    localStorage, e volta quando a pagina recarrega.
 //
-// 2. A lista vive no estado do módulo. Como o localStorage foi
-//    removido, cada carregamento de página começa com a lista
-//    vazia e os avisos somem ao recarregar. Quando existir o
-//    backend de avisos, basta trocar o _saveAvisos por uma
-//    chamada à API.
+// 2. A lista e por navegador, e nao e compartilhada: um aviso publicado
+//    na maquina de um professor nao aparece para os outros. Quando houver
+//    backend de avisos, basta trocar os _ler/_gravar por chamadas a API,
+//    como o reservas.js faz com /reservas.
 //
-// 3. AvisosApp.subscribe(fn) permite que uma página "escute"
-//    mudanças (criação/exclusão) feitas nela mesma e sempre
-//    re-renderize a lista sem precisar chamar a função de render
-//    manualmente em cada ação.
+// 3. AvisosApp.subscribe(fn) permite que uma pagina "escute" mudancas
+//    (criacao/exclusao) feitas nela mesma e sempre se re-renderize sem
+//    precisar chamar a funcao de render manualmente.
 //
 // ==========================================================
 
@@ -29,7 +27,11 @@ const AvisosApp = (() => {
   // ESTADO
   // ========================================================
 
-  let avisos = [];
+  // O prefixo evita colisao com outro sistema na mesma origem.
+  const CHAVE = 'reservaSenaiAvisos';
+
+  // null ate a primeira leitura, para o localStorage ser aberto uma vez.
+  let avisos = null;
 
   const _listeners = [];
 
@@ -53,13 +55,69 @@ const AvisosApp = (() => {
 
 
   // ========================================================
+  // PERSISTENCIA
+  // ========================================================
+
+  function _ler() {
+
+    if (avisos !== null) {
+
+      return avisos;
+
+    }
+
+    try {
+
+      const bruto = localStorage.getItem(CHAVE);
+
+      const guardado = bruto ? JSON.parse(bruto) : [];
+
+      avisos = Array.isArray(guardado) ? guardado : [];
+
+    } catch (erro) {
+
+      // localStorage indisponivel (modo anonimo) ou conteudo corrompido:
+      // os avisos passam a durar so a aba aberta, em vez de a tela
+      // inteira quebrar.
+      avisos = [];
+
+    }
+
+    return avisos;
+
+  }
+
+
+  function _gravar(lista) {
+
+    // Guarda uma copia, para que a tela nao segure uma referencia que
+    // muda por baixo dos panos.
+    avisos = [...lista];
+
+    try {
+
+      localStorage.setItem(CHAVE, JSON.stringify(avisos));
+
+    } catch (erro) {
+
+      // Sem espaco em disco, por exemplo: a lista continua valendo
+      // enquanto a aba estiver aberta.
+
+    }
+
+    return true;
+
+  }
+
+
+  // ========================================================
   // LEITURA / ESCRITA
   // ========================================================
 
   function getAvisos() {
 
     // Mais recentes primeiro.
-    return [...avisos].sort(
+    return [..._ler()].sort(
       (a, b) => new Date(b.criadoEm) - new Date(a.criadoEm)
     );
 
@@ -68,11 +126,7 @@ const AvisosApp = (() => {
 
   function _saveAvisos(lista) {
 
-    // Guarda uma cópia, para que a tela não segure uma
-    // referência que muda por baixo dos panos.
-    avisos = [...lista];
-
-    return true;
+    return _gravar(lista);
 
   }
 
@@ -172,3 +226,16 @@ const AvisosApp = (() => {
   };
 
 })();
+
+
+// ============================================================
+// GLOBAL
+// ============================================================
+//
+// O "const" do topo de um script cria um binding no escopo léxico
+// global, e não uma propriedade de "window". Quem chama por
+// "window.AvisosApp" — como o "notificacoes-push.js" faz para conferir
+// se o módulo está carregado — receberia "undefined" e desligaria a
+// notificação silenciosamente. Por isso o global é publicado
+// explicitamente aqui.
+window.AvisosApp = AvisosApp;

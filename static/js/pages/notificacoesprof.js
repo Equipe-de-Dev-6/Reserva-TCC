@@ -1,6 +1,5 @@
 // Busca o nome do usuário autenticado pela sessão do FastAPI.
 
-
         document.addEventListener('DOMContentLoaded', () => {
 function escapeHtml(value) {
                 return String(value ?? '').replace(
@@ -122,39 +121,29 @@ function escapeHtml(value) {
                     }).join('')
                     : '<p class="notification-empty">Nenhuma notificação de reserva.</p>';
 
-                configurarBusca();
+                // ======================================================
+                // BUSCA
+                // ======================================================
 
-                const searchInput = document.getElementById('search-input');
+                // A busca em si mora no app.js: ele escuta o campo e
+                // filtra os itens marcados com "searchable". Aqui so
+                // falta reaplicar o filtro quando a lista e redesenhada
+                // com o campo ja preenchido — senao o texto digitado
+                // some da tela ate a pessoa digitar de novo.
+                //
+                // Esta tela tinha uma segunda busca, igual a do app.js, e
+                // ela declarava o campo duas vezes. Na limpeza do JS as
+                // duas declaracoes sairam e os usos ficaram pendurados:
+                // "searchInput is not defined", e a tela parava de
+                // renderizar assim que a lista era desenhada.
+                const campo = document.getElementById('search-input');
 
-                if (searchInput && searchInput.value.trim()) {
-                    searchInput.dispatchEvent(new Event('input'));
+                if (campo && campo.value.trim()) {
+                    campo.dispatchEvent(new Event('input'));
                 }
             }
 
-            function configurarBusca() {
-                const searchInput = document.getElementById('search-input');
-
-                if (!searchInput || searchInput.dataset.bound) {
-                    return;
-                }
-
-                searchInput.dataset.bound = 'true';
-
-                searchInput.addEventListener('input', (e) => {
-                    const term = e.target.value.toLowerCase().trim();
-
-                    document
-                        .querySelectorAll('#notificationsList .searchable')
-                        .forEach((item) => {
-                            item.style.display =
-                                item.textContent.toLowerCase().includes(term)
-                                    ? ''
-                                    : 'none';
-                        });
-                });
-            }
-
-            // Renderiza as notificações.
+// Renderiza as notificações.
             renderNotificacoes();
 
             // Atualiza quando houver alterações.
@@ -196,42 +185,7 @@ function escapeHtml(value) {
                     ReservasApp.clearNotificacoes();
                 });
 
-            // Dropdown do usuário.
-            const userProfile = document.getElementById('userProfile');
-            const userDropdown = document.getElementById('userDropdown');
+            
 
-            if (userProfile && userDropdown) {
-                userProfile.addEventListener('click', (e) => {
-                    e.stopPropagation();
-
-                    if (userDropdown.contains(e.target)) {
-                        return;
-                    }
-
-                    userDropdown.classList.toggle('active');
-                });
-
-                document.addEventListener('click', (e) => {
-                    if (!userProfile.contains(e.target)) {
-                        userDropdown.classList.remove('active');
-                    }
-                });
-            }
-
-            // Menu mobile.
-            const menuToggle = document.getElementById('menuToggle');
-            const sidebar = document.querySelector('.sidebar');
-            const sidebarOverlay = document.getElementById('sidebarOverlay');
-
-            if (menuToggle && sidebar && sidebarOverlay) {
-                menuToggle.addEventListener('click', () => {
-                    sidebar.classList.toggle('open');
-                    sidebarOverlay.classList.toggle('active');
-                });
-
-                sidebarOverlay.addEventListener('click', () => {
-                    sidebar.classList.remove('open');
-                    sidebarOverlay.classList.remove('active');
-                });
-            }
+            
         });

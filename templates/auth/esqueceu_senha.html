@@ -1,0 +1,43 @@
+{#- Tela de acesso: esqueleto herdado de base_auth.html. -#}
+{% extends "auth/base_auth.html" %}
+
+{% block head_extra %}
+  <link rel="stylesheet" href="/css/esqueceu_senha.css">
+{% endblock %}
+
+{% block titulo %}Esqueci minha senha{% endblock %}
+
+{% block conteudo %}
+    <div class="container">
+        <div class="logo">
+            <img src="/assets/img/Logo senai.png">
+        </div>
+        <div class="hr"></div>
+        <div class="links">
+
+            <p>Redefinir senha</p>
+
+            <p> Gestão de salas e equipamentos </p>
+
+
+        </div>
+        <div class="hr"></div>
+        <div class="form-container">
+            <h2>Informe o e-mail para redefinir sua senha.</h2>
+
+            <form action="/redefinir_senha">
+                <div class="input-container">
+                    <i class="bi bi-envelope"></i>
+                    <input type="email" placeholder="Email..." required>
+                </div>
+                <button type="submit">Enviar e-mail</button>
+            </form>
+
+
+            <div class="links">
+                <p><a href="/">Voltar ao login</a></p>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+

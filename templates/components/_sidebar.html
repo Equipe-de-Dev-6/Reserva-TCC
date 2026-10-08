@@ -1,0 +1,37 @@
+{#-
+  _sidebar.html
+
+  Menu lateral. Os itens vêm prontos do app.py (variável "menu"), com a
+  forma:
+
+      {"rota": "/professores_adm", "icone": "user (3)", "rotulo": "Professores"}
+
+  E a rota atual vem em "rota_atual", para marcar o item ativo. Sem
+  preciso escrever a lista aqui, o menu do Coordenador nunca mostra um
+  link de Professor: o item simplesmente não existe na lista dele.
+-#}
+<aside class="sidebar">
+  <div class="sidebar-top">
+
+    <a href="{{ rota_inicio }}" class="logo">
+      <img src="/assets/img/Logo senai.png" alt="SENAI">
+    </a>
+
+    <nav class="nav-menu">
+      {% for item in menu %}
+        <a href="{{ item.rota }}" class="nav-item {{ 'active' if item.rota == rota_atual }}">
+          <img src="/assets/icons/{{ item.icone }}.png" alt="" width="20" height="20">
+          {{ item.rotulo }}
+        </a>
+      {% endfor %}
+    </nav>
+
+  </div>
+
+  <form method="POST" action="/logout" class="logout-form">
+    <button type="submit" class="btn-logout">
+      <img src="/assets/icons/exit.png" alt="" width="20" height="20">
+      Sair
+    </button>
+  </form>
+</aside>

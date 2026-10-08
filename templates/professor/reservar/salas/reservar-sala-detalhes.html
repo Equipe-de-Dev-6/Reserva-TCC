@@ -1,0 +1,167 @@
+{#- Esqueleto herdado de base.html; aqui fica so o que e proprio
+      desta tela. -#}
+{% extends "base.html" %}
+
+{% block head_extra %}
+  <link rel="stylesheet" href="/css/reservar-sala-detalhes.css">
+{% endblock %}
+
+{% block titulo %}Detalhes da Reserva{% endblock %}
+
+{% block busca_placeholder %}Buscar salas, carrinhos, laboratórios...{% endblock %}
+
+{% block conteudo %}
+
+      <section class="quick-actions-section">
+
+        <h2>O que você deseja reservar hoje?</h2>
+
+        <div class="booking-layout">
+
+          <div class="category-card">
+
+            <div class="category-icon">
+              <img src="/assets/icons/classroom.png" alt="Salas">
+            </div>
+
+            <h3>
+              Salas de aula, reuniões e treinamentos
+            </h3>
+
+          </div>
+
+          <div class="form-card">
+
+            <h3 class="form-title">
+              Passo 02: Detalhes da Reserva
+            </h3>
+
+            <p class="form-subtitle">
+              Por favor, preencha as informações necessárias para finalizar a solicitação da sala.
+            </p>
+
+            <form id="reservaForm" class="reserva-form" novalidate>
+
+              <div class="form-row">
+
+                <div class="form-group">
+
+                  <label for="nomeProfessor">
+                    Nome do professor
+                  </label>
+
+                  <input type="text" id="nomeProfessor" name="nomeProfessor" placeholder="Ex: Thiago Almeida" required>
+
+                </div>
+
+                <div class="form-group">
+
+                  <label for="curso">
+                    Curso
+                  </label>
+
+                  <input type="text" id="curso" name="curso" placeholder="Ex: Desenvolvimento de Sistemas" required>
+
+                </div>
+
+              </div>
+
+              <div class="form-group">
+
+                <label for="motivo">
+                  Qual o motivo da reserva?
+                </label>
+
+                <textarea id="motivo" name="motivo" rows="3"
+                  placeholder="Ex: Aula prática de desenvolvimento de sistemas para a turma de Aprendizagem Industrial."
+                  required></textarea>
+
+              </div>
+
+              <div class="form-group">
+
+                <label for="data">
+                  Data da reserva
+                </label>
+
+                <input type="date" id="data" name="data" required>
+
+              </div>
+
+              <div class="form-row">
+
+                <div class="form-group">
+
+                  <label for="horaEntrada">
+                    Horário de entrada
+                  </label>
+
+                  <input type="time" id="horaEntrada" name="horaEntrada" required>
+
+                </div>
+
+                <div class="form-group">
+
+                  <label for="horaSaida">
+                    Horário de saída
+                  </label>
+
+                  <input type="time" id="horaSaida" name="horaSaida" required>
+
+                </div>
+
+              </div>
+
+              <div class="form-actions">
+
+                <a href="/escolher_reserva_salas" class="btn-voltar">
+                  Voltar
+                </a>
+
+                <button type="submit" class="btn-enviar">
+                  Enviar
+                </button>
+
+              </div>
+
+            </form>
+
+          </div>
+
+          <!-- Indicador de etapas -->
+
+          <div class="step-indicator">
+
+            <div class="step active">
+              01
+            </div>
+
+            <div class="step-line active-line"></div>
+
+            <div class="step active">
+              02
+            </div>
+
+            <div class="step-line"></div>
+
+            <div class="step">
+              03
+            </div>
+
+          </div>
+
+        </div>
+
+      </section>
+
+{% endblock %}
+
+{% block scripts %}
+  <script src="/js/reservas.js"></script>
+
+  <script type="module" src="/js/pages/passo2reservaprof.js"></script>
+
+</body>
+
+</html>
+{% endblock %}

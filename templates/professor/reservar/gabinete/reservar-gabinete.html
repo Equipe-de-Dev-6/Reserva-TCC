@@ -1,0 +1,94 @@
+{#- Esqueleto herdado de base.html; aqui fica so o que e proprio
+      desta tela. -#}
+{% extends "base.html" %}
+
+{% block head_extra %}
+  <link rel="stylesheet" href="/css/reservar-sala.css">
+{% endblock %}
+
+{% block titulo %}Reservar Gabinetes{% endblock %}
+
+{% block busca_placeholder %}Buscar salas, carrinhos, laboratórios...{% endblock %}
+
+{% block conteudo %}
+
+      <!-- =======================================================
+           HEADER
+      ======================================================== -->
+
+      <!-- =======================================================
+           SEÇÃO DE RESERVA
+      ======================================================== -->
+      <section class="quick-actions-section">
+
+        <h2>
+          O que você deseja reservar hoje?
+        </h2>
+
+        <div class="booking-layout">
+
+          <!-- Categoria -->
+          <div class="category-card">
+
+            <div class="category-icon">
+
+              <img src="/assets/icons/shopping-cart.png" alt="Gabinetes">
+
+            </div>
+
+            <h3>
+              Gabinetes de notebooks e equipamentos móveis
+            </h3>
+
+          </div>
+
+          <!-- ===================================================
+               LISTA DE GABINETES
+          ==================================================== -->
+          <div class="rooms-list"
+             data-lista-salas
+             data-categoria="gabinete"
+             data-proximo="/passo2_reserva_prof">
+
+              <!-- Os cards sao gerados pelo /js/salas.js a partir
+                   de GET /salas. Os que estavam escritos aqui a mao
+                   traziam nomes de gabinete que nao existem no banco. --></div>
+
+          <!-- ===================================================
+               INDICADOR DE ETAPAS
+          ==================================================== -->
+          <div class="step-indicator">
+
+            <div class="step active">
+              01
+            </div>
+
+            <div class="step-line"></div>
+
+            <div class="step">
+              02
+            </div>
+
+            <div class="step-line"></div>
+
+            <div class="step">
+              03
+            </div>
+
+          </div>
+
+        </div>
+
+      </section>
+
+{% endblock %}
+
+{% block scripts %}
+  <!-- Salas, laboratorios e gabinetes: os cards vem do banco. -->
+<script type="module" src="/js/salas.js"></script>
+  <script type="module" src="/js/pages/escolherreservaprof3.js"></script>
+
+</body>
+
+</html>
+{% endblock %}

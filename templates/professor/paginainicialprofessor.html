@@ -1,0 +1,220 @@
+{#- Esqueleto herdado de base.html; aqui fica so o que e proprio
+      desta tela. -#}
+{% extends "base.html" %}
+
+{% block head_extra %}
+  <link rel="stylesheet" href="/css/home.css">
+{% endblock %}
+
+{% block titulo %}Início{% endblock %}
+
+{% block busca_placeholder %}Buscar salas, carrinhos, laboratórios...{% endblock %}
+
+{% block conteudo %}
+
+      <!-- HEADER -->
+
+      <!-- AÇÕES RÁPIDAS -->
+      <section class="quick-actions-section">
+
+        <h2>
+          O que você deseja reservar hoje?
+        </h2>
+
+        <div class="cards-grid">
+
+          <!-- Salas -->
+          <a href="/escolher_reserva_salas" class="action-card searchable">
+
+            <div class="icon-box">
+              <img src="/assets/icons/classroom.png" alt="Ícone de Salas" width="24" height="24">
+            </div>
+
+            <div class="card-text">
+
+              <h3>Salas</h3>
+
+              <p>
+                Salas de aula, reuniões e treinamentos
+              </p>
+
+            </div>
+
+          </a>
+
+          <!-- Laboratórios -->
+          <a href="/escolher_reserva_laboratorios" class="action-card searchable">
+
+            <div class="icon-box">
+              <img src="/assets/icons/computer.png" alt="Laboratórios" width="24" height="24">
+            </div>
+
+            <div class="card-text">
+
+              <h3>Laboratórios</h3>
+
+              <p>
+                Laboratórios de informática, automação,
+                mecânica e outros
+              </p>
+
+            </div>
+
+          </a>
+
+          <!-- Gabinetes -->
+          <a href="/escolher_reserva_gabinetes" class="action-card searchable">
+
+            <div class="icon-box">
+              <img src="/assets/icons/shopping-cart.png" alt="Gabinetes" width="24" height="24">
+            </div>
+
+            <div class="card-text">
+
+              <h3>Gabinetes</h3>
+
+              <p>
+                Gabinetes de notebooks e equipamentos móveis
+              </p>
+
+            </div>
+
+          </a>
+
+        </div>
+
+      </section>
+
+      <!-- DASHBOARD -->
+      <div class="dashboard-split">
+
+        <!-- RESERVAS -->
+        <section class="reservations">
+
+          <div class="section-header">
+
+            <h2>
+              Próximas reservas
+            </h2>
+
+            <a href="/reservas_prof" class="ver-mais">
+              Ver mais -&gt;
+            </a>
+
+          </div>
+
+          <div class="res-list" id="proximasReservasList">
+            <!-- Renderizado dinamicamente via JS -->
+          </div>
+
+          <div class="res-empty" id="proximasReservasEmpty" style="display: none;">
+
+            <p>
+              Você ainda não tem reservas.
+
+              <a href="/reservar">
+                Fazer uma reserva -&gt;
+              </a>
+            </p>
+
+          </div>
+
+        </section>
+
+        <!-- PAINEL DIREITO -->
+        <aside class="right-panel">
+
+          <!-- CALENDÁRIO -->
+          <div class="calendar-widget">
+
+            <div class="cal-header">
+
+              <h3>
+                Calendário
+              </h3>
+
+              <div class="cal-nav">
+
+                <button class="cal-nav-btn" id="homeCalPrev" aria-label="Mês anterior">
+                  ‹
+                </button>
+
+                <a href="/calendario_prof" class="month-selector" id="homeCalLabel">
+                  Mês Ano
+                </a>
+
+                <button class="cal-nav-btn" id="homeCalNext" aria-label="Próximo mês">
+                  ›
+                </button>
+
+              </div>
+
+            </div>
+
+            <div class="cal-grid" id="homeCalGrid">
+
+              <div class="day-name">D</div>
+              <div class="day-name">S</div>
+              <div class="day-name">T</div>
+              <div class="day-name">Q</div>
+              <div class="day-name">Q</div>
+              <div class="day-name">S</div>
+              <div class="day-name">S</div>
+
+              <!-- Dias renderizados pelo JavaScript -->
+
+            </div>
+
+          </div>
+
+          <!-- AVISOS -->
+          <div class="notices">
+
+            <div class="section-header">
+
+              <h2>
+                Avisos importantes
+              </h2>
+
+              <a href="/avisos" class="ver-mais">
+                Ver mais -&gt;
+              </a>
+
+            </div>
+
+            <div class="avisos-preview-list" id="avisosPreviewList">
+              <!-- Renderizado dinamicamente via JS -->
+            </div>
+
+            <div class="avisos-preview-empty" id="avisosPreviewEmpty" style="display: none;">
+
+              <p>
+                Nenhum aviso publicado ainda.
+
+                <a href="/avisos">
+                  Criar o primeiro aviso -&gt;
+                </a>
+              </p>
+
+            </div>
+
+          </div>
+
+        </aside>
+
+      </div>
+
+{% endblock %}
+
+{% block scripts %}
+<script src="/js/reservas.js"></script>
+<script src="/js/avisos.js"></script>
+<script src="/js/notificacoes-push.js"></script>
+
+  <!-- JAVASCRIPT INTERNO -->
+  <script type="module" src="/js/pages/paginainicialprofessor.js"></script>
+
+</body>
+
+</html>
+{% endblock %}

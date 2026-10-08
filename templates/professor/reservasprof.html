@@ -1,0 +1,66 @@
+{#- Esqueleto herdado de base.html; aqui fica so o que e proprio
+      desta tela. -#}
+{% extends "base.html" %}
+
+{% block head_extra %}
+  <link rel="stylesheet" href="/css/reservasprof.css">
+{% endblock %}
+
+{% block titulo %}Minhas Reservas{% endblock %}
+
+{% block busca_placeholder %}Buscar salas, carrinhos, laboratórios...{% endblock %}
+
+{% block conteudo %}
+
+      <section class="reservas-section">
+
+        <div class="reservas-header">
+          <h2>Minhas solicitações</h2>
+
+          <div class="filter-tabs" id="filterTabs">
+            <button class="filter-tab active" data-filter="todas">
+              Todas
+            </button>
+
+            <button class="filter-tab" data-filter="aguardando">
+              Aguardando
+            </button>
+
+            <button class="filter-tab" data-filter="aprovada">
+              Aprovadas
+            </button>
+
+            <button class="filter-tab" data-filter="negada">
+              Negadas
+            </button>
+          </div>
+        </div>
+
+        <div class="reservas-list searchable-container" id="reservasList">
+          <!-- Cards de reserva são renderizados via JS -->
+        </div>
+
+        <div class="reservas-empty" id="reservasEmpty" style="display: none;">
+          <img src="/assets/icons/calendar.png" alt="">
+
+          <p>
+            Você ainda não fez nenhuma reserva.
+            Que tal agendar uma sala, laboratório ou gabinete agora mesmo?
+          </p>
+
+          <a href="/reservar" class="btn-nova-reserva">
+            Fazer uma reserva
+          </a>
+        </div>
+
+      </section>
+{% endblock %}
+
+{% block scripts %}
+  <script src="/js/reservas.js"></script>
+
+  <script type="module" src="/js/pages/reservasprof.js"></script>
+</body>
+
+</html>
+{% endblock %}

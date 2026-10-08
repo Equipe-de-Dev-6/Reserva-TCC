@@ -1,0 +1,94 @@
+{#- Esqueleto herdado de base.html; aqui fica so o que e proprio
+      desta tela. -#}
+{% extends "base.html" %}
+
+{% block head_extra %}
+  <link rel="stylesheet" href="/css/reservar_tela_prof.css">
+{% endblock %}
+
+{% block titulo %}Reservar{% endblock %}
+
+{% block busca_placeholder %}Buscar salas, carrinhos, laboratórios...{% endblock %}
+
+{% block conteudo %}
+
+      <!-- Cabeçalho -->
+
+      <!-- Ações de reserva -->
+      <section class="quick-actions-section">
+
+        <h2>O que você deseja reservar hoje?</h2>
+
+        <div class="cards-grid-large">
+
+          <!-- Salas -->
+          <div class="large-action-card">
+            <div class="card-text-top">
+              <h3>Salas de aula, reuniões e treinamentos</h3>
+              <p>
+                Escolha espaços para aulas, reuniões e atividades
+                de treinamento.
+              </p>
+            </div>
+
+            <div class="card-large-icon">
+              <img src="/assets/icons/classroom.png" alt="Salas">
+            </div>
+
+            <a href="/escolher_reserva_salas" class="btn-ver-opcoes">
+              Ver opções &rarr;
+            </a>
+          </div>
+
+          <!-- Laboratórios -->
+          <div class="large-action-card">
+            <div class="card-text-top">
+              <h3>
+                Laboratórios de informática, automação,
+                mecânica e outros
+              </h3>
+              <p>
+                Acesse laboratórios com equipamentos
+                especializados para práticas e projetos.
+              </p>
+            </div>
+
+            <div class="card-large-icon">
+              <img src="/assets/icons/computer.png" alt="Laboratórios">
+            </div>
+
+            <a href="/escolher_reserva_laboratorios" class="btn-ver-opcoes">
+              Ver opções &rarr;
+            </a>
+          </div>
+
+          <!-- Gabinetes -->
+          <div class="large-action-card">
+            <div class="card-text-top">
+              <h3>Gabinetes de notebooks e equipamentos móveis</h3>
+              <p>
+                Reserve gabinetes e equipamentos para atividades
+                móveis e em campo.
+              </p>
+            </div>
+
+            <div class="card-large-icon">
+              <img src="/assets/icons/shopping-cart.png" alt="Gabinetes">
+            </div>
+
+            <a href="/escolher_reserva_gabinetes" class="btn-ver-opcoes">
+              Ver opções &rarr;
+            </a>
+          </div>
+
+        </div>
+      </section>
+{% endblock %}
+
+{% block scripts %}
+  <script type="module" src="/js/pages/reservar_tela_prof.js"></script>
+
+</body>
+
+</html>
+{% endblock %}

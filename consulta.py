@@ -49,17 +49,10 @@ def consultar_usuarios():
     return resposta.data
 
 
-def consultar_usuario_por_email_senha(email, senha):
-    """Busca um usuário específico por email e senha"""
-    resposta = (
-        supabase
-        .table(TABELA)
-        .select("*")
-        .eq("email", email)
-        .eq("senha", senha)
-        .execute()
-    )
-    return resposta.data
+# Não existe consulta por "e-mail e senha" aqui de propósito: a senha
+# guardada é um hash bcrypt, que não pode ser comparado com a senha
+# digitada. A verificação acontece com bcrypt.checkpw, em
+# criptografia.verify_password, chamada pela rota /login.
 
 
 # ============================================================

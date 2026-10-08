@@ -15,40 +15,25 @@
 
 import { listarSalas, buscarSala } from '/js/api.js';
 
-
 // ============================================================
 // CLASSIFICAÇÃO
 // ============================================================
 
 /**
- * Uma sala é laboratório quando a própria descrição diz
- * "Laboratório". Salas de prática sem essa palavra no texto
- * (Sala de TI, Metrologia, salas de eletrônica) continuam
- * sendo tratadas como salas.
- */
-const PALAVRA_LABORATORIO = 'laborat';
-
-
-/**
- * Descobre em qual das telas a sala deve aparecer.
+ * Em qual tela a sala aparece.
  *
- * A API já entrega somente as salas reserváveis, então aqui
- * basta decidir entre a tela de Salas e a de Laboratórios.
+ * A classificação é feita no servidor: o campo "categoria" de
+ * GET /salas já vem decidido pelo app.py, a partir da descrição
+ * cadastrada ("Laboratório de informática" vai para a tela de
+ * laboratórios, "Gabinete..." para a de gabinetes).
+ *
+ * Antes cada tela repetia essa conta por conta própria, e uma sala que
+ * mudasse de categoria Depending umas telas e outras não.
  */
 function categorizar(sala) {
 
-  const contexto = sala.contexto || {};
-
-  const descricao = String(contexto.descricao || '')
-    .toLowerCase()
-    .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '');
-
-  return descricao.includes(PALAVRA_LABORATORIO)
-    ? 'laboratorios'
-    : 'salas';
+  return sala.categoria || 'sala';
 }
-
 
 // ============================================================
 // RENDERIZAÇÃO
@@ -69,7 +54,6 @@ function tituloDaSala(sala) {
     : sala.nome;
 }
 
-
 /**
  * Monta a linha abaixo do título, sempre com a mesma forma:
  * "32 lugares".
@@ -86,7 +70,6 @@ function detalheDaSala(sala) {
     ? `${quantidade} lugares`
     : '';
 }
-
 
 /**
  * Cria o card de uma sala.
@@ -191,7 +174,6 @@ function criarCard(sala, proximoPasso) {
   return card;
 }
 
-
 /**
  * Busca a sala na API, guarda a escolha e abre o próximo passo.
  */
@@ -201,12 +183,16 @@ async function selecionarSala(salaId, proximoPasso) {
 
     const sala = await buscarSala(salaId);
 
+    // A categoria vem pronta do servidor. O "reservas.js" usa esse
+    // rótulo para classificar a reserva, sem precisar repetir a conta
+    // a partir do texto da sala.
     sessionStorage.setItem(
       'salaSelecionada',
       JSON.stringify({
         id: sala.id,
         nome: sala.nome,
-        contexto: sala.contexto
+        contexto: sala.contexto,
+        categoria: sala.categoriaRotulo || 'Sala'
       })
     );
 
@@ -218,7 +204,6 @@ async function selecionarSala(salaId, proximoPasso) {
 
   window.location.href = proximoPasso;
 }
-
 
 /**
  * Mostra uma mensagem quando a lista não traz nenhuma sala.
@@ -232,7 +217,6 @@ function mostrarVazio(container, mensagem) {
 
   container.appendChild(aviso);
 }
-
 
 // ============================================================
 // INICIALIZAÇÃO
@@ -296,59 +280,17 @@ async function initSalas() {
   }
 }
 
-
-/**
- * Filtra os cards pelo texto digitado na busca.
- *
- * Usa delegação de evento porque os cards são criados depois
- * que a página carrega.
- */
-function initBusca() {
-
-  const campo = document.getElementById('search-input');
-
-  const lista = document.querySelector('[data-lista-salas]');
-
-  if (!campo || !lista) {
-    return;
-  }
-
-  campo.addEventListener('input', () => {
-
-    const termo = campo.value
-      .toLowerCase()
-      .trim();
-
-    lista
-      .querySelectorAll('.room-card')
-      .forEach((card) => {
-
-        const texto = card.textContent.toLowerCase();
-
-        card.style.display = texto.includes(termo)
-          ? ''
-          : 'none';
-
-      });
-
-  });
-
-}
-
-
 if (document.readyState === 'loading') {
 
   document.addEventListener(
     'DOMContentLoaded',
     () => {
-      initBusca();
-      initSalas();
+        initSalas();
     }
   );
 
 } else {
 
-  initBusca();
   initSalas();
 
 }

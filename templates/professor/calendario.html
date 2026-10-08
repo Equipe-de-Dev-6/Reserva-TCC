@@ -1,0 +1,87 @@
+{#- Esqueleto herdado de base.html; aqui fica so o que e proprio
+      desta tela. -#}
+{% extends "base.html" %}
+
+{% block head_extra %}
+  <link rel="stylesheet" href="/css/calendario.css">
+{% endblock %}
+
+{% block titulo %}Calendário{% endblock %}
+
+{% block busca_placeholder %}Buscar salas, carrinhos, laboratórios...{% endblock %}
+
+{% block conteudo %}
+
+      <section class="calendar-section">
+
+        <h2>Calendário de Reservas</h2>
+
+        <div class="calendar-page-layout">
+
+          <div class="calendar-card">
+
+            <div class="calendar-nav">
+              <button class="calendar-nav-btn" id="calPrev" aria-label="Mês anterior">
+                <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path d="M15 18l-6-6 6-6"></path>
+                </svg>
+              </button>
+
+              <span class="calendar-month-label" id="calMonthLabel">
+                Mês Ano
+              </span>
+
+              <button class="calendar-nav-btn" id="calNext" aria-label="Próximo mês">
+                <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path d="M9 18l6-6-6-6"></path>
+                </svg>
+              </button>
+            </div>
+
+            <div class="calendar-grid-header">
+              <span>Dom</span>
+              <span>Seg</span>
+              <span>Ter</span>
+              <span>Qua</span>
+              <span>Qui</span>
+              <span>Sex</span>
+              <span>Sáb</span>
+            </div>
+
+            <div class="calendar-grid" id="calendarGrid">
+              <!-- Renderizado dinamicamente via JS -->
+            </div>
+
+          </div>
+
+          <aside class="calendar-day-panel">
+
+            <h3 id="dayPanelTitle">
+              Reservas - Dia --
+            </h3>
+
+            <p class="day-panel-subtitle" id="dayPanelSubtitle">
+              --
+            </p>
+
+            <div id="dayPanelList">
+              <!-- Renderizado dinamicamente via JS -->
+            </div>
+
+            <a href="/reservar" class="btn-nova-reserva-dia">
+              + Solicitar Nova Reserva
+            </a>
+
+          </aside>
+        </div>
+      </section>
+{% endblock %}
+
+{% block scripts %}
+  <script src="/js/reservas.js"></script>
+
+    <script type="module" src="/js/pages/calendarioprof.js"></script>
+</body>
+
+</html>
+{% endblock %}

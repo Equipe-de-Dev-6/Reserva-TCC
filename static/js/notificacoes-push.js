@@ -45,9 +45,9 @@
     badge: '/assets/icons/notification.png',
 
     // Status usados pelo reservas.js:
-    // 'aguardando' (padrão), 'aprovada', 'negado', 'cancelada'
+    // 'aguardando' (padrão), 'aprovada', 'negada', 'cancelada'
     statusAprovado: ['aprovada'],
-    statusNegado: ['negado'],
+    statusNegado: ['negada'],
     statusCancelado: ['cancelada'],
 
     // Notificar também quando o coordenador APROVAR?

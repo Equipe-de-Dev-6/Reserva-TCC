@@ -1,0 +1,44 @@
+{#- Esqueleto herdado de base.html; aqui fica so o que e proprio
+      desta tela. -#}
+{% extends "base.html" %}
+
+{% block head_extra %}
+  <link rel="stylesheet" href="/css/notificacoes.css">
+{% endblock %}
+
+{% block titulo %}Notificações{% endblock %}
+
+{% block busca_placeholder %}Buscar notificações...{% endblock %}
+
+{% block conteudo %}
+
+            <section>
+                <div class="notifications-heading">
+                    <div class="greeting">
+                        <h2>
+                            Notificações
+                        </h2>
+                        <p>
+                            Acompanhe atualizações de reservas, alertas de recursos e manutenções programadas.
+                        </p>
+                    </div>
+
+                    <button type="button" class="btn-limpar-notificacoes" id="clearNotificationsButton">
+                        Limpar notificações
+                    </button>
+                </div>
+
+                <aside class="notifications-container" id="notificationsList">
+                    <!-- Renderizado dinamicamente a partir do histórico persistido de reservas. -->
+                </aside>
+            </section>
+{% endblock %}
+
+{% block scripts %}
+    <script src="/js/reservas.js"></script>
+
+    <script type="module" src="/js/pages/notificacoesprof.js"></script>
+</body>
+
+</html>
+{% endblock %}

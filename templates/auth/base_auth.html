@@ -1,0 +1,53 @@
+{#-
+  auth/base_auth.html
+
+  Esqueleto das telas de acesso: login, cadastro, redefinição e
+  recuperação de senha.
+
+  São telas sem menu lateral e sem cabeçalho — quem ainda não entrou
+  no sistema não tem perfil, e mostrar o menu dele ali não faria
+  sentido. Por isso existe uma base separada, e não a mesma "base.html"
+  com uma condição dentro.
+
+  Uma tela estende este arquivo e preenche:
+
+    {% extends "auth/base_auth.html" %}
+    {% block titulo %}Login{% endblock %}
+    {% block conteudo %}...{% endblock %}
+    {% block scripts %}...{% endblock %}
+-#}
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>{% block titulo %}Acesso{% endblock %} - Gestão de salas e equipamentos</title>
+
+  {#- As telas de acesso não usam o menu, e por isso não precisam
+      nem da fonte Inter nem do flaticon.
+
+      O que as quatro telas de acesso têm em comum — o cartão, o logo,
+      o campo com ícone, o botão e o separador "ou" — está em
+      auth.css, uma vez só. Ele vem ANTES do {% block head_extra %} de
+      propósito: assim, uma tela que ajuste uma dessas propriedades
+      no próprio CSS continua vencendo, que é como era quando cada
+      uma carregava o seu arquivo com tudo dentro. -#}
+  <link rel="stylesheet" href="/css/auth.css">
+
+  {#- O que é só desta tela. -#}
+  {% block head_extra %}{% endblock %}
+
+  {% block style %}{% endblock %}
+</head>
+
+<body>
+
+  {% block conteudo %}{% endblock %}
+
+  {% block scripts %}{% endblock %}
+
+</body>
+
+</html>

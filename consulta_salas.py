@@ -1,3 +1,9 @@
+"""Consulta das salas que aparecem nas telas de reserva.
+
+O filtro das salas acontece aqui, na consulta ao banco, e não depois no
+navegador: assim o browser só recebe o que pode ser reservado.
+"""
+
 from db import supabase
 
 
@@ -5,52 +11,39 @@ from db import supabase
 # SALAS RESERVÁVEIS
 # ============================================================
 
-# Ids das salas e laboratórios que aparecem nas telas de reserva.
-# A lista foi levantada a partir do cadastro do campus: entram
-# somente as salas usadas por professores. O que ficou de fora
-# (portas, depósitos, cozinhas, cilindros de gás) não é
-# reservável e por isso nunca chega ao frontend.
-#
-# A seleção é feita pelo "id" e não pelo nome, porque existem
-# salas com o mesmo nome e ids diferentes (as duas C24, por
-# exemplo). Para incluir ou remover uma sala, ajuste esta lista.
-SALAS_RESERVAVEIS = [
+# Quais salas aparecem nas telas de reserva é um dado do banco, na
+# coluna "reservavel": o Coordenador liga e desliga isso na tela de
+# gerenciamento de salas. A lista vivia antes escrita em Python, e cada
+# mudança de sala da escola exigia alterar e republicar o código.
+
+# Ids que já eram reserváveis. Servem só para marcar a coluna na
+# primeira vez que a migração roda, preservando o comportamento atual.
+SALAS_RESERVAVEIS_INICIAL = [
     1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17,
     18, 19, 24, 25, 55, 56, 57, 89, 90, 91
 ]
-
-# Uma sala é laboratório quando a própria descrição diz
-# "Laboratório". Salas de prática sem essa palavra no texto
-# (Sala de TI, Metrologia, salas de eletrônica) continuam
-# sendo tratadas como salas.
-PALAVRA_LABORATORIO = "laborat"
 
 
 # ============================================================
 # CONSULTA
 # ============================================================
 
-def consultar_salas_reservaveis():
+def salas_para_tela(supabase_cliente=None):
     """Retorna somente as salas que aparecem nas telas de reserva.
 
-    O filtro acontece na consulta ao banco (cláusula IN), e não
-    depois no frontend, para que o navegador receba apenas as
-    salas reserváveis.
+    O filtro acontece na consulta ao banco (WHERE reservavel), e não
+    depois no frontend, para que o navegador receba apenas as salas
+    reserváveis.
     """
+    cliente = supabase_cliente or supabase
+
     resposta = (
-        supabase
+        cliente
         .table("salas")
         .select("*")
-        .in_("id", SALAS_RESERVAVEIS)
+        .eq("reservavel", True)
         .order("id")
         .execute()
     )
 
     return resposta.data or []
-
-
-def eh_laboratorio(sala):
-    """Informa se a sala pertence à tela de laboratórios."""
-    caracteristica = str(sala.get("caracteristica") or "").lower()
-
-    return PALAVRA_LABORATORIO in caracteristica

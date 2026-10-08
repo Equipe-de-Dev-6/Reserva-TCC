@@ -1,0 +1,78 @@
+{#- Esqueleto herdado de base.html; aqui fica so o que e proprio
+      desta tela. -#}
+{% extends "base.html" %}
+
+{% block head_extra %}
+  <link rel="stylesheet" href="/css/reservar-sala.css">
+{% endblock %}
+
+{% block titulo %}Reservar Laboratórios{% endblock %}
+
+{% block busca_placeholder %}Buscar salas, carrinhos, laboratórios...{% endblock %}
+
+{% block conteudo %}
+
+      <section class="quick-actions-section">
+
+        <h2>O que você deseja reservar hoje?</h2>
+
+        <div class="booking-layout">
+
+          <div class="category-card">
+
+            <div class="category-icon">
+
+              <img src="/assets/icons/computer.png" alt="Laboratórios">
+
+            </div>
+
+            <h3>
+              Laboratórios de informática, automação, mecânica e outros
+            </h3>
+
+          </div>
+
+          <div class="rooms-list"
+             data-lista-salas
+             data-categoria="laboratorio"
+             data-proximo="/passo2_reserva_prof">
+
+              <!-- Os cards sao gerados pelo /js/salas.js a partir
+                   de GET /salas. Os que estavam escritos aqui a mao
+                   traziam nomes de sala que nao existem no banco. --></div>
+
+          <div class="step-indicator">
+
+            <div class="step active">
+              01
+            </div>
+
+            <div class="step-line"></div>
+
+            <div class="step">
+              02
+            </div>
+
+            <div class="step-line"></div>
+
+            <div class="step">
+              03
+            </div>
+
+          </div>
+
+        </div>
+
+      </section>
+
+{% endblock %}
+
+{% block scripts %}
+  <!-- Salas, laboratorios e gabinetes: os cards vem do banco. -->
+<script type="module" src="/js/salas.js"></script>
+  <script type="module" src="/js/pages/escolherreservaprof2.js"></script>
+
+</body>
+
+</html>
+{% endblock %}
