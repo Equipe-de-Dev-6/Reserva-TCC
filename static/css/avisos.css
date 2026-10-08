@@ -5,8 +5,6 @@
  * base.css; aqui fica so o que e desta tela.
  * ============================================================ */
 
-@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@200..800&family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap');
-
   :root {
   --senai-red: #E30613;
   --senai-blue: #3B82F6;
@@ -351,128 +349,127 @@
 
 @media (max-width: 1024px) {
   .search-container {
-    width: 220px;
+  width: 220px;
   }
 
   .user-info {
-    display: none;
+  display: none;
   }
 
   .main-content {
-    padding: 0 20px 20px;
+  padding: 0 20px 20px;
   }
 }
 
 @media (max-width: 860px) {
   body, html {
-    height: auto;
-    overflow: visible;
+  height: auto;
+  overflow: visible;
   }
 
   .app-container {
-    height: auto;
-    min-height: 100vh;
+  height: auto;
+  min-height: 100vh;
   }
 
   .main-content {
-    height: auto;
-    overflow: visible;
+  height: auto;
+  overflow: visible;
   }
 
   .sidebar {
-    position: fixed;
-    left: 0;
-    top: 0;
-    transform: translateX(-100%);
-    box-shadow: 4px 0 16px rgba(0,0,0,0.1);
-    z-index: 300;
+  position: fixed;
+  left: 0;
+  top: 0;
+  transform: translateX(-100%);
+  box-shadow: 4px 0 16px rgba(0,0,0,0.1);
+  z-index: 300;
   }
 
   .sidebar.open {
-    transform: translateX(0);
+  transform: translateX(0);
   }
 
   .menu-toggle {
-    display: flex;
+  display: flex;
   }
 
   .search-container {
-    display: none;
+  display: none;
   }
 
   .form-row {
-    grid-template-columns: 1fr;
+  grid-template-columns: 1fr;
   }
 }
 
 @media (max-width: 600px) {
   .main-content {
-    padding: 0 16px 16px;
+  padding: 0 16px 16px;
   }
 
   .header {
-    flex-wrap: wrap;
+  flex-wrap: wrap;
   }
 
   .header-actions {
-    width: 100%;
-    justify-content: flex-end;
-    margin-top: 12px;
-    gap: 12px;
+  width: 100%;
+  justify-content: flex-end;
+  margin-top: 12px;
+  gap: 12px;
   }
 
   .greeting h1 {
-    font-size: 20px;
+  font-size: 20px;
   }
 
   .greeting p {
-    font-size: 12px;
+  font-size: 12px;
   }
 
   .avatar {
-    width: 40px;
-    height: 40px;
+  width: 40px;
+  height: 40px;
   }
 
   .avisos-page-header h2 {
-    font-size: 17px;
+  font-size: 17px;
   }
 
   .btn-criar-aviso {
-    width: 100%;
-    text-align: center;
+  width: 100%;
+  text-align: center;
   }
 
   .notice-card {
-    flex-direction: column;
-    align-items: stretch;
+  flex-direction: column;
+  align-items: stretch;
   }
 
   .btn-excluir-aviso {
-    width: 100%;
+  width: 100%;
   }
 
   .form-actions {
-    flex-direction: column-reverse;
+  flex-direction: column-reverse;
   }
 
-  .btn-voltar,
-  .btn-enviar {
-    width: 100%;
-    text-align: center;
+  .btn-voltar, .btn-enviar {
+  width: 100%;
+  text-align: center;
   }
 }
 
 @media (max-width: 380px) {
   .sidebar {
-    width: 220px;
+  width: 220px;
   }
 
   .greeting h1 {
-    font-size: 18px;
+  font-size: 18px;
   }
 
   .user-dropdown {
-    width: 160px;
+  width: 160px;
   }
 }

@@ -24,67 +24,32 @@
   }
 
 @media (max-width: 600px) {
-    body {
-        padding: 20px;
-    }
+  .form-container h2 {
+  font-size: 16px;
+  }
 
-    .container {
-        padding: 30px 20px;
-    }
+  .input-container {
+  height: 50px;
+  padding: 0 14px;
+  gap: 10px;
+  }
 
-    .logo {
-        margin-bottom: 25px;
-    }
+  .input-container input {
+  font-size: 13px;
+  }
 
-    .logo img {
-        width: 240px;
-    }
+  .links p {
+  font-size: 12px;
+  font-weight: 600;
+  }
 
-    .hr {
-        margin-bottom: 25px;
-    }
+  .divider {
+  font-size: 13px;
+  font-weight: 700;
+  margin: 16px 0;
+  }
 
-    .form-container h2 {
-        font-size: 16px;
-    }
-
-    .input-container {
-        height: 50px;
-        padding: 0 14px;
-        gap: 10px;
-    }
-
-    .input-container i {
-        font-size: 22px;
-    }
-
-    .input-container input {
-        font-size: 13px;
-    }
-
-    button[type="submit"],
-    .google-btn {
-        font-size: 13px;
-        padding: 12px 14px;
-    }
-
-    .links p {
-        font-size: 12px;
-        font-weight: 600;
-    }
-
-    .links a {
-        font-weight: 600;
-    }
-
-    .divider {
-        font-size: 13px;
-        font-weight: 700;
-        margin: 16px 0;
-    }
-
-    .divider::before,
-    .divider::after {
-        height: 2px;
-    }
+  .divider::before, .divider::after {
+  height: 2px;
+  }
 }

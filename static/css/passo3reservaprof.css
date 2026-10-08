@@ -5,8 +5,6 @@
  * base.css; aqui fica so o que e desta tela.
  * ============================================================ */
 
-@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@200..800&family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap');
-
   :root {
   --senai-red: #E30613;
   --senai-blue: #3B82F6;
@@ -274,198 +272,196 @@
 
 @media (max-width: 1024px) {
   .search-container {
-    width: 220px;
+  width: 220px;
   }
 
   .user-info {
-    display: none;
+  display: none;
   }
 
   .main-content {
-    padding: 0 20px 20px;
+  padding: 0 20px 20px;
   }
 
   .booking-layout {
-    grid-template-columns: 240px 1fr 56px;
-    gap: 16px;
+  grid-template-columns: 240px 1fr 56px;
+  gap: 16px;
   }
 
   .category-icon {
-    width: 130px;
-    height: 150px;
+  width: 130px;
+  height: 150px;
   }
 
   .category-icon img {
-    width: 70px;
+  width: 70px;
   }
 
   .success-card {
-    padding: 36px 28px;
+  padding: 36px 28px;
   }
 }
 
 @media (max-width: 860px) {
   body, html {
-    height: auto;
-    overflow: visible;
+  height: auto;
+  overflow: visible;
   }
 
   .app-container {
-    height: auto;
-    min-height: 100vh;
+  height: auto;
+  min-height: 100vh;
   }
 
   .main-content {
-    height: auto;
-    overflow: visible;
+  height: auto;
+  overflow: visible;
   }
 
   .sidebar {
-    position: fixed;
-    left: 0;
-    top: 0;
-    transform: translateX(-100%);
-    box-shadow: 4px 0 16px rgba(0,0,0,0.1);
-    z-index: 300;
+  position: fixed;
+  left: 0;
+  top: 0;
+  transform: translateX(-100%);
+  box-shadow: 4px 0 16px rgba(0,0,0,0.1);
+  z-index: 300;
   }
 
   .sidebar.open {
-    transform: translateX(0);
+  transform: translateX(0);
   }
 
   .menu-toggle {
-    display: flex;
+  display: flex;
   }
 
   .search-container {
-    display: none;
+  display: none;
   }
 
   .booking-layout {
-    grid-template-columns: 1fr;
-    grid-template-areas:
-      "steps"
+  grid-template-columns: 1fr;
+  grid-template-areas: "steps"
       "category"
       "success";
   }
 
   .category-card {
-    grid-area: category;
-    flex-direction: row;
-    text-align: left;
-    align-items: center;
-    gap: 20px;
+  grid-area: category;
+  flex-direction: row;
+  text-align: left;
+  align-items: center;
+  gap: 20px;
   }
 
   .category-icon {
-    width: 90px;
-    height: 90px;
-    flex-shrink: 0;
+  width: 90px;
+  height: 90px;
+  flex-shrink: 0;
   }
 
   .category-icon img {
-    width: 48px;
+  width: 48px;
   }
 
   .success-card {
-    grid-area: success;
+  grid-area: success;
   }
 
   .step-indicator {
-    grid-area: steps;
-    flex-direction: row;
-    justify-content: center;
-    gap: 0;
+  grid-area: steps;
+  flex-direction: row;
+  justify-content: center;
+  gap: 0;
   }
 
   .step-line {
-    width: auto;
-    height: 2px;
-    min-width: 32px;
-    flex: 1;
+  width: auto;
+  height: 2px;
+  min-width: 32px;
+  flex: 1;
   }
 }
 
 @media (max-width: 600px) {
   .main-content {
-    padding: 0 16px 16px;
+  padding: 0 16px 16px;
   }
 
   .header {
-    flex-wrap: wrap;
+  flex-wrap: wrap;
   }
 
   .header-actions {
-    width: 100%;
-    justify-content: flex-end;
-    margin-top: 12px;
-    gap: 12px;
+  width: 100%;
+  justify-content: flex-end;
+  margin-top: 12px;
+  gap: 12px;
   }
 
   .greeting h1 {
-    font-size: 20px;
+  font-size: 20px;
   }
 
   .greeting p {
-    font-size: 12px;
+  font-size: 12px;
   }
 
   .avatar {
-    width: 40px;
-    height: 40px;
+  width: 40px;
+  height: 40px;
   }
 
   .category-card {
-    flex-direction: column;
-    text-align: center;
+  flex-direction: column;
+  text-align: center;
   }
 
   .category-icon {
-    width: 130px;
-    height: 130px;
+  width: 130px;
+  height: 130px;
   }
 
   .category-icon img {
-    width: 64px;
+  width: 64px;
   }
 
   .success-card {
-    padding: 28px 20px;
+  padding: 28px 20px;
   }
 
   .success-icon {
-    width: 96px;
-    height: 96px;
+  width: 96px;
+  height: 96px;
   }
 
   .success-actions {
-    flex-direction: column;
-    width: 100%;
+  flex-direction: column;
+  width: 100%;
   }
 
-  .btn-inicio,
-  .btn-ver-reservas {
-    width: 100%;
-    text-align: center;
+  .btn-inicio, .btn-ver-reservas {
+  width: 100%;
+  text-align: center;
   }
 }
 
 @media (max-width: 380px) {
   .sidebar {
-    width: 220px;
+  width: 220px;
   }
 
   .greeting h1 {
-    font-size: 18px;
+  font-size: 18px;
   }
 
   .user-dropdown {
-    width: 160px;
+  width: 160px;
   }
 
   .step {
-    width: 36px;
-    height: 36px;
-    font-size: 11px;
+  width: 36px;
+  height: 36px;
+  font-size: 11px;
   }
 }

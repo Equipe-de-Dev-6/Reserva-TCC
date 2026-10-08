@@ -5,8 +5,6 @@
  * auth.css; aqui fica so o que e desta tela.
  * ============================================================ */
 
-@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@200..800&family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap');
-
   .form-container h2 {
   color: var(--cor-principal);
   }
@@ -86,71 +84,32 @@
   }
 
 @media (max-width: 600px) {
+  .form-container h2 {
+  font-size: 16px;
+  }
 
-    body {
-        padding: 20px;
-    }
+  .input-container {
+  height: 50px;
+  padding: 0 14px;
+  gap: 10px;
+  }
 
-    .container {
-        padding: 30px 20px;
-    }
+  .input-container input {
+  font-size: 13px;
+  }
 
-    .logo {
-        margin-bottom: 25px;
-    }
+  .links p {
+  font-size: 12px;
+  font-weight: 600;
+  }
 
-    .logo img {
-        width: 240px;
-    }
+  .divider {
+  font-size: 13px;
+  font-weight: 700;
+  margin: 16px 0;
+  }
 
-    .hr {
-        margin-bottom: 25px;
-    }
-
-    .form-container h2 {
-        font-size: 16px;
-    }
-
-    .input-container {
-        height: 50px;
-
-        padding: 0 14px;
-        gap: 10px;
-    }
-
-    .input-container i {
-        font-size: 22px;
-    }
-
-    .input-container input {
-        font-size: 13px;
-    }
-
-    button[type="submit"],
-    .google-btn {
-        font-size: 13px;
-
-        padding: 12px 14px;
-    }
-
-    .links p {
-        font-size: 12px;
-        font-weight: 600;
-    }
-
-    .links a {
-        font-weight: 600;
-    }
-
-    .divider {
-        font-size: 13px;
-        font-weight: 700;
-
-        margin: 16px 0;
-    }
-
-    .divider::before,
-    .divider::after {
-        height: 2px;
-    }
+  .divider::before, .divider::after {
+  height: 2px;
+  }
 }

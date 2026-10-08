@@ -142,3 +142,52 @@
   font-weight: 600;
   margin: 0;
   }
+
+/* ============================================================
+ * OS PONTOS DE QUEBRA
+ *
+ * Em tela estreita, todas as telas ajustam o mesmo trio: o
+ * titulo do cabecalho, a barra lateral e o menu de perfil.
+ * Antes isso estava repetido em cada arquivo, e em
+ * @media (max-width: 860px) eram nove telas com sete versoes
+ * diferentes do mesmo trio.
+ *
+ * Vem no FIM do arquivo, depois das regras de topo: se viesse
+ * antes, uma regra de topo da mesma especificidade venceria a
+ * do ponto de quebra e a tela nao encolheria.
+ * ============================================================ */
+
+@media (max-width: 600px) {
+  .container {
+  padding: 30px 20px;
+  }
+
+  .hr {
+  margin-bottom: 25px;
+  }
+
+  .input-container i {
+  font-size: 22px;
+  }
+
+  .links a {
+  font-weight: 600;
+  }
+
+  .logo {
+  margin-bottom: 25px;
+  }
+
+  .logo img {
+  width: 240px;
+  }
+
+  body {
+  padding: 20px;
+  }
+
+  button[type="submit"], .google-btn {
+  font-size: 13px;
+  padding: 12px 14px;
+  }
+}
