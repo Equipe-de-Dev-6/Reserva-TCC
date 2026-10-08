@@ -7,97 +7,34 @@ document.addEventListener('DOMContentLoaded', () => {
       // PESQUISA
       // ======================================================
 
-      const searchInput =
-        document.getElementById('search-input');
+      
 
       const itemsToSearch =
         document.querySelectorAll('.searchable');
 
-      if (searchInput) {
-
-        searchInput.addEventListener('input', (e) => {
-
-          const searchTerm =
-            e.target.value.toLowerCase().trim();
-
-          itemsToSearch.forEach(item => {
-
-            const text =
-              item.textContent.toLowerCase();
-
-            item.style.display =
-              text.includes(searchTerm) ? '' : 'none';
-
-          });
-
-        });
-
-      }
-
+      
 
       // ======================================================
       // DROPDOWN DO USUÁRIO
       // ======================================================
 
-      const userProfile =
-        document.getElementById('userProfile');
+      
 
-      const userDropdown =
-        document.getElementById('userDropdown');
+      
 
-      if (userProfile && userDropdown) {
-
-        userProfile.addEventListener('click', (e) => {
-
-          // Não fecha o dropdown ao clicar dentro dele
-          e.stopPropagation();
-
-          userDropdown.classList.toggle('active');
-
-        });
-
-        document.addEventListener('click', (e) => {
-
-          if (!userProfile.contains(e.target)) {
-            userDropdown.classList.remove('active');
-          }
-
-        });
-
-      }
-
+      
 
       // ======================================================
       // MENU MOBILE
       // ======================================================
 
-      const menuToggle =
-        document.getElementById('menuToggle');
+      
 
-      const sidebar =
-        document.querySelector('.sidebar');
+      
 
-      const sidebarOverlay =
-        document.getElementById('sidebarOverlay');
+      
 
-      if (menuToggle && sidebar && sidebarOverlay) {
-
-        menuToggle.addEventListener('click', () => {
-
-          sidebar.classList.toggle('open');
-          sidebarOverlay.classList.toggle('active');
-
-        });
-
-        sidebarOverlay.addEventListener('click', () => {
-
-          sidebar.classList.remove('open');
-          sidebarOverlay.classList.remove('active');
-
-        });
-
-      }
-
+      
 
       // ======================================================
       // ÍCONE DA CATEGORIA
@@ -119,7 +56,6 @@ document.addEventListener('DOMContentLoaded', () => {
         return '/assets/icons/classroom.png';
 
       }
-
 
       // ======================================================
       // PRÓXIMAS RESERVAS
@@ -235,7 +171,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
       }
 
-
       // ======================================================
       // AÇÕES DAS RESERVAS
       // ======================================================
@@ -293,7 +228,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
       renderProximasReservas();
 
-
       // ======================================================
       // ATUALIZAÇÃO DAS RESERVAS
       // ======================================================
@@ -304,7 +238,6 @@ document.addEventListener('DOMContentLoaded', () => {
         renderCalendarioWidget();
 
       });
-
 
       // ======================================================
       // AVISOS IMPORTANTES (PRÉVIA)
@@ -376,13 +309,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
       renderAvisosPreview();
 
-
       // ======================================================
       // ATUALIZAÇÃO DOS AVISOS
       // ======================================================
 
       AvisosApp.subscribe(renderAvisosPreview);
-
 
       // ======================================================
       // CALENDÁRIO
@@ -398,7 +329,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
       const hojeISO =
         ReservasApp.todayISO();
-
 
       function renderCalendarioWidget() {
 
@@ -473,7 +403,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
       }
 
-
       // ======================================================
       // MÊS ANTERIOR
       // ======================================================
@@ -500,7 +429,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
       }
 
-
       // ======================================================
       // PRÓXIMO MÊS
       // ======================================================
@@ -526,7 +454,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
       }
-
 
       // ======================================================
       // INICIALIZA CALENDÁRIO

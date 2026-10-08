@@ -2,45 +2,18 @@
     // CARREGAR USUÁRIO LOGADO
     // ======================================================
 
-
     document.addEventListener('DOMContentLoaded', () => {
 // ======================================================
       // DROPDOWN DO USUÁRIO
       // ======================================================
-      const userProfile = document.getElementById('userProfile');
-      const userDropdown = document.getElementById('userDropdown');
-
-      if (userProfile && userDropdown) {
-        userProfile.addEventListener('click', (e) => {
-          e.stopPropagation();
-          userDropdown.classList.toggle('active');
-        });
-
-        document.addEventListener('click', (e) => {
-          if (!userProfile.contains(e.target)) {
-            userDropdown.classList.remove('active');
-          }
-        });
-      }
 
       // ======================================================
       // MENU MOBILE
       // ======================================================
-      const menuToggle = document.getElementById('menuToggle');
-      const sidebar = document.querySelector('.sidebar');
-      const sidebarOverlay = document.getElementById('sidebarOverlay');
 
-      if (menuToggle && sidebar && sidebarOverlay) {
-        menuToggle.addEventListener('click', () => {
-          sidebar.classList.toggle('open');
-          sidebarOverlay.classList.toggle('active');
-        });
+      
 
-        sidebarOverlay.addEventListener('click', () => {
-          sidebar.classList.remove('open');
-          sidebarOverlay.classList.remove('active');
-        });
-      }
+      
 
       // ======================================================
       // ABRIR / FECHAR FORMULÁRIO DE NOVO AVISO
@@ -159,19 +132,8 @@
 
       // ======================================================
       // BUSCA
-      // ======================================================
-      const searchInput = document.getElementById('search-input');
 
-      if (searchInput) {
-        searchInput.addEventListener('input', (e) => {
-          const termo = e.target.value.toLowerCase().trim();
-
-          document.querySelectorAll('.notice-card').forEach((card) => {
-            const texto = card.textContent.toLowerCase();
-            card.style.display = texto.includes(termo) ? '' : 'none';
-          });
-        });
-      }
+      
 
       // ======================================================
       // ATUALIZAÇÃO AUTOMÁTICA DA LISTA

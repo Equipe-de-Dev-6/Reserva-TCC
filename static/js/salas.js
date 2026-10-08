@@ -15,7 +15,6 @@
 
 import { listarSalas, buscarSala } from '/js/api.js';
 
-
 // ============================================================
 // CLASSIFICAÇÃO
 // ============================================================
@@ -36,7 +35,6 @@ function categorizar(sala) {
   return sala.categoria || 'sala';
 }
 
-
 // ============================================================
 // RENDERIZAÇÃO
 // ============================================================
@@ -56,7 +54,6 @@ function tituloDaSala(sala) {
     : sala.nome;
 }
 
-
 /**
  * Monta a linha abaixo do título, sempre com a mesma forma:
  * "32 lugares".
@@ -73,7 +70,6 @@ function detalheDaSala(sala) {
     ? `${quantidade} lugares`
     : '';
 }
-
 
 /**
  * Cria o card de uma sala.
@@ -178,7 +174,6 @@ function criarCard(sala, proximoPasso) {
   return card;
 }
 
-
 /**
  * Busca a sala na API, guarda a escolha e abre o próximo passo.
  */
@@ -210,7 +205,6 @@ async function selecionarSala(salaId, proximoPasso) {
   window.location.href = proximoPasso;
 }
 
-
 /**
  * Mostra uma mensagem quando a lista não traz nenhuma sala.
  */
@@ -223,7 +217,6 @@ function mostrarVazio(container, mensagem) {
 
   container.appendChild(aviso);
 }
-
 
 // ============================================================
 // INICIALIZAÇÃO
@@ -287,59 +280,17 @@ async function initSalas() {
   }
 }
 
-
-/**
- * Filtra os cards pelo texto digitado na busca.
- *
- * Usa delegação de evento porque os cards são criados depois
- * que a página carrega.
- */
-function initBusca() {
-
-  const campo = document.getElementById('search-input');
-
-  const lista = document.querySelector('[data-lista-salas]');
-
-  if (!campo || !lista) {
-    return;
-  }
-
-  campo.addEventListener('input', () => {
-
-    const termo = campo.value
-      .toLowerCase()
-      .trim();
-
-    lista
-      .querySelectorAll('.room-card')
-      .forEach((card) => {
-
-        const texto = card.textContent.toLowerCase();
-
-        card.style.display = texto.includes(termo)
-          ? ''
-          : 'none';
-
-      });
-
-  });
-
-}
-
-
 if (document.readyState === 'loading') {
 
   document.addEventListener(
     'DOMContentLoaded',
     () => {
-      initBusca();
-      initSalas();
+        initSalas();
     }
   );
 
 } else {
 
-  initBusca();
   initSalas();
 
 }

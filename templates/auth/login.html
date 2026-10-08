@@ -1,25 +1,13 @@
-<!DOCTYPE html>
+{#- Tela de acesso: esqueleto herdado de base_auth.html. -#}
+{% extends "auth/base_auth.html" %}
 
-<html lang="pt-BR">
+{% block head_extra %}
+  <link rel="stylesheet" href="/css/login.css">
+{% endblock %}
 
-<head>
+{% block titulo %}Login{% endblock %}
 
-    <meta charset="UTF-8">
-
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-
-    <link rel="stylesheet" href="/css/login">
-
-    <title>
-        Login - Gestão de salas e equipamentos
-    </title>
-
-</head>
-
-
-<body>
+{% block conteudo %}
 
     <div class="container">
 
@@ -96,8 +84,10 @@
 
     <!-- JAVASCRIPT -->
 
+{% endblock %}
+
+{% block scripts %}
     <script type="module" src="/js/login.js"></script>
 
-</body>
 
-</html>
+{% endblock %}

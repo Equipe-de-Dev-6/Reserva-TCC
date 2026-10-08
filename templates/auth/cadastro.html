@@ -1,16 +1,13 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
+{#- Tela de acesso: esqueleto herdado de base_auth.html. -#}
+{% extends "auth/base_auth.html" %}
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-    <link rel="stylesheet" href="/css/cadastro.css">
+{% block head_extra %}
+  <link rel="stylesheet" href="/css/cadastro.css">
+{% endblock %}
 
-    <title>SENAI - Gestão de Salas e Equipamentos</title>
-</head>
+{% block titulo %}Cadastro{% endblock %}
 
-<body>
+{% block conteudo %}
     <div class="container">
         <div class="logo">
             <img src="/assets/img/Logo senai.png">
@@ -73,8 +70,10 @@
         </div>
     </div>
 
+{% endblock %}
+
+{% block scripts %}
     <script type="module" src="/js/cadastro.js"></script>
 
-</body>
 
-</html>
+{% endblock %}

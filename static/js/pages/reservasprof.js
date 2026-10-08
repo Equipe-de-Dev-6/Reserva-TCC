@@ -1,43 +1,10 @@
 // Busca o nome do usuário autenticado pela sessão do FastAPI.
 
-
     document.addEventListener('DOMContentLoaded', () => {
-const userProfile = document.getElementById('userProfile');
-      const userDropdown = document.getElementById('userDropdown');
 
-      if (userProfile && userDropdown) {
-        userProfile.addEventListener('click', (e) => {
-          e.stopPropagation();
+      
 
-          if (userDropdown.contains(e.target)) {
-            return;
-          }
-
-          userDropdown.classList.toggle('active');
-        });
-
-        document.addEventListener('click', (e) => {
-          if (!userProfile.contains(e.target)) {
-            userDropdown.classList.remove('active');
-          }
-        });
-      }
-
-      const menuToggle = document.getElementById('menuToggle');
-      const sidebar = document.querySelector('.sidebar');
-      const sidebarOverlay = document.getElementById('sidebarOverlay');
-
-      if (menuToggle && sidebar && sidebarOverlay) {
-        menuToggle.addEventListener('click', () => {
-          sidebar.classList.toggle('open');
-          sidebarOverlay.classList.toggle('active');
-        });
-
-        sidebarOverlay.addEventListener('click', () => {
-          sidebar.classList.remove('open');
-          sidebarOverlay.classList.remove('active');
-        });
-      }
+      
 
       function iconeDaCategoria(categoria) {
         const cat = (categoria || '').toLowerCase();
@@ -199,22 +166,9 @@ const userProfile = document.getElementById('userProfile');
           renderReservas();
         });
 
-      const searchInput = document.getElementById('search-input');
+      
 
-      if (searchInput) {
-        searchInput.addEventListener('input', (e) => {
-          const termo = e.target.value.toLowerCase().trim();
-
-          document
-            .querySelectorAll('.reserva-card')
-            .forEach((card) => {
-              const texto = card.textContent.toLowerCase();
-
-              card.style.display =
-                texto.includes(termo) ? '' : 'none';
-            });
-        });
-      }
+      
 
       renderReservas();
       ReservasApp.subscribe(() => renderReservas());

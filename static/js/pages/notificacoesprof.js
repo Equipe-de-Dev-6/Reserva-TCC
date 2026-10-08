@@ -1,6 +1,5 @@
 // Busca o nome do usuário autenticado pela sessão do FastAPI.
 
-
         document.addEventListener('DOMContentLoaded', () => {
 function escapeHtml(value) {
                 return String(value ?? '').replace(
@@ -124,7 +123,7 @@ function escapeHtml(value) {
 
                 configurarBusca();
 
-                const searchInput = document.getElementById('search-input');
+                
 
                 if (searchInput && searchInput.value.trim()) {
                     searchInput.dispatchEvent(new Event('input'));
@@ -132,7 +131,7 @@ function escapeHtml(value) {
             }
 
             function configurarBusca() {
-                const searchInput = document.getElementById('search-input');
+                
 
                 if (!searchInput || searchInput.dataset.bound) {
                     return;
@@ -196,42 +195,7 @@ function escapeHtml(value) {
                     ReservasApp.clearNotificacoes();
                 });
 
-            // Dropdown do usuário.
-            const userProfile = document.getElementById('userProfile');
-            const userDropdown = document.getElementById('userDropdown');
+            
 
-            if (userProfile && userDropdown) {
-                userProfile.addEventListener('click', (e) => {
-                    e.stopPropagation();
-
-                    if (userDropdown.contains(e.target)) {
-                        return;
-                    }
-
-                    userDropdown.classList.toggle('active');
-                });
-
-                document.addEventListener('click', (e) => {
-                    if (!userProfile.contains(e.target)) {
-                        userDropdown.classList.remove('active');
-                    }
-                });
-            }
-
-            // Menu mobile.
-            const menuToggle = document.getElementById('menuToggle');
-            const sidebar = document.querySelector('.sidebar');
-            const sidebarOverlay = document.getElementById('sidebarOverlay');
-
-            if (menuToggle && sidebar && sidebarOverlay) {
-                menuToggle.addEventListener('click', () => {
-                    sidebar.classList.toggle('open');
-                    sidebarOverlay.classList.toggle('active');
-                });
-
-                sidebarOverlay.addEventListener('click', () => {
-                    sidebar.classList.remove('open');
-                    sidebarOverlay.classList.remove('active');
-                });
-            }
+            
         });

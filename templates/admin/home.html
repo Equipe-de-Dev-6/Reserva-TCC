@@ -1,14 +1,8 @@
-{#- Esqueleto herdado de base.html; aqui fica so o que e proprio
-      desta tela. -#}
+{#- Estrutura herdada de base.html; aqui fica so o que e
+      proprio desta tela. -#}
 {% extends "base.html" %}
 
-{% block head_extra %}
-  <link rel="stylesheet" href="/css/paginainicialprofessor.css">
-{% endblock %}
-
 {% block titulo %}Início{% endblock %}
-
-{% block busca_placeholder %}Buscar salas, carrinhos, laboratórios...{% endblock %}
 
 {% block conteudo %}
 
@@ -207,12 +201,11 @@
 {% endblock %}
 
 {% block scripts %}
-<script src="/js/reservas.js"></script>
-<script src="/js/avisos.js"></script>
-<script src="/js/notificacoes-push.js"></script>
+  <script src="/js/reservas.js"></script>
+  <script src="/js/avisos.js"></script>
 
   <!-- JAVASCRIPT INTERNO -->
-  <script type="module" src="/js/pages/paginainicialprofessor.js"></script>
+  <script type="module" src="/js/pages/paginainicialadm.js"></script>
 
 </body>
 

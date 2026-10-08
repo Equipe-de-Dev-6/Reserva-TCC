@@ -14,6 +14,7 @@ from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
+from fastapi.templating import Jinja2Templates
 from starlette.requests import Request
 from starlette.responses import JSONResponse
 import os
@@ -39,6 +40,52 @@ from model import (
     categoria_da_sala
 )
 
+
+# ============================================================
+# MENU LATERAL
+# ============================================================
+
+# O menu é montado aqui, e não escrito no HTML de cada tela. Isso
+# resolve dois problemas de uma vez:
+#
+# 1. Um Coordenador não vê link de Professor, porque o item não está na
+#    lista dele. Antes o menu estava copiado em cada arquivo, e a home
+#    do Coordinator tinha recebido uma cópia do menu do Professor.
+#
+# 2. Mudar um destino é editar uma linha aqui, em vez de procurar o
+#    link em todas as telas.
+#
+# Os ícones apontam para static/icons/<nome>.png.
+
+MENU_COORDENADOR = [
+    {"rota": "/home_admin", "icone": "home", "rotulo": "Início"},
+    {"rota": "/aprovar_reservas_adm", "icone": "reserved", "rotulo": "Aprovar Reservas"},
+    {"rota": "/gerenciar_salas_adm", "icone": "classroom", "rotulo": "Gerenciar Salas"},
+    {"rota": "/professores_adm", "icone": "user (3)", "rotulo": "Professores"},
+    {"rota": "/configuracoes_adm", "icone": "gear", "rotulo": "Configurações"},
+    {"rota": "/ajuda", "icone": "interrogation", "rotulo": "Ajuda"},
+]
+
+MENU_PROFESSOR = [
+    {"rota": "/home", "icone": "home", "rotulo": "Início"},
+    {"rota": "/reservar", "icone": "reserved", "rotulo": "Reservar"},
+    {"rota": "/reservas_prof", "icone": "calendar", "rotulo": "Minhas Reservas"},
+    {"rota": "/calendario_prof", "icone": "calendar", "rotulo": "Calendário"},
+    {"rota": "/notificacoes_prof", "icone": "notification", "rotulo": "Notificações"},
+    {"rota": "/avisos", "icone": "warning", "rotulo": "Avisos"},
+    {"rota": "/configuracoes", "icone": "gear", "rotulo": "Configurações"},
+    {"rota": "/ajuda", "icone": "interrogation", "rotulo": "Ajuda"},
+]
+
+# A home de cada perfil. O logo da barra lateral aponta para cá, e é
+# por isso que a home do Coordenador não levava o usuário para a home
+# do Professor.
+INICIO_COORDENADOR = "/home_admin"
+INICIO_PROFESSOR = "/home"
+
+# Os dois primeiros itens do menu viram atalho no menu de perfil, que
+# fica no canto da tela. É o mesmo menu, mostrado em outro lugar.
+ATALHOS_USUARIO = 2
 
 # ============================================================
 # CONFIGURAÇÃO DA API
@@ -324,9 +371,50 @@ def pagina_do_coordenador(request: Request):
     return None
 
 
-def pagina(nome_do_arquivo: str):
-    """Devolve o arquivo de templates já resolvido no caminho certo."""
-    return FileResponse(BASE_DIR / "templates" / nome_do_arquivo)
+# Motor de templates. Todas as telas passam por aqui: não existe mais
+# entrega direta de arquivo.
+templates = Jinja2Templates(directory=str(BASE_DIR / "templates"))
+
+
+def renderizar(request: Request, nome_do_arquivo: str, **contexto):
+    """Renderiza uma tela pelo Jinja2, com o menu e o usuário prontos.
+
+    Toda tela nasce com as mesmas coisas no contexto — quem está
+    logado, o menu do perfil dele e a rota atual —, para que nenhum
+    arquivo precise montar isso de novo, e para que um item do menu
+    seja marcado como ativo sem a tela saber de onde ele veio.
+    """
+    eh_admin = eh_coordenador(request)
+
+    # Desde o Starlette 1.x a assinatura e TemplateResponse(request,
+    # nome, contexto): o request vem primeiro, e e ele que define o
+    # "url_for" e o status da resposta.
+    return templates.TemplateResponse(
+        request,
+        nome_do_arquivo,
+        {
+            "usuario": {
+                "nome": request.session.get("usuario_nome") or "",
+                "cargo": (
+                    CARGO_COORDENADOR if eh_admin else "Professor"
+                ),
+            },
+            "menu": MENU_COORDENADOR if eh_admin else MENU_PROFESSOR,
+            "rota_inicio": (
+                INICIO_COORDENADOR if eh_admin else INICIO_PROFESSOR
+            ),
+            "rota_atual": request.url.path,
+            "rota_notificacoes": "/notificacoes_prof",
+            "atalhos_usuario": ATALHOS_USUARIO,
+            "busca_placeholder": contexto.pop(
+                "busca_placeholder", "Buscar..."
+            ),
+            # A frase de apoio do cabeçalho. Vazio em telas que não
+            # têm uma, e ai o componente nem cria o <p>.
+            "subtitulo": contexto.pop("subtitulo", ""),
+            **contexto,
+        },
+    )
 
 
 # ============================================================
@@ -503,7 +591,11 @@ async def inicio(request: Request):
 
         return RedirectResponse(url=destino, status_code=302)
 
-    return pagina("login.html")
+    return renderizar(
+        request,
+        "auth/login.html",
+        pagina="Login"
+    )
 
 
 @app.post('/login')
@@ -619,18 +711,9 @@ def service_worker():
 # INÍCIO PROFESSOR
 # ------------------------------------------------------------
 
-@app.get("/home")
-def home_professor(request: Request):
-    return pagina_de_usuario(request) or pagina("paginainicialprofessor.html")
-
-
 # ------------------------------------------------------------
 # INÍCIO ADMIN
 # ------------------------------------------------------------
-
-@app.get("/home_admin")
-def home_admin(request: Request):
-    return pagina_do_coordenador(request) or pagina("paginainicialadm.html")
 
 
 # ------------------------------------------------------------
@@ -646,7 +729,11 @@ def cadastro(request: Request):
     qualquer cargo, e com o cargo errado ainda ganhava acesso de
     administrador.
     """
-    return pagina_do_coordenador(request) or pagina("cadastro.html")
+    return pagina_do_coordenador(request) or renderizar(
+        request,
+        "auth/cadastro.html",
+        pagina="Cadastro"
+    )
 
 
 # ------------------------------------------------------------
@@ -654,8 +741,12 @@ def cadastro(request: Request):
 # ------------------------------------------------------------
 
 @app.get("/redefinir_senha")
-def redefinir_senha():
-    return pagina("redefsenha.html")
+def redefinir_senha(request: Request):
+    return renderizar(
+        request,
+        "auth/redefsenha.html",
+        pagina="Redefinir senha"
+    )
 
 
 # ------------------------------------------------------------
@@ -663,8 +754,12 @@ def redefinir_senha():
 # ------------------------------------------------------------
 
 @app.get("/esqueceu_senha")
-def esqueceu_senha():
-    return pagina("esqueceu_senha.html")
+def esqueceu_senha(request: Request):
+    return renderizar(
+        request,
+        "auth/esqueceu_senha.html",
+        pagina="Esqueci minha senha"
+    )
 
 
 # ============================================================
@@ -673,28 +768,91 @@ def esqueceu_senha():
 
 # Cada página do professor é um GET que só exige sessão. Estão juntos
 # numa lista para não repetir a mesma rota oito vezes no arquivo.
+# Cada entrada traz o template, o texto da busca e a frase de apoio do
+# cabeçalho. A frase ficava copiada e colada em todas as telas — e era
+# a mesma em nove delas, incluindo o calendário e as configurações,
+# onde não fazia sentido ("faça novos agendamentos").
 PAGINAS_DO_PROFESSOR = {
-    "/reservar": "reservar_tela_prof.html",
-    "/calendario_prof": "calendarioprof.html",
-    "/notificacoes_prof": "notificacoesprof.html",
-    "/escolher_reserva_salas": "escolherreservaprof.html",
-    "/escolher_reserva_laboratorios": "escolherreservaprof2.html",
-    "/escolher_reserva_gabinetes": "escolherreservaprof3.html",
-    "/ajuda": "ajuda.html",
-    "/avisos": "avisos.html",
-    "/configuracoes": "configuracoes.html",
-    "/reservas_prof": "reservasprof.html",
-    "/passo2_reserva_prof": "passo2reservaprof.html",
-    "/passo3_reserva_prof": "passo3reservaprof.html",
+    "/home": (
+        "professor/paginainicialprofessor.html",
+        "Buscar por sala ou professor...",
+        ""
+    ),
+    "/reservar": (
+        "professor/reservar_tela_prof.html",
+        "Buscar sala, laboratório ou gabinete...",
+        "Escolha o que deseja reservar"
+    ),
+    "/reservas_prof": (
+        "professor/reservasprof.html",
+        "Buscar por sala ou professor...",
+        "Acompanhe e gerencie suas reservas"
+    ),
+    "/calendario_prof": (
+        "professor/calendario.html",
+        "Buscar por sala ou professor...",
+        "Veja as reservas de cada dia"
+    ),
+    "/notificacoes_prof": (
+        "professor/notificacoes.html",
+        "Buscar nas notificações...",
+        "Avisos e mudanças nas suas reservas"
+    ),
+    "/escolher_reserva_salas": (
+        "professor/reservar/salas/reservar-sala.html",
+        "Buscar sala por nome ou tipo...",
+        "Escolha a sala"
+    ),
+    "/escolher_reserva_laboratorios": (
+        "professor/reservar/laboratorios/reservar-laboratorio.html",
+        "Buscar laboratório por nome ou tipo...",
+        "Escolha o laboratório"
+    ),
+    "/escolher_reserva_gabinetes": (
+        "professor/reservar/gabinete/reservar-gabinete.html",
+        "Buscar gabinete por nome ou tipo...",
+        "Escolha o gabinete"
+    ),
+    "/passo2_reserva_prof": (
+        "professor/reservar/salas/reservar-sala-detalhes.html",
+        "Buscar por sala ou professor...",
+        "Detalhes da reserva"
+    ),
+    "/passo3_reserva_prof": (
+        "professor/reservar/salas/reservar-sala-confirmacao.html",
+        "Buscar por sala ou professor...",
+        "Solicitação enviada"
+    ),
+    "/avisos": (
+        "avisos.html",
+        "Buscar aviso por título...",
+        "Avisos importantes do campus"
+    ),
+    "/configuracoes": (
+        "configuracoes.html",
+        "Buscar uma configuração...",
+        "Ajuste o seu perfil e a senha"
+    ),
+    "/ajuda": (
+        "ajuda.html",
+        "Buscar uma dúvida...",
+        "Como usar o sistema"
+    ),
 }
 
 
 def _criar_paginas():
     """Registra uma rota protegida por sessão para cada página."""
-    for caminho, arquivo in PAGINAS_DO_PROFESSOR.items():
+    for caminho, (arquivo, busca, frase) in PAGINAS_DO_PROFESSOR.items():
 
-        def rota(request: Request, arquivo=arquivo):
-            return pagina_de_usuario(request) or pagina(arquivo)
+        def rota(request: Request, arquivo=arquivo, busca=busca, frase=frase):
+            return pagina_de_usuario(request) or renderizar(
+                request,
+                arquivo,
+                pagina=arquivo.rsplit("/", 1)[-1].removesuffix(".html"),
+                busca_placeholder=busca,
+                subtitulo=frase
+            )
 
         rota.__name__ = caminho.strip("/").replace("/", "_")
 
@@ -710,19 +868,44 @@ _criar_paginas()
 
 # Telas que só o Coordenador enxerga. O professor que abrir um destes
 # endereços volta para a home dele.
+# As telas do Coordenador já foram convertidas para o Jinja2: elas
+# estendem "base.html" e recebem o menu pelo contexto. Cada entrada
+# traz o template e o texto do campo de busca, que muda de tela para
+# tela.
 PAGINAS_DO_COORDENADOR = {
-    "/aprovar_reservas_adm": "aprovar_reservas_adm.html",
-    "/configuracoes_adm": "configuracoes_adm.html",
-    "/gerenciar_salas_adm": "gerenciar_salas_adm.html",
-    "/professores_adm": "professores_adm.html",
+    "/home_admin": (
+        "admin/home.html",
+        "Buscar por sala ou professor..."
+    ),
+    "/aprovar_reservas_adm": (
+        "admin/aprovar_reservas.html",
+        "Buscar por professor ou sala..."
+    ),
+    "/gerenciar_salas_adm": (
+        "admin/gerenciar_salas.html",
+        "Buscar sala por nome ou tipo..."
+    ),
+    "/professores_adm": (
+        "admin/professores.html",
+        "Buscar professor por nome ou e-mail..."
+    ),
+    "/configuracoes_adm": (
+        "admin/configuracoes.html",
+        "Buscar uma configuração..."
+    ),
 }
 
 
 def _criar_paginas_do_coordenador():
-    for caminho, arquivo in PAGINAS_DO_COORDENADOR.items():
+    for caminho, (arquivo, busca) in PAGINAS_DO_COORDENADOR.items():
 
-        def rota(request: Request, arquivo=arquivo):
-            return pagina_do_coordenador(request) or pagina(arquivo)
+        def rota(request: Request, arquivo=arquivo, busca=busca):
+            return pagina_do_coordenador(request) or renderizar(
+                request,
+                arquivo,
+                pagina=arquivo.rsplit("/", 1)[-1].removesuffix(".html"),
+                busca_placeholder=busca
+            )
 
         rota.__name__ = caminho.strip("/").replace("/", "_")
 

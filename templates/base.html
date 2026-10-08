@@ -1,0 +1,74 @@
+{#-
+  base.html
+
+  Esqueleto de todas as telas com menu lateral. Uma tela estende este
+  arquivo e preenche os blocos:
+
+    {% extends "base.html" %}
+    {% block titulo %}Professores{% endblock %}
+    {% block head_extra %}<link rel="stylesheet" href="/css/x.css">{% endblock %}
+    {% block conteudo %}...{% endblock %}
+    {% block scripts %}...{% endblock %}
+
+  O que a tela NÃO preenche chega pelo contexto, montado no app.py:
+  "usuario" (nome e cargo), "menu" (os itens do perfil de quem está
+  logado), "rota_atual" (para marcar o item ativo), "rota_inicio"
+  (para onde vai o logo), "busca_placeholder" e "subtitulo" (a frase
+  de apoio do cabeçalho).
+
+  O menu não é escrito aqui: ele chega na variável "menu", montada no
+  app.py a partir do perfil de quem está logado. É por isso que uma
+  tela do Coordenador não consegue mostrar um link de Professor — o
+  link não existe na lista, e não é que alguém esqueceu de apagar.
+-#}
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>{% block titulo %}{{ pagina }}{% endblock %} - Gestão de salas e equipamentos</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="https://www.flaticon.com/flaticon.css">
+
+  {#- CSS comum a todas as telas com menu: cabeçalho, menu lateral,
+      cartão de perfil e o esqueleto de duas colunas. -#}
+  <link rel="stylesheet" href="/css/paginainicialprofessor.css">
+
+  {#- Estilo específico da tela. -#}
+  {% block head_extra %}{% endblock %}
+
+  {% block style %}{% endblock %}
+</head>
+
+<body>
+  <div class="app-container">
+
+    {#
+      O menu de perfil e o menu lateral do celular sao comportamento
+      igual em todas as telas, e moram em app.js. Este script e
+      classico e fica antes do modulo da pagina (que e type="module", e
+      o navegador adia): assim app.js ja esta pronto quando a tela
+      precisar chamar iniciarBusca(), depois de montar os cards.
+    #}
+    <script src="/js/app.js"></script>
+
+    {% include "components/_sidebar.html" %}
+
+    <main class="main-content">
+
+      {% include "components/_header.html" %}
+
+      {% block conteudo %}{% endblock %}
+
+    </main>
+
+  </div>
+
+  {% block scripts %}{% endblock %}
+</body>
+
+</html>

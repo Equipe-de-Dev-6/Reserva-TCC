@@ -639,7 +639,147 @@ def main():
     fechar(c)
 
     # -----------------------------------------------------------------
-    print("\n[11] Sessão isolada")
+    print("\n[11] Toda rota entrega uma tela de verdade")
+
+    # Este teste existe porque as telas foram movidas para pastas
+    # (professor/, auth/, admin/) e o app.py continuou apontando para
+    # o nome antigo: as rotas respondiam 500 sem aviso. Aqui toda rota
+    # e chamada de verdade e tem que devolver uma pagina.
+    c, banco = cliente_logado(USUARIO_PROF)
+    quebradas = []
+
+    for rota in (
+        "/home", "/reservar", "/calendario_prof", "/notificacoes_prof",
+        "/escolher_reserva_salas", "/escolher_reserva_laboratorios",
+        "/escolher_reserva_gabinetes", "/ajuda", "/avisos",
+        "/configuracoes", "/reservas_prof", "/passo2_reserva_prof",
+        "/passo3_reserva_prof",
+    ):
+        r = c.get(rota)
+
+        if r.status_code != 200:
+            quebradas.append(f"{rota}={r.status_code}")
+        elif "<html" not in r.text.lower():
+            quebradas.append(f"{rota}=nao-e-html")
+
+    check("todas as telas do professor abrem", not quebradas, ", ".join(quebradas))
+    fechar(c)
+
+    c, banco = cliente_logado(USUARIO_COORD)
+    quebradas = []
+
+    for rota in (
+        "/home_admin", "/aprovar_reservas_adm", "/configuracoes_adm",
+        "/gerenciar_salas_adm", "/professores_adm", "/cadastro",
+    ):
+        r = c.get(rota)
+
+        if r.status_code != 200:
+            quebradas.append(f"{rota}={r.status_code}")
+        elif "<html" not in r.text.lower():
+            quebradas.append(f"{rota}=nao-e-html")
+
+    check("todas as telas do coordenador abrem", not quebradas, ", ".join(quebradas))
+    fechar(c)
+
+    # As telas de acesso nao exigem sessao.
+    c2 = TestClient(app)
+    quebradas = []
+
+    for rota in ("/redefinir_senha", "/esqueceu_senha"):
+        r = c2.get(rota)
+
+        if r.status_code != 200 or "<html" not in r.text.lower():
+            quebradas.append(f"{rota}={r.status_code}")
+
+    r = c2.get("/", follow_redirects=False)
+    if r.status_code != 200:
+        quebradas.append(f"/={r.status_code}")
+
+    check("as telas de acesso abrem sem sessao", not quebradas, ", ".join(quebradas))
+
+    print("\n[13] Menu por perfil")
+
+    # O menu saiu do HTML e virou dado, montado no app.py. O teste
+    # confere o resultado: um Coordenador nao pode receber link de
+    # Professor, e cada tela precisa marcar a si mesma como ativa.
+    c, banco = cliente_logado(USUARIO_COORD)
+
+    def menu_de(rota):
+        banco.respostas.append([])
+        html = c.get(rota).text
+
+        itens = [
+            l.split('href="')[1].split('"')[0]
+            for l in html.splitlines()
+            if 'class="nav-item' in l and 'href="' in l
+        ]
+        ativos = [
+            l.split('href="')[1].split('"')[0]
+            for l in html.splitlines()
+            if "nav-item active" in l
+        ]
+        return html, itens, ativos
+
+    PROFESSOR = (
+        "/home", "/reservar", "/reservas_prof", "/calendario_prof",
+        "/configuracoes", "/avisos"
+    )
+
+    html, itens, ativos = menu_de("/home_admin")
+
+    check(
+        "coordenador recebe o menu de administrador",
+        itens[:5] == [
+            "/home_admin", "/aprovar_reservas_adm", "/gerenciar_salas_adm",
+            "/professores_adm", "/configuracoes_adm",
+        ],
+        str(itens),
+    )
+    check(
+        "nenhum link de professor no menu do coordenador",
+        not [i for i in itens if i in PROFESSOR],
+        str([i for i in itens if i in PROFESSOR]),
+    )
+    check(
+        "o logo aponta para a home do coordenador",
+        'href="/home_admin" class="logo"' in html,
+        "logo nao aponta para /home_admin",
+    )
+    check("a home marca a si mesma como ativa", ativos == ["/home_admin"], str(ativos))
+    check("o nome vem do servidor", USUARIO_COORD["nome"] in html)
+
+    # O esqueleto duplicado nao pode voltar a vazar no HTML.
+    vazou = [m for m in ("{% extends", "{{ usuario", "{% block") if m in html]
+    check("nada de sintaxe Jinja vaza na resposta", not vazou, str(vazou))
+
+    # Cada tela marca a propria rota como ativa.
+    for rota in ("/professores_adm", "/gerenciar_salas_adm",
+                 "/aprovar_reservas_adm", "/configuracoes_adm"):
+        _, _, ativos = menu_de(rota)
+        check(f"{rota} marca a si mesma", ativos == [rota], str(ativos))
+
+    fechar(c)
+
+    # O Professor recebe o outro menu.
+    c, banco = cliente_logado(USUARIO_PROF)
+    banco.respostas.append([])
+    html = c.get("/home").text
+
+    itens_prof = [
+        l.split('href="')[1].split('"')[0]
+        for l in html.splitlines()
+        if 'class="nav-item' in l and 'href="' in l
+    ]
+
+    check(
+        "professor recebe o menu de professor",
+        itens_prof[0] == "/home" and "/professores_adm" not in itens_prof,
+        str(itens_prof),
+    )
+    fechar(c)
+
+    print("\n[14] Sessao isolada")
 
     c = TestClient(app)
     r = c.get("/")

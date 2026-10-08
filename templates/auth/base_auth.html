@@ -1,0 +1,44 @@
+{#-
+  auth/base_auth.html
+
+  Esqueleto das telas de acesso: login, cadastro, redefinição e
+  recuperação de senha.
+
+  São telas sem menu lateral e sem cabeçalho — quem ainda não entrou
+  no sistema não tem perfil, e mostrar o menu dele ali não faria
+  sentido. Por isso existe uma base separada, e não a mesma "base.html"
+  com uma condição dentro.
+
+  Uma tela estende este arquivo e preenche:
+
+    {% extends "auth/base_auth.html" %}
+    {% block titulo %}Login{% endblock %}
+    {% block conteudo %}...{% endblock %}
+    {% block scripts %}...{% endblock %}
+-#}
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>{% block titulo %}Acesso{% endblock %} - Gestão de salas e equipamentos</title>
+
+  {#- As telas de acesso não usam o menu, e por isso não precisam
+      nem da fonte Inter nem do flaticon: cada uma tem o seu CSS em
+      static/css. -#}
+  {% block head_extra %}{% endblock %}
+
+  {% block style %}{% endblock %}
+</head>
+
+<body>
+
+  {% block conteudo %}{% endblock %}
+
+  {% block scripts %}{% endblock %}
+
+</body>
+
+</html>
