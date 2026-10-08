@@ -14,6 +14,26 @@
  * Seletor com texto diferente em cada tela entra aqui so com
  * as declaracoes iguais; o que sobra fica no CSS da tela.
  * ============================================================ */
+  /* A fonte de toda tela com menu. Antes nao havia nenhuma
+     declaracao de font-family no body em lugar nenhum do projeto: a
+     Inter estava so em "button" e em "*", em parte dos arquivos. O
+     menu lateral e o cabecalho saiam na Times New Roman, a fonte
+     padrao do navegador. */
+
+  body, html {
+  font-family: 'Inter', sans-serif;
+  }
+  /* Campo de formulario nao herda a fonte: o navegador da a ele a
+     propria, que no Chrome e Arial. Por isso isto esta aqui e nao
+     so no body. Antes eram seis copias de "button { font-family }",
+     uma por arquivo, e os input, select e textarea ficavam de
+     fora. */
+
+  button, input, select, textarea {
+  font-family: 'Inter', sans-serif;
+  }
+
+
 
   .app-container {
   display: flex;

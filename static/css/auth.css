@@ -11,6 +11,24 @@
  * Entra pelo base_auth.html, antes do CSS da tela, para uma
  * propriedade continuar sendo decidida pelo mesmo lugar.
  * ============================================================ */
+  /* Mesma fonte das telas com menu. As telas de acesso nao declaravam
+     fonte nenhuma: login, cadastro e redefinicao saiam na Times New
+     Roman, e o login ainda pegava uma Montserrat instalada na
+     maquina. */
+
+  body {
+  font-family: 'Inter', sans-serif;
+  }
+  /* Campo de formulario nao herda a fonte: o navegador da a ele a
+     propria, que no Chrome e Arial. Por isso isto esta aqui e nao
+     so no body. Antes eram seis copias de "button { font-family }",
+     uma por arquivo, e os input, select e textarea ficavam de
+     fora. */
+
+  button, input, select, textarea {
+  font-family: 'Inter', sans-serif;
+  }
+
 
   .container {
   display: flex;
@@ -191,3 +209,4 @@
   padding: 12px 14px;
   }
 }
+
