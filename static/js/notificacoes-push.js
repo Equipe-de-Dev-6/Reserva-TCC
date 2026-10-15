@@ -581,6 +581,32 @@
     checarLembretes();
   }
 
+  // O retrato inicial ("primeira execucao") e tirado de
+  // ReservasApp.getReservas(), e essa funcao devolve a copia guardada
+  // no localStorage - e nao a lista que veio do banco.
+  //
+  // O problema e a ordem: o "reservas.js" dispara a sincronizacao com
+  // a API ja no fim do arquivo, e sincronizar() comeca com um "await"
+  // (o fetch de GET /reservas). Enquanto esse await nao volta, a lista
+  // ainda e a do cache. Como este arquivo e o proximo <script> da
+  // pagina, ele roda antes de a sincronizacao terminar, e tirava o
+  // retrato do cache. Pouco depois a sincronizacao concluia, os
+  // listeners disparavam checarReservas(false), e TODA reserva que ja
+  // existia no banco era tratada como nova: uma notificacao para
+  // cada uma delas.
+  //
+  // Por isso a inicializacao espera a promessa antes do retrato.
+  function esperarReservas() {
+
+    if (!temReservas() || !window.ReservasApp.sincronizacao) {
+      return Promise.resolve();
+    }
+
+    return Promise.resolve(window.ReservasApp.sincronizacao)
+      .catch(() => false);
+
+  }
+
   function iniciar() {
 
     if (!suportado) {
@@ -588,8 +614,17 @@
       return;
     }
 
+
+
+    esperarReservas().then(comecar);
+
+  }
+
+  function comecar() {
+
     // Primeira execução: guarda o que já existe sem notificar,
     // para o usuário não receber uma enxurrada de avisos antigos.
+
     const primeira = !ler(KEYS.iniciado, false);
 
     if (primeira) {

@@ -21,13 +21,18 @@
               Mantenha o cadastro das salas atualizado para que os professores vejam apenas o que está disponível
             </p>
           </div>
+
+          {#- O botao fica dentro do cabecalho para alinhar a direita, na
+              mesma linha do titulo. Solto abaixo dele, ele ficava
+              encostado na esquerda e com um vao de 20px antes da grade
+              de cartoes. O ".adm-page-header" ja e flex com
+              "justify-content: space-between". -#}
+          <button class="adm-btn-cadastrar" type="button" id="btnNovaSala">
+            + Cadastrar Sala
+          </button>
         </div>
 
-        <button class="adm-btn-cadastrar" type="button" id="btnNovaSala">
-          + Cadastrar Sala
-        </button>
-
-      <!-- FORMULÁRIO - NOVA SALA / EDIÇÃO -->
+        <!-- FORMULÁRIO - NOVA SALA / EDIÇÃO -->
       <div class="adm-form-card" id="formSalaCard" style="display: none;">
 
         <h3 class="adm-form-title" id="formSalaTitulo">Nova sala</h3>
@@ -203,10 +208,17 @@
         .replace(/'/g, '&#39;');
     }
 
+    // Quantos equipamentos aparecem no cartao antes de virar "+N".
+    const MAX_EQUIPAMENTOS = 3;
+
     function montarCard(sala) {
       const contexto = sala.contexto || {};
       const disponivel = !!sala.disponibilidade;
 
+      // "Corredor A · 32 lugares · Sala de equipamentos plasnticos".
+      // Uma sala sem setor, capacidade e descricao nao deve gerar um
+      // <p> vazio: antes o navegador ainda desenhava a linha em branco
+      // e o cartao ficava com um vao entre o nome e os botoes.
       const linha = [
         contexto.setor,
         contexto.quantidade_alunos
@@ -215,19 +227,32 @@
         contexto.descricao
       ].filter(Boolean).join(' · ');
 
-      const equipamentos = (contexto.equipamentos || []);
+      const todos = (contexto.equipamentos || []).filter(Boolean);
+      const visiveis = todos.slice(0, MAX_EQUIPAMENTOS);
+      const resto = todos.length - visiveis.length;
+
+      // O "+N" fica fora do texto: ele vai num <span> destacado logo em
+      // seguida. Se fosse montado aqui também, apareceria duas vezes.
+      const textoEquip = visiveis.join(', ');
 
       return `
         <div class="adm-card">
-          <h4>${escapar(sala.nome || 'Sala')}</h4>
+          <div class="adm-card-topo">
+            <h4>${escapar(sala.nome || 'Sala')}</h4>
 
-          <p>${escapar(linha)}</p>
+            <span class="adm-selo adm-selo-${disponivel ? 'disponivel' : 'indisponivel'}">
+              ${disponivel ? 'Disponível' : 'Indisponível'}
+            </span>
+          </div>
 
-          <span class="adm-selo adm-selo-${disponivel ? 'disponivel' : 'indisponivel'}">
-            ${disponivel ? 'Disponível' : 'Indisponível'}
-          </span>
+          ${linha ? `<p>${escapar(linha)}</p>` : ''}
 
-          ${equipamentos.length ? `<p class="adm-detalhe">${escapar(equipamentos.join(', '))}</p>` : ''}
+          ${todos.length ? `
+            <p class="adm-card-equip" title="${escapar(todos.join(', '))}">
+              ${escapar(textoEquip)}${resto > 0
+                ? ` <span class="adm-card-equip-mais">+${resto}</span>`
+                : ''}
+            </p>` : ''}
 
           <div class="adm-card-actions">
             <button class="adm-btn adm-btn-editar" data-acao="editar" data-id="${sala.id}">

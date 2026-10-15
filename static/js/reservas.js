@@ -963,6 +963,77 @@ const ReservasApp = (() => {
 
 
   // ========================================================
+  // CATEGORIA MOSTRADA NA TELA
+  // ========================================================
+  //
+  // O cartao de categoria das telas de detalhe (passo 02) e de
+  // confirmacao (passo 03) era fixo em "classroom.png" e "Salas de
+  // aula, reuniões e treinamentos". Como as tres telas de escolha
+  // (salas, laboratorios e gabinetes) levam todas ao mesmo passo 02,
+  // escolher um laboratorio abria a tela com o icone e o titulo de uma
+  // sala. O mesmo acontecia com os gabinetes.
+  //
+  // A escolha ja esta no sessionStorage, com a categoria que o
+  // servidor classificou: "Sala", "Laboratorio" ou "Gabinete".
+  // Aqui essa categoria vira o icone e o texto certainos.
+
+  const CATEGORIA_NA_TELA = {
+    sala: {
+      icone: 'classroom.png',
+      alt: 'Salas',
+      titulo: 'Salas de aula, reuniões e treinamentos'
+    },
+    laboratorio: {
+      icone: 'computer.png',
+      alt: 'Laboratórios',
+      titulo: 'Laboratórios de informática, automação, mecânica e outros'
+    },
+    gabinete: {
+      icone: 'shopping-cart.png',
+      alt: 'Gabinetes',
+      titulo: 'Gabinetes de notebooks e equipamentos móveis'
+    }
+  };
+
+  function _semAcento(texto) {
+    return String(texto || '')
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .toLowerCase()
+      .trim();
+  }
+
+  function telaDaCategoria() {
+    const recurso = _lerSalaEscolhida();
+    const chave = _semAcento(recurso.categoria);
+
+    return CATEGORIA_NA_TELA[chave] || CATEGORIA_NA_TELA.sala;
+  }
+
+  // Escreve o icone e o titulo no DOM. Os elementos sao os que
+  // carregam "data-categoria-icone" e "data-categoria-titulo"; sem
+  // nenhum dos dois, a funcao nao faz nada e a tela segue com o texto
+  // fixo do template.
+  function pintarCategoria() {
+    const tela = telaDaCategoria();
+
+    const icone = document.querySelector('[data-categoria-icone]');
+    const titulo = document.querySelector('[data-categoria-titulo]');
+
+    if (icone) {
+      icone.src = '/assets/icons/' + tela.icone;
+      icone.alt = tela.alt;
+    }
+
+    if (titulo) {
+      titulo.textContent = tela.titulo;
+    }
+
+    return tela;
+  }
+
+
+  // ========================================================
   // EXPORTAÇÕES
   // ========================================================
 
@@ -973,6 +1044,9 @@ const ReservasApp = (() => {
 
     stageReserva,
     commitStagedReserva,
+
+    telaDaCategoria,
+    pintarCategoria,
 
     cancelReserva,
     deleteReserva,

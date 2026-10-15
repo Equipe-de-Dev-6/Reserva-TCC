@@ -5,8 +5,12 @@
  * comuns as telas do Coordinator estao em admin.css.
  * ============================================================ */
 
+  /* O "--senai-red" e a cor da marca e vem do ":root" do base.css.
+     Antes estas regras usavam "--primary-color, #b91c1c", um vermelho
+     mais escuro e diferente do resto do sistema. */
+
   .adm-btn-cadastrar {
-  background: var(--primary-color, #b91c1c);
+  background: var(--senai-red, #E30613);
   border: none;
   border-radius: 8px;
   color: #fff;
@@ -15,6 +19,11 @@
   font-size: 13px;
   font-weight: 600;
   padding: 10px 16px;
+  transition: filter 0.2s;
+  }
+
+  .adm-btn-cadastrar:hover {
+  filter: brightness(0.92);
   }
 
   .adm-cards {
@@ -23,28 +32,71 @@
   grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
   }
 
+  /* Coluna de flex para que os botoes fiquem sempre na base do cartao,
+     mesmo quando o nome ou a lista de equipamentos e bem maior que a
+     dos vizinhos. */
+
   .adm-card {
   background: var(--card-bg, #fff);
   border: 1px solid var(--border-color, #e5e7eb);
   border-radius: 12px;
   padding: 16px 18px;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  }
+
+  /* Nome e selo na mesma linha: o selo nao empurrava mais o titulo
+     para baixo e deixava o cartao com um vao no meio. */
+
+  .adm-card-topo {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
   }
 
   .adm-card h4 {
   font-size: 15px;
   font-weight: 700;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
   }
 
   .adm-card p {
   color: var(--text-secondary, #6b7280);
   font-size: 13px;
-  margin-top: 2px;
+  line-height: 1.4;
+  margin-top: 6px;
+  }
+
+  /* A lista de equipamentos do campus e longa demais (a sala C15 tem
+     onze itens). Exibe os tres primeiros e um "+N", com o texto
+     completo no title do elemento. */
+
+  .adm-card-equip {
+  color: var(--text-secondary, #6b7280);
+  font-size: 12px;
+  line-height: 1.4;
+  margin-top: 8px;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  }
+
+  .adm-card-equip-mais {
+  color: var(--senai-red, #E30613);
+  font-weight: 600;
   }
 
   .adm-card-actions {
   display: flex;
   gap: 8px;
-  margin-top: 14px;
+  margin-top: auto;
+  padding-top: 14px;
   }
 
   .adm-btn {
@@ -62,10 +114,18 @@
   color: var(--text-secondary, #6b7280);
   }
 
+  .adm-btn-editar:hover {
+  background: #F9FAFB;
+  }
+
   .adm-btn-excluir {
   background: transparent;
   border: 1px solid var(--border-color, #e5e7eb);
-  color: var(--primary-color, #b91c1c);
+  color: var(--senai-red, #b91c1c);
+  }
+
+  .adm-btn-excluir:hover {
+  background: var(--red-bg, #FEE2E2);
   }
 
   .adm-empty {
