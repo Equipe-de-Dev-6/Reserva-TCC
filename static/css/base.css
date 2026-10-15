@@ -101,6 +101,14 @@
   border-bottom-left-radius: 4px;
   }
 
+  /* O carrinho de "Gabinetes" e o unico icone branco do menu, e a
+     barra lateral e clara. O seletor pega pelo "src" para que nenhum
+     outro icone seja remexido. */
+
+  .nav-item img[src*="shopping-cart.png"] {
+  filter: var(--senai-filtro-branco);
+  }
+
   .divider {
   height: 1px;
   background-color: var(--border-color);
@@ -352,6 +360,17 @@
   --red-text: #DC2626;
   --yellow-bg: #FEF3C7;
   --yellow-text: #B45309;
+  /* Leva um icone branco ao vermelho do SENAI (#E30613), preservando o
+     canal alfa. Existe porque o "shopping-cart.png" e branco: ele foi
+     desenhado para as telas de reserva, onde o icone fica sobre um
+     quadrado vermelho. Sobre fundo claro - a barra lateral, o estado
+     vazio das telas de ADM - o branco some, entao la ele recebe este
+     filtro. A cadeia foi medida pixel a pixel no navegador (o canvas
+     usa o mesmo motor de filtro do CSS) em 26.655 combinacoes: o
+     branco do arquivo vira rgb(227, 6, 18), contra rgb(227, 6, 19) do
+     #E30613. O arquivo em si nao foi recolorido, senao sumiria dos
+     quatro lugares que o usam sobre fundo vermelho. */
+  --senai-filtro-branco: brightness(0) invert(15%) sepia(100%) saturate(6000%) hue-rotate(352deg) brightness(88%) contrast(104%);
   }
 
 * {

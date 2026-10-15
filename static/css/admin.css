@@ -81,6 +81,13 @@
   font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
   }
 
+  /* O icone do estado vazio da tela de Gabinetes e o carrinho branco,
+     que some no fundo claro. Ve a explicacao da variavel em base.css. */
+
+  .adm-empty img[src*="shopping-cart.png"] {
+  filter: var(--senai-filtro-branco);
+  }
+
   /* Os selos de disponibilidade e de "aparece na reserva" desceram
      para uma linha própria, porque o lugar do topo do cartão agora é
      do código. */
