@@ -305,6 +305,13 @@
 
 :root {
   --senai-red: #E30613;
+  /* Azul de selecao/destaque. O valor nao era inventado: e o mesmo que
+     "avisos.css" e "reservar-sala-confirmacao.css" ja usavam no
+     ":root" deles. O que faltava era a declaracao aqui no esqueleto,
+     que e o unico ":root" carregado pelas 25 telas com menu - por isso
+     o dia selecionado do calendario e a borda da sala selecionada
+     perdiam a cor e caiam no valor inicial do navegador. */
+  --senai-blue: #3B82F6;
   --bg-color: #F4F5F7;
   --white: #FFFFFF;
   --text-dark: #1F2937;

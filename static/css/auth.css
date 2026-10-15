@@ -11,6 +11,51 @@
  * Entra pelo base_auth.html, antes do CSS da tela, para uma
  * propriedade continuar sendo decidida pelo mesmo lugar.
  * ============================================================ */
+
+  /* ============================================================
+   * AS VARIAVEIS DE COR DAS TELAS DE ACESSO
+   *
+   * Os cinco arquivos desta pasta (auth, login, cadastro,
+   * redefsenha e esqueceu_senha) usam um conjunto proprio de nomes --
+   * --cor-texto, --cor-fundo, --cor-principal -- que nunca chegou a
+   * ser declarado. Sem declaracao, o "var(--cor-texto)" vira uma
+   * regra invalida: o navegador joga fora a propriedade e usa o valor
+   * inicial. Foi assim que o login e o cadastro ficaram sem a cor do
+   * campo, sem a cor do botao, sem o arredondamento e sem a
+   * divisoria.
+   *
+   * O "base_auth.html" nao carrega o "base.css" -- sao telas sem menu
+   * --, entao o ":root" do esqueleto nao chega aqui. Por isso as
+   * variaveis sao declaradas neste arquivo.
+   *
+   * Os valores NAO foram inventados. O desenho original se deduce do
+   * proprio codigo:
+   *
+   *   - o campo era escuro: o placeholder e "rgba(255,255,255,0.9)"
+   *     (auth.css) e a seta do <select> e branca em SVG (cadastro.css);
+   *   - o texto sobre o campo era claro: "color: var(--cor-fundo)"
+   *     no input, e "color: var(--cor-fundo)" no icone;
+   *   - o botao era escuro com texto claro: "background: var(--cor-texto)"
+   *     junto de "color: var(--cor-fundo)";
+   *   - as opcoes do <select> tinham fundo claro e texto escuro.
+   *
+   * A escala de cinza e a mesma que o projeto inteiro ja usa
+   * (--text-dark #1F2937, --text-gray #6B7280, --border-color #E5E7EB,
+   * e #D1D5DB / #9CA3AF em base.css e reservar-sala.css).
+   * ============================================================ */
+
+  :root {
+  --cor-fundo: #FFFFFF;
+  --cor-texto: #1F2937;
+  --cor-secundaria: #6B7280;
+  --cor-borda: #E5E7EB;
+  --cor-principal: #1F2937;
+  --cor-hover: #374151;
+  --cor-ativa: #111827;
+  --sombra: 0 4px 12px rgba(0, 0, 0, 0.08);
+  --border-radius: 10px;
+  }
+
   /* Mesma fonte das telas com menu. As telas de acesso nao declaravam
      fonte nenhuma: login, cadastro e redefinicao saiam na Times New
      Roman, e o login ainda pegava uma Montserrat instalada na
