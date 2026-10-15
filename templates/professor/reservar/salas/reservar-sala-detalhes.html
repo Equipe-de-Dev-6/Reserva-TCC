@@ -20,10 +20,14 @@
           <div class="category-card">
 
             <div class="category-icon">
-              <img src="/assets/icons/classroom.png" alt="Salas">
+              {#- O icone e o texto sao trocados pelo "reservas.js"
+                  conforme a categoria escolhida no passo 01. Fixos
+                  aqui, apareciam o icone e o titulo de sala mesmo
+                  quando a reserva era de laboratorio ou gabinete. -#}
+              <img data-categoria-icone src="/assets/icons/classroom.png" alt="Salas">
             </div>
 
-            <h3>
+            <h3 data-categoria-titulo>
               Salas de aula, reuniões e treinamentos
             </h3>
 

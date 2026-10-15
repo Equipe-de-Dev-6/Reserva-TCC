@@ -45,13 +45,16 @@
    * ============================================================ */
 
   :root {
+  /* O "--cor-texto" e o "--cor-principal" sao o vermelho do SENAI, o
+     mesmo "--senai-red" que o resto do sistema usa. Sao eles que
+     pintam o campo, o botao, a divisoria e o titulo. */
   --cor-fundo: #FFFFFF;
-  --cor-texto: #1F2937;
+  --cor-texto: #E30613;
   --cor-secundaria: #6B7280;
   --cor-borda: #E5E7EB;
-  --cor-principal: #1F2937;
-  --cor-hover: #374151;
-  --cor-ativa: #111827;
+  --cor-principal: #E30613;
+  --cor-hover: #C1050E;
+  --cor-ativa: #9B0009;
   --sombra: 0 4px 12px rgba(0, 0, 0, 0.08);
   --border-radius: 10px;
   }
@@ -82,6 +85,9 @@
   justify-content: center;
   width: 100%;
   max-width: 400px;
+  /* Sem isto o cartao ficava encostado na borda esquerda da janela,
+     porque um bloco com "max-width" nao se centraliza sozinho. */
+  margin: 0 auto;
   padding: 60px 40px;
   }
 

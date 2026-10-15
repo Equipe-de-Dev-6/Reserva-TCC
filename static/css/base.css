@@ -112,12 +112,16 @@
   align-items: center;
   justify-content: center;
   gap: 8px;
+  /* Ocupa a largura toda da barra. Antes ele encolhia no conteudo
+     (76px) e ficava com 140px vazios a direita, desalinhado do menu. */
+  width: 100%;
   padding: 10px;
   border: 1px solid var(--border-color);
   border-radius: 8px;
   font-size: 14px;
   font-weight: 600;
   color: var(--text-dark);
+  cursor: pointer;
   }
 
   .btn-logout:hover {
@@ -286,6 +290,21 @@
   height: 1px;
   background-color: var(--border-color);
   margin: 6px 0;
+  }
+
+  /* O "Sair" do menu de perfil precisa ser um <button>, porque e ele
+     que envia o POST de logout. Sem estas regras ele aparecia com o
+     botao nativo do navegador — borda 3D, sem arredondamento, 20px de
+     altura e 28px de largura. Aqui ele reaproveita o visual dos
+     ".dropdown-item" e so zera o que o botao traz por padrao. */
+
+  .dropdown-sair {
+  width: 100%;
+  border: none;
+  background: none;
+  border-radius: 0;
+  cursor: pointer;
+  text-align: left;
   }
 
   /* ============================================================

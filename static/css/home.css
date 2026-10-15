@@ -173,6 +173,17 @@
   flex-shrink: 0;
   }
 
+  /* O icone dentro desta caixa precisa sair branco, e nao com a cor
+     que tiver no arquivo. O "classroom.png" do menu e vermelho (para
+     aparecer na barra lateral, que e clara) e sumiria aqui, dentro de
+     um quadrado vermelho. O mesmo filtro ja existe em ".reserva-icon
+     img", no reservasprof.css. */
+  .img-placeholder img {
+  width: 24px;
+  height: 24px;
+  filter: brightness(0) invert(1);
+  }
+
   .res-info {
   min-width: 0;
   }
