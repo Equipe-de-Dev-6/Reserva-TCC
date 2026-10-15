@@ -38,14 +38,33 @@ SUITES_NODE = [
 
 def executar(executavel, arquivos) -> bool:
 
-    print(f"\n=== {', '.join(os.path.basename(a) for a in arquivos)} ===\n")
+    passou = True
 
-    resultado = subprocess.run(
-        [executavel, *arquivos],
-        cwd=RAIZ,
-    )
+    # Um arquivo por invocacao, e nao todos de uma vez.
+    #
+    # O node so executa o primeiro caminho que recebe; o resto da linha
+    # de comando vira argv e e descartado sem aviso nenhum. Com
+    # [node, test_reservas.js, test_avisos.js, check_wiring.js,
+    # check_migrations.js] rodava so o primeiro, e o codigo de saida do
+    # processo — que era 0 — era lido como se os quatro tivessem passado.
+    # test_avisos.js, check_wiring.js e check_migrations.js nao rodavam,
+    # e o run.py ainda anunciava "tudo certo".
+    #
+    # Rodar um por um tambem faz cada suitee ter o nome em cima da
+    # saida dela. Sem isso nao dava para saber de onde vinha um "ok".
+    # Uma falha nao interrompe as outras: o resumo vem no fim.
+    for arquivo in arquivos:
 
-    return resultado.returncode == 0
+        print(f"\n=== {os.path.basename(arquivo)} ===\n")
+
+        resultado = subprocess.run(
+            [executavel, arquivo],
+            cwd=RAIZ,
+        )
+
+        passou = resultado.returncode == 0 and passou
+
+    return passou
 
 
 def main() -> int:

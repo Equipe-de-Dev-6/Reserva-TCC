@@ -11,6 +11,35 @@
  * Entra pelo base_auth.html, antes do CSS da tela, para uma
  * propriedade continuar sendo decidida pelo mesmo lugar.
  * ============================================================ */
+
+  /* A paleta das telas de acesso. Ficava em static/css/base/variables.css,
+     que o commit 997a200 deletou junto com o resto da separacao antiga
+     em subpastas. O arquivo mesmo nao era linked em lugar nenhum, mas o
+     :root dele nao era codigo morto: era a unica definicao destas
+     variaveis, e as quatro telas de acesso as usam. Sem este bloco,
+     todo var(--cor-*) desta pasta caia em vazio e as telas saiam sem
+     estilo nenhum — fundo transparente, texto preto, botao invisivel.
+     O check_wiring nao pegou porque ele compara regras entre arquivos e
+     nao confere se uma variavel existe.
+     
+     O outro :root, em base.css, e outra paleta (--senai-red, --bg-color,
+     --text-dark...), a das telas com menu. As duas coexistem: nenhuma
+     tela de acesso carrega base.css. */
+
+  :root {
+  --cor-principal: #FF0000;
+  --cor-hover: #CC0000;
+  --cor-ativa: #990000;
+
+  --cor-fundo: #FFFFFF;
+  --cor-texto: #111111;
+  --cor-secundaria: #666666;
+
+  --cor-borda: #DDDDDD;
+  --sombra: 0 4px 12px rgba(0, 0, 0, 0.15);
+  --border-radius: 8px;
+  }
+
   /* Mesma fonte das telas com menu. As telas de acesso nao declaravam
      fonte nenhuma: login, cadastro e redefinicao saiam na Times New
      Roman, e o login ainda pegava uma Montserrat instalada na
@@ -75,17 +104,46 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  color: var(--cor-fundo);
+  color: var(--cor-secundaria);
   font-size: 24px;
   flex-shrink: 0;
   }
 
+  /* O placeholder e o icone andam na cor secundaria, e nao no branco de
+     --cor-fundo: o campo e branco, e branco sobre branco some — o que
+     e exatamente o defeito corrigido no preenchimento automatico,
+     atravessado por outro caminho. */
   .input-container input::placeholder {
-  color: rgba(255, 255, 255, 0.9);
+  color: var(--cor-secundaria);
   }
 
-  .input-container:focus-within {
-  background-color: var(--cor-hover);
+  /* O preenchimento automatico do navegador desenha um fundo claro
+     por cima do campo. Como o input tem fundo transparente e texto
+     branco, um e-mail e uma senha preenchidos sozinhos saiam brancos
+     sobre branco: o campo desaparecia. Numa tela de login e o
+     primeiro acesso de quem tem senha salva no navegador, que e
+     justamente o caso em que o campo tem que aparecer mais.
+
+     Aqui o fundo do campo e forcado por cima do do navegador, e a
+     cor do texto e reescrita. O -webkit-text-fill-color conta mais
+     que "color" aqui: e o Chrome que ele usa para pintar o texto
+     preenchido, e ele ignora a "color" da regra comum.
+
+     O fundo forcado e o branco do campo, e nao mais a paleta
+     antiga: o campo de login agora e branco, e pintar o
+     preenchimento automatico de vermelho deixaria um campo vermelho
+     no meio de um formulario neutro.
+
+     Os tres estados sao necessarios porque o Chrome reestiliza no
+     hover e no focus tambem. O atraso enorme no transition impede o
+     campo de piscar branco no instante em que a pagina abre. */
+  .input-container input:-webkit-autofill,
+  .input-container input:-webkit-autofill:hover,
+  .input-container input:-webkit-autofill:focus {
+  -webkit-text-fill-color: var(--cor-texto);
+  -webkit-box-shadow: 0 0 0 1000px var(--cor-fundo) inset;
+  caret-color: var(--cor-texto);
+  transition: background-color 9999s ease-in-out 0s;
   }
 
   button[type="submit"]:hover {
@@ -123,17 +181,37 @@
   height: 52px;
   padding: 0 16px;
   gap: 12px;
-  background-color: var(--cor-principal);
+  background-color: var(--cor-fundo);
   border-radius: var(--border-radius);
-  transition: background-color 0.3s ease;
+  outline: 1px solid var(--cor-borda);
+  outline-offset: 0;
+  transition: outline-color 0.3s ease;
   }
 
+  /* O contorno e do campo, e nao do input: o input e transparente e
+     ocupa so a area do texto, entao um contorno nele desenharia uma
+     caixa em volta das palavras, dentro do campo. No container ele
+     acompanha o retangulo arredondado inteiro.
+
+     Fica em --cor-borda (cinza claro) e com 1px, desenhado rente a
+     borda do campo: e o suficiente para dizer onde ele acaba, sem
+     pesar. No foco ele so escurece, sem engrossar — quem navega pelo
+     teclado precisa de uma diferenca, e engrossar era justamente o
+     que deixava o campo com cara de alerta. */
+  .input-container:focus-within {
+  outline-color: var(--cor-texto);
+  }
+
+  /* O "outline: none" do input continua aqui de proposito: sem ele o
+     Chrome desenha o anel padrao de foco em volta do input E deste
+     contorno, e o campo ganha dois. Este e o lugar onde o foco e
+     mostrado, um nivel acima. */
   .input-container input {
   width: 100%;
   border: none;
   outline: none;
   background: transparent;
-  color: var(--cor-fundo);
+  color: var(--cor-texto);
   font-size: 14px;
   }
 

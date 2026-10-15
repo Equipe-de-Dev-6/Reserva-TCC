@@ -225,8 +225,90 @@ if (cssSemDono.length) {
 console.log(`  -> ${cssEmDisco.length - cssSemDono.length}/${cssEmDisco.length} CSS em uso, ` +
             `${linksQuebrados.length} link(s) quebrado(s), ${telasSemEstilo.length} tela(s) sem estilo`);
 
+// 6) As variaveis de CSS.
+//
+// Um var(--x) sem definicao NAO da erro nenhum. A propriedade cai em
+// "invalid at computed-value time" e o navegador pinta o elemento como
+// se a declaracao nao existisse — sem aviso no console. Foi assim que as
+// quatro telas de acesso (login, cadastro, redefinir e recuperar senha)
+// ficaram sem cor nenhuma depois do commit 997a200, que apagou
+// static/css/base/variables.css: o arquivo nao era linked por ninguem,
+// mas o :root dele era a unica definicao da paleta --cor-*. A tela abria,
+// o formulario funcionava, so que sem fundo, sem botao e com o texto
+// branco sobre o branco do navegador.
+//
+// A checagem e global, e nao tela por tela, de proposito: :root vale para
+// o documento inteiro, entao um :root em auth.css define a variavel para
+// qualquer tela que carregue aquele arquivo.
+//
+// var(--x, valor) com valor padrao nao e problema: e o proprio jeito de
+// usar a variavel sem depender dela. Por isso --primary-color, --card-bg e
+// --text-secondary, que nao tem :root nenhum em lugar nenhum, passam
+// direto: se um dia a variavel deixar de existir, ninguem perde a cor.
+console.log('\nVariaveis de CSS:');
+
+// Comentario e texto igual para o resto do arquivo. Sem isso, o
+// --cor-principal: que aparece escrito na explicacao do auth.css seria
+// lido como definicao, e a guarda passaria sem conferir nada.
+const semComentario = (txt) => txt.replace(/\/\*[\s\S]*?\*\//g, '');
+
+const definidas = new Set();
+const usadas = new Map(); // nome -> Set de arquivos
+
+const anotarUso = (nome, origem) => {
+  if (!usadas.has(nome)) usadas.set(nome, new Set());
+  usadas.get(nome).add(origem);
+};
+
+// So interessa o uso SEM valor padrao: e esse que quebra a tela quando a
+// variavel some. O grupo de captura final diz se o que vem depois do
+// nome e uma virgula (tem fallback) ou o fecha da chamada (nao tem).
+const USO = /var\(\s*(--[a-zA-Z0-9_-]+)\s*([,)])/g;
+const DEFINICAO = /(--[a-zA-Z0-9_-]+)\s*:/g;
+
+for (const rel of cssEmDisco) {
+  const txt = semComentario(fs.readFileSync(path.join('static', 'css', rel), 'utf8'));
+  for (const m of txt.matchAll(DEFINICAO)) definidas.add(m[1]);
+  for (const m of txt.matchAll(USO)) {
+    if (m[2] === ')') anotarUso(m[1], rel);
+  }
+}
+
+// Estilo dentro do proprio HTML. Os templates nao tem mais nenhum — o
+// commit 83e73f0 tirou — mas a guarda nao deve depender disso para
+// continuar olhando o que importa.
+for (const arq of varrerHtml('templates')) {
+  const rel = path.relative('templates', arq).replace(/\\/g, '/');
+  const bruto = fs.readFileSync(arq, 'utf8').replace(/\{#[\s\S]*?#\}/g, '');
+
+  for (const bloco of bruto.matchAll(/<style[^>]*>([\s\S]*?)<\/style>/g)) {
+    const txt = semComentario(bloco[1]);
+    for (const m of txt.matchAll(USO)) {
+      if (m[2] === ')') anotarUso(m[1], rel);
+    }
+  }
+}
+
+const semDefinicao = [...usadas.keys()].filter(v => !definidas.has(v)).sort();
+
+for (const v of [...definidas].sort()) {
+  const onde = usadas.get(v);
+  console.log(`  ok    ${v}${onde ? '' : '  (definida, sem uso)'}`);
+}
+
+if (semDefinicao.length) {
+  console.log('  USADA SEM DEFINICAO — a propriedade cai no navegador:');
+  for (const v of semDefinicao) {
+    console.log(`    ${v}  <-  ${[...usadas.get(v)].join(', ')}`);
+  }
+}
+
+console.log(`  -> ${definidas.size} definida(s), ${semDefinicao.length} usada(s) sem definicao`);
+
 if (alvosQuebrados.length) process.exit(1);
 
 if (problemas || quebradas.length || semArquivo.length) process.exit(1);
 
 if (linksQuebrados.length || cssSemDono.length || telasSemEstilo.length) process.exit(1);
+
+if (semDefinicao.length) process.exit(1);

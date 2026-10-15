@@ -28,6 +28,21 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap"
     rel="stylesheet">
 
+  {#- O campo das quatro telas traz um icone a esquerda, e ele vem do
+      Bootstrap Icons: <i class="bi bi-envelope">, <i class="bi bi-lock">.
+      O Flaticon do base.html nao serve aqui — sao familias diferentes, e
+      nenhuma das duas define as classes "bi".
+
+      Sem esta linha o <i> ficava com 0x0: nao ha fonte que desenhe o
+      envelope, o espaco do icone some, e o texto do campo encosta na
+      margem. O campo continua funcionando, so que sem o icone que
+      dizia qual dos dois campos era qual — e numa tela com e-mail e
+      senha, isso e o que distingue os dois.
+
+      Mesmo CDN que o base.html ja usa para o flaticon. -#}
+  <link rel="stylesheet"
+    href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
   {#- As telas de acesso não usam o menu, e por isso não precisam do
       flaticon. A fonte Inter sim: é a mesma das telas com menu, e sem
       ela o texto saía na Times New Roman.
