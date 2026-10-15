@@ -8,7 +8,6 @@
 
 {% block titulo %}Configurações{% endblock %}
 
-{% block busca_placeholder %}Buscar salas, carrinhos, laboratórios...{% endblock %}
 
 {% block conteudo %}
 
@@ -123,7 +122,8 @@
 
                             <label class="switch">
 
-                                <input type="checkbox" id="notificacoesReservas" checked>
+                                <input type="checkbox" id="notificacoesReservas" checked
+                    aria-label="Pedidos de reserva">
 
                                 <span class="slider"></span>
 
@@ -147,7 +147,8 @@
 
                             <label class="switch">
 
-                                <input type="checkbox" id="notificacoesSistema" checked>
+                                <input type="checkbox" id="notificacoesSistema" checked
+                    aria-label="Notificações do sistema">
 
                                 <span class="slider"></span>
 
@@ -183,8 +184,4 @@
 
 {% block scripts %}
         <script type="module" src="/js/pages/configuracoes.js"></script>
-
-</body>
-
-</html>
 {% endblock %}

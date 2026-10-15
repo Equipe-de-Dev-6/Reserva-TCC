@@ -20,14 +20,10 @@
   z-index: 150;
   }
 
+  /* Tamanho e borda ficam no base.css (42px); aqui so o que ele nao define. */
   .menu-toggle {
   align-items: center;
   justify-content: center;
-  width: 40px;
-  height: 40px;
-  border: 1px solid var(--border-color);
-  background-color: var(--white);
-  border-radius: 8px;
   color: var(--text-dark);
   flex-shrink: 0;
   }

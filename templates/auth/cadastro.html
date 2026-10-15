@@ -10,29 +10,30 @@
 {% block conteudo %}
     <div class="container">
         <div class="logo">
-            <img src="/assets/img/Logo senai.png">
+            <img src="/assets/img/Logo senai.png" alt="SENAI" width="320" height="107">
         </div>
         <div class="hr"></div>
         <div class="form-container">
             <h2>Gestão de salas e equipamentos</h2>
 
-            <form action="/" method="GET">
-
-                <form>
+            <form>
 
                     <div class="input-container">
                         <i class="bi bi-person-circle"></i>
-                        <input type="text" id="nome" placeholder="Nome completo...">
+                        <input type="text" id="nome" placeholder="Nome completo..."
+                            aria-label="Nome completo">
                     </div>
 
                     <div class="input-container">
                         <i class="bi bi-envelope"></i>
-                        <input type="email" id="email" placeholder="Email...">
+                        <input type="email" id="email" placeholder="Email..."
+                            aria-label="Email">
                     </div>
 
                     <div class="input-container">
                         <i class="bi bi-person-badge"></i>
-                        <select id="cargo" name="cargo" required>
+                        <select id="cargo" name="cargo" required
+                            aria-label="Cargo">
                             <option value="" selected disabled>Selecione o cargo...</option>
                             <option value="Professor">Professor</option>
                             <option value="Coordenador">Coordenador</option>
@@ -41,12 +42,14 @@
 
                     <div class="input-container">
                         <i class="bi bi-lock"></i>
-                        <input type="password" id="senha" placeholder="Senha...">
+                        <input type="password" id="senha" placeholder="Senha..."
+                            aria-label="Senha">
                     </div>
 
                     <div class="input-container">
                         <i class="bi bi-lock"></i>
-                        <input type="password" id="confirmar-senha" placeholder="Confirme sua senha...">
+                        <input type="password" id="confirmar-senha" placeholder="Confirme sua senha..."
+                            aria-label="Confirme sua senha">
                     </div>
 
                     <button type="submit" id="btn_cadastro">

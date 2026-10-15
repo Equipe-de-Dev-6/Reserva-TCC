@@ -10,10 +10,10 @@ export function inicializarFaq() {
     return;
   }
 
-  faqList.querySelectorAll('.faq-item').forEach((item) => {
-    item.classList.add('open');
-  });
-
+  // As perguntas comecam fechadas. Antes este arquivo adicionava ".open"
+  // em todos os itens assim que a tela carregava, o que anulava o
+  // ".faq-answer { display: none }" do CSS: o acordeao aparecia com
+  // tudo aberto e nenhuma pergunta respondia a "abre e fecha".
   faqList.addEventListener('click', (event) => {
     const question = event.target.closest('.faq-question');
 

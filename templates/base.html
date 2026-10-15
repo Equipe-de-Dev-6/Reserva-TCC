@@ -32,8 +32,6 @@
 
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap"
     rel="stylesheet">
-  <link rel="stylesheet" href="https://www.flaticon.com/flaticon.css">
-
   {#- O esqueleto de todas as telas com menu: a barra lateral, o
       cabeçalho, o campo de busca e o cartão de perfil.
 
@@ -71,6 +69,28 @@
     <script src="/js/app.js"></script>
 
     {% include "components/_sidebar.html" %}
+
+    {#-
+      Fundo escurecido que aparece atras da barra lateral no celular.
+
+      Fica aqui, e nao dentro do "components/_sidebar.html", por um
+      motivo tecnico: um "position: fixed" dentro de um elemento que
+      tem "transform" se posiciona em relacao a esse elemento, e nao
+      a janela. Como o ".sidebar" ganha "transform: translateX(-100%)"
+      em tela estreita, o overlay dentro dele cobriria so a barra.
+
+      O "app.js" procurava #sidebarOverlay, nao achava, e abortava
+      antes de ligar o botao de menu — que aparecia na tela e nao
+      abria nada. O CSS do overlay ja existia (em base.css e nos CSS
+      de tela); o elemento e que nunca tinha sido escrito no HTML.
+
+      Fora do <aside> e dentro do ".app-container" — que nao tem
+      transform — o "fixed" volta a se posicionar em relacao a
+      janela. Em tela larga
+      o "display: none" de base.css mantem o elemento invisivel, entao
+      nada muda no desktop.
+    -#}
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
 
     <main class="main-content">
 

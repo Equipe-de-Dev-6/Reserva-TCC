@@ -10,7 +10,7 @@
 {% block conteudo %}
     <div class="container">
         <div class="logo">
-            <img src="/assets/img/Logo senai.png">
+            <img src="/assets/img/Logo senai.png" alt="SENAI" width="320" height="107">
         </div>
         <div class="hr"></div>
         <div class="links">
@@ -28,7 +28,8 @@
             <form action="/redefinir_senha">
                 <div class="input-container">
                     <i class="bi bi-envelope"></i>
-                    <input type="email" placeholder="Email..." required>
+                    <input type="email" placeholder="Email..." required
+                        aria-label="Email">
                 </div>
                 <button type="submit">Enviar e-mail</button>
             </form>
