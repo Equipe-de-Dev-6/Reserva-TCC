@@ -1034,10 +1034,37 @@ const ReservasApp = (() => {
 
 
   // ========================================================
+  // ESCAPAR TEXTO
+  // ========================================================
+  //
+  // Nome do laboratorio, curso, motivo e descricao sao texto livre
+  // digitado pelo professor e arrives aqui pela API. As telas montam o
+  // cartao com innerHTML, entao esse texto precisa ir escapado: sem
+  // isso, um "<img onerror=...>" em qualquer um desses campos vira
+  // script rodando no navegador de quem abre a tela - inclusive no do
+  // Coordenador, que enxerga as reservas de todo mundo.
+  //
+  // Fica aqui, e nao em cada tela, porque ja existiam cinco copias
+  // dessa funcao (quatro em templates e uma em "notificacoesprof.js")
+  // e oito pontos de injecao que esqueceram de chamar qualquer uma
+  // delas.
+  function escapar(texto) {
+    return String(texto ?? '')
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
+  }
+
+
+  // ========================================================
   // EXPORTAÇÕES
   // ========================================================
 
   return {
+    escapar,
+
     getReservas,
     getReservasPorData,
     construirMatrizMes,

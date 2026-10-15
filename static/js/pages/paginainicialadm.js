@@ -131,7 +131,9 @@ document.addEventListener('DOMContentLoaded', () => {
                                 <div class="res-info">
 
                                     <h4>
-                                        ${r.item || r.categoria}
+                                        ${ReservasApp.escapar(
+                                          r.item || r.categoria
+                                        )}
                                     </h4>
 
                                     <p>
@@ -292,12 +294,12 @@ document.addEventListener('DOMContentLoaded', () => {
                                     height="24"
                                 >
 
-                                ${a.titulo}
+                                ${ReservasApp.escapar(a.titulo)}
 
                             </div>
 
                             <p>
-                                ${a.descricao}
+                                ${ReservasApp.escapar(a.descricao)}
                             </p>
 
                         </a>

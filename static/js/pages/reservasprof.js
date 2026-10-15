@@ -77,12 +77,15 @@
 
                 <div class="reserva-info">
                   <h4>
-                    ${r.item || r.categoria}
+                    ${ReservasApp.escapar(
+                            r.item || r.categoria
+                          )}
                   </h4>
 
                   <p>
-                    ${r.curso ? r.curso + ' · ' : ''}
-                    ${r.professor || ''}
+                    ${ReservasApp.escapar(r.curso)
+                          ? ReservasApp.escapar(r.curso) + ' · ' : ''}
+                    ${ReservasApp.escapar(r.professor)}
                   </p>
 
                   <div class="reserva-meta">

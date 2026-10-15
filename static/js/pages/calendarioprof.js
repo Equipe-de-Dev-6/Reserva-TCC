@@ -82,7 +82,9 @@
               </p>
 
               <p class="reserva-titulo">
-                ${r.item || r.categoria}
+                ${ReservasApp.escapar(
+                                  r.item || r.categoria
+                                )}
               </p>
 
               <p class="reserva-subtitulo">
