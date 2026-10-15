@@ -61,6 +61,7 @@ MENU_COORDENADOR = [
     {"rota": "/home_admin", "icone": "home", "rotulo": "Início"},
     {"rota": "/aprovar_reservas_adm", "icone": "reserved", "rotulo": "Aprovar Reservas"},
     {"rota": "/gerenciar_salas_adm", "icone": "classroom", "rotulo": "Gerenciar Salas"},
+    {"rota": "/gerenciar_laboratorios_adm", "icone": "management", "rotulo": "Labs e Gabinetes"},
     {"rota": "/professores_adm", "icone": "user (3)", "rotulo": "Professores"},
     {"rota": "/configuracoes_adm", "icone": "gear", "rotulo": "Configurações"},
     {"rota": "/ajuda", "icone": "interrogation", "rotulo": "Ajuda"},
@@ -884,6 +885,10 @@ PAGINAS_DO_COORDENADOR = {
     "/gerenciar_salas_adm": (
         "admin/gerenciar_salas.html",
         "Buscar sala por nome ou tipo..."
+    ),
+    "/gerenciar_laboratorios_adm": (
+        "admin/gerenciar_laboratorios.html",
+        "Buscar laboratório ou gabinete..."
     ),
     "/professores_adm": (
         "admin/professores.html",

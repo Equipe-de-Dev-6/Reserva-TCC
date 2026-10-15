@@ -670,7 +670,8 @@ def main():
 
     for rota in (
         "/home_admin", "/aprovar_reservas_adm", "/configuracoes_adm",
-        "/gerenciar_salas_adm", "/professores_adm", "/cadastro",
+        "/gerenciar_salas_adm", "/gerenciar_laboratorios_adm",
+        "/professores_adm", "/cadastro",
     ):
         r = c.get(rota)
 
@@ -730,9 +731,10 @@ def main():
 
     check(
         "coordenador recebe o menu de administrador",
-        itens[:5] == [
+        itens[:6] == [
             "/home_admin", "/aprovar_reservas_adm", "/gerenciar_salas_adm",
-            "/professores_adm", "/configuracoes_adm",
+            "/gerenciar_laboratorios_adm", "/professores_adm",
+            "/configuracoes_adm",
         ],
         str(itens),
     )
@@ -755,6 +757,7 @@ def main():
 
     # Cada tela marca a propria rota como ativa.
     for rota in ("/professores_adm", "/gerenciar_salas_adm",
+                 "/gerenciar_laboratorios_adm",
                  "/aprovar_reservas_adm", "/configuracoes_adm"):
         _, _, ativos = menu_de(rota)
         check(f"{rota} marca a si mesma", ativos == [rota], str(ativos))
