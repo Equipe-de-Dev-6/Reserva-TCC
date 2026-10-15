@@ -1,0 +1,623 @@
+{#- Estrutura herdada de base.html; aqui fica so o que e
+      proprio desta tela. -#}
+{% extends "base.html" %}
+
+{% block titulo %}Laboratórios e Gabinetes{% endblock %}
+
+{% block head_extra %}
+  <link rel="stylesheet" href="/css/admin.css">
+  <link rel="stylesheet" href="/css/admin-gerenciar-salas.css">
+{% endblock %}
+
+{% block conteudo %}
+
+      <!-- LABORATÓRIOS E GABINETES -->
+      <section class="adm-section">
+
+        <div class="adm-page-header">
+          <div>
+            <h2>Laboratórios e Gabinetes</h2>
+            <p>
+              Cadastre e mantenha os laboratórios e os gabinetes de equipamentos do campus
+            </p>
+          </div>
+
+          {#- O botão fica dentro do cabeçalho para alinhar a direita,
+              na mesma linha do título. O ".adm-page-header" já é flex
+              com "justify-content: space-between". -#}
+          <button class="adm-btn-cadastrar" type="button" id="btnNovo">
+            + Cadastrar
+          </button>
+        </div>
+
+        <!-- FILTRO POR TIPO -->
+
+        <div class="adm-filtros-tipo" id="filtrosTipo">
+          <button class="adm-filtro-tipo ativo" type="button" data-tipo="todos">
+            Todos
+          </button>
+
+          <button class="adm-filtro-tipo" type="button" data-tipo="laboratorio">
+            Laboratórios
+          </button>
+
+          <button class="adm-filtro-tipo" type="button" data-tipo="gabinete">
+            Gabinetes
+          </button>
+        </div>
+
+        <!-- FORMULÁRIO - NOVO / EDIÇÃO -->
+
+        <div class="adm-form-card" id="formCard" style="display: none;">
+
+          <h3 class="adm-form-title" id="formTitulo">Novo cadastro</h3>
+
+          <p class="adm-form-subtitle">
+            O "Tipo" é anexado ao final da "Descrição" ao salvar, porque é
+            por esse texto que o sistema decide em que tela o recurso
+            aparece. Atenção: se a descrição já citar outra categoria
+            (por exemplo "Laboratório de automação") e você escolher
+            "Gabinete", o que estiver escrito no texto vence — ajuste a
+            descrição para ficar coerente.
+          </p>
+
+          <form id="formRecurso" class="adm-form" novalidate>
+
+            <div class="adm-form-linha">
+              <div class="adm-form-campo">
+                <label for="campoNome">Nome</label>
+                <input type="text" id="campoNome" name="nome" required
+                  placeholder="Ex: Lab. de Elétrica">
+              </div>
+
+              <div class="adm-form-campo">
+                <label for="campoTipo">Tipo</label>
+                <select id="campoTipo" name="tipo" required>
+                  <option value="laboratorio">Laboratório</option>
+                  <option value="gabinete">Gabinete de equipamentos</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="adm-form-linha">
+              <div class="adm-form-campo">
+                <label for="campoSetor">Setor</label>
+                <input type="text" id="campoSetor" name="setor"
+                  placeholder="Ex: Elétrica">
+              </div>
+
+              <div class="adm-form-campo">
+                <label for="campoQtd">Quantidade de alunos</label>
+                <input type="number" id="campoQtd" name="quantidade_alunos" min="0"
+                  placeholder="Ex: 32">
+              </div>
+            </div>
+
+            <div class="adm-form-linha">
+              <div class="adm-form-campo">
+                <label for="campoDisponibilidade">Disponibilidade</label>
+                <select id="campoDisponibilidade" name="disponibilidade">
+                  <option value="true">Disponível</option>
+                  <option value="false">Indisponível</option>
+                </select>
+              </div>
+
+              <div class="adm-form-campo">
+                <label for="campoReservavel">Aparece na reserva</label>
+                <select id="campoReservavel" name="reservavel">
+                  <option value="false">Não aparece</option>
+                  <option value="true">Aparece</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="adm-form-campo">
+              <label for="campoEquipamentos">Equipamentos</label>
+              <input type="text" id="campoEquipamentos" name="equipamentos"
+                placeholder="Separe por vírgula. Ex: Projetor, 30 carteiras">
+            </div>
+
+            <div class="adm-form-campo">
+              <label for="campoDescricao">Descrição</label>
+              <textarea id="campoDescricao" name="descricao" rows="2"
+                placeholder="Ex: Laboratório de automação com bancadas"></textarea>
+            </div>
+
+            <div class="adm-form-acoes">
+              <button type="button" class="adm-btn adm-btn-editar" id="btnCancelar">
+                Cancelar
+              </button>
+
+              <button type="submit" class="adm-btn-cadastrar" id="btnSalvar">
+                Salvar
+              </button>
+            </div>
+
+          </form>
+        </div>
+
+        <div class="adm-cards" id="listaRecursos">
+          <!-- Renderizado dinamicamente via JS -->
+        </div>
+
+        <div class="adm-empty" id="listaVazia" style="display: none;">
+          <img src="/assets/icons/management.png" alt="" width="40" height="40">
+          <p id="listaVaziaTexto">
+            Nenhum laboratório ou gabinete cadastrado até o momento.
+          </p>
+        </div>
+
+        <div class="adm-empty" id="listaErro" style="display: none;">
+          <img src="/assets/icons/warning.png" alt="" width="40" height="40">
+          <p id="listaErroTexto">
+            Não foi possível carregar os recursos.
+          </p>
+        </div>
+
+      </section>
+{% endblock %}
+
+{% block scripts %}
+  <script type="module">
+    import {
+      listarSalasAdmin,
+      cadastrarSala,
+      atualizarSala,
+      excluirSala
+    } from '/js/api.js';
+
+    // ======================================================
+    // CARREGAR USUÁRIO LOGADO
+    // ======================================================
+    async function carregarUsuario() {
+      try {
+        const resposta = await fetch('/usuario_logado', {
+          method: 'GET',
+          credentials: 'same-origin'
+        });
+
+        if (resposta.status === 401) {
+          window.location.href = '/';
+          return;
+        }
+
+        if (!resposta.ok) {
+          throw new Error('Não foi possível carregar os dados do usuário.');
+        }
+
+        const usuario = await resposta.json();
+
+        const nomeUsuario = document.getElementById('nomeUsuario');
+        const nomePerfil = document.getElementById('nomePerfil');
+
+        if (nomeUsuario) {
+          nomeUsuario.textContent = usuario.nome || 'Usuário';
+        }
+
+        if (nomePerfil) {
+          nomePerfil.textContent = usuario.nome || 'Usuário';
+        }
+
+      } catch (erro) {
+        console.error('Erro ao carregar usuário:', erro);
+      }
+    }
+
+    // ======================================================
+    // LABORATÓRIOS E GABINETES
+    // ======================================================
+    //
+    // Os dois tipos vivem na tabela "salas", como toda sala: ainda
+    // não existe uma tabela de gabinetes, e o que separa um
+    // laboratorio de uma sala e de um gabinete e o texto da coluna
+    // "caracteristica" — é dele que o servidor tira a categoria, e
+    // com ela o ícone que aparece nas telas de reserva.
+    //
+    // Por isso a lista vem inteira de GET /admin/salas e o filtro
+    // abaixo roda no navegador: é a mesma resposta que a tela de
+    // Gerenciar Salas já usa, sem nenhuma rota nova no backend.
+
+    // Categorias que esta tela cuida. Uma sala comum não aparece
+    // aqui — ela fica em /gerenciar_salas_adm.
+    const CATEGORIAS = ['laboratorio', 'gabinete'];
+
+    const ROTULOS = {
+      laboratorio: 'Laboratório',
+      gabinete: 'Gabinete'
+    };
+
+    const lista = document.getElementById('listaRecursos');
+    const listaVazia = document.getElementById('listaVazia');
+    const listaErro = document.getElementById('listaErro');
+
+    const formCard = document.getElementById('formCard');
+    const form = document.getElementById('formRecurso');
+    const formTitulo = document.getElementById('formTitulo');
+    const btnNovo = document.getElementById('btnNovo');
+    const btnCancelar = document.getElementById('btnCancelar');
+
+    // Guarda a última lista para abrir o formulário de edição
+    // já com os dados preenchidos.
+    let todosRecursos = [];
+    let emEdicao = null;
+    let filtroAtual = 'todos';
+
+    /**
+     * Escapa o texto antes de colocá-lo no HTML, porque os
+     * dados vêm do banco e são montados com template string.
+     */
+    function escapar(texto) {
+      return String(texto ?? '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
+
+    // Quantos equipamentos aparecem no cartão antes de virar "+N".
+    const MAX_EQUIPAMENTOS = 3;
+
+    function montarCard(recurso) {
+      const contexto = recurso.contexto || {};
+      const disponivel = !!recurso.disponibilidade;
+      const tipo = recurso.categoria || 'laboratorio';
+
+      const linha = [
+        contexto.setor,
+        contexto.quantidade_alunos
+          ? `${contexto.quantidade_alunos} lugares`
+          : '',
+        contexto.descricao
+      ].filter(Boolean).join(' · ');
+
+      const todos = (contexto.equipamentos || []).filter(Boolean);
+      const visiveis = todos.slice(0, MAX_EQUIPAMENTOS);
+      const resto = todos.length - visiveis.length;
+
+      return `
+        <div class="adm-card">
+          <div class="adm-card-topo">
+            <h4>${escapar(recurso.nome || 'Recurso')}</h4>
+
+            <span class="adm-selo adm-selo-tipo adm-selo-tipo-${escapar(tipo)}">
+              ${escapar(ROTULOS[tipo] || 'Laboratório')}
+            </span>
+          </div>
+
+          ${linha ? `<p>${escapar(linha)}</p>` : ''}
+
+          ${todos.length ? `
+            <p class="adm-card-equip" title="${escapar(todos.join(', '))}">
+              ${escapar(visiveis.join(', '))}${resto > 0
+                ? ` <span class="adm-card-equip-mais">+${resto}</span>`
+                : ''}
+            </p>` : ''}
+
+          <div class="adm-selo-linha">
+            <span class="adm-selo adm-selo-${disponivel ? 'disponivel' : 'indisponivel'}">
+              ${disponivel ? 'Disponível' : 'Indisponível'}
+            </span>
+
+            ${recurso.reservavel
+              ? '<span class="adm-selo adm-selo-reserva">Aparece na reserva</span>'
+              : ''}
+          </div>
+
+          <div class="adm-card-actions">
+            <button class="adm-btn adm-btn-editar" data-acao="editar" data-id="${recurso.id}">
+              Editar
+            </button>
+
+            <button class="adm-btn adm-btn-excluir" data-acao="excluir" data-id="${recurso.id}">
+              Excluir
+            </button>
+          </div>
+        </div>
+      `;
+    }
+
+    function render() {
+      const recursos = filtroAtual === 'todos'
+        ? todosRecursos
+        : todosRecursos.filter((item) => item.categoria === filtroAtual);
+
+      listaErro.style.display = 'none';
+
+      if (recursos.length === 0) {
+        lista.innerHTML = '';
+        listaVazia.style.display = 'flex';
+
+        document.getElementById('listaVaziaTexto').textContent =
+          filtroAtual === 'gabinete'
+            ? 'Nenhum gabinete cadastrado até o momento.'
+            : filtroAtual === 'laboratorio'
+              ? 'Nenhum laboratório cadastrado até o momento.'
+              : 'Nenhum laboratório ou gabinete cadastrado até o momento.';
+
+        return;
+      }
+
+      listaVazia.style.display = 'none';
+      lista.innerHTML = recursos.map(montarCard).join('');
+    }
+
+    async function carregarRecursos() {
+      try {
+        const todas = await listarSalasAdmin();
+
+        // Só entram nesta tela as linhas que o servidor classificou
+        // como laboratório ou gabinete.
+        todosRecursos = todas.filter((item) => CATEGORIAS.includes(item.categoria));
+
+        render();
+
+      } catch (erro) {
+        console.error('Erro ao carregar os recursos:', erro);
+
+        todosRecursos = [];
+        lista.innerHTML = '';
+        listaVazia.style.display = 'none';
+        listaErro.style.display = 'flex';
+        document.getElementById('listaErroTexto').textContent =
+          erro.message || 'Não foi possível carregar os recursos.';
+      }
+    }
+
+    // ======================================================
+    // FILTRO POR TIPO
+    // ======================================================
+    document.querySelectorAll('.adm-filtro-tipo').forEach((botao) => {
+      botao.addEventListener('click', () => {
+        document.querySelectorAll('.adm-filtro-tipo').forEach((b) => {
+          b.classList.remove('ativo');
+        });
+
+        botao.classList.add('ativo');
+        filtroAtual = botao.dataset.tipo;
+
+        render();
+      });
+    });
+
+    // ======================================================
+    // FORMULÁRIO
+    // ======================================================
+
+    /**
+     * Garante que a descrição carregue a palavra que decide a
+     * categoria.
+     *
+     * O servidor classifica pela coluna "caracteristica" (que a API
+     * monta a partir do campo "Descrição" do formulário) e é dela
+     * que sai o ícone que o professor vê na tela de reserva. Sem a
+     * palavra, um gabinete novo cairia na tela de salas.
+     *
+     * A comparação é feita sem acento e em minúsculas, porque o
+     * texto pode ter sido digitado de qualquer jeito.
+     */
+    function garantirTipo(descricao, tipo) {
+      const texto = (descricao || '').trim();
+
+      const procurado = tipo === 'gabinete'
+        ? 'gabinete'
+        : 'laborat';
+
+      const jaTem = texto
+        .toLowerCase()
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .includes(procurado);
+
+      if (jaTem) {
+        return texto;
+      }
+
+      const rotulo = tipo === 'gabinete' ? 'Gabinete' : 'Laboratório';
+
+      return `${texto} (${rotulo})`.trim();
+    }
+
+    function abrirFormulario(recurso) {
+      emEdicao = recurso || null;
+
+      formTitulo.textContent = recurso
+        ? `Editar ${recurso.nome}`
+        : 'Novo cadastro';
+
+      document.getElementById('campoNome').value = recurso ? recurso.nome : '';
+      document.getElementById('campoSetor').value = recurso?.contexto?.setor || '';
+      document.getElementById('campoQtd').value = recurso?.contexto?.quantidade_alunos || '';
+      document.getElementById('campoEquipamentos').value =
+        (recurso?.contexto?.equipamentos || []).join(', ');
+      document.getElementById('campoDescricao').value = recurso?.contexto?.descricao || '';
+      document.getElementById('campoTipo').value = recurso?.categoria || 'laboratorio';
+      document.getElementById('campoDisponibilidade').value =
+        recurso?.disponibilidade ? 'true' : 'false';
+      document.getElementById('campoReservavel').value =
+        recurso?.reservavel ? 'true' : 'false';
+
+      formCard.style.display = 'block';
+      document.getElementById('campoNome').focus();
+
+      formCard.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+
+    function fecharFormulario() {
+      emEdicao = null;
+      form.reset();
+      document.getElementById('campoTipo').value = 'laboratorio';
+      formCard.style.display = 'none';
+    }
+
+    /**
+     * Monta o corpo da requisição a partir do formulário.
+     */
+    function lerFormulario() {
+      const quantidade = document.getElementById('campoQtd').value.trim();
+      const tipo = document.getElementById('campoTipo').value;
+
+      return {
+        nome: document.getElementById('campoNome').value.trim(),
+        setor: document.getElementById('campoSetor').value.trim(),
+        // A API espera número ou null. O campo vazio vira null,
+        // e não 0, para não registrar "0 lugares".
+        quantidade_alunos: quantidade === '' ? null : Number(quantidade),
+        equipamentos: document.getElementById('campoEquipamentos').value
+          .split(',')
+          .map((item) => item.trim())
+          .filter(Boolean),
+        descricao: garantirTipo(
+          document.getElementById('campoDescricao').value.trim(),
+          tipo
+        ),
+        disponibilidade: document.getElementById('campoDisponibilidade').value === 'true',
+        reservavel: document.getElementById('campoReservavel').value === 'true'
+      };
+    }
+
+    form.addEventListener('submit', async (evento) => {
+      evento.preventDefault();
+
+      if (!form.checkValidity()) {
+        form.reportValidity();
+        return;
+      }
+
+      const dados = lerFormulario();
+      const btn = document.getElementById('btnSalvar');
+
+      btn.disabled = true;
+
+      try {
+        if (emEdicao) {
+          await atualizarSala(emEdicao.id, dados);
+
+        } else {
+          await cadastrarSala(dados);
+        }
+
+        fecharFormulario();
+        await carregarRecursos();
+
+      } catch (erro) {
+        console.error('Erro ao salvar:', erro);
+        window.alert(erro.message || 'Não foi possível salvar.');
+
+      } finally {
+        btn.disabled = false;
+      }
+    });
+
+    btnNovo.addEventListener('click', () => abrirFormulario(null));
+    btnCancelar.addEventListener('click', fecharFormulario);
+
+    // ======================================================
+    // BUSCA
+    // ======================================================
+    const campoBusca = document.getElementById('search-input');
+
+    if (campoBusca) {
+      campoBusca.addEventListener('input', (evento) => {
+        const termo = evento.target.value.toLowerCase().trim();
+
+        lista.querySelectorAll('.adm-card').forEach((card) => {
+          const texto = card.textContent.toLowerCase();
+
+          card.style.display = texto.includes(termo) ? '' : 'none';
+        });
+      });
+    }
+
+    // ======================================================
+    // EDITAR E EXCLUIR
+    // ======================================================
+    async function excluir(id, nome) {
+      const confirmar = window.confirm(
+        `Tem certeza que deseja excluir "${nome}"?`
+      );
+
+      if (!confirmar) {
+        return;
+      }
+
+      try {
+        await excluirSala(id);
+        await carregarRecursos();
+
+      } catch (erro) {
+        console.error('Erro ao excluir:', erro);
+
+        // A API recusa a exclusão quando o recurso tem reservas
+        // registradas. A mensagem chega preenchida.
+        window.alert(erro.message || 'Não foi possível excluir.');
+      }
+    }
+
+    // Delegação de evento: os cards são recriados a cada busca.
+    lista.addEventListener('click', (evento) => {
+      const botao = evento.target.closest('[data-acao]');
+
+      if (!botao) {
+        return;
+      }
+
+      const id = Number(botao.dataset.id);
+      const recurso = todosRecursos.find((item) => item.id === id);
+
+      if (!recurso) {
+        return;
+      }
+
+      if (botao.dataset.acao === 'editar') {
+        abrirFormulario(recurso);
+
+      } else if (botao.dataset.acao === 'excluir') {
+        excluir(id, recurso.nome);
+      }
+    });
+
+    document.addEventListener('DOMContentLoaded', () => {
+      carregarUsuario();
+      carregarRecursos();
+
+      // ======================================================
+      // DROPDOWN DO USUÁRIO
+      // ======================================================
+      const userProfile = document.getElementById('userProfile');
+      const userDropdown = document.getElementById('userDropdown');
+
+      if (userProfile && userDropdown) {
+        userProfile.addEventListener('click', (e) => {
+          e.stopPropagation();
+          userDropdown.classList.toggle('active');
+        });
+
+        document.addEventListener('click', (e) => {
+          if (!userProfile.contains(e.target)) {
+            userDropdown.classList.remove('active');
+          }
+        });
+      }
+
+      // ======================================================
+      // MENU MOBILE
+      // ======================================================
+      const menuToggle = document.getElementById('menuToggle');
+      const sidebar = document.querySelector('.sidebar');
+      const sidebarOverlay = document.getElementById('sidebarOverlay');
+
+      if (menuToggle && sidebar && sidebarOverlay) {
+        menuToggle.addEventListener('click', () => {
+          sidebar.classList.toggle('open');
+          sidebarOverlay.classList.add('active');
+        });
+
+        sidebarOverlay.addEventListener('click', () => {
+          sidebar.classList.remove('open');
+          sidebarOverlay.classList.remove('active');
+        });
+      }
+    });
+  </script>
+{% endblock %}

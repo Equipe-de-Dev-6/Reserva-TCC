@@ -234,6 +234,16 @@
   justify-content: center;
   }
 
+  /* O icone de usuario do cabecalho e preto. O mesmo arquivo
+     ("user (3).png") e vermelho no menu lateral, porque os itens do
+     menu sao vermelhos; aqui ele e forcado para preto com
+     "brightness(0)", que leva qualquer cor a preto sem precisar de uma
+     segunda copia do arquivo. */
+
+  .avatar img {
+  filter: brightness(0);
+  }
+
   .user-info {
   display: flex;
   flex-direction: column;
