@@ -64,58 +64,26 @@
   /* ============================================================
    * LABORATÓRIOS E GABINETES
    *
-   * Só as peças que a tela de Labs e Gabinetes usa e que ainda não
-   * existiam. O cartão em si é o mesmo de gerenciar_salas.html e vem
-   * do admin-gerenciar-salas.css.
+   * Só as peças que as telas /gerenciar_laboratorios_adm e
+   * /gerenciar_gabinetes_adm usam e que ainda não existiam. O cartão
+   * em si é o mesmo de gerenciar_salas.html e vem do
+   * admin-gerenciar-salas.css.
    * ============================================================ */
 
-  .adm-filtros-tipo {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  margin-bottom: 16px;
-  }
+  /* O selo ao lado do título do cartão é o código da sala ("C16"),
+     e não o tipo: cada tela já tem um só tipo, e o código é o que
+     diferencia dois laboratórios que compartilham a descrição. */
 
-  .adm-filtro-tipo {
-  background: transparent;
-  border: 1px solid var(--border-color, #e5e7eb);
-  border-radius: 999px;
+  .adm-selo-codigo {
+  background: #f3f4f6;
   color: var(--text-secondary, #6b7280);
-  cursor: pointer;
-  font-family: inherit;
-  font-size: 12px;
-  font-weight: 600;
-  padding: 6px 14px;
-  transition: background-color 0.2s, border-color 0.2s, color 0.2s;
-  }
-
-  .adm-filtro-tipo:hover {
-  background: #F9FAFB;
-  }
-
-  .adm-filtro-tipo.ativo {
-  background: var(--senai-red, #E30613);
-  border-color: var(--senai-red, #E30613);
-  color: #fff;
-  }
-
-  /* O selo do tipo fica no lugar do "Disponível", que desceu para
-     uma linha própria junto do "Aparece na reserva". Assim o cartão
-     diz de uma vez o que é e se está disponível. */
-
-  .adm-selo-tipo {
   flex-shrink: 0;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
   }
 
-  .adm-selo-tipo-laboratorio {
-  background: #dbeafe;
-  color: #1d4ed8;
-  }
-
-  .adm-selo-tipo-gabinete {
-  background: #ede9fe;
-  color: #6d28d9;
-  }
+  /* Os selos de disponibilidade e de "aparece na reserva" desceram
+     para uma linha própria, porque o lugar do topo do cartão agora é
+     do código. */
 
   .adm-selo-linha {
   display: flex;

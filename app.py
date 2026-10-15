@@ -61,7 +61,8 @@ MENU_COORDENADOR = [
     {"rota": "/home_admin", "icone": "home", "rotulo": "Início"},
     {"rota": "/aprovar_reservas_adm", "icone": "reserved", "rotulo": "Aprovar Reservas"},
     {"rota": "/gerenciar_salas_adm", "icone": "classroom", "rotulo": "Gerenciar Salas"},
-    {"rota": "/gerenciar_laboratorios_adm", "icone": "management", "rotulo": "Labs e Gabinetes"},
+    {"rota": "/gerenciar_laboratorios_adm", "icone": "management", "rotulo": "Laboratórios"},
+    {"rota": "/gerenciar_gabinetes_adm", "icone": "box", "rotulo": "Gabinetes"},
     {"rota": "/professores_adm", "icone": "user (3)", "rotulo": "Professores"},
     {"rota": "/configuracoes_adm", "icone": "gear", "rotulo": "Configurações"},
     {"rota": "/ajuda", "icone": "interrogation", "rotulo": "Ajuda"},
@@ -887,8 +888,14 @@ PAGINAS_DO_COORDENADOR = {
         "Buscar sala por nome ou tipo..."
     ),
     "/gerenciar_laboratorios_adm": (
-        "admin/gerenciar_laboratorios.html",
-        "Buscar laboratório ou gabinete..."
+        "admin/gerenciar_recurso.html",
+        "Buscar laboratório por nome...",
+        {"categoria": "laboratorio", "rotulo": "Laboratório", "icone": "management"}
+    ),
+    "/gerenciar_gabinetes_adm": (
+        "admin/gerenciar_recurso.html",
+        "Buscar gabinete por nome...",
+        {"categoria": "gabinete", "rotulo": "Gabinete", "icone": "box"}
     ),
     "/professores_adm": (
         "admin/professores.html",
@@ -902,14 +909,23 @@ PAGINAS_DO_COORDENADOR = {
 
 
 def _criar_paginas_do_coordenador():
-    for caminho, (arquivo, busca) in PAGINAS_DO_COORDENADOR.items():
+    # Cada entrada e (arquivo, busca) e, se a tela precisar saber de
+    # que tipo de recurso ela trata, um terceiro item com o contexto
+    # extra. E o que faz "/gerenciar_laboratorios_adm" e
+    # "/gerenciar_gabinetes_adm" servirem o mesmo arquivo com textos e
+    # filtro diferentes, sem duplicar o arquivo inteiro.
+    for caminho, entrada in PAGINAS_DO_COORDENADOR.items():
+        arquivo, busca = entrada[0], entrada[1]
+        contexto_extra = entrada[2] if len(entrada) > 2 else {}
 
-        def rota(request: Request, arquivo=arquivo, busca=busca):
+        def rota(request: Request, arquivo=arquivo, busca=busca,
+                 contexto_extra=contexto_extra):
             return pagina_do_coordenador(request) or renderizar(
                 request,
                 arquivo,
                 pagina=arquivo.rsplit("/", 1)[-1].removesuffix(".html"),
-                busca_placeholder=busca
+                busca_placeholder=busca,
+                **contexto_extra,
             )
 
         rota.__name__ = caminho.strip("/").replace("/", "_")

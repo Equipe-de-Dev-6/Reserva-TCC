@@ -86,8 +86,19 @@ const RAIZ_TEMPLATES = path.join(__dirname, '..', 'templates');
 const fonte = fs.readFileSync(path.join(__dirname, '..', 'app.py'), 'utf8');
 
 const citados = new Set([...fonte.matchAll(/pagina\(\s*"([^"]+)"/g)].map(m => m[1]));
+
+// Só interessa o caminho do template. Uma entrada pode trazer ainda
+// um terceiro item com o contexto extra da tela (ver
+// "_criar_paginas_do_coordenador"), e ele é preenchido com
+// "rotulo": "Laboratório" — texto que não é caminho de arquivo e não
+// deve ser procurado em templates/. O filtro pelo ".html" no fim
+// separa os dois casos.
+const ehCaminho = (s) => s.endsWith('.html');
+
 for (const bloco of fonte.matchAll(/PAGINAS_DO_(?:PROFESSOR|COORDENADOR)\s*=\s*\{([\s\S]*?)\}/g)) {
-  for (const m of bloco[1].matchAll(/:\s*"([^"]+)"/g)) citados.add(m[1]);
+  for (const m of bloco[1].matchAll(/:\s*"([^"]+)"/g)) {
+    if (ehCaminho(m[1])) citados.add(m[1]);
+  }
 }
 
 const semArquivo = [];
