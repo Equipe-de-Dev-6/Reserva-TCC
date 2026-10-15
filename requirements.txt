@@ -1,8 +1,6 @@
-fastapi[standard]
-supabase
-python-dotenv
-python-multipart
-bcrypt>=4.0,<6.0
-
-# Cifra o cookie de sessão (sessao.py).
-cryptography>=42.0
+fastapi[standard] # Framework para criar a API e disponibilizar recursos padrão, como servidor e documentação automática
+supabase # Integração com o banco de dados e os serviços do Supabase
+python-dotenv # Carrega variáveis de ambiente de um arquivo .env
+python-multipart # Permite receber arquivos e formulários enviados por requisições HTTP
+bcrypt>=4.0,<6.0 # Criptografa senhas com hash para armazenamento seguro
+cryptography>=42.0 # Biblioteca usada para cifrar e decifrar o cookie de sessão (sessao.py)
