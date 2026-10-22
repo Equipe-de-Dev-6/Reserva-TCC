@@ -54,7 +54,7 @@ e oferece uma experiência mais rápida para professores e equipe administrativa
   </tr>
   <tr>
     <td align="center" width="50%">
-      <h3>🎨 João Vitor</h3>
+      <h3>🖌️ João Vitor</h3>
       <img src="static/assets/equipe/joao.jpg" alt="João Vitor" width="140" style="border-radius:50%; object-fit:cover;">
       <p><strong>Desenvolvedor Front-end • UI/UX</strong></p>
       <p>Desenvolveu as páginas HTML e realizou a estilização CSS da interface.</p>
