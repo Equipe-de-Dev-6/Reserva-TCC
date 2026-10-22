@@ -114,9 +114,9 @@ CARGO_COORDENADOR = 'Coordenador'
 # ============================================================
 
 app.mount(
-    "/css",
-    StaticFiles(directory=BASE_DIR / "static" / "css"),
-    name="css"
+    "/static",
+    StaticFiles(directory=BASE_DIR / "static"),
+    name="static"
 )
 
 app.mount(
