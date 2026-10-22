@@ -1671,21 +1671,25 @@ async def aceitar_pendencia(pendencia_id, request: Request):
 
 
 @app.post('/pendencias/{pendencia_id}/recusar')
-async def aceitar_pendencia(pendencia_id, request: Request):
+async def recusar_pendencia(pendencia_id: int, request: Request):
     coordenador = exigir_coordenador(request)
 
-    consulta_pendecia = (
+    consulta_pendencia = (
         supabase.table('pendencia_senhas')
         .update({
             "status": "negada",
             "resolvido_em": datetime.now().isoformat(),
             "resolvido_por": coordenador["id"]
         })
+        .eq("id", pendencia_id)
+        .eq("status", "pendente")
+        .execute()
     )
 
-    if not consulta_pendecia.data:
-        return {
-            "Aviso": "Solicitação já foi resolvida ou não existe"
-        }
-    
+    if not consulta_pendencia.data:
+        raise HTTPException(
+            status_code=409,
+            detail="Solicitação já foi resolvida ou não existe"
+        )
+
     return {"mensagem": "Solicitação negada com sucesso"}
