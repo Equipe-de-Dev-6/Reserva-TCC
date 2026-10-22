@@ -1626,3 +1626,9 @@ async def recuperar_senha(request: Request):
     )
 
     return {"mensagem": "Solicitação enviada. Aguarde a aprovação de um coordenador."}
+
+@app.get('/pendencias')
+async def listar_pendencias(request: Request):
+    consulta_pendencias = supabase.table('pendencias_senhas').select('*').eq('status', 'pendente').execute()
+    pendencias = consulta_pendencias.data
+    return pendencias
