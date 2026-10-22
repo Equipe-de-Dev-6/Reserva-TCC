@@ -325,3 +325,10 @@ def categoria_da_sala(caracteristica: str) -> tuple[str, str]:
     return CATEGORIA_PADRAO, CATEGORIAS[CATEGORIA_PADRAO][1]
 
 
+#====================================
+# Esqueci minha senha - models
+#====================================
+
+class EsqueciMinhaSenhaIn(BaseModel):
+    email: str
+    senha_nova: str

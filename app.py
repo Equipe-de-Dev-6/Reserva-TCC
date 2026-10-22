@@ -1590,3 +1590,39 @@ def decidir_reserva(
         )
 
     return reserva_para_json(resposta.data[0])
+
+
+#==================================
+# ESQUECIA SENHA
+#==================================
+
+@app.post('/senha/solicitar', status_code=201)
+async def recuperar_senha(request: Request):
+    dados = await request.form()
+    email = (dados.get("email") or "").strip().lower()
+    nova_senha = dados.get("senha") or ""
+
+    if len(nova_senha) < 6:
+        return {"Aviso": "Senha muito curta"}
+
+
+    usuario = (
+        supabase.table('usuarios').select('id').eq('email', email).execute()
+    )
+
+    if not usuario.data:
+        return {
+            "Aviso": "Usuário não encontrado"
+        }
+    
+    usuario_id = usuario.data[0]["id"]
+
+    pendencia = (
+        supabase.table('pendencia_senhas')
+        .select('id')
+        .eq('usuario_id', usuario_id)
+        .eq('status', 'pendente')
+        .execute()
+    )
+
+    return {"mensagem": "Solicitação enviada. Aguarde a aprovação de um coordenador."}
