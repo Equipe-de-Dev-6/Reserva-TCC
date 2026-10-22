@@ -1627,8 +1627,46 @@ async def recuperar_senha(request: Request):
 
     return {"mensagem": "Solicitação enviada. Aguarde a aprovação de um coordenador."}
 
+
 @app.get('/pendencias')
 async def listar_pendencias(request: Request):
     consulta_pendencias = supabase.table('pendencias_senhas').select('*').eq('status', 'pendente').execute()
     pendencias = consulta_pendencias.data
     return pendencias
+
+
+@app.post('/pendencias/{pendencia_id}/aceitar')
+async def aceitar_pendencia(pendencia_id, request: Request):
+    coordenador = exigir_coordenador(request)
+
+    consulta_pendecia = (
+        supabase.table('pendencia_senhas')
+        .update({
+            "status": "aprovada",
+            "resolvido_em": datetime.now().isoformat(),
+            "resolvido_por": coordenador["id"]
+        })
+    )
+
+    if not consulta_pendecia.data:
+        return {
+            "Aviso": "Solicitação já foi resolvida ou não existe"
+        }
+
+    linha_a_ser_alterada = consulta_pendecia.data[0]
+
+    try:
+        supabase.table('usuarios').update({"senha":linha_a_ser_alterada["nova_senha_hash"]}).eq('id', linha_a_ser_alterada["usuario_id"]).execute()
+    
+    except Exception:
+        supabase.table('pendencia_senhas').update({
+            "status": "pendente",
+            "resolvido_em": None,
+            "resolvido_por": None
+        }).eq('id', pendencia_id).execute()
+        
+        raise HTTPException(status_code=502, detail="Não foi possível trocar a senha")
+    
+    return {"mensagem": "Senha trocada com sucesso"}
+
+
