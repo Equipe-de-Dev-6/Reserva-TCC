@@ -98,16 +98,7 @@ document.addEventListener('DOMContentLoaded', () => {
             ReservasApp.statusInfo(r.status);
 
           const acoes =
-            r.status === 'cancelada'
-              ? ''
-              : `
-                                <button
-                                    class="btn-cancelar-reserva btn-cancelar-sm"
-                                    data-cancel-id="${r.id}"
-                                >
-                                    Cancelar Reserva
-                                </button>
-                            `;
+            '';
 
           return `
                         <div
@@ -184,48 +175,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
       if (listaReservas) {
 
-        listaReservas.addEventListener('click', (e) => {
-
-          const deleteButton =
-            e.target.closest('[data-delete-id]');
-
-          if (deleteButton) {
-
-            const confirmar =
-              window.confirm(
-                'Excluir esta reserva definitivamente?'
-              );
-
-            if (!confirmar) return;
-
-            ReservasApp.deleteReserva(
-              deleteButton.dataset.deleteId
-            );
-
-            return;
-
-          }
-
-          const btn =
-            e.target.closest('[data-cancel-id]');
-
-          if (!btn) return;
-
-          const confirmar =
-            window.confirm(
-              'Tem certeza que deseja cancelar esta reserva?'
-            );
-
-          if (!confirmar) return;
-
-          ReservasApp.cancelReserva(
-            btn.dataset.cancelId
-          );
-
-          renderProximasReservas();
-
-        });
-
+        // O coordenador so aprova ou recusa reservas na tela de
+        // aprovar_reservas_adm. Nao exclui nem cancela daqui.
       }
 
       renderProximasReservas();

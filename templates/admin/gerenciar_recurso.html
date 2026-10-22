@@ -68,7 +68,7 @@
               </div>
             </div>
 
-            <div class="adm-form-linha">
+            <div class="adm-form-linha {% if categoria == 'gabinete' %}ocultar-para-gabinete{% endif %}">
               <div class="adm-form-campo">
                 <label for="campoQtd">Quantidade de alunos</label>
                 <input type="number" id="campoQtd" name="quantidade_alunos" min="0"

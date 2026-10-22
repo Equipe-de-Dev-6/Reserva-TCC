@@ -60,9 +60,7 @@ from model import (
 MENU_COORDENADOR = [
     {"rota": "/home_admin", "icone": "home", "rotulo": "Início"},
     {"rota": "/aprovar_reservas_adm", "icone": "reserved", "rotulo": "Aprovar Reservas"},
-    {"rota": "/gerenciar_salas_adm", "icone": "classroom", "rotulo": "Gerenciar Salas"},
-    {"rota": "/gerenciar_laboratorios_adm", "icone": "management", "rotulo": "Laboratórios"},
-    {"rota": "/gerenciar_gabinetes_adm", "icone": "shopping-cart", "rotulo": "Gabinetes"},
+    {"rota": "/gerenciar_recursos_adm", "icone": "classroom", "rotulo": "Gerenciar Recursos"},
     {"rota": "/avisos_adm", "icone": "warning", "rotulo": "Avisos"},
     {"rota": "/notificacoes_adm", "icone": "notification", "rotulo": "Notificações"},
     {"rota": "/calendario_adm", "icone": "calendar", "rotulo": "Calendário"},
@@ -605,6 +603,20 @@ async def inicio(request: Request):
     )
 
 
+@app.get("/login")
+async def login_get(request: Request):
+    """Acessar a página de login diretamente pela URL."""
+    if request.session.get("usuario_id"):
+        destino = "/home_admin" if eh_coordenador(request) else "/home"
+        return RedirectResponse(url=destino, status_code=302)
+
+    return renderizar(
+        request,
+        "auth/login.html",
+        pagina="Login"
+    )
+
+
 @app.post('/login')
 async def login_post(request: Request):
     """Processa login do usuário"""
@@ -749,11 +761,8 @@ def cadastro(request: Request):
 
 @app.get("/redefinir_senha")
 def redefinir_senha(request: Request):
-    return renderizar(
-        request,
-        "auth/redefsenha.html",
-        pagina="Redefinir senha"
-    )
+    """Redefinição de senha é feita pelo Coordenador, não por e-mail."""
+    return RedirectResponse(url="/", status_code=302)
 
 
 # ------------------------------------------------------------
@@ -762,11 +771,8 @@ def redefinir_senha(request: Request):
 
 @app.get("/esqueceu_senha")
 def esqueceu_senha(request: Request):
-    return renderizar(
-        request,
-        "auth/esqueceu_senha.html",
-        pagina="Esqueci minha senha"
-    )
+    """Redefinição de senha é feita pelo Coordenador, não por e-mail."""
+    return RedirectResponse(url="/", status_code=302)
 
 
 # ============================================================
@@ -887,6 +893,10 @@ PAGINAS_DO_COORDENADOR = {
     "/aprovar_reservas_adm": (
         "admin/aprovar_reservas.html",
         "Buscar por professor ou sala..."
+    ),
+    "/gerenciar_recursos_adm": (
+        "admin/gerenciar_recursos.html",
+        "Buscar por sala ou professor..."
     ),
     "/gerenciar_salas_adm": (
         "admin/gerenciar_salas.html",
@@ -1410,6 +1420,14 @@ def criar_reserva(reserva: Reserva, request: Request):
 
     inicio = montar_horario(reserva.data, reserva.horaEntrada)
     fim = montar_horario(reserva.data, reserva.horaSaida)
+
+    # Não permite agendar em datas que já passaram.
+    hoje = datetime.now().strftime("%Y-%m-%d")
+    if reserva.data < hoje:
+        raise HTTPException(
+            status_code=400,
+            detail="Não é possível agendar em dias que já passaram."
+        )
 
     if fim <= inicio:
         raise HTTPException(

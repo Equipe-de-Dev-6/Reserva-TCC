@@ -6,6 +6,8 @@
 
       
 
+      
+
       function iconeDaCategoria(categoria) {
         const cat = (categoria || '').toLowerCase();
 
@@ -101,13 +103,6 @@
                 </span>
 
                 ${acoes}
-
-                <button
-                  class="btn-excluir-reserva"
-                  data-delete-id="${r.id}"
-                >
-                  Excluir
-                </button>
               </div>
             </div>
           `;
@@ -131,23 +126,6 @@
         .getElementById('reservasList')
         .addEventListener('click', (e) => {
 
-          const deleteButton = e.target.closest('[data-delete-id]');
-
-          if (deleteButton) {
-            if (!window.confirm(
-              'Excluir esta reserva definitivamente?'
-            )) {
-              return;
-            }
-
-            ReservasApp.deleteReserva(
-              deleteButton.dataset.deleteId
-            );
-
-            renderReservas();
-            return;
-          }
-
           const btn = e.target.closest('[data-cancel-id]');
 
           if (!btn) {
@@ -169,9 +147,7 @@
           renderReservas();
         });
 
-      
 
-      
 
       renderReservas();
       ReservasApp.subscribe(() => renderReservas());
