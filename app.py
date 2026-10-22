@@ -1670,3 +1670,22 @@ async def aceitar_pendencia(pendencia_id, request: Request):
     return {"mensagem": "Senha trocada com sucesso"}
 
 
+@app.post('/pendencias/{pendencia_id}/recusar')
+async def aceitar_pendencia(pendencia_id, request: Request):
+    coordenador = exigir_coordenador(request)
+
+    consulta_pendecia = (
+        supabase.table('pendencia_senhas')
+        .update({
+            "status": "negada",
+            "resolvido_em": datetime.now().isoformat(),
+            "resolvido_por": coordenador["id"]
+        })
+    )
+
+    if not consulta_pendecia.data:
+        return {
+            "Aviso": "Solicitação já foi resolvida ou não existe"
+        }
+    
+    return {"mensagem": "Solicitação negada com sucesso"}
