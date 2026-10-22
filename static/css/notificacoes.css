@@ -71,6 +71,21 @@
   flex-shrink: 0;
   }
 
+  /* Mesma regra da home: os icones vermelhos do projeto (classroom,
+     computer, reserved...) somem dentro do quadrado vermelho. O filtro
+     leva qualquer cor ao branco e preserva o canal alfa. */
+  .icon-box img {
+  width: 24px;
+  height: 24px;
+  object-fit: contain;
+  filter: brightness(0) invert(1);
+  }
+
+  .icon-box img[src*="classroom.png"] {
+  width: 30px;
+  height: 30px;
+  }
+
   .card-text h3 {
   font-size: 15px;
   font-weight: 700;

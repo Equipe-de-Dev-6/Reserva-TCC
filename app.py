@@ -132,6 +132,28 @@ app.mount(
 )
 
 
+@app.middleware("http")
+async def revalidar_arquivos_estaticos(request: Request, call_next):
+    """Impede que uma correção de CSS/JS fique presa no cache do navegador.
+
+    O StaticFiles do Starlette manda ETag e Last-Modified, mas não manda
+    Cache-Control. Sem esse cabeçalho, o navegador pode reaproveitar a
+    versão antiga sem consultar o servidor, e uma correção (como a cor
+    do ícone dentro do quadrado vermelho) parece não ter efeito.
+
+    "no-cache" não desliga o cache: ele obriga o navegador a perguntar
+    ao servidor antes de usar a cópia guardada. Como o ETag/Last-Modified
+    continua valendo, um arquivo sem mudança responde 304 e não é
+    baixado de novo.
+    """
+    resposta = await call_next(request)
+
+    if request.url.path.startswith(("/css/", "/js/")):
+        resposta.headers["Cache-Control"] = "no-cache, must-revalidate"
+
+    return resposta
+
+
 # ============================================================
 # CORS
 # ============================================================

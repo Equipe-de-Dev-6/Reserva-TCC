@@ -232,7 +232,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
           return `
                         <a
-                            href="/avisos"
+                            href="/avisos_adm"
                             class="notice-card searchable"
                         >
 
@@ -328,7 +328,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
           // Abre o calendário na data selecionada
           el.href =
-            `/calendario_prof?ano=${anoDaCelula}&mes=${mesDaCelula}&dia=${c.dia}`;
+            `/calendario_adm?ano=${anoDaCelula}&mes=${mesDaCelula}&dia=${c.dia}`;
 
           const classes = ['day-num'];
 

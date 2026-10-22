@@ -7,6 +7,7 @@
 #   python tests/test_api.py
 import os
 import sys
+from datetime import datetime, timedelta
 
 RAIZ = os.path.dirname(os.path.dirname(os.path.abspath(__file__))); os.chdir(RAIZ); sys.path.insert(0, RAIZ)
 
@@ -451,8 +452,13 @@ def main():
     print("\n[7] Criar reserva")
 
     c, banco = cliente_logado(USUARIO_PROF)
+
+    # A data precisa estar no futuro: a API recusa agendar em dias que já
+    # passaram, e uma data fixa transforma o teste em falha no dia seguinte.
+    data_futura = (datetime.now() + timedelta(days=1)).strftime("%Y-%m-%d")
+
     dados = {
-        "data": "2026-10-20",
+        "data": data_futura,
         "horaEntrada": "08:00",
         "horaSaida": "10:00",
         "professor": "Ana",
@@ -474,7 +480,7 @@ def main():
     check("dono vem da sessão", insert["dados"]["usuario_id"] == 10, str(insert["dados"]))
     check("nascendo como aguardando", insert["dados"]["status"] == "aguardando")
     check("sala_id gravado", insert["dados"].get("sala_id") == 1, str(insert["dados"].get("sala_id")))
-    check("horário montado", insert["dados"]["data_inicio"] == "2026-10-20T08:00:00")
+    check("horário montado", insert["dados"]["data_inicio"] == f"{data_futura}T08:00:00")
 
     # Sem salaId (gabinete): sala_id não vai no insert.
     banco.respostas.clear()
@@ -732,10 +738,10 @@ def main():
 
     check(
         "coordenador recebe o menu de administrador",
-        itens[:7] == [
-            "/home_admin", "/aprovar_reservas_adm", "/gerenciar_salas_adm",
-            "/gerenciar_laboratorios_adm", "/gerenciar_gabinetes_adm",
-            "/professores_adm", "/configuracoes_adm",
+        itens == [
+            "/home_admin", "/aprovar_reservas_adm", "/gerenciar_recursos_adm",
+            "/avisos_adm", "/notificacoes_adm", "/calendario_adm",
+            "/professores_adm", "/configuracoes_adm", "/ajuda",
         ],
         str(itens),
     )
@@ -757,9 +763,9 @@ def main():
     check("nada de sintaxe Jinja vaza na resposta", not vazou, str(vazou))
 
     # Cada tela marca a propria rota como ativa.
-    for rota in ("/professores_adm", "/gerenciar_salas_adm",
-                 "/gerenciar_laboratorios_adm", "/gerenciar_gabinetes_adm",
-                 "/aprovar_reservas_adm", "/configuracoes_adm"):
+    for rota in ("/professores_adm", "/gerenciar_recursos_adm",
+                 "/aprovar_reservas_adm", "/configuracoes_adm",
+                 "/avisos_adm", "/notificacoes_adm", "/calendario_adm"):
         _, _, ativos = menu_de(rota)
         check(f"{rota} marca a si mesma", ativos == [rota], str(ativos))
 
