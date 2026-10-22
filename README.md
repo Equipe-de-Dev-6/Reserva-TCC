@@ -2,6 +2,8 @@
 
   <img src="static/assets/img/Logo senai.png" alt="Logo Reserva SENAI" width="220">
 
+  <img src="static/assets/img/favicon.png" alt="Favicon" width="220">
+
   # 🚀 Reserva SENAI
 
   <p><strong>Gestão inteligente de reservas de salas, laboratórios e equipamentos.</strong></p>
