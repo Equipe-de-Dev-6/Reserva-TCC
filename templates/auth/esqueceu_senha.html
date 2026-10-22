@@ -1,4 +1,4 @@
-{#- Tela de acesso: esqueleto herdado de base_auth.html. -#}
+{#- Tela de solicitação de redefinição de senha: esqueleto herdado de base_auth.html. -#}
 {% extends "auth/base_auth.html" %}
 
 {% block head_extra %}
@@ -9,36 +9,92 @@
 
 {% block conteudo %}
     <div class="container">
+
         <div class="logo">
             <img src="/assets/img/Logo senai.png" alt="SENAI" width="320" height="107">
         </div>
         <div class="hr"></div>
-        <div class="links">
 
-            <p>Redefinir senha</p>
-
-            <p> Gestão de salas e equipamentos </p>
-
-
-        </div>
-        <div class="hr"></div>
         <div class="form-container">
-            <h2>Informe o e-mail para redefinir sua senha.</h2>
+            <h2>Redefinição de senha</h2>
+            <p>
+                Informe o e-mail cadastrado no sistema. O Coordenador receberá
+                a solicitação e poderá definir uma nova senha para você.
+            </p>
 
-            <form action="/redefinir_senha">
+            <form id="formEsqueceuSenha" class="reserva-form" novalidate>
                 <div class="input-container">
-                    <i class="bi bi-envelope"></i>
-                    <input type="email" placeholder="Email..." required
-                        aria-label="Email">
+                    <img src="/assets/icons/user (3).png" alt="E-mail" width="20" height="20">
+                    <input type="email" id="email" name="email" placeholder="E-mail institucional" required
+                        aria-label="E-mail">
                 </div>
-                <button type="submit">Enviar e-mail</button>
-            </form>
 
+                <div class="form-actions">
+                    <button type="button" class="btn-voltar" id="btnCancelar">
+                        Cancelar
+                    </button>
+                    <button type="submit" class="btn-enviar" id="btnSolicitar">
+                        Solicitar redefinição
+                    </button>
+                </div>
+
+                <div id="mensagem" style="margin-top: 12px; font-size: 13px; text-align: center;"></div>
+            </form>
 
             <div class="links">
                 <p><a href="/">Voltar ao login</a></p>
             </div>
         </div>
+
     </div>
 {% endblock %}
 
+{% block scripts %}
+    <script type="module">
+        const form = document.getElementById('formEsqueceuSenha');
+        const mensagem = document.getElementById('mensagem');
+        const btnSolicitar = document.getElementById('btnSolicitar');
+        const btnCancelar = document.getElementById('btnCancelar');
+
+        btnCancelar.addEventListener('click', () => {
+            window.location.href = '/';
+        });
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const email = document.getElementById('email').value.trim();
+            mensagem.textContent = '';
+            btnSolicitar.disabled = true;
+            btnSolicitar.textContent = 'Enviando...';
+
+            try {
+                const resposta = await fetch('/esqueceu_senha', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: `email=${encodeURIComponent(email)}`
+                });
+
+                const dados = await resposta.json();
+
+                if (!resposta.ok) {
+                    mensagem.style.color = '#DC2626';
+                    mensagem.textContent = dados.detail || 'Erro ao solicitar redefinição.';
+                    return;
+                }
+
+                mensagem.style.color = '#059669';
+                mensagem.textContent = dados.mensagem || 'Solicitação enviada com sucesso.';
+                form.reset();
+
+            } catch (erro) {
+                mensagem.style.color = '#DC2626';
+                mensagem.textContent = 'Não foi possível conectar ao servidor.';
+                console.error(erro);
+            } finally {
+                btnSolicitar.disabled = false;
+                btnSolicitar.textContent = 'Solicitar redefinição';
+            }
+        });
+    </script>
+{% endblock %}

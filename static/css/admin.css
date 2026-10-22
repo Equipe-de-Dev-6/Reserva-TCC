@@ -121,3 +121,45 @@
   .ocultar-para-gabinete {
   display: none;
   }
+
+  /* ============================================================
+   * MODAL DE REDEFINIÇÃO DE SENHA
+   * ============================================================ */
+
+  .adm-modal {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(17, 24, 39, 0.45);
+  z-index: 1000;
+  align-items: center;
+  justify-content: center;
+  }
+
+  .adm-modal-caixa {
+  background-color: var(--white);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 24px;
+  width: 100%;
+  max-width: 420px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  }
+
+  .adm-modal-caixa h3 {
+  font-size: 16px;
+  font-weight: 700;
+  margin-bottom: 6px;
+  }
+
+  .adm-modal-subtitulo {
+  font-size: 13px;
+  color: var(--text-gray);
+  margin-bottom: 16px;
+  }
+
+  .adm-acoes {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+  }

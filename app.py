@@ -61,6 +61,7 @@ MENU_COORDENADOR = [
     {"rota": "/home_admin", "icone": "home", "rotulo": "Início"},
     {"rota": "/aprovar_reservas_adm", "icone": "reserved", "rotulo": "Aprovar Reservas"},
     {"rota": "/gerenciar_recursos_adm", "icone": "classroom", "rotulo": "Gerenciar Recursos"},
+    {"rota": "/redefinicoes_pendentes_adm", "icone": "user (3)", "rotulo": "Redefinições de Senha"},
     {"rota": "/avisos_adm", "icone": "warning", "rotulo": "Avisos"},
     {"rota": "/notificacoes_adm", "icone": "notification", "rotulo": "Notificações"},
     {"rota": "/calendario_adm", "icone": "calendar", "rotulo": "Calendário"},
@@ -756,23 +757,159 @@ def cadastro(request: Request):
 
 
 # ------------------------------------------------------------
-# REDEFINIR SENHA
-# ------------------------------------------------------------
-
-@app.get("/redefinir_senha")
-def redefinir_senha(request: Request):
-    """Redefinição de senha é feita pelo Coordenador, não por e-mail."""
-    return RedirectResponse(url="/", status_code=302)
-
-
-# ------------------------------------------------------------
-# ESQUECEU SENHA
+# SOLICITAÇÃO DE REDEFINIÇÃO DE SENHA (ESQUECEU SENHA)
 # ------------------------------------------------------------
 
 @app.get("/esqueceu_senha")
 def esqueceu_senha(request: Request):
-    """Redefinição de senha é feita pelo Coordenador, não por e-mail."""
-    return RedirectResponse(url="/", status_code=302)
+    """Página para o usuário solicitar redefinição de senha."""
+    return renderizar(
+        request,
+        "auth/esqueceu_senha.html",
+        pagina="Esqueci minha senha"
+    )
+
+
+@app.post("/esqueceu_senha")
+async def esqueceu_senha_post(request: Request):
+    """Registra uma solicitação de redefinição de senha.
+
+    O usuário informa o e-mail. Se existir, cria uma solicitação
+    pendente para o Coordenador definir uma nova senha.
+    Não há envio de e-mail: o Coordenador vê a solicitação na sua área.
+    """
+    dados = await request.form()
+    email = (dados.get('email') or '').strip().lower()
+
+    if not email:
+        raise HTTPException(
+            status_code=400,
+            detail="Informe o e-mail."
+        )
+
+    resposta = (
+        supabase
+        .table("usuarios")
+        .select("id, nome, email, cargo")
+        .eq("email", email)
+        .execute()
+    )
+
+    usuarios = resposta.data or []
+
+    if not usuarios:
+        # Mesmo retorno de sucesso para não revelar quais e-mails existem.
+        return {"mensagem": "Se o e-mail estiver cadastrado, uma solicitação será gerada."}
+
+    usuario = usuarios[0]
+
+    # Verifica se já existe uma solicitação pendente para este e-mail.
+    existente = (
+        supabase
+        .table("solicitacoes_redefinicao_senha")
+        .select("id")
+        .eq("email", email)
+        .eq("status", "pendente")
+        .execute()
+    )
+
+    if existente.data:
+        return {"mensagem": "Já existe uma solicitação pendente para este e-mail."}
+
+    supabase.table("solicitacoes_redefinicao_senha").insert({
+        "email": email,
+        "usuario_id": usuario["id"],
+        "status": "pendente"
+    }).execute()
+
+    return {"mensagem": "Solicitação enviada ao Coordenador."}
+
+
+# ------------------------------------------------------------
+# REDEFINIÇÃO DE SENHA PELO COORDENADOR
+# ------------------------------------------------------------
+
+@app.get("/redefinicoes_pendentes_adm")
+def redefinicoes_pendentes_adm(request: Request):
+    """Lista solicitações pendentes de redefinição de senha (apenas Coordenador)."""
+    return pagina_do_coordenador(request) or renderizar(
+        request,
+        "admin/redefinicoes_pendentes.html",
+        pagina="Redefinições Pendentes"
+    )
+
+
+@app.get("/api/solicitacoes_redefinicao_senha")
+def listar_solicitacoes_redefinicao_senha(request: Request):
+    """API: lista solicitações pendentes de redefinição de senha."""
+    exigir_coordenador(request)
+
+    resposta = (
+        supabase
+        .table("solicitacoes_redefinicao_senha")
+        .select("*, usuarios(nome, email, cargo)")
+        .eq("status", "pendente")
+        .order("criado_em", desc=True)
+        .execute()
+    )
+
+    return resposta.data or []
+
+
+@app.post("/api/solicitacoes_redefinicao_senha/{solicitacao_id}/executar")
+async def executar_redefinicao_senha(
+    solicitacao_id: int,
+    request: Request
+):
+    """API: Coordenador define uma nova senha para o usuário solicitante."""
+    exigir_coordenador(request)
+
+    dados = await request.json()
+    nova_senha = (dados.get("senha") or "").strip()
+
+    if not nova_senha:
+        raise HTTPException(
+            status_code=400,
+            detail="Informe a nova senha."
+        )
+
+    # Verifica se a solicitação existe e está pendente.
+    resposta = (
+        supabase
+        .table("solicitacoes_redefinicao_senha")
+        .select("*, usuarios(id, nome, email)")
+        .eq("id", solicitacao_id)
+        .eq("status", "pendente")
+        .execute()
+    )
+
+    solicitacoes = resposta.data or []
+
+    if not solicitacoes:
+        raise HTTPException(
+            status_code=404,
+            detail="Solicitação não encontrada ou já processada."
+        )
+
+    solicitacao = solicitacoes[0]
+    usuario_id = solicitacao["usuario_id"]
+
+    # Atualiza a senha do usuário.
+    hashed = hash_password(nova_senha)
+
+    supabase.table("usuarios").update({
+        "senha": hashed
+    }).eq("id", usuario_id).execute()
+
+    # Marca a solicitação como executada.
+    supabase.table("solicitacoes_redefinicao_senha").update({
+        "status": "executada"
+    }).eq("id", solicitacao_id).execute()
+
+    return {
+        "mensagem": "Senha redefinida com sucesso.",
+        "usuario": solicitacao["usuarios"]
+    }
 
 
 # ============================================================
@@ -897,6 +1034,10 @@ PAGINAS_DO_COORDENADOR = {
     "/gerenciar_recursos_adm": (
         "admin/gerenciar_recursos.html",
         "Buscar por sala ou professor..."
+    ),
+    "/redefinicoes_pendentes_adm": (
+        "admin/redefinicoes_pendentes.html",
+        "Buscar por e-mail ou nome..."
     ),
     "/gerenciar_salas_adm": (
         "admin/gerenciar_salas.html",

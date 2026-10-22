@@ -1,0 +1,326 @@
+{#- Estrutura herdada de base.html; aqui fica so o que e proprio
+      desta tela. -#}
+{% extends "base.html" %}
+
+{% block titulo %}Redefinições de Senha{% endblock %}
+
+{% block head_extra %}
+  <link rel="stylesheet" href="/css/admin.css">
+{% endblock %}
+
+{% block conteudo %}
+
+      <!-- REDEFINIÇÕES PENDENTES -->
+      <section class="adm-section">
+
+        <div class="adm-page-header">
+          <div>
+            <h2>Redefinições de Senha</h2>
+            <p>
+              Solicitações de professores que esqueceram a senha.
+              Defina uma nova senha para cada solicitação pendente.
+            </p>
+          </div>
+        </div>
+
+        <div class="adm-table-wrapper" id="tabelaSolicitacoes">
+          <table class="adm-table">
+            <thead>
+              <tr>
+                <th>Usuário</th>
+                <th>E-mail</th>
+                <th>Cargo</th>
+                <th>Solicitado em</th>
+                <th>Ações</th>
+              </tr>
+            </thead>
+            <tbody id="listaSolicitacoes">
+              <!-- Renderizado dinamicamente via JS -->
+            </tbody>
+          </table>
+        </div>
+
+        <div class="adm-empty" id="listaVazia" style="display: none;">
+          <img src="/assets/icons/user (3).png" alt="" width="40" height="40">
+          <p>
+            Nenhuma solicitação de redefinição de senha pendente.
+          </p>
+        </div>
+
+        <div class="adm-empty" id="listaErro" style="display: none;">
+          <img src="/assets/icons/warning.png" alt="" width="40" height="40">
+          <p id="listaErroTexto">
+            Não foi possível carregar as solicitações.
+          </p>
+        </div>
+
+        <!-- MODAL DE NOVA SENHA -->
+        <div class="adm-modal" id="modalRedefinir" style="display: none;">
+          <div class="adm-modal-caixa">
+            <h3>Definir nova senha</h3>
+            <p class="adm-modal-subtitulo" id="modalUsuarioInfo"></p>
+
+            <form id="formRedefinir" class="adm-form" novalidate>
+              <input type="hidden" id="solicitacaoId">
+
+              <div class="adm-form-campo">
+                <label for="novaSenha">Nova senha</label>
+                <input type="password" id="novaSenha" name="senha" required
+                  placeholder="Digite a nova senha" minlength="4" maxlength="72">
+              </div>
+
+              <div class="adm-form-acoes">
+                <button type="button" class="adm-btn-adm" id="btnCancelarRedefinir">
+                  Cancelar
+                </button>
+                <button type="submit" class="adm-btn-adm salvar" id="btnSalvarNovaSenha">
+                  Definir senha
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+
+      </section>
+
+{% endblock %}
+
+{% block scripts %}
+  <script type="module">
+    // ======================================================
+    // CARREGAR SOLICITAÇÕES
+    // ======================================================
+    const listaEl = document.getElementById('listaSolicitacoes');
+    const tabelaEl = document.getElementById('tabelaSolicitacoes');
+    const listaVazia = document.getElementById('listaVazia');
+    const listaErro = document.getElementById('listaErro');
+    const listaErroTexto = document.getElementById('listaErroTexto');
+
+    let solicitacoes = [];
+
+    function escapar(texto) {
+      return String(texto ?? '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
+
+    function formatarDataBR(iso) {
+      if (!iso) return '';
+      const partes = String(iso).split('T')[0].split('-');
+      if (partes.length !== 3) return iso;
+      return `${partes[2]}/${partes[1]}/${partes[0]}`;
+    }
+
+    function renderSolicitacoes(lista) {
+      solicitacoes = lista || [];
+      listaErro.style.display = 'none';
+
+      if (solicitacoes.length === 0) {
+        listaEl.innerHTML = '';
+        tabelaEl.style.display = 'none';
+        listaVazia.style.display = 'flex';
+        return;
+      }
+
+      tabelaEl.style.display = '';
+      listaVazia.style.display = 'none';
+
+      listaEl.innerHTML = solicitacoes.map((s) => {
+        const usuario = s.usuarios || {};
+        return `
+          <tr>
+            <td>${escapar(usuario.nome || 'Não informado')}</td>
+            <td>${escapar(usuario.email || s.email)}</td>
+            <td>${escapar(usuario.cargo || '')}</td>
+            <td>${formatarDataBR(s.criado_em)}</td>
+            <td class="adm-acoes">
+              <button class="adm-btn-adm editar" type="button"
+                data-acao="redefinir" data-id="${s.id}"
+                data-email="${escapar(usuario.email || s.email)}">
+                Redefinir senha
+              </button>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    async function carregarSolicitacoes() {
+      try {
+        const resposta = await fetch('/api/solicitacoes_redefinicao_senha', {
+          credentials: 'same-origin'
+        });
+
+        if (resposta.status === 401) {
+          window.location.href = '/';
+          return;
+        }
+
+        if (!resposta.ok) {
+          throw new Error('Não foi possível carregar as solicitações.');
+        }
+
+        const dados = await resposta.json();
+        renderSolicitacoes(dados);
+
+      } catch (erro) {
+        console.error('Erro ao carregar solicitações:', erro);
+        listaEl.innerHTML = '';
+        tabelaEl.style.display = 'none';
+        listaVazia.style.display = 'none';
+        listaErro.style.display = 'flex';
+        listaErroTexto.textContent = erro.message || 'Não foi possível carregar as solicitações.';
+      }
+    }
+
+    // ======================================================
+    // MODAL DE REDEFINIÇÃO
+    // ======================================================
+    const modal = document.getElementById('modalRedefinir');
+    const formRedefinir = document.getElementById('formRedefinir');
+    const modalUsuarioInfo = document.getElementById('modalUsuarioInfo');
+    const solicitacaoIdInput = document.getElementById('solicitacaoId');
+    const btnCancelarRedefinir = document.getElementById('btnCancelarRedefinir');
+
+    let solicitacaoAtual = null;
+
+    function abrirModal(solicitacao) {
+      solicitacaoAtual = solicitacao;
+      const usuario = solicitacao.usuarios || {};
+      modalUsuarioInfo.textContent = `Usuário: ${usuario.nome || 'Não informado'} — ${usuario.email}`;
+      solicitacaoIdInput.value = solicitacao.id;
+      document.getElementById('novaSenha').value = '';
+      modal.style.display = 'flex';
+      document.getElementById('novaSenha').focus();
+    }
+
+    function fecharModal() {
+      solicitacaoAtual = null;
+      formRedefinir.reset();
+      modal.style.display = 'none';
+    }
+
+    btnCancelarRedefinir.addEventListener('click', fecharModal);
+    modal.addEventListener('click', (evento) => {
+      if (evento.target === modal) {
+        fecharModal();
+      }
+    });
+
+    formRedefinir.addEventListener('submit', async (evento) => {
+      evento.preventDefault();
+
+      if (!formRedefinir.checkValidity()) {
+        formRedefinir.reportValidity();
+        return;
+      }
+
+      const senha = document.getElementById('novaSenha').value.trim();
+      const btn = document.getElementById('btnSalvarNovaSenha');
+      btn.disabled = true;
+      btn.textContent = 'Definindo...';
+
+      try {
+        const resposta = await fetch(
+          `/api/solicitacoes_redefinicao_senha/${solicitacaoAtual.id}/executar`,
+          {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ senha })
+          }
+        );
+
+        if (!resposta.ok) {
+          const corpo = await resposta.json();
+          throw new Error(corpo.detail || 'Não foi possível redefinir a senha.');
+        }
+
+        fecharModal();
+        await carregarSolicitacoes();
+
+      } catch (erro) {
+        console.error('Erro ao redefinir senha:', erro);
+        window.alert(erro.message || 'Não foi possível redefinir a senha.');
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Definir senha';
+      }
+    });
+
+    // ======================================================
+    // DELEGAÇÃO DE EVENTO - BOTÃO REDEFINIR
+    // ======================================================
+    listaEl.addEventListener('click', (evento) => {
+      const botao = evento.target.closest('[data-acao="redefinir"]');
+      if (!botao) return;
+
+      const id = Number(botao.dataset.id);
+      const solicitacao = solicitacoes.find((s) => s.id === id);
+      if (solicitacao) {
+        abrirModal(solicitacao);
+      }
+    });
+
+    // ======================================================
+    // BUSCA
+    // ======================================================
+    const searchInput = document.getElementById('search-input');
+    if (searchInput) {
+      searchInput.addEventListener('input', (e) => {
+        const termo = e.target.value.toLowerCase().trim();
+        listaEl.querySelectorAll('tr').forEach((linha) => {
+          const texto = linha.textContent.toLowerCase();
+          linha.style.display = texto.includes(termo) ? '' : 'none';
+        });
+      });
+    }
+
+    // ======================================================
+    // INICIALIZAÇÃO
+    // ======================================================
+    document.addEventListener('DOMContentLoaded', () => {
+      carregarSolicitacoes();
+
+      // ======================================================
+      // DROPDOWN DO USUÁRIO
+      // ======================================================
+      const userProfile = document.getElementById('userProfile');
+      const userDropdown = document.getElementById('userDropdown');
+
+      if (userProfile && userDropdown) {
+        userProfile.addEventListener('click', (e) => {
+          e.stopPropagation();
+          userDropdown.classList.toggle('active');
+        });
+
+        document.addEventListener('click', (e) => {
+          if (!userProfile.contains(e.target)) {
+            userDropdown.classList.remove('active');
+          }
+        });
+      }
+
+      // ======================================================
+      // MENU MOBILE
+      // ======================================================
+      const menuToggle = document.getElementById('menuToggle');
+      const sidebar = document.querySelector('.sidebar');
+      const sidebarOverlay = document.getElementById('sidebarOverlay');
+
+      if (menuToggle && sidebar && sidebarOverlay) {
+        menuToggle.addEventListener('click', () => {
+          sidebar.classList.toggle('open');
+          sidebarOverlay.classList.add('active');
+        });
+
+        sidebarOverlay.addEventListener('click', () => {
+          sidebar.classList.remove('open');
+          sidebarOverlay.classList.remove('active');
+        });
+      }
+    });
+  </script>
+{% endblock %}
