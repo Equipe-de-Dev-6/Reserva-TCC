@@ -81,6 +81,15 @@
   flex-shrink: 0;
   }
 
+  /* O icone da sala (classroom.png) e vermelho e o fundo do icon-box
+     tambem e vermelho, entao o icone sumia. Forca o icone a ficar
+     branco, igual ja se faz em ".img-placeholder img". */
+  .icon-box img {
+  width: 24px;
+  height: 24px;
+  filter: brightness(0) invert(1);
+  }
+
   .card-text h3 {
   font-size: 15px;
   font-weight: 700;

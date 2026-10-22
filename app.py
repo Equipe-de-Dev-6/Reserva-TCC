@@ -63,6 +63,9 @@ MENU_COORDENADOR = [
     {"rota": "/gerenciar_salas_adm", "icone": "classroom", "rotulo": "Gerenciar Salas"},
     {"rota": "/gerenciar_laboratorios_adm", "icone": "management", "rotulo": "Laboratórios"},
     {"rota": "/gerenciar_gabinetes_adm", "icone": "shopping-cart", "rotulo": "Gabinetes"},
+    {"rota": "/avisos_adm", "icone": "warning", "rotulo": "Avisos"},
+    {"rota": "/notificacoes_adm", "icone": "notification", "rotulo": "Notificações"},
+    {"rota": "/calendario_adm", "icone": "calendar", "rotulo": "Calendário"},
     {"rota": "/professores_adm", "icone": "user (3)", "rotulo": "Professores"},
     {"rota": "/configuracoes_adm", "icone": "gear", "rotulo": "Configurações"},
     {"rota": "/ajuda", "icone": "interrogation", "rotulo": "Ajuda"},
@@ -406,7 +409,9 @@ def renderizar(request: Request, nome_do_arquivo: str, **contexto):
                 INICIO_COORDENADOR if eh_admin else INICIO_PROFESSOR
             ),
             "rota_atual": request.url.path,
-            "rota_notificacoes": "/notificacoes_prof",
+            "rota_notificacoes": (
+                "/notificacoes_adm" if eh_admin else "/notificacoes_prof"
+            ),
             "atalhos_usuario": ATALHOS_USUARIO,
             "busca_placeholder": contexto.pop(
                 "busca_placeholder", "Buscar..."
@@ -896,6 +901,21 @@ PAGINAS_DO_COORDENADOR = {
         "admin/gerenciar_recurso.html",
         "Buscar gabinete por nome...",
         {"categoria": "gabinete", "rotulo": "Gabinete", "icone": "shopping-cart"}
+    ),
+    "/avisos_adm": (
+        "avisos.html",
+        "Buscar aviso por título...",
+        {"subtitulo": "Avisos publicados pelos professores"}
+    ),
+    "/notificacoes_adm": (
+        "professor/notificacoes.html",
+        "Buscar nas notificações...",
+        {"subtitulo": "Avisos e mudanças nas suas reservas"}
+    ),
+    "/calendario_adm": (
+        "professor/calendario.html",
+        "Buscar por sala ou professor...",
+        {"subtitulo": "Veja as reservas de cada dia"}
     ),
     "/professores_adm": (
         "admin/professores.html",
