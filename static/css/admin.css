@@ -115,3 +115,9 @@
   gap: 8px;
   justify-content: flex-end;
   }
+
+  /* Oculta o campo "Quantidade de alunos" para gabinetes, pois
+     nao faz sentido pedir capacidade para um gabinete de notebooks. */
+  .ocultar-para-gabinete {
+  display: none;
+  }

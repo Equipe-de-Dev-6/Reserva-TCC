@@ -323,3 +323,5 @@ def categoria_da_sala(caracteristica: str) -> tuple[str, str]:
             return chave, rotulo
 
     return CATEGORIA_PADRAO, CATEGORIAS[CATEGORIA_PADRAO][1]
+
+

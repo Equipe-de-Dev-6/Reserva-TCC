@@ -1,0 +1,89 @@
+{#- Estrutura herdada de base.html; aqui fica so o que e proprio
+      desta tela. -#}
+{% extends "base.html" %}
+
+{% block titulo %}Gerenciar Recursos{% endblock %}
+
+{% block head_extra %}
+  <link rel="stylesheet" href="/css/admin.css">
+{% endblock %}
+
+{% block conteudo %}
+
+      <!-- GERENCIAR RECURSOS -->
+      <section class="adm-section">
+
+        <div class="adm-page-header">
+          <div>
+            <h2>Gerenciar Recursos</h2>
+            <p>
+              Escolha o tipo de recurso que deseja cadastrar ou editar
+            </p>
+          </div>
+        </div>
+
+        <div class="cards-grid">
+
+          <!-- Salas -->
+          <a href="/gerenciar_salas_adm" class="action-card searchable">
+
+            <div class="icon-box">
+              <img src="/assets/icons/classroom.png" alt="Ícone de Salas" width="24" height="24">
+            </div>
+
+            <div class="card-text">
+
+              <h3>Salas</h3>
+
+              <p>
+                Salas de aula, reuniões e treinamentos
+              </p>
+
+            </div>
+
+          </a>
+
+          <!-- Laboratórios -->
+          <a href="/gerenciar_laboratorios_adm" class="action-card searchable">
+
+            <div class="icon-box">
+              <img src="/assets/icons/computer.png" alt="Laboratórios" width="24" height="24">
+            </div>
+
+            <div class="card-text">
+
+              <h3>Laboratórios</h3>
+
+              <p>
+                Laboratórios de informática, automação,
+                mecânica e outros
+              </p>
+
+            </div>
+
+          </a>
+
+          <!-- Gabinetes -->
+          <a href="/gerenciar_gabinetes_adm" class="action-card searchable">
+
+            <div class="icon-box">
+              <img src="/assets/icons/shopping-cart.png" alt="Gabinetes" width="24" height="24">
+            </div>
+
+            <div class="card-text">
+
+              <h3>Gabinetes</h3>
+
+              <p>
+                Gabinetes de notebooks e equipamentos móveis
+              </p>
+
+            </div>
+
+          </a>
+
+        </div>
+
+      </section>
+
+{% endblock %}
