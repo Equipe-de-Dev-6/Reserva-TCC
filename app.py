@@ -1590,3 +1590,106 @@ def decidir_reserva(
         )
 
     return reserva_para_json(resposta.data[0])
+
+
+#==================================
+# ESQUECIA SENHA
+#==================================
+
+@app.post('/senha/solicitar', status_code=201)
+async def recuperar_senha(request: Request):
+    dados = await request.form()
+    email = (dados.get("email") or "").strip().lower()
+    nova_senha = dados.get("senha") or ""
+
+    if len(nova_senha) < 6:
+        return {"Aviso": "Senha muito curta"}
+
+
+    usuario = (
+        supabase.table('usuarios').select('id').eq('email', email).execute()
+    )
+
+    if not usuario.data:
+        return {
+            "Aviso": "Usuário não encontrado"
+        }
+    
+    usuario_id = usuario.data[0]["id"]
+
+    pendencia = (
+        supabase.table('pendencia_senhas')
+        .select('id')
+        .eq('usuario_id', usuario_id)
+        .eq('status', 'pendente')
+        .execute()
+    )
+
+    return {"mensagem": "Solicitação enviada. Aguarde a aprovação de um coordenador."}
+
+
+@app.get('/pendencias')
+async def listar_pendencias(request: Request):
+    consulta_pendencias = supabase.table('pendencias_senhas').select('*').eq('status', 'pendente').execute()
+    pendencias = consulta_pendencias.data
+    return pendencias
+
+
+@app.post('/pendencias/{pendencia_id}/aceitar')
+async def aceitar_pendencia(pendencia_id, request: Request):
+    coordenador = exigir_coordenador(request)
+
+    consulta_pendecia = (
+        supabase.table('pendencia_senhas')
+        .update({
+            "status": "aprovada",
+            "resolvido_em": datetime.now().isoformat(),
+            "resolvido_por": coordenador["id"]
+        })
+    )
+
+    if not consulta_pendecia.data:
+        return {
+            "Aviso": "Solicitação já foi resolvida ou não existe"
+        }
+
+    linha_a_ser_alterada = consulta_pendecia.data[0]
+
+    try:
+        supabase.table('usuarios').update({"senha":linha_a_ser_alterada["nova_senha_hash"]}).eq('id', linha_a_ser_alterada["usuario_id"]).execute()
+    
+    except Exception:
+        supabase.table('pendencia_senhas').update({
+            "status": "pendente",
+            "resolvido_em": None,
+            "resolvido_por": None
+        }).eq('id', pendencia_id).execute()
+        
+        raise HTTPException(status_code=502, detail="Não foi possível trocar a senha")
+    
+    return {"mensagem": "Senha trocada com sucesso"}
+
+
+@app.post('/pendencias/{pendencia_id}/recusar')
+async def recusar_pendencia(pendencia_id: int, request: Request):
+    coordenador = exigir_coordenador(request)
+
+    consulta_pendencia = (
+        supabase.table('pendencia_senhas')
+        .update({
+            "status": "negada",
+            "resolvido_em": datetime.now().isoformat(),
+            "resolvido_por": coordenador["id"]
+        })
+        .eq("id", pendencia_id)
+        .eq("status", "pendente")
+        .execute()
+    )
+
+    if not consulta_pendencia.data:
+        raise HTTPException(
+            status_code=409,
+            detail="Solicitação já foi resolvida ou não existe"
+        )
+
+    return {"mensagem": "Solicitação negada com sucesso"}
