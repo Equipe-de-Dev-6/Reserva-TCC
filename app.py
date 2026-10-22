@@ -131,6 +131,11 @@ app.mount(
     name="assets"
 )
 
+app.mount(
+    "/css",
+    StaticFiles(directory=BASE_DIR / "static" / "css"),
+    name="css"
+)
 
 @app.middleware("http")
 async def revalidar_arquivos_estaticos(request: Request, call_next):
