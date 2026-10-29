@@ -20,7 +20,7 @@
     <nav class="nav-menu">
       {% for item in menu %}
         <a href="{{ item.rota }}" class="nav-item {{ 'active' if item.rota == rota_atual }}">
-          <img src="/assets/icons/{{ item.icone }}.png" alt="" width="20" height="20">
+          <img src="/assets/icons/{{ item.icone }}.png?v=2" alt="" width="20" height="20">
           {{ item.rotulo }}
         </a>
       {% endfor %}

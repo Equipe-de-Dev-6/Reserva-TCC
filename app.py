@@ -193,7 +193,7 @@ async def revalidar_arquivos_estaticos(request: Request, call_next):
     """
     resposta = await call_next(request)
 
-    if request.url.path.startswith(("/css/", "/js/")):
+    if request.url.path.startswith(("/css/", "/js/", "/assets/")):
         resposta.headers["Cache-Control"] = "no-cache, must-revalidate"
 
     return resposta
