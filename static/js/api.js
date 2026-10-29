@@ -271,7 +271,7 @@ export async function decidirReserva(id, decisao) {
 
 
 export async function alterarSenhaUsuario(id, senha) {
-  return pedir(/usuarios//senha, {
+  return pedir(`/usuarios/${id}/senha`, {
     method: 'PUT',
     ...corpoJson({ senha })
   });
