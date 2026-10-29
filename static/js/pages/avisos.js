@@ -100,35 +100,10 @@
 
                 ${dataFormatada ? `<p class="notice-data">Referente a ${dataFormatada}</p>` : ''}
               </div>
-
-              <button class="btn-excluir-aviso" data-delete-id="${a.id}">
-                Excluir
-              </button>
             </div>
           `;
         }).join('');
       }
-
-      // ======================================================
-      // EXCLUIR AVISO
-      // ======================================================
-      document.getElementById('avisosList').addEventListener('click', (e) => {
-        const btn = e.target.closest('[data-delete-id]');
-
-        if (!btn) {
-          return;
-        }
-
-        const confirmar = window.confirm(
-          'Tem certeza que deseja excluir este aviso?'
-        );
-
-        if (!confirmar) {
-          return;
-        }
-
-        AvisosApp.deleteAviso(btn.dataset.deleteId);
-      });
 
       // ======================================================
       // BUSCA

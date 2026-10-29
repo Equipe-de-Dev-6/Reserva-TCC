@@ -314,7 +314,7 @@
         (sala?.contexto?.equipamentos || []).join(', ');
       document.getElementById('salaDescricao').value = sala?.contexto?.descricao || '';
       document.getElementById('salaDisponibilidade').value =
-        sala?.disponibilidade ? 'true' : 'false';
+        sala == null ? 'true' : (sala.disponibilidade ? 'true' : 'false');
       document.getElementById('salaReservavel').value =
         sala?.reservavel ? 'true' : 'false';
 

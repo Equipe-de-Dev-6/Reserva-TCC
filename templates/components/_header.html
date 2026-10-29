@@ -64,8 +64,8 @@
 
       <div class="user-dropdown" id="userDropdown">
 
-        {#- Atalhos do menu, os mesmos itens da barra lateral. -#}
-        {% for item in menu[:atalhos_usuario] %}
+        {#- Atalhos do menu do perfil. -#}
+        {% for item in atalhos %}
           <a href="{{ item.rota }}" class="dropdown-item">
             {{ item.rotulo }}
           </a>

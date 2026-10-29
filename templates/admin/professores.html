@@ -101,8 +101,18 @@
 
               <div class="adm-form-campo">
                 <label for="profCargo">Cargo</label>
-                <input type="text" id="profCargo" name="cargo" required
-                  autocomplete="off">
+                <select id="profCargo" name="cargo" required>
+                  <option value="" disabled>Selecione o cargo...</option>
+                  <option value="Professor">Professor</option>
+                  <option value="Coordenador">Coordenador</option>
+                </select>
+              </div>
+
+              <div class="adm-form-campo">
+                <label for="profSenha">Nova senha (opcional)</label>
+                <input type="password" id="profSenha" name="senha"
+                  autocomplete="new-password" minlength="6"
+                  placeholder="Deixe em branco para manter">
               </div>
 
               <div class="adm-form-acoes">
@@ -126,7 +136,8 @@
     import {
       listarUsuarios,
       atualizarUsuario,
-      excluirUsuario
+      excluirUsuario,
+      alterarSenhaUsuario
     } from '/js/api.js';
 
     document.addEventListener('DOMContentLoaded', () => {
@@ -261,6 +272,7 @@
         document.getElementById('profNome').value = professor.nome || '';
         document.getElementById('profEmail').value = professor.email || '';
         document.getElementById('profCargo').value = professor.cargo || '';
+        document.getElementById('profSenha').value = '';
 
         modal.style.display = 'flex';
         document.getElementById('profNome').focus();
@@ -319,6 +331,15 @@
             email: document.getElementById('profEmail').value.trim(),
             cargo: document.getElementById('profCargo').value.trim()
           });
+
+          const novaSenha =
+            document.getElementById('profSenha').value.trim();
+
+          if (novaSenha) {
+            await alterarSenhaUsuario(professorEmEdicao.id, novaSenha);
+          }
+
+          document.getElementById('profSenha').value = '';
 
           fecharModal();
           await carregarProfessores();

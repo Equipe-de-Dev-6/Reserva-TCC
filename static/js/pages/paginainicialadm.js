@@ -97,9 +97,6 @@ document.addEventListener('DOMContentLoaded', () => {
           const info =
             ReservasApp.statusInfo(r.status);
 
-          const acoes =
-            '';
-
           return `
                         <div
                             class="res-card searchable"
@@ -145,15 +142,6 @@ document.addEventListener('DOMContentLoaded', () => {
                                 <span class="${info.badgeClass}">
                                     ${info.label}
                                 </span>
-
-                                ${acoes}
-
-                                <button
-                                    class="btn-excluir-reserva btn-cancelar-sm"
-                                    data-delete-id="${r.id}"
-                                >
-                                    Excluir
-                                </button>
 
                             </div>
 

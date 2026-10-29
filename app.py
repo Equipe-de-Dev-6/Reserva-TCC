@@ -37,6 +37,7 @@ from model import (
     SalaEdicao,
     Usuario,
     UsuarioAtualizacao,
+    UsuarioSenha,
     categoria_da_sala
 )
 
@@ -80,6 +81,37 @@ MENU_PROFESSOR = [
     {"rota": "/ajuda", "icone": "interrogation", "rotulo": "Ajuda"},
 ]
 
+# Mapeia rotas "filhas" para o item do menu que deve ficar ativo. Sem
+# isso, páginas como /escolher_reserva_salas ou /gerenciar_salas_adm
+# não destacam nenhum item da barra lateral.
+ROTA_ATIVA = {
+    "/home": "/home",
+    "/reservar": "/reservar",
+    "/escolher_reserva_salas": "/reservar",
+    "/escolher_reserva_laboratorios": "/reservar",
+    "/escolher_reserva_gabinetes": "/reservar",
+    "/passo2_reserva_prof": "/reservar",
+    "/passo3_reserva_prof": "/reservar",
+    "/reservas_prof": "/reservas_prof",
+    "/calendario_prof": "/calendario_prof",
+    "/notificacoes_prof": "/notificacoes_prof",
+    "/avisos": "/avisos",
+    "/configuracoes": "/configuracoes",
+    "/ajuda": "/ajuda",
+    "/home_admin": "/home_admin",
+    "/aprovar_reservas_adm": "/aprovar_reservas_adm",
+    "/gerenciar_recursos_adm": "/gerenciar_recursos_adm",
+    "/gerenciar_salas_adm": "/gerenciar_recursos_adm",
+    "/gerenciar_laboratorios_adm": "/gerenciar_recursos_adm",
+    "/gerenciar_gabinetes_adm": "/gerenciar_recursos_adm",
+    "/avisos_adm": "/avisos_adm",
+    "/notificacoes_adm": "/notificacoes_adm",
+    "/calendario_adm": "/calendario_adm",
+    "/professores_adm": "/professores_adm",
+    "/configuracoes_adm": "/configuracoes_adm",
+    "/cadastro": "/professores_adm",
+}
+
 # A home de cada perfil. O logo da barra lateral aponta para cá, e é
 # por isso que a home do Coordenador não levava o usuário para a home
 # do Professor.
@@ -88,7 +120,15 @@ INICIO_PROFESSOR = "/home"
 
 # Os dois primeiros itens do menu viram atalho no menu de perfil, que
 # fica no canto da tela. É o mesmo menu, mostrado em outro lugar.
-ATALHOS_USUARIO = 2
+ATALHOS_COORDENADOR = [
+    '/home_admin',
+    '/aprovar_reservas_adm',
+]
+
+ATALHOS_PROFESSOR = [
+    '/home',
+    '/reservas_prof',
+]
 
 # ============================================================
 # CONFIGURAÇÃO DA API
@@ -433,11 +473,14 @@ def renderizar(request: Request, nome_do_arquivo: str, **contexto):
             "rota_inicio": (
                 INICIO_COORDENADOR if eh_admin else INICIO_PROFESSOR
             ),
-            "rota_atual": request.url.path,
+            "rota_atual": ROTA_ATIVA.get(request.url.path, request.url.path),
             "rota_notificacoes": (
                 "/notificacoes_adm" if eh_admin else "/notificacoes_prof"
             ),
-            "atalhos_usuario": ATALHOS_USUARIO,
+            "atalhos": (
+                [i for i in (MENU_COORDENADOR if eh_admin else MENU_PROFESSOR)
+                 if i["rota"] in (ATALHOS_COORDENADOR if eh_admin else ATALHOS_PROFESSOR)]
+            ),
             "busca_placeholder": contexto.pop(
                 "busca_placeholder", "Buscar..."
             ),
@@ -1178,6 +1221,35 @@ def atualizar_usuario(
 # ------------------------------------------------------------
 # EXCLUIR USUÁRIO
 # ------------------------------------------------------------
+
+@app.put("/usuarios/{usuario_id}/senha")
+def alterar_senha_usuario(
+    usuario_id: int,
+    alteracao: UsuarioSenha,
+    request: Request
+):
+    """Troca a senha de um usuário. Restrito ao coordenador."""
+
+    exigir_coordenador(request)
+
+    nova_hash = hash_password(alteracao.senha)
+
+    resposta = (
+        supabase
+        .table("usuarios")
+        .update({"senha": nova_hash})
+        .eq("id", usuario_id)
+        .execute()
+    )
+
+    if not resposta.data:
+        raise HTTPException(
+            status_code=404,
+            detail="Usuário não encontrado"
+        )
+
+    return {"mensagem": "Senha alterada com sucesso"}
+
 
 @app.delete("/usuarios/{usuario_id}")
 def excluir_usuario(usuario_id: int, request: Request):
