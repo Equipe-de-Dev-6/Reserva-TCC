@@ -322,11 +322,13 @@
           return;
         }
 
+        const professorId = professorEmEdicao.id;
+
         const btn = document.getElementById('btnSalvarProfessor');
         btn.disabled = true;
 
         try {
-          await atualizarUsuario(professorEmEdicao.id, {
+          await atualizarUsuario(professorId, {
             nome: document.getElementById('profNome').value.trim(),
             email: document.getElementById('profEmail').value.trim(),
             cargo: document.getElementById('profCargo').value.trim()
@@ -336,7 +338,7 @@
             document.getElementById('profSenha').value.trim();
 
           if (novaSenha) {
-            await alterarSenhaUsuario(professorEmEdicao.id, novaSenha);
+            await alterarSenhaUsuario(professorId, novaSenha);
           }
 
           document.getElementById('profSenha').value = '';
