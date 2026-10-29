@@ -1,31 +1,99 @@
-{#- Tela de acesso: esqueleto herdado de base_auth.html. -#}
+{#- Tela de redefinição de senha: esqueleto herdado de base_auth.html. -#}
 {% extends "auth/base_auth.html" %}
 
 {% block head_extra %}
-  <link rel="stylesheet" href="/css/redefsenha.css">
+<link rel="stylesheet" href="/css/redefsenha.css">
+<style>
+    .resultado {
+        display: none;
+        margin-top: 1.5rem;
+        text-align: center;
+    }
+
+    .resultado.visivel {
+        display: block;
+    }
+
+    .id-senha {
+        display: inline-block;
+        margin: 0.5rem 0 1rem;
+        padding: 0.6rem 1.2rem;
+        font-family: monospace;
+        font-size: 1.4rem;
+        font-weight: bold;
+        letter-spacing: 0.1em;
+        border: 2px dashed currentColor;
+        border-radius: 8px;
+        user-select: all;
+    }
+
+    .instrucao {
+        margin: 0;
+    }
+</style>
 {% endblock %}
 
 {% block titulo %}Redefinir senha{% endblock %}
 
 {% block conteudo %}
-    <div class="container">
-        <div class="logo">
-            <img src="/assets/img/Logo senai.png" alt="SENAI" width="320" height="107">
-        </div>
-        <div class="hr"></div>
-        <div class="form-container">
-            <h2>Enviamos um código de verificação para seu e-mail.</h2>
-            <h2 class="ex-email">exemplo@gmail.com</h2>
-            <div class="hr"></div>
-            
-            <form action="/" method="GET">
-                <div class="input-container">
-                    <input type="text" placeholder="0 0 0 0 0 0" maxlength="6" required>
-                </div>
-                <button type="submit">Enviar código</button>
-            </form>
-        </div>
-        <a class="links" href="/">Voltar ao login</a>
+<div class="container">
+    <div class="logo">
+        <img src="/assets/img/Logo senai.png" alt="SENAI" width="320" height="107">
     </div>
-{% endblock %}
+    <div class="hr"></div>
+    <div class="form-container">
+        <h2>Informe o e-mail da sua conta.</h2>
+        <div class="hr"></div>
 
+        <form id="form-redefinir">
+            <div class="input-container">
+                <input type="email" id="email" name="email" placeholder="seuemail@exemplo.com" required>
+            </div>
+            <button type="submit">Confirmar</button>
+        </form>
+
+        <div id="resultado" class="resultado" aria-live="polite">
+            <h2>Seu ID de redefinição:</h2>
+            <div class="id-senha" id="id-usuario"></div>
+            <p class="instrucao">Vá até a sala do coordenador e peça para redefinir a senha com este ID.</p>
+        </div>
+    </div>
+    <a class="links" href="/">Voltar ao login</a>
+</div>
+
+<script>
+    (function () {
+        const form = document.getElementById('form-redefinir');
+        const campoEmail = document.getElementById('email');
+        const resultado = document.getElementById('resultado');
+        const id_usuario = document.getElementById('id-usuario');
+
+        async function buscarId(email) {
+            const url = `/senha/id?email=${encodeURIComponent(email)}`;
+
+            try {
+                const resposta = await fetch(url);
+                const dados = await resposta.json().catch(() => ({}));
+
+                if (!resposta.ok) {
+                    // FastAPI devolve o texto do erro em "detail"
+                    return { erro: dados.detail || 'Erro ao buscar o ID' };
+                }
+
+                return { id: dados.id };
+            } catch (e) {
+                return { erro: 'Falha de conexão. Tente de novo.' };
+            }
+        }
+
+        form.addEventListener('submit', async function (evento) {
+            evento.preventDefault();
+
+            const { id, erro } = await buscarId(campoEmail.value.trim());
+
+            id_usuario.textContent = erro ? erro : id;
+            resultado.classList.add('visivel');
+        });
+    })();
+</script>
+{% endblock %}
