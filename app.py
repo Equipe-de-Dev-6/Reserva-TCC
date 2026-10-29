@@ -1091,7 +1091,7 @@ def listar_usuarios(request: Request):
 
 
 # ------------------------------------------------------------
-# BUSCAR USUÁRIO POR E-MAIL
+# BUSCAR ID POR EMAIL
 # ------------------------------------------------------------
 
 @app.get("/senha/id")
