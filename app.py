@@ -1592,6 +1592,129 @@ def decidir_reserva(
     return reserva_para_json(resposta.data[0])
 
 
+# ============================================================
+# AVISOS (compartilhados entre professores e coordenadores)
+# ============================================================
+
+@app.get("/api/avisos")
+def listar_avisos(request: Request):
+    """Lista todos os avisos publicados.
+
+    Professores e coordenadores enxergam todos os avisos.
+    Exige sessão autenticada.
+    """
+    exigir_sessao(request)
+
+    resposta = (
+        supabase
+        .table("avisos")
+        .select("*, usuarios(nome, email, cargo)")
+        .order("criado_em", desc=True)
+        .execute()
+    )
+
+    return resposta.data or []
+
+
+@app.post("/api/avisos", status_code=201)
+def criar_aviso(request: Request):
+    """Cria um novo aviso.
+
+    Qualquer usuário autenticado (professor ou coordenador) pode publicar.
+    O usuario_id vem da sessão, não do corpo da requisição.
+    """
+    usuario = exigir_sessao(request)
+
+    dados = await request.json()
+    titulo = (dados.get("titulo") or "").strip()
+    descricao = (dados.get("descricao") or "").strip()
+    data = dados.get("data") or None
+
+    if not titulo:
+        raise HTTPException(
+            status_code=400,
+            detail="Título é obrigatório."
+        )
+
+    if not descricao:
+        raise HTTPException(
+            status_code=400,
+            detail="Descrição é obrigatória."
+        )
+
+    resposta = (
+        supabase
+        .table("avisos")
+        .insert({
+            "usuario_id": usuario["id"],
+            "titulo": titulo,
+            "descricao": descricao,
+            "data": data
+        })
+        .execute()
+    )
+
+    if not resposta.data:
+        raise HTTPException(
+            status_code=500,
+            detail="Não foi possível publicar o aviso."
+        )
+
+    return resposta.data[0]
+
+
+@app.delete("/api/avisos/{aviso_id}")
+def excluir_aviso(aviso_id: int, request: Request):
+    """Exclui um aviso.
+
+    O dono do aviso ou qualquer coordenador pode excluir.
+    """
+    usuario = exigir_sessao(request)
+    eh_admin = eh_coordenador(request)
+
+    # Verifica se o aviso existe e quem é o dono.
+    resposta = (
+        supabase
+        .table("avisos")
+        .select("usuario_id")
+        .eq("id", aviso_id)
+        .execute()
+    )
+
+    avisos = resposta.data or []
+
+    if not avisos:
+        raise HTTPException(
+            status_code=404,
+            detail="Aviso não encontrado."
+        )
+
+    aviso = avisos[0]
+
+    # Só o dono ou coordenador pode excluir.
+    if not eh_admin and str(aviso.get("usuario_id")) != str(usuario["id"]):
+        raise HTTPException(
+            status_code=403,
+            detail="Você não pode excluir este aviso."
+        )
+
+    resposta = (
+        supabase
+        .table("avisos")
+        .delete()
+        .eq("id", aviso_id)
+        .execute()
+    )
+
+    if not resposta.data:
+        raise HTTPException(
+            status_code=404,
+            detail="Aviso não encontrado."
+        )
+
+    return {"mensagem": "Aviso excluído com sucesso."}
+
+
 #==================================
 # ESQUECIA SENHA
 #==================================

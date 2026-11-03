@@ -6,19 +6,12 @@
 //
 // Como funciona:
 //
-// 1. Na pagina "Avisos" (/avisos), o professor preenche o formulario e
-//    clica em "Publicar Aviso". O aviso fica guardado no navegador, em
-//    localStorage, e volta quando a pagina recarrega.
-//
-// 2. A lista e por navegador, e nao e compartilhada: um aviso publicado
-//    na maquina de um professor nao aparece para os outros. Quando houver
-//    backend de avisos, basta trocar os _ler/_gravar por chamadas a API,
-//    como o reservas.js faz com /reservas.
-//
+// 1. Os avisos ficam no banco de dados (tabela "avisos", via /api/avisos),
+//    e sao compartilhados entre professores e coordenadores.
+// 2. A leitura e sincronizacao sao feitas pela API, como o reservas.js faz
+//    com /reservas.
 // 3. AvisosApp.subscribe(fn) permite que uma pagina "escute" mudancas
-//    (criacao/exclusao) feitas nela mesma e sempre se re-renderize sem
-//    precisar chamar a funcao de render manualmente.
-//
+//    e sempre se re-renderize sem precisar chamar o render na mão.
 // ==========================================================
 
 const AvisosApp = (() => {
@@ -27,10 +20,6 @@ const AvisosApp = (() => {
   // ESTADO
   // ========================================================
 
-  // O prefixo evita colisao com outro sistema na mesma origem.
-  const CHAVE = 'reservaSenaiAvisos';
-
-  // null ate a primeira leitura, para o localStorage ser aberto uma vez.
   let avisos = null;
 
   const _listeners = [];
@@ -40,72 +29,87 @@ const AvisosApp = (() => {
   // UTILITÁRIOS INTERNOS
   // ========================================================
 
-  function _uid() {
-
-    return 'a_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2, 7);
-
-  }
-
-
   function _notify() {
 
-    _listeners.forEach((fn) => fn());
+    _listeners.forEach((fn) => {
+
+      try { fn(); } catch (e) { /* nao quebrar outras telas */ }
+
+    });
 
   }
 
 
   // ========================================================
-  // PERSISTENCIA
+  // API
   // ========================================================
 
-  function _ler() {
+  async function _fetchAvisos() {
 
-    if (avisos !== null) {
+    const resposta = await fetch('/api/avisos', {
+      headers: { 'Accept': 'application/json' },
+      credentials: 'same-origin'
+    });
 
-      return avisos;
+    if (!resposta.ok) {
 
-    }
-
-    try {
-
-      const bruto = localStorage.getItem(CHAVE);
-
-      const guardado = bruto ? JSON.parse(bruto) : [];
-
-      avisos = Array.isArray(guardado) ? guardado : [];
-
-    } catch (erro) {
-
-      // localStorage indisponivel (modo anonimo) ou conteudo corrompido:
-      // os avisos passam a durar so a aba aberta, em vez de a tela
-      // inteira quebrar.
-      avisos = [];
+      throw new Error('Falha ao buscar avisos');
 
     }
 
-    return avisos;
+    const dados = await resposta.json();
+
+    return Array.isArray(dados) ? dados : [];
 
   }
 
 
-  function _gravar(lista) {
+  async function _criarAvisoApi({ titulo, descricao, data }) {
 
-    // Guarda uma copia, para que a tela nao segure uma referencia que
-    // muda por baixo dos panos.
-    avisos = [...lista];
+    const resposta = await fetch('/api/avisos', {
 
-    try {
+      method: 'POST',
 
-      localStorage.setItem(CHAVE, JSON.stringify(avisos));
+      headers: { 'Content-Type': 'application/json' },
 
-    } catch (erro) {
+      credentials: 'same-origin',
 
-      // Sem espaco em disco, por exemplo: a lista continua valendo
-      // enquanto a aba estiver aberta.
+      body: JSON.stringify({ titulo, descricao, data })
+
+    });
+
+    if (!resposta.ok) {
+
+      const corpo = await resposta.json().catch(() => ({}));
+
+      throw new Error(corpo.detail || 'Falha ao publicar o aviso.');
 
     }
 
-    return true;
+    return await resposta.json();
+
+  }
+
+
+  async function _excluirAvisoApi(id) {
+
+    const resposta = await fetch(`/api/avisos/${id}`, {
+
+      method: 'DELETE',
+
+      credentials: 'same-origin'
+
+    });
+
+    if (!resposta.ok) {
+
+      const corpo = await resposta.json().catch(() => ({}));
+
+      throw new Error(corpo.detail || 'Falha ao excluir o aviso.');
+
+    }
+
+    return await resposta.json();
 
   }
 
@@ -114,69 +118,61 @@ const AvisosApp = (() => {
   // LEITURA / ESCRITA
   // ========================================================
 
-  function getAvisos() {
+  async function getAvisos() {
+
+    if (avisos === null) {
+
+      avisos = await _fetchAvisos();
+
+    }
 
     // Mais recentes primeiro.
-    return [..._ler()].sort(
-      (a, b) => new Date(b.criadoEm) - new Date(a.criadoEm)
+    return [...avisos].sort(
+
+      (a, b) => new Date(b.criado_em || b.criadoEm || 0) - new Date(a.criado_em || a.criadoEm || 0)
+
     );
 
   }
 
 
-  function _saveAvisos(lista) {
+  async function addAviso({ titulo, descricao, data }) {
 
-    return _gravar(lista);
+    const gravado = await _criarAvisoApi({ titulo, descricao, data });
 
-  }
+    // Recarrega a lista para ficar consistente com o banco.
+    avisos = null;
 
+    const lista = await getAvisos();
 
-  // ========================================================
-  // CRIAR AVISO
-  // ========================================================
-
-  function addAviso({ titulo, descricao, data }) {
-
-    const aviso = {
-      id: _uid(),
-      titulo: (titulo || '').trim(),
-      descricao: (descricao || '').trim(),
-      data: data || '',
-      criadoEm: new Date().toISOString(),
-    };
-
-    const lista = getAvisos();
-
-    lista.unshift(aviso);
-
-    _saveAvisos(lista);
+    avisos = lista;
 
     _notify();
 
-    return aviso;
+    return gravado;
 
   }
 
 
-  // ========================================================
-  // EXCLUIR AVISO
-  // ========================================================
+  async function deleteAviso(id) {
 
-  function deleteAviso(id) {
+    await _excluirAvisoApi(id);
 
-    const lista = getAvisos().filter((a) => a.id !== id);
+    avisos = null;
 
-    const ok = _saveAvisos(lista);
+    const lista = await getAvisos();
+
+    avisos = lista;
 
     _notify();
 
-    return ok;
+    return true;
 
   }
 
 
   // ========================================================
-  // INSCRIÇÃO PARA ATUALIZAÇÕES (mesma página)
+  // INSCRIÇÃO PARA ATUALIZAÇÕES
   // ========================================================
 
   function subscribe(fn) {
@@ -202,7 +198,7 @@ const AvisosApp = (() => {
 
     }
 
-    const partes = isoDate.split('-');
+    const partes = String(isoDate).split('T')[0].split('-');
 
     if (partes.length !== 3) {
 
@@ -217,12 +213,32 @@ const AvisosApp = (() => {
   }
 
 
+  // Sincroniza com o banco (força recarga).
+  async function sincronizar() {
+
+    avisos = null;
+
+    await getAvisos();
+
+    _notify();
+
+  }
+
+
   return {
+
     getAvisos,
+
     addAviso,
+
     deleteAviso,
+
     subscribe,
+
     formatDateBR,
+
+    sincronizar
+
   };
 
 })();
