@@ -105,9 +105,6 @@ document.addEventListener('DOMContentLoaded', () => {
           const info =
             ReservasApp.statusInfo(r.status);
 
-          const acoes =
-            '';
-
           return `
                         <div
                             class="res-card searchable"
@@ -153,15 +150,6 @@ document.addEventListener('DOMContentLoaded', () => {
                                 <span class="${info.badgeClass}">
                                     ${info.label}
                                 </span>
-
-                                ${acoes}
-
-                                <button
-                                    class="btn-excluir-reserva btn-cancelar-sm"
-                                    data-delete-id="${r.id}"
-                                >
-                                    Excluir
-                                </button>
 
                             </div>
 
@@ -257,7 +245,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
           return `
                         <a
-                            href="/avisos"
+                            href="/avisos_adm"
                             class="notice-card searchable"
                         >
 
@@ -357,7 +345,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
           // Abre o calendário na data selecionada
           el.href =
-            `/calendario_prof?ano=${anoDaCelula}&mes=${mesDaCelula}&dia=${c.dia}`;
+            `/calendario_adm?ano=${anoDaCelula}&mes=${mesDaCelula}&dia=${c.dia}`;
 
           const classes = ['day-num'];
 

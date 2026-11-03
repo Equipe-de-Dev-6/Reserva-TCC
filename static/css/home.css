@@ -87,7 +87,17 @@
   .icon-box img {
   width: 24px;
   height: 24px;
+  object-fit: contain;
   filter: brightness(0) invert(1);
+  }
+
+  /* O "classroom.png" tem margem interna e traco fino (a lousa e as
+     pessoas sao desenhadas com poucos pixels). Em 24px o desenho fica
+     fraco dentro do quadrado vermelho e parece que o icone sumiu.
+     Um pouco maior aqui, sem mexer nos outros icones do cartao. */
+  .icon-box img[src*="classroom.png"] {
+  width: 30px;
+  height: 30px;
   }
 
   .card-text h3 {
@@ -190,7 +200,15 @@
   .img-placeholder img {
   width: 24px;
   height: 24px;
+  object-fit: contain;
   filter: brightness(0) invert(1);
+  }
+
+  /* Mesmo caso do ".icon-box img": o desenho da sala e fino e precisa
+     de alguns pixels a mais para aparecer dentro do quadrado vermelho. */
+  .img-placeholder img[src*="classroom.png"] {
+  width: 30px;
+  height: 30px;
   }
 
   .res-info {

@@ -197,7 +197,9 @@ for (const arq of varrerHtml('templates')) {
   // positivo.
   const txt = bruto.replace(/\{#[\s\S]*?#\}/g, '');
 
-  const links = [...txt.matchAll(/href=["'][^"']*\/css\/([^"']+)["']/g)].map(m => m[1]);
+  // O sufixo "?v=..." e cache-busting: nao faz parte do nome do
+  // arquivo e precisa sair antes de comparar com o que existe em disco.
+  const links = [...txt.matchAll(/href=["'][^"']*\/css\/([^"'"?#]+)(?:[?#][^"']*)?["']/g)].map(m => m[1]);
 
   const ruins = [];
   for (const css of links) {

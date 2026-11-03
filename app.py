@@ -15,7 +15,6 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
-from starlette.requests import Request
 from starlette.responses import JSONResponse
 import os
 import random
@@ -37,6 +36,7 @@ from model import (
     SalaEdicao,
     Usuario,
     UsuarioAtualizacao,
+    UsuarioSenha,
     categoria_da_sala
 )
 
@@ -80,6 +80,37 @@ MENU_PROFESSOR = [
     {"rota": "/ajuda", "icone": "interrogation", "rotulo": "Ajuda"},
 ]
 
+# Mapeia rotas "filhas" para o item do menu que deve ficar ativo. Sem
+# isso, páginas como /escolher_reserva_salas ou /gerenciar_salas_adm
+# não destacam nenhum item da barra lateral.
+ROTA_ATIVA = {
+    "/home": "/home",
+    "/reservar": "/reservar",
+    "/escolher_reserva_salas": "/reservar",
+    "/escolher_reserva_laboratorios": "/reservar",
+    "/escolher_reserva_gabinetes": "/reservar",
+    "/passo2_reserva_prof": "/reservar",
+    "/passo3_reserva_prof": "/reservar",
+    "/reservas_prof": "/reservas_prof",
+    "/calendario_prof": "/calendario_prof",
+    "/notificacoes_prof": "/notificacoes_prof",
+    "/avisos": "/avisos",
+    "/configuracoes": "/configuracoes",
+    "/ajuda": "/ajuda",
+    "/home_admin": "/home_admin",
+    "/aprovar_reservas_adm": "/aprovar_reservas_adm",
+    "/gerenciar_recursos_adm": "/gerenciar_recursos_adm",
+    "/gerenciar_salas_adm": "/gerenciar_recursos_adm",
+    "/gerenciar_laboratorios_adm": "/gerenciar_recursos_adm",
+    "/gerenciar_gabinetes_adm": "/gerenciar_recursos_adm",
+    "/avisos_adm": "/avisos_adm",
+    "/notificacoes_adm": "/notificacoes_adm",
+    "/calendario_adm": "/calendario_adm",
+    "/professores_adm": "/professores_adm",
+    "/configuracoes_adm": "/configuracoes_adm",
+    "/cadastro": "/professores_adm",
+}
+
 # A home de cada perfil. O logo da barra lateral aponta para cá, e é
 # por isso que a home do Coordenador não levava o usuário para a home
 # do Professor.
@@ -88,7 +119,15 @@ INICIO_PROFESSOR = "/home"
 
 # Os dois primeiros itens do menu viram atalho no menu de perfil, que
 # fica no canto da tela. É o mesmo menu, mostrado em outro lugar.
-ATALHOS_USUARIO = 2
+ATALHOS_COORDENADOR = [
+    '/home_admin',
+    '/aprovar_reservas_adm',
+]
+
+ATALHOS_PROFESSOR = [
+    '/home',
+    '/reservas_prof',
+]
 
 # ============================================================
 # CONFIGURAÇÃO DA API
@@ -114,9 +153,9 @@ CARGO_COORDENADOR = 'Coordenador'
 # ============================================================
 
 app.mount(
-    "/css",
-    StaticFiles(directory=BASE_DIR / "static" / "css"),
-    name="css"
+    "/static",
+    StaticFiles(directory=BASE_DIR / "static"),
+    name="static"
 )
 
 app.mount(
@@ -130,6 +169,34 @@ app.mount(
     StaticFiles(directory=BASE_DIR / "static" / "assets"),
     name="assets"
 )
+
+app.mount(
+    "/css",
+    StaticFiles(directory=BASE_DIR / "static" / "css"),
+    name="css"
+)
+
+
+@app.middleware("http")
+async def revalidar_arquivos_estaticos(request: Request, call_next):
+    """Impede que uma correção de CSS/JS fique presa no cache do navegador.
+
+    O StaticFiles do Starlette manda ETag e Last-Modified, mas não manda
+    Cache-Control. Sem esse cabeçalho, o navegador pode reaproveitar a
+    versão antiga sem consultar o servidor, e uma correção (como a cor
+    do ícone dentro do quadrado vermelho) parece não ter efeito.
+
+    "no-cache" não desliga o cache: ele obriga o navegador a perguntar
+    ao servidor antes de usar a cópia guardada. Como o ETag/Last-Modified
+    continua valendo, um arquivo sem mudança responde 304 e não é
+    baixado de novo.
+    """
+    resposta = await call_next(request)
+
+    if request.url.path.startswith(("/css/", "/js/", "/assets/")):
+        resposta.headers["Cache-Control"] = "no-cache, must-revalidate"
+
+    return resposta
 
 
 # ============================================================
@@ -257,7 +324,7 @@ def _registrar_tentativa(endereco: str) -> None:
         return
 
     # As tentativas vencidas não entram na conta e só ocupariam espaço
-    # para sempre. A limpeza é occasional, para não custar uma consulta
+    # para sempre. A limpeza é ocasional, para não custar uma consulta
     # a cada tentativa.
     if random.random() < 0.05:
         try:
@@ -389,8 +456,8 @@ def renderizar(request: Request, nome_do_arquivo: str, **contexto):
     """
     eh_admin = eh_coordenador(request)
 
-    # Desde o Starlette 1.x a assinatura e TemplateResponse(request,
-    # nome, contexto): o request vem primeiro, e e ele que define o
+    # Desde o Starlette 1.x a assinatura é TemplateResponse(request,
+    # nome, contexto): o request vem primeiro, e é ele que define o
     # "url_for" e o status da resposta.
     return templates.TemplateResponse(
         request,
@@ -406,16 +473,19 @@ def renderizar(request: Request, nome_do_arquivo: str, **contexto):
             "rota_inicio": (
                 INICIO_COORDENADOR if eh_admin else INICIO_PROFESSOR
             ),
-            "rota_atual": request.url.path,
+            "rota_atual": ROTA_ATIVA.get(request.url.path, request.url.path),
             "rota_notificacoes": (
                 "/notificacoes_adm" if eh_admin else "/notificacoes_prof"
             ),
-            "atalhos_usuario": ATALHOS_USUARIO,
+            "atalhos": (
+                [i for i in (MENU_COORDENADOR if eh_admin else MENU_PROFESSOR)
+                 if i["rota"] in (ATALHOS_COORDENADOR if eh_admin else ATALHOS_PROFESSOR)]
+            ),
             "busca_placeholder": contexto.pop(
                 "busca_placeholder", "Buscar..."
             ),
             # A frase de apoio do cabeçalho. Vazio em telas que não
-            # têm uma, e ai o componente nem cria o <p>.
+            # têm uma, e aí o componente nem cria o <p>.
             "subtitulo": contexto.pop("subtitulo", ""),
             **contexto,
         },
@@ -727,15 +797,6 @@ def service_worker():
 
 
 # ------------------------------------------------------------
-# INÍCIO PROFESSOR
-# ------------------------------------------------------------
-
-# ------------------------------------------------------------
-# INÍCIO ADMIN
-# ------------------------------------------------------------
-
-
-# ------------------------------------------------------------
 # CADASTRO
 # ------------------------------------------------------------
 
@@ -771,8 +832,8 @@ def redefinir_senha(request: Request):
 
 @app.get("/esqueceu_senha")
 def esqueceu_senha(request: Request):
-    """Redefinição de senha é feita pelo Coordenador, não por e-mail."""
-    return RedirectResponse(url="/", status_code=302)
+    """Tela de redefinição de senha. O ID é gerado pelo servidor ao enviar o formulário."""
+    return renderizar(request, "/auth/redefsenha.html")
 
 
 # ============================================================
@@ -939,9 +1000,9 @@ PAGINAS_DO_COORDENADOR = {
 
 
 def _criar_paginas_do_coordenador():
-    # Cada entrada e (arquivo, busca) e, se a tela precisar saber de
+    # Cada entrada é (arquivo, busca) e, se a tela precisar saber de
     # que tipo de recurso ela trata, um terceiro item com o contexto
-    # extra. E o que faz "/gerenciar_laboratorios_adm" e
+    # extra. É o que faz "/gerenciar_laboratorios_adm" e
     # "/gerenciar_gabinetes_adm" servirem o mesmo arquivo com textos e
     # filtro diferentes, sem duplicar o arquivo inteiro.
     for caminho, entrada in PAGINAS_DO_COORDENADOR.items():
@@ -1027,6 +1088,46 @@ def listar_usuarios(request: Request):
         })
 
     return usuarios
+
+
+# ------------------------------------------------------------
+# BUSCAR ID POR EMAIL
+# ------------------------------------------------------------
+
+@app.get("/senha/id")
+def buscar_id_para_redefinicao(email: str, request: Request):
+    """Devolve o ID do usuário a partir do e-mail. Rota pública.
+
+    Quem esqueceu a senha não tem sessão, então esta rota não exige
+    login. Devolve apenas o ID (nunca nome, cargo ou senha) e usa o
+    mesmo limite de tentativas do login, para dificultar que alguém
+    teste e-mails em massa para descobrir quem tem conta.
+    """
+    endereco = _endereco_de(request)
+
+    if _tentativas_restantes(endereco) <= 0:
+        raise HTTPException(
+            status_code=429,
+            detail="Muitas tentativas. Aguarde alguns minutos e tente de novo."
+        )
+
+    resposta = (
+        supabase
+        .table("usuarios")
+        .select("id")
+        .eq("email", email.strip().lower())
+        .execute()
+    )
+
+    if not resposta.data:
+        _registrar_tentativa(endereco)
+
+        raise HTTPException(
+            status_code=404,
+            detail="Usuário não encontrado"
+        )
+
+    return {"id": resposta.data[0]["id"]}
 
 
 # ------------------------------------------------------------
@@ -1151,6 +1252,35 @@ def atualizar_usuario(
 # ------------------------------------------------------------
 # EXCLUIR USUÁRIO
 # ------------------------------------------------------------
+
+@app.put("/usuarios/{usuario_id}/senha")
+def alterar_senha_usuario(
+    usuario_id: int,
+    alteracao: UsuarioSenha,
+    request: Request
+):
+    """Troca a senha de um usuário. Restrito ao coordenador."""
+
+    exigir_coordenador(request)
+
+    nova_hash = hash_password(alteracao.senha)
+
+    resposta = (
+        supabase
+        .table("usuarios")
+        .update({"senha": nova_hash})
+        .eq("id", usuario_id)
+        .execute()
+    )
+
+    if not resposta.data:
+        raise HTTPException(
+            status_code=404,
+            detail="Usuário não encontrado"
+        )
+
+    return {"mensagem": "Senha alterada com sucesso"}
+
 
 @app.delete("/usuarios/{usuario_id}")
 def excluir_usuario(usuario_id: int, request: Request):
@@ -1593,203 +1723,143 @@ def decidir_reserva(
 
 
 # ============================================================
-# AVISOS (compartilhados entre professores e coordenadores)
+# REDEFINIÇÃO DE SENHA
 # ============================================================
-
-@app.get("/api/avisos")
-def listar_avisos(request: Request):
-    """Lista todos os avisos publicados.
-
-    Professores e coordenadores enxergam todos os avisos.
-    Exige sessão autenticada.
-    """
-    exigir_sessao(request)
-
-    resposta = (
-        supabase
-        .table("avisos")
-        .select("*, usuarios(nome, email, cargo)")
-        .order("criado_em", desc=True)
-        .execute()
-    )
-
-    return resposta.data or []
-
-
-@app.post("/api/avisos", status_code=201)
-def criar_aviso(request: Request):
-    """Cria um novo aviso.
-
-    Qualquer usuário autenticado (professor ou coordenador) pode publicar.
-    O usuario_id vem da sessão, não do corpo da requisição.
-    """
-    usuario = exigir_sessao(request)
-
-    dados = await request.json()
-    titulo = (dados.get("titulo") or "").strip()
-    descricao = (dados.get("descricao") or "").strip()
-    data = dados.get("data") or None
-
-    if not titulo:
-        raise HTTPException(
-            status_code=400,
-            detail="Título é obrigatório."
-        )
-
-    if not descricao:
-        raise HTTPException(
-            status_code=400,
-            detail="Descrição é obrigatória."
-        )
-
-    resposta = (
-        supabase
-        .table("avisos")
-        .insert({
-            "usuario_id": usuario["id"],
-            "titulo": titulo,
-            "descricao": descricao,
-            "data": data
-        })
-        .execute()
-    )
-
-    if not resposta.data:
-        raise HTTPException(
-            status_code=500,
-            detail="Não foi possível publicar o aviso."
-        )
-
-    return resposta.data[0]
-
-
-@app.delete("/api/avisos/{aviso_id}")
-def excluir_aviso(aviso_id: int, request: Request):
-    """Exclui um aviso.
-
-    O dono do aviso ou qualquer coordenador pode excluir.
-    """
-    usuario = exigir_sessao(request)
-    eh_admin = eh_coordenador(request)
-
-    # Verifica se o aviso existe e quem é o dono.
-    resposta = (
-        supabase
-        .table("avisos")
-        .select("usuario_id")
-        .eq("id", aviso_id)
-        .execute()
-    )
-
-    avisos = resposta.data or []
-
-    if not avisos:
-        raise HTTPException(
-            status_code=404,
-            detail="Aviso não encontrado."
-        )
-
-    aviso = avisos[0]
-
-    # Só o dono ou coordenador pode excluir.
-    if not eh_admin and str(aviso.get("usuario_id")) != str(usuario["id"]):
-        raise HTTPException(
-            status_code=403,
-            detail="Você não pode excluir este aviso."
-        )
-
-    resposta = (
-        supabase
-        .table("avisos")
-        .delete()
-        .eq("id", aviso_id)
-        .execute()
-    )
-
-    if not resposta.data:
-        raise HTTPException(
-            status_code=404,
-            detail="Aviso não encontrado."
-        )
-
-    return {"mensagem": "Aviso excluído com sucesso."}
-
-
-#==================================
-# ESQUECIA SENHA
-#==================================
+#
+# O professor envia o e-mail e a nova senha. O servidor grava a
+# pendência já com o hash da senha e devolve o ID, que o professor leva
+# ao coordenador. Só o coordenador aprova, e a troca acontece nesse
+# momento, nunca antes.
 
 @app.post('/senha/solicitar', status_code=201)
-async def recuperar_senha(request: Request):
+async def solicitar_redefinicao(request: Request):
     dados = await request.form()
     email = (dados.get("email") or "").strip().lower()
     nova_senha = dados.get("senha") or ""
 
     if len(nova_senha) < 6:
-        return {"Aviso": "Senha muito curta"}
-
+        raise HTTPException(
+            status_code=400,
+            detail="A nova senha precisa ter pelo menos 6 caracteres"
+        )
 
     usuario = (
-        supabase.table('usuarios').select('id').eq('email', email).execute()
+        supabase
+        .table('usuarios')
+        .select('id')
+        .eq('email', email)
+        .execute()
     )
 
     if not usuario.data:
-        return {
-            "Aviso": "Usuário não encontrado"
-        }
-    
+        raise HTTPException(
+            status_code=404,
+            detail="Usuário não encontrado"
+        )
+
     usuario_id = usuario.data[0]["id"]
 
-    pendencia = (
-        supabase.table('pendencia_senhas')
+    # Uma solicitação pendente por vez: evita acumular pedidos e deixar
+    # o coordenador escolher entre senhas diferentes para a mesma conta.
+    pendente = (
+        supabase
+        .table('pendencias_senhas')
         .select('id')
         .eq('usuario_id', usuario_id)
         .eq('status', 'pendente')
         .execute()
     )
 
-    return {"mensagem": "Solicitação enviada. Aguarde a aprovação de um coordenador."}
+    if pendente.data:
+        raise HTTPException(
+            status_code=409,
+            detail="Já existe uma solicitação pendente para este usuário"
+        )
+
+    resposta = (
+        supabase
+        .table('pendencias_senhas')
+        .insert({
+            "usuario_id": usuario_id,
+            "status": "pendente",
+            "nova_senha_hash": hash_password(nova_senha)
+        })
+        .execute()
+    )
+
+    if not resposta.data:
+        raise HTTPException(
+            status_code=502,
+            detail="Não foi possível registrar a solicitação"
+        )
+
+    return {"id": resposta.data[0]["id"]}
 
 
 @app.get('/pendencias')
 async def listar_pendencias(request: Request):
-    consulta_pendencias = supabase.table('pendencias_senhas').select('*').eq('status', 'pendente').execute()
-    pendencias = consulta_pendencias.data
-    return pendencias
+    exigir_coordenador(request)
+
+    consulta = (
+        supabase
+        .table('pendencias_senhas')
+        .select('id, usuario_id, status')
+        .eq('status', 'pendente')
+        .execute()
+    )
+
+    return consulta.data or []
 
 
 @app.post('/pendencias/{pendencia_id}/aceitar')
-async def aceitar_pendencia(pendencia_id, request: Request):
+async def aceitar_pendencia(pendencia_id: int, request: Request):
     coordenador = exigir_coordenador(request)
 
-    consulta_pendecia = (
-        supabase.table('pendencia_senhas')
+    consulta = (
+        supabase
+        .table('pendencias_senhas')
+        .select('*')
+        .eq('id', pendencia_id)
+        .eq('status', 'pendente')
+        .execute()
+    )
+
+    if not consulta.data:
+        raise HTTPException(
+            status_code=409,
+            detail="Solicitação já foi resolvida ou não existe"
+        )
+
+    pendencia = consulta.data[0]
+
+    # Primeiro troca a senha. Se falhar, a pendência continua pendente
+    # e o coordenador pode tentar de novo.
+    try:
+        (
+            supabase
+            .table('usuarios')
+            .update({"senha": pendencia["nova_senha_hash"]})
+            .eq('id', pendencia["usuario_id"])
+            .execute()
+        )
+    except Exception:  # noqa: BLE001
+        raise HTTPException(
+            status_code=502,
+            detail="Não foi possível trocar a senha"
+        )
+
+    (
+        supabase
+        .table('pendencias_senhas')
         .update({
             "status": "aprovada",
             "resolvido_em": datetime.now().isoformat(),
             "resolvido_por": coordenador["id"]
         })
+        .eq('id', pendencia_id)
+        .execute()
     )
 
-    if not consulta_pendecia.data:
-        return {
-            "Aviso": "Solicitação já foi resolvida ou não existe"
-        }
-
-    linha_a_ser_alterada = consulta_pendecia.data[0]
-
-    try:
-        supabase.table('usuarios').update({"senha":linha_a_ser_alterada["nova_senha_hash"]}).eq('id', linha_a_ser_alterada["usuario_id"]).execute()
-    
-    except Exception:
-        supabase.table('pendencia_senhas').update({
-            "status": "pendente",
-            "resolvido_em": None,
-            "resolvido_por": None
-        }).eq('id', pendencia_id).execute()
-        
-        raise HTTPException(status_code=502, detail="Não foi possível trocar a senha")
-    
     return {"mensagem": "Senha trocada com sucesso"}
 
 
@@ -1798,7 +1868,8 @@ async def recusar_pendencia(pendencia_id: int, request: Request):
     coordenador = exigir_coordenador(request)
 
     consulta_pendencia = (
-        supabase.table('pendencia_senhas')
+        supabase
+        .table('pendencias_senhas')
         .update({
             "status": "negada",
             "resolvido_em": datetime.now().isoformat(),

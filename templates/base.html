@@ -32,6 +32,13 @@
 
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap"
     rel="stylesheet">
+
+<link
+    rel="icon"
+    type="image/png"
+    href="/static/assets/img/favicon.png"
+>
+
   {#- O esqueleto de todas as telas com menu: a barra lateral, o
       cabeçalho, o campo de busca e o cartão de perfil.
 
@@ -39,7 +46,7 @@
       propriedade continua sendo decidida pelo mesmo lugar que antes:
       quando cada tela trazia uma cópia do esqueleto no próprio CSS,
       essa cópia vinha antes das regras dela. -#}
-  <link rel="stylesheet" href="/css/base.css">
+  <link rel="stylesheet" href="/css/base.css?v=2">
 
   {#- O que sobrou do CSS da home do Professor. Continua em todas as
       telas porque ainda carrega regras que outras usam: "button
@@ -48,7 +55,7 @@
       onze telas voltarem para a Arial — o retrato de estilo
       computado pegou. Extrair essas regras é trabalho próprio, e as
       telas divergem justamente nelas. -#}
-  <link rel="stylesheet" href="/css/home.css">
+  <link rel="stylesheet" href="/css/home.css?v=2">
 
   {#- Estilo específico da tela. -#}
   {% block head_extra %}{% endblock %}

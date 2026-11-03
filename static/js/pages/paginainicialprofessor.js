@@ -144,13 +144,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
                                 ${acoes}
 
-                                <button
-                                    class="btn-excluir-reserva btn-cancelar-sm"
-                                    data-delete-id="${r.id}"
-                                >
-                                    Excluir
-                                </button>
-
                             </div>
 
                         </div>
@@ -172,26 +165,6 @@ document.addEventListener('DOMContentLoaded', () => {
       if (listaReservas) {
 
         listaReservas.addEventListener('click', (e) => {
-
-          const deleteButton =
-            e.target.closest('[data-delete-id]');
-
-          if (deleteButton) {
-
-            const confirmar =
-              window.confirm(
-                'Excluir esta reserva definitivamente?'
-              );
-
-            if (!confirmar) return;
-
-            ReservasApp.deleteReserva(
-              deleteButton.dataset.deleteId
-            );
-
-            return;
-
-          }
 
           const btn =
             e.target.closest('[data-cancel-id]');

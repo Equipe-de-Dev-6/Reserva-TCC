@@ -99,6 +99,18 @@ class UsuarioAtualizacao(BaseModel):
         }
 
 
+class UsuarioSenha(BaseModel):
+    """Troca de senha feita pelo coordenador para um usuário.
+
+    Separada de UsuarioAtualizacao para que a edição de dados comuns
+    nunca toque na senha por engano.
+    """
+
+    model_config = ConfigDict(str_strip_whitespace=True)
+
+    senha: str = Field(min_length=6, max_length=72)
+
+
 # ============================================================
 # MODELO: SALA
 # ============================================================

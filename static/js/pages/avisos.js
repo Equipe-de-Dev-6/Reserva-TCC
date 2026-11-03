@@ -1,245 +1,119 @@
 // ======================================================
-// PÁGINA DE AVISOS (/avisos)
+    // CARREGAR USUÁRIO LOGADO
+    // ======================================================
+
+    document.addEventListener('DOMContentLoaded', () => {
 // ======================================================
+      // DROPDOWN DO USUÁRIO
+      // ======================================================
 
-document.addEventListener('DOMContentLoaded', async () => {
+      // ======================================================
+      // MENU MOBILE
+      // ======================================================
 
-  // ======================================================
-  // DROPDOWN DO USUÁRIO
-  // ======================================================
+      
 
-  // ======================================================
-  // MENU MOBILE
-  // ======================================================
+      
 
-  // ======================================================
-  // ABRIR / FECHAR FORMULÁRIO DE NOVO AVISO
-  // ======================================================
-  const btnCriarAviso = document.getElementById('btnCriarAviso');
-  const avisoFormCard = document.getElementById('avisoFormCard');
-  const avisoForm = document.getElementById('avisoForm');
-  const btnCancelarAviso = document.getElementById('btnCancelarAviso');
+      // ======================================================
+      // ABRIR / FECHAR FORMULÁRIO DE NOVO AVISO
+      // ======================================================
+      const btnCriarAviso = document.getElementById('btnCriarAviso');
+      const avisoFormCard = document.getElementById('avisoFormCard');
+      const avisoForm = document.getElementById('avisoForm');
+      const btnCancelarAviso = document.getElementById('btnCancelarAviso');
 
-  function abrirFormulario() {
-    avisoFormCard.classList.add('active');
-    document.getElementById('avisoTitulo').focus();
-  }
-
-  function fecharFormulario() {
-    avisoFormCard.classList.remove('active');
-    avisoForm.reset();
-  }
-
-  if (btnCriarAviso) {
-    btnCriarAviso.addEventListener('click', () => {
-      if (avisoFormCard.classList.contains('active')) {
-        fecharFormulario();
-      } else {
-        abrirFormulario();
-      }
-    });
-  }
-
-  if (btnCancelarAviso) {
-    btnCancelarAviso.addEventListener('click', fecharFormulario);
-  }
-
-  // ======================================================
-  // ENVIAR NOVO AVISO
-  // ======================================================
-  if (avisoForm) {
-    avisoForm.addEventListener('submit', async (e) => {
-      e.preventDefault();
-
-      if (!avisoForm.checkValidity()) {
-        avisoForm.reportValidity();
-        return;
+      function abrirFormulario() {
+        avisoFormCard.classList.add('active');
+        document.getElementById('avisoTitulo').focus();
       }
 
-      const btn = avisoForm.querySelector('button[type="submit"]');
-      const textoOriginal = btn.textContent;
+      function fecharFormulario() {
+        avisoFormCard.classList.remove('active');
+        avisoForm.reset();
+      }
 
-      btn.disabled = true;
-      btn.textContent = 'Publicando...';
-
-      try {
-
-        await AvisosApp.addAviso({
-          titulo: document.getElementById('avisoTitulo').value,
-          descricao: document.getElementById('avisoDescricao').value,
-          data: document.getElementById('avisoData').value,
+      if (btnCriarAviso) {
+        btnCriarAviso.addEventListener('click', () => {
+          if (avisoFormCard.classList.contains('active')) {
+            fecharFormulario();
+          } else {
+            abrirFormulario();
+          }
         });
-
-        fecharFormulario();
-
-      } catch (erro) {
-
-        console.error('Erro ao publicar aviso:', erro);
-        window.alert(erro.message || 'Não foi publicar o aviso.');
-
-      } finally {
-
-        btn.disabled = false;
-        btn.textContent = textoOriginal;
-
-      }
-    });
-  }
-
-  // ======================================================
-  // RENDERIZAR LISTA DE AVISOS
-  // ======================================================
-  async function renderAvisos() {
-
-    let lista = [];
-
-    try {
-
-      lista = await AvisosApp.getAvisos();
-
-    } catch (erro) {
-
-      console.error('Erro ao carregar avisos:', erro);
-
-      const listaEl = document.getElementById('avisosList');
-      const emptyEl = document.getElementById('avisosEmpty');
-
-      if (listaEl) listaEl.innerHTML = '';
-      if (emptyEl) {
-        emptyEl.style.display = 'flex';
-        emptyEl.querySelector('p').textContent =
-          'Não foi possível carregar os avisos.';
       }
 
-      return;
+      if (btnCancelarAviso) {
+        btnCancelarAviso.addEventListener('click', fecharFormulario);
+      }
 
-    }
+      // ======================================================
+      // ENVIAR NOVO AVISO
+      // ======================================================
+      if (avisoForm) {
+        avisoForm.addEventListener('submit', (e) => {
+          e.preventDefault();
 
-    const listaEl = document.getElementById('avisosList');
-    const emptyEl = document.getElementById('avisosEmpty');
+          if (!avisoForm.checkValidity()) {
+            avisoForm.reportValidity();
+            return;
+          }
 
-    if (lista.length === 0) {
+          AvisosApp.addAviso({
+            titulo: document.getElementById('avisoTitulo').value,
+            descricao: document.getElementById('avisoDescricao').value,
+            data: document.getElementById('avisoData').value,
+          });
 
-      if (listaEl) listaEl.innerHTML = '';
-      if (emptyEl) emptyEl.style.display = 'flex';
+          fecharFormulario();
+        });
+      }
 
-      return;
+      // ======================================================
+      // RENDERIZAR LISTA DE AVISOS
+      // ======================================================
+      function renderAvisos() {
+        const lista = AvisosApp.getAvisos();
+        const listaEl = document.getElementById('avisosList');
+        const emptyEl = document.getElementById('avisosEmpty');
 
-    }
+        if (lista.length === 0) {
+          listaEl.innerHTML = '';
+          emptyEl.style.display = 'flex';
+          return;
+        }
 
-    if (emptyEl) emptyEl.style.display = 'none';
+        emptyEl.style.display = 'none';
 
-    function escapar(texto) {
+        listaEl.innerHTML = lista.map((a) => {
+          const dataFormatada = AvisosApp.formatDateBR(a.data);
 
-      return String(texto ?? '')
+          return `
+            <div class="notice-card searchable" data-id="${a.id}">
+              <div class="notice-card-main">
+                <div class="notice-title">
+                  <img src="/assets/icons/warning.png" alt="" width="20" height="20">
+                  ${a.titulo}
+                </div>
 
-        .replace(/&/g, '&amp;')
+                <p>${a.descricao}</p>
 
-        .replace(/</g, '&lt;')
-
-        .replace(/>/g, '&gt;')
-
-        .replace(/"/g, '&quot;')
-
-        .replace(/'/g, '&#39;');
-
-    }
-
-    function formatarDataBR(iso) {
-
-      if (!iso) return '';
-
-      const partes = String(iso).split('T')[0].split('-');
-
-      if (partes.length !== 3) return iso;
-
-      return `${partes[2]}/${partes[1]}/${partes[0]}`;
-
-    }
-
-    if (listaEl) {
-
-      listaEl.innerHTML = lista.map((a) => {
-
-        const dataFormatada = formatarDataBR(a.data);
-
-        return `
-          <div class="notice-card searchable" data-id="${a.id}">
-            <div class="notice-card-main">
-              <div class="notice-title">
-                <img src="/assets/icons/warning.png" alt="" width="20" height="20">
-                ${escapar(a.titulo)}
+                ${dataFormatada ? `<p class="notice-data">Referente a ${dataFormatada}</p>` : ''}
               </div>
-
-              <p>${escapar(a.descricao)}</p>
-
-              ${dataFormatada ? `<p class="notice-data">Referente a ${dataFormatada}</p>` : ''}
             </div>
+          `;
+        }).join('');
+      }
 
-            <button class="btn-excluir-aviso" data-delete-id="${a.id}">
-              Excluir
-            </button>
-          </div>
-        `;
+      // ======================================================
+      // BUSCA
 
-      }).join('');
+      
 
-    }
+      // ======================================================
+      // ATUALIZAÇÃO AUTOMÁTICA DA LISTA
+      // ======================================================
+      AvisosApp.subscribe(renderAvisos);
 
-  }
-
-  // ======================================================
-  // EXCLUIR AVISO
-  // ======================================================
-  document.getElementById('avisosList').addEventListener('click', async (e) => {
-
-    const btn = e.target.closest('[data-delete-id]');
-
-    if (!btn) {
-
-      return;
-
-    }
-
-    const confirmar = window.confirm(
-
-      'Tem certeza que deseja excluir este aviso?'
-
-    );
-
-    if (!confirmar) {
-
-      return;
-
-    }
-
-    try {
-
-      await AvisosApp.deleteAviso(btn.dataset.deleteId);
-
-    } catch (erro) {
-
-      console.error('Erro ao excluir aviso:', erro);
-
-      window.alert(erro.message || 'Não foi possível excluir o aviso.');
-
-    }
-
-  });
-
-  // ======================================================
-  // BUSCA
-  // ======================================================
-
-  // ======================================================
-  // ATUALIZAÇÃO AUTOMÁTICA DA LISTA
-  // ======================================================
-  AvisosApp.subscribe(() => {
-
-    renderAvisos();
-
-  });
-
-  renderAvisos();
-
-});
+      renderAvisos();
+    });

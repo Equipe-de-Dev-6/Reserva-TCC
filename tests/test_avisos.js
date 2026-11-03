@@ -14,7 +14,7 @@ const check = (n, c, d) => { if (c) { ok++; console.log('  ok   ' + n); } else {
 // Cada "carregamento de pagina" e um contexto novo, com o mesmo
 // armazenamento.
 function carregar() {
-  const ctx = vm.createContext({ localStorage: storage, Date, Math, JSON, console });
+  const ctx = vm.createContext({ localStorage: storage, window: {}, Date, Math, JSON, console });
   vm.runInContext(codigo, ctx, { filename: 'avisos.js' });
   return vm.runInContext('AvisosApp', ctx);
 }
@@ -47,6 +47,7 @@ const ctx2 = vm.createContext({
   localStorage: { getItem: () => { throw new Error('bloqueado'); },
                   setItem: () => { throw new Error('bloqueado'); },
                   removeItem: () => {} },
+  window: {},
   Date, Math, JSON, console,
 });
 vm.runInContext(codigo, ctx2, { filename: 'avisos.js' });
