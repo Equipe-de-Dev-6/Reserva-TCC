@@ -263,6 +263,10 @@
   .user-info {
   display: flex;
   flex-direction: column;
+  /* Largura minima fixa para que o texto "Professor" e "Coordenador"
+     ocupem o mesmo espaco, evitando deslocamento da busca e do icone
+     de notificacoes ao trocar de perfil. */
+  min-width: 110px;
   }
 
   .user-info .name {
