@@ -389,6 +389,13 @@ document.addEventListener('DOMContentLoaded', () => {
       // MÊS ANTERIOR
       // ======================================================
 
+      function atualizarURLWidget() {
+        const url = new URL(window.location);
+        url.searchParams.set('ano', String(widgetAno));
+        url.searchParams.set('mes', String(widgetMes + 1));
+        window.history.replaceState(null, '', url);
+      }
+
       const homeCalPrev =
         document.getElementById('homeCalPrev');
 
@@ -406,6 +413,7 @@ document.addEventListener('DOMContentLoaded', () => {
           }
 
           renderCalendarioWidget();
+          atualizarURLWidget();
 
         });
 
@@ -432,6 +440,7 @@ document.addEventListener('DOMContentLoaded', () => {
           }
 
           renderCalendarioWidget();
+          atualizarURLWidget();
 
         });
 

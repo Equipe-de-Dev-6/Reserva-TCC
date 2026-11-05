@@ -55,6 +55,7 @@ async function cadastrar(event) {
 
             // Sem a lista (o endpoint exige perfil de Coordenador),
             // o cadastro segue e o servidor é quem decide.
+            // Não bloqueia o fluxo: a validação real está no backend.
 
         }
 

@@ -486,7 +486,7 @@
         } else {
           notificar({
             titulo: 'Reserva negada pelo coordenador',
-            corpo: `${nomeRecurso(r)} · ${dataBR(r.data)}${r.motivoRecusa ? ' · ' + r.motivoRecusa : ''}`,
+            corpo: `${nomeRecurso(r)} · ${dataBR(r.data)}`,
             tag: `reserva-negada-${id}`,
             url: '/reservas_prof'
           });
@@ -501,7 +501,7 @@
         if (ehNegada(status)) {
           notificar({
             titulo: 'Reserva negada pelo coordenador',
-            corpo: `${nomeRecurso(r)} · ${dataBR(r.data)} · ${r.horaEntrada || ''}${r.motivoRecusa ? ' · ' + r.motivoRecusa : ''}`,
+            corpo: `${nomeRecurso(r)} · ${dataBR(r.data)} · ${r.horaEntrada || ''}`,
             tag: `reserva-negada-${id}`,
             url: '/reservas_prof'
           });

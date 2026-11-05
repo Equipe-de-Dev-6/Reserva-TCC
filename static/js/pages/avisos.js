@@ -70,8 +70,25 @@
       // ======================================================
       // RENDERIZAR LISTA DE AVISOS
       // ======================================================
+<<<<<<< HEAD
       async function renderAvisos() {
         const lista = await AvisosApp.getAvisos();
+=======
+      // ESCAPE DE HTML (previne XSS em avisos publicados)
+      // ======================================================
+      function escapar(texto) {
+        return String(texto ?? '')
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+          .replace(/"/g, '&quot;')
+          .replace(/'/g, '&#39;');
+      }
+
+      // ======================================================
+      function renderAvisos() {
+        const lista = AvisosApp.getAvisos();
+>>>>>>> Correçãodeerrosvisuais
         const listaEl = document.getElementById('avisosList');
         const emptyEl = document.getElementById('avisosEmpty');
 
@@ -91,10 +108,10 @@
               <div class="notice-card-main">
                 <div class="notice-title">
                   <img src="/assets/icons/warning.png" alt="" width="20" height="20">
-                  ${a.titulo}
+                  ${escapar(a.titulo)}
                 </div>
 
-                <p>${a.descricao}</p>
+                <p>${escapar(a.descricao)}</p>
 
                 ${dataFormatada ? `<p class="notice-data">Referente a ${dataFormatada}</p>` : ''}
               </div>

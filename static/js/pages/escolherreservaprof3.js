@@ -2,21 +2,64 @@
 // escolherreservaprof3.js  —  tela de escolha de gabinetes
 // ============================================================
 //
-// Esta tela nao tem script proprio.
+// Esta tela monta os cards de gabinete pelo "/js/salas.js", que lê
+// GET /salas e escreve dentro de [data-lista-salas]. A escolha e o
+// avanço para o passo 02 também são feitos pelo salas.js.
 //
-// Os cards de gabinete sao montados pelo "/js/salas.js", que le GET
-// /salas e escreve dentro de [data-lista-salas]. A escolha e o
-// avancamento para o passo 02 tambem sao dele.
-//
-// Este arquivo usava ligar um listener de clique em ".room-card"
-// dentro do DOMContentLoaded. Isso nunca funcionou: o "salas.js"
-// so monta os cards depois do fetch a API, entao no DOMContentLoaded
-// a lista ainda estava vazia e o listener nunca era registrado em
-// ninguem. O codigo tambem comparava "card.dataset.status === 'negado'",
-// valor que o "salas.js" nunca escreve (ele grava 'disponivel' ou
-// 'indisponivel').
-//
-// O arquivo continua existindo porque o template o carrega com
-// <script src>, e um arquivo ausente devolveria 404 em toda visita a
-// tela.
+// Este arquivo registra o listener de clique nos cards após a API
+// responder, garantindo que a seleção funcione mesmo quando os cards
+// são montados de forma assíncrona.
 // ============================================================
+
+document.addEventListener('DOMContentLoaded', () => {
+
+  const container = document.querySelector('[data-lista-salas]');
+
+  if (!container) {
+    return;
+  }
+
+  // Delegação de evento: captura cliques em .room-card mesmo após
+  // eles serem criados dinamicamente pelo salas.js.
+  container.addEventListener('click', (evento) => {
+
+    const card = evento.target.closest('.room-card');
+
+    if (!card) {
+      return;
+    }
+
+    // Salas indisponíveis não avançam.
+    if (card.dataset.status === 'indisponivel') {
+      evento.preventDefault();
+      return;
+    }
+
+    const salaId = card.dataset.salaId;
+    const salaNome = card.dataset.sala;
+
+    if (!salaId) {
+      return;
+    }
+
+    evento.preventDefault();
+
+    // Marca visualmente o card selecionado.
+    const cards = document.querySelectorAll('.room-card');
+    cards.forEach((c) => c.classList.remove('selected'));
+    card.classList.add('selected');
+
+    // Guarda a escolha no sessionStorage para o passo 02.
+    sessionStorage.setItem(
+      'salaSelecionada',
+      JSON.stringify({
+        id: parseInt(salaId, 10),
+        nome: salaNome || '',
+        categoria: 'Gabinete'
+      })
+    );
+
+    window.location.href = '/passo2_reserva_prof';
+  });
+
+});

@@ -278,8 +278,8 @@
         return;
       }
 
-      const botoes = listaAprovacoes.querySelectorAll('button');
-      botoes.forEach((b) => { b.disabled = true; });
+      // Desabilita apenas o botão clicado, não todos da lista.
+      botao.disabled = true;
 
       try {
         await decidirReserva(id, status);
@@ -290,7 +290,7 @@
 
         window.alert(erro.message || 'Não foi possível salvar a decisão.');
 
-        botoes.forEach((b) => { b.disabled = false; });
+        botao.disabled = false;
       }
     }
 
