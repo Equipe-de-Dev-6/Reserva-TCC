@@ -87,8 +87,8 @@
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 10px 16px;
-  font-size: 14px;
+  padding: 8px 12px;
+  font-size: 12px;
   font-weight: 500;
   color: var(--text-gray);
   border-radius: 8px;
@@ -130,10 +130,10 @@
   /* Ocupa a largura toda da barra. Antes ele encolhia no conteudo
      (76px) e ficava com 140px vazios a direita, desalinhado do menu. */
   width: 100%;
-  padding: 10px;
+  padding: 8px;
   border: 1px solid var(--border-color);
   border-radius: 8px;
-  font-size: 14px;
+  font-size: 12px;
   font-weight: 600;
   color: var(--text-dark);
   cursor: pointer;
