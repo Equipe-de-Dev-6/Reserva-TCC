@@ -78,7 +78,6 @@ MENU_PROFESSOR = [
     {"rota": "/calendario_prof", "icone": "calendar", "rotulo": "Calendário"},
     {"rota": "/notificacoes_prof", "icone": "notification", "rotulo": "Notificações"},
     {"rota": "/avisos", "icone": "warning", "rotulo": "Avisos"},
-    {"rota": "/gerenciar_recursos", "icone": "classroom", "rotulo": "Gerenciar Recursos"},
     {"rota": "/configuracoes", "icone": "gear", "rotulo": "Configurações"},
     {"rota": "/ajuda", "icone": "interrogation", "rotulo": "Ajuda"},
 ]
@@ -937,16 +936,6 @@ def _criar_paginas():
         rota.__name__ = caminho.strip("/").replace("/", "_")
 
         app.get(caminho)(rota)
-
-
-# Rota para gerenciar_recursos do professor (iguala ao do admin)
-app.get("/gerenciar_recursos")(lambda request: pagina_de_usuario(request) or renderizar(
-    request,
-    "admin/gerenciar_recursos.html",
-    pagina="Gerenciar Recursos",
-    busca_placeholder="Buscar por sala ou professor...",
-    subtitulo="Escolha o tipo de recurso que deseja cadastrar ou editar"
-))
 
 
 _criar_paginas()
