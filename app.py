@@ -65,7 +65,7 @@ MENU_COORDENADOR = [
     {"rota": "/avisos_adm", "icone": "warning", "rotulo": "Avisos"},
     {"rota": "/notificacoes_adm", "icone": "notification", "rotulo": "Notificações"},
     {"rota": "/calendario_adm", "icone": "calendar", "rotulo": "Calendário"},
-    {"rota": "/professores_adm", "icone": "user (3)", "rotulo": "Professores"},
+    {"rota": "/professores_adm", "icone": "user (3)", "rotulo": "Usuários"},
     {"rota": "/configuracoes_adm", "icone": "gear", "rotulo": "Configurações"},
     {"rota": "/ajuda", "icone": "interrogation", "rotulo": "Ajuda"},
 ]
