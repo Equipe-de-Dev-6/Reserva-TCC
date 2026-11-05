@@ -16,6 +16,7 @@ const ARQUIVOS = [
   'migracao_reservas.sql',
   'migracao_schema.sql',
   'migracao_rls.sql',
+  'migracao_avisos.sql',
 ];
 
 let passou = 0;
@@ -146,6 +147,7 @@ const COLUNAS = {
   caracteristicas: ['id', 'nome'],
   sala_caracteristicas: ['sala_id', 'caracteristicas_id'],
   login_tentativas: ['id', 'endereco', 'tentativa'],
+  avisos: ['id', 'usuario_id', 'titulo', 'descricao', 'data', 'criado_em', 'atualizado_em'],
 };
 
 for (const arquivo of ARQUIVOS) {

@@ -344,3 +344,32 @@ def categoria_da_sala(caracteristica: str) -> tuple[str, str]:
 class EsqueciMinhaSenhaIn(BaseModel):
     email: str
     senha_nova: str
+
+
+# ============================================================
+# MODELO: AVISO
+# ============================================================
+
+class AvisoCriacao(BaseModel):
+    """Dados enviados pelo professor/coordenador ao publicar um aviso."""
+
+    model_config = ConfigDict(str_strip_whitespace=True)
+
+    titulo: str = Field(min_length=1, max_length=100)
+    descricao: str = Field(min_length=1, max_length=2000)
+    data: str | None = None
+
+    @field_validator('data')
+    @classmethod
+    def validar_data(cls, valor):
+        if valor is None or valor == '':
+            return None
+
+        from datetime import date
+
+        try:
+            date.fromisoformat(valor)
+        except ValueError:
+            raise ValueError('Data invalida. Use o formato AAAA-MM-DD.')
+
+        return valor

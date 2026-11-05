@@ -63,17 +63,15 @@
             titulo: document.getElementById('avisoTitulo').value,
             descricao: document.getElementById('avisoDescricao').value,
             data: document.getElementById('avisoData').value,
-          });
-
-          fecharFormulario();
+          }).then(() => fecharFormulario()).catch((erro) => alert(erro.message));
         });
       }
 
       // ======================================================
       // RENDERIZAR LISTA DE AVISOS
       // ======================================================
-      function renderAvisos() {
-        const lista = AvisosApp.getAvisos();
+      async function renderAvisos() {
+        const lista = await AvisosApp.getAvisos();
         const listaEl = document.getElementById('avisosList');
         const emptyEl = document.getElementById('avisosEmpty');
 
@@ -100,6 +98,10 @@
 
                 ${dataFormatada ? `<p class="notice-data">Referente a ${dataFormatada}</p>` : ''}
               </div>
+
+              <button class="notice-delete" data-acao="excluir" data-id="${a.id}" type="button">
+                Excluir
+              </button>
             </div>
           `;
         }).join('');
@@ -113,6 +115,31 @@
       // ======================================================
       // ATUALIZAÇÃO AUTOMÁTICA DA LISTA
       // ======================================================
+      const listaEl = document.getElementById('avisosList');
+
+      if (listaEl) {
+        listaEl.addEventListener('click', async (evento) => {
+          const botao = evento.target.closest('[data-acao="excluir"]');
+
+          if (!botao) {
+            return;
+          }
+
+          const id = Number(botao.dataset.id);
+
+          if (!window.confirm('Excluir este aviso?')) {
+            return;
+          }
+
+          try {
+            await AvisosApp.deleteAviso(id);
+
+          } catch (erro) {
+            window.alert(erro.message || 'Nao foi possivel excluir o aviso.');
+          }
+        });
+      }
+
       AvisosApp.subscribe(renderAvisos);
 
       renderAvisos();
