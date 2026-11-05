@@ -1,6 +1,6 @@
 /* ============================================================
  * Estilo de reservasprof.css.
- * 
+ *
  * O esqueleto comum a todas as telas com menu esta em
  * base.css; aqui fica so o que e desta tela.
  * ============================================================ */
@@ -91,10 +91,11 @@
   background-color: var(--white);
   border: 1px solid var(--border-color);
   border-radius: 12px;
-  padding: 16px 18px;
+  padding: 16px 20px;
   display: flex;
-  justify-content: space-between;
+  flex-direction: row;
   align-items: center;
+  justify-content: space-between;
   gap: 16px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
   animation: fadeInUp 0.25s ease;
@@ -115,9 +116,11 @@
   align-items: center;
   gap: 16px;
   min-width: 0;
+  flex: 1;
   }
 
   .reserva-icon {
+  flex-shrink: 0;
   width: 48px;
   height: 48px;
   background-color: var(--senai-red);
@@ -125,7 +128,6 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  flex-shrink: 0;
   }
 
   .reserva-icon img {
@@ -144,16 +146,17 @@
 
   .reserva-info {
   min-width: 0;
+  flex: 1;
   }
 
   .reserva-info h4 {
   font-size: 14px;
   font-weight: 700;
-  margin-bottom: 4px;
+  margin: 0 0 4px 0;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  max-width: 200px;
+  max-width: 100%;
   }
 
   .reserva-info p {
@@ -163,7 +166,7 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  max-width: 200px;
+  max-width: 100%;
   margin: 0;
   }
 
@@ -171,7 +174,7 @@
   display: flex;
   gap: 10px;
   flex-wrap: wrap;
-  margin-top: 4px;
+  margin-top: 6px;
   font-size: 11px;
   color: var(--text-gray);
   }
@@ -179,16 +182,18 @@
   .reserva-right {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
   flex-shrink: 0;
   }
 
   .badge-green, .badge-yellow, .badge-red {
-  padding: 4px 8px;
+  padding: 5px 10px;
   border-radius: 12px;
   font-size: 11px;
-  font-weight: 600;
+  font-weight: 700;
   white-space: nowrap;
+  display: inline-flex;
+  align-items: center;
   }
 
   .badge-green {
