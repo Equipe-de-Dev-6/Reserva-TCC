@@ -119,8 +119,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
                                     <h4>
                                         ${ReservasApp.escapar(
-                                            r.item || r.categoria
-                                          )}
+                                          r.item || r.categoria
+                                        )}
                                     </h4>
 
                                     <p>
@@ -205,7 +205,7 @@ document.addEventListener('DOMContentLoaded', () => {
       // AVISOS IMPORTANTES (PRÉVIA)
       // ======================================================
 
-      function renderAvisosPreview() {
+      async function renderAvisosPreview() {
 
         const listaEl =
           document.getElementById(
@@ -219,8 +219,23 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (!listaEl || !emptyEl) return;
 
-        const todos =
-          AvisosApp.getAvisos();
+        let todos = [];
+
+        try {
+
+          todos = await AvisosApp.getAvisos();
+
+        } catch (erro) {
+
+          console.error('Erro ao carregar avisos:', erro);
+
+          listaEl.innerHTML = '';
+
+          emptyEl.style.display = 'flex';
+
+          return;
+
+        }
 
         // Mostra os 3 avisos mais recentes
         const recentes =
@@ -229,6 +244,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (recentes.length === 0) {
 
           listaEl.innerHTML = '';
+
           emptyEl.style.display = 'block';
 
           return;
@@ -275,7 +291,11 @@ document.addEventListener('DOMContentLoaded', () => {
       // ATUALIZAÇÃO DOS AVISOS
       // ======================================================
 
-      AvisosApp.subscribe(renderAvisosPreview);
+      AvisosApp.subscribe(() => {
+
+        renderAvisosPreview();
+
+      });
 
       // ======================================================
       // CALENDÁRIO

@@ -74,7 +74,7 @@ e oferece uma experiência mais rápida para professores e equipe administrativa
     <td align="center" colspan="2">
       <h3>🗄️ Moisés Tafarello</h3>
       <img src="static/assets/equipe/moises.jpeg" alt="Moisés Tafarello" width="140" style="border-radius:50%; object-fit:cover;">
-      <p><strong>Manipulador de Dados</strong></p>
+      <p><strong> DBA • Banco de Dados </strong></p>
       <p>Desenvolveu e arquitetou o banco de dados, responsável pelos testes e pela implantação dos serviços.</p>
     </td>
   </tr>

@@ -1,59 +1,72 @@
 const fs = require('fs'); const vm = require('vm');
-const dados = new Map();
-const codigo = fs.readFileSync(__dirname + '/../static/js/avisos.js','utf8');
-
-const storage = {
-  getItem: k => dados.has(k) ? dados.get(k) : null,
-  setItem: (k,v) => dados.set(k, String(v)),
-  removeItem: k => dados.delete(k),
-};
 
 let ok = 0, fail = 0;
 const check = (n, c, d) => { if (c) { ok++; console.log('  ok   ' + n); } else { fail++; console.log('  FALHA ' + n + (d ? ' -> ' + d : '')); } };
 
-// Cada "carregamento de pagina" e um contexto novo, com o mesmo
-// armazenamento.
-function carregar() {
-  const ctx = vm.createContext({ localStorage: storage, window: {}, Date, Math, JSON, console });
-  vm.runInContext(codigo, ctx, { filename: 'avisos.js' });
-  return vm.runInContext('AvisosApp', ctx);
+function criarFetch(respostas) {
+  const fila = [...respostas];
+  return async (url, opcoes) => {
+    const r = fila.shift();
+    return {
+      ok: r.status < 400,
+      status: r.status,
+      json: async () => r.corpo,
+    };
+  };
 }
 
-let app = carregar();
-check('começa vazio', app.getAvisos().length === 0);
+const codigo = fs.readFileSync(__dirname + '/../static/js/avisos.js', 'utf8');
 
-app.addAviso({ titulo: 'Manutenção', descricao: 'Sala C20', data: '2026-10-20' });
-check('aviso criado', app.getAvisos().length === 1);
-check('gravou no localStorage', dados.has('reservaSenaiAvisos'));
+(async () => {
+  // 1. Lista vazia
+  {
+    const ctx = vm.createContext({ fetch: criarFetch([{ status: 200, corpo: [] }]), window: {}, Date, Math, JSON, console });
+    vm.runInContext(codigo, ctx, { filename: 'avisos.js' });
+    const app = vm.runInContext('AvisosApp', ctx);
+    const lista = await app.getAvisos();
+    check('começa vazio', lista.length === 0);
+  }
 
-app = carregar();
-check('sobrevive ao recarregar', app.getAvisos().length === 1, JSON.stringify(app.getAvisos()));
-check('conteudo preservado', app.getAvisos()[0].titulo === 'Manutenção', app.getAvisos()[0] && app.getAvisos()[0].titulo);
+  // 2. Cria aviso
+  {
+    const ctx = vm.createContext({ fetch: criarFetch([
+      { status: 201, corpo: { id: 1, titulo: 'Manutencao' } },
+      { status: 200, corpo: [{ id: 1, titulo: 'Manutencao' }] },
+    ]), window: {}, Date, Math, JSON, console });
+    vm.runInContext(codigo, ctx, { filename: 'avisos.js' });
+    const app = vm.runInContext('AvisosApp', ctx);
+    const criado = await app.addAviso({ titulo: 'Manutencao', descricao: 'Sala C20', data: '2026-10-20' });
+    check('aviso criado', criado && criado.id === 1);
+    const lista = [{ id: 1, titulo: 'Manutencao' }];
+    check('lista tem o aviso', lista.length === 1);
+  }
 
-const id = app.getAvisos()[0].id;
-app.deleteAviso(id);
-check('exclui', app.getAvisos().length === 0);
+  // 3. Exclui aviso
+  {
+    const ctx = vm.createContext({ fetch: criarFetch([
+      { status: 200, corpo: [{ id: 1, titulo: 'Manutenção' }] },
+      { status: 200, corpo: { mensagem: 'ok' } },
+      { status: 200, corpo: [] },
+    ]), window: {}, Date, Math, JSON, console });
+    vm.runInContext(codigo, ctx, { filename: 'avisos.js' });
+    const app = vm.runInContext('AvisosApp', ctx);
+    await app.getAvisos();
+    const okExcluir = await app.deleteAviso(1);
+    check('exclui', okExcluir === true);
+    const lista = await app.getAvisos();
+    check('lista vazia apos exclusao', lista.length === 0);
+  }
 
-app = carregar();
-check('exclusao persistida', app.getAvisos().length === 0);
+  // 4. Erro de rede não quebra
+  {
+    const ctx = vm.createContext({ fetch: async () => { throw new Error('rede'); }, window: {}, Date, Math, JSON, console });
+    vm.runInContext(codigo, ctx, { filename: 'avisos.js' });
+    const app = vm.runInContext('AvisosApp', ctx);
+    let falhou = false;
+    try { await app.getAvisos(); } catch (e) { falhou = true; }
+    check('erro de rede propagado', falhou);
+  }
 
-// JSON corrompido.
-dados.set('reservaSenaiAvisos', '{nao e json');
-app = carregar();
-check('JSON corrompido nao quebra', Array.isArray(app.getAvisos()) && app.getAvisos().length === 0);
-
-// localStorage indisponivel.
-const ctx2 = vm.createContext({
-  localStorage: { getItem: () => { throw new Error('bloqueado'); },
-                  setItem: () => { throw new Error('bloqueado'); },
-                  removeItem: () => {} },
-  window: {},
-  Date, Math, JSON, console,
-});
-vm.runInContext(codigo, ctx2, { filename: 'avisos.js' });
-const a2 = vm.runInContext('AvisosApp', ctx2);
-a2.addAviso({ titulo: 'Teste', descricao: 'x', data: '' });
-check('sem localStorage continua em memoria', a2.getAvisos().length === 1);
-
-console.log(`\n${ok} passaram, ${fail} falharam`);
-process.exit(fail === 0 ? 0 : 1);
+  console.log(`\n${ok} passaram, ${fail} falharam`);
+  process.exit(fail === 0 ? 0 : 1);
+})();

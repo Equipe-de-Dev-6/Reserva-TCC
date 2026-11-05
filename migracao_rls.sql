@@ -31,6 +31,8 @@ ALTER TABLE public.carrinhos ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.notebooks ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.caracteristicas ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.sala_caracteristicas ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.avisos ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.notificacoes ENABLE ROW LEVEL SECURITY;
 
 
 -- ===========================================================================

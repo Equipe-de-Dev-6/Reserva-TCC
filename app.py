@@ -1,4 +1,4 @@
-"""API e páginas do Reserva SENAI.
+﻿"""API e páginas do Reserva SENAI.
 
 A organização é sempre a mesma: uma seção de configuração no topo, os
 auxiliares de sessão e de autorização, as páginas (que exigem sessão) e
@@ -37,6 +37,7 @@ from model import (
     Usuario,
     UsuarioAtualizacao,
     UsuarioSenha,
+    AvisoCriacao,
     categoria_da_sala
 )
 
@@ -64,7 +65,7 @@ MENU_COORDENADOR = [
     {"rota": "/avisos_adm", "icone": "warning", "rotulo": "Avisos"},
     {"rota": "/notificacoes_adm", "icone": "notification", "rotulo": "Notificações"},
     {"rota": "/calendario_adm", "icone": "calendar", "rotulo": "Calendário"},
-    {"rota": "/professores_adm", "icone": "user (3)", "rotulo": "Professores"},
+    {"rota": "/professores_adm", "icone": "user (3)", "rotulo": "Usuários"},
     {"rota": "/configuracoes_adm", "icone": "gear", "rotulo": "Configurações"},
     {"rota": "/ajuda", "icone": "interrogation", "rotulo": "Ajuda"},
 ]
@@ -1091,7 +1092,7 @@ def listar_usuarios(request: Request):
 
 
 # ------------------------------------------------------------
-# BUSCAR USUÁRIO POR E-MAIL
+# BUSCAR ID POR EMAIL
 # ------------------------------------------------------------
 
 @app.get("/senha/id")
@@ -1887,3 +1888,164 @@ async def recusar_pendencia(pendencia_id: int, request: Request):
         )
 
     return {"mensagem": "Solicitação negada com sucesso"}
+
+
+
+# ============================================================
+# AVISOS
+# ============================================================
+
+@app.get('/api/avisos')
+def listar_avisos(request: Request):
+    exigir_sessao(request)
+
+    resposta = (
+        supabase
+        .table('avisos')
+        .select('*')
+        .order('criado_em', desc=True)
+        .execute()
+    )
+
+    return resposta.data or []
+
+
+@app.post('/api/avisos', status_code=201)
+def criar_aviso(aviso: AvisoCriacao, request: Request):
+    usuario = exigir_sessao(request)
+
+    dados = {
+        'usuario_id': usuario['id'],
+        'titulo': aviso.titulo,
+        'descricao': aviso.descricao,
+        'data': aviso.data or None,
+    }
+
+    resposta = (
+        supabase
+        .table('avisos')
+        .insert(dados)
+        .execute()
+    )
+
+    if not resposta.data:
+        raise HTTPException(status_code=502, detail='Nao foi possivel publicar o aviso')
+
+    return resposta.data[0]
+
+
+@app.delete('/api/avisos/{aviso_id}')
+def excluir_aviso(aviso_id: int, request: Request):
+    usuario = exigir_sessao(request)
+
+    consulta = (
+        supabase
+        .table('avisos')
+        .select('usuario_id')
+        .eq('id', aviso_id)
+        .execute()
+    )
+
+    if not consulta.data:
+        raise HTTPException(status_code=404, detail='Aviso nao encontrado')
+
+    dono = consulta.data[0].get('usuario_id')
+
+    if not eh_coordenador(request) and dono != usuario['id']:
+        raise HTTPException(status_code=403, detail='Este aviso nao e seu')
+
+    resposta = (
+        supabase
+        .table('avisos')
+        .delete()
+        .eq('id', aviso_id)
+        .execute()
+    )
+
+    if not resposta.data:
+        raise HTTPException(status_code=404, detail='Aviso nao encontrado')
+
+    return {'mensagem': 'Aviso excluido'}
+
+
+# ============================================================
+# NOTIFICACOES
+# ============================================================
+
+@app.get('/api/notificacoes')
+def listar_notificacoes(request: Request):
+    usuario = exigir_sessao(request)
+
+    resposta = (
+        supabase
+        .table('notificacoes')
+        .select('*')
+        .eq('usuario_id', usuario['id'])
+        .order('criado_em', desc=True)
+        .execute()
+    )
+
+    return resposta.data or []
+
+
+@app.post('/api/notificacoes', status_code=201)
+async def criar_notificacao(request: Request):
+    usuario = exigir_sessao(request)
+
+    dados = await request.json()
+
+    insercao = {
+        'usuario_id': usuario['id'],
+        'titulo': dados.get('titulo') or 'Notificacao',
+        'mensagem': dados.get('mensagem') or '',
+    }
+
+    resposta = (
+        supabase
+        .table('notificacoes')
+        .insert(insercao)
+        .execute()
+    )
+
+    if not resposta.data:
+        raise HTTPException(status_code=502, detail='Nao foi possivel criar a notificacao')
+
+    return resposta.data[0]
+
+
+@app.patch('/api/notificacoes/{notificacao_id}/ler')
+def marcar_lida(notificacao_id: int, request: Request):
+    usuario = exigir_sessao(request)
+
+    resposta = (
+        supabase
+        .table('notificacoes')
+        .update({'lida': True})
+        .eq('id', notificacao_id)
+        .eq('usuario_id', usuario['id'])
+        .execute()
+    )
+
+    if not resposta.data:
+        raise HTTPException(status_code=404, detail='Notificacao nao encontrada')
+
+    return resposta.data[0]
+
+
+@app.delete('/api/notificacoes/{notificacao_id}')
+def excluir_notificacao(notificacao_id: int, request: Request):
+    usuario = exigir_sessao(request)
+
+    resposta = (
+        supabase
+        .table('notificacoes')
+        .delete()
+        .eq('id', notificacao_id)
+        .eq('usuario_id', usuario['id'])
+        .execute()
+    )
+
+    if not resposta.data:
+        raise HTTPException(status_code=404, detail='Notificacao nao encontrada')
+
+    return {'mensagem': 'Notificacao excluida'}

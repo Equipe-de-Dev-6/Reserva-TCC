@@ -1,16 +1,24 @@
-{#- Tela de acesso: esqueleto herdado de base_auth.html. -#}
-{% extends "auth/base_auth.html" %}
+{#- Tela do Coordenador: cadastro de novo usuario, no mesmo estilo
+      das telas de gerenciamento de salas. -#}
+{% extends "base.html" %}
 
 {% block head_extra %}
-  <link rel="stylesheet" href="/css/cadastro.css">
+  <link rel="stylesheet" href="/css/admin.css">
+  <link rel="stylesheet" href="/css/admin-professores.css">
 {% endblock %}
 
-{% block titulo %}Cadastro{% endblock %}
+{% block titulo %}Cadastrar Usuário{% endblock %}
 
 {% block conteudo %}
-    <div class="container">
-        <div class="logo">
-            <img src="/assets/img/Logo senai.png" alt="SENAI" width="320" height="107">
+      <section class="adm-section">
+
+        <div class="adm-page-header">
+          <div>
+            <h2>Novo usuário</h2>
+            <p>
+              Cadastre professores e coordenadores que terão acesso ao sistema
+            </p>
+          </div>
         </div>
         <div class="hr"></div>
         <div class="form-container">
@@ -70,13 +78,104 @@
                     </p>
                 </div>
 
-        </div>
-    </div>
+        <div class="adm-form-card" id="formUsuarioCard">
+          <h3 class="adm-form-title">Dados do usuário</h3>
 
+          <p class="adm-form-subtitle">
+            O e-mail será o login. A senha precisa ter ao menos 6 caracteres.
+          </p>
+
+          <form id="formUsuario" class="adm-form" novalidate>
+
+            <div class="adm-form-linha">
+              <div class="adm-form-campo">
+                <label for="nome">Nome completo</label>
+                <input type="text" id="nome" name="nome" required
+                  placeholder="Ex: João Silva">
+              </div>
+
+              <div class="adm-form-campo">
+                <label for="email">E-mail</label>
+                <input type="email" id="email" name="email" required
+                  placeholder="Ex: joao@senai.br">
+              </div>
+            </div>
+
+            <div class="adm-form-linha">
+              <div class="adm-form-campo">
+                <label for="cargo">Cargo</label>
+                <select id="cargo" name="cargo" required>
+                  <option value="" selected disabled>Selecione o cargo...</option>
+                  <option value="Professor">Professor</option>
+                  <option value="Coordenador">Coordenador</option>
+                </select>
+              </div>
+
+              <div class="adm-form-campo">
+                <label for="senha">Senha</label>
+                <input type="password" id="senha" name="senha" required
+                  minlength="6" placeholder="Mínimo 6 caracteres">
+              </div>
+
+              <div class="adm-form-campo">
+                <label for="confirmar-senha">Confirmar senha</label>
+                <input type="password" id="confirmar-senha" name="confirmar-senha"
+                  required minlength="6" placeholder="Repita a senha">
+              </div>
+            </div>
+
+            <div class="adm-form-acoes">
+              <a href="/professores_adm" class="adm-btn adm-btn-editar">
+                Voltar
+              </a>
+
+              <button type="submit" class="adm-btn-cadastrar" id="btn_cadastro">
+                Criar Conta
+              </button>
+            </div>
+
+          </form>
+        </div>
+
+      </section>
 {% endblock %}
 
 {% block scripts %}
-    <script type="module" src="/js/cadastro.js"></script>
+  <script type="module" src="/js/cadastro.js"></script>
 
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const userProfile = document.getElementById('userProfile');
+      const userDropdown = document.getElementById('userDropdown');
 
+      if (userProfile && userDropdown) {
+        userProfile.addEventListener('click', (e) => {
+          e.stopPropagation();
+          userDropdown.classList.toggle('active');
+        });
+
+        document.addEventListener('click', (e) => {
+          if (!userProfile.contains(e.target)) {
+            userDropdown.classList.remove('active');
+          }
+        });
+      }
+
+      const menuToggle = document.getElementById('menuToggle');
+      const sidebar = document.querySelector('.sidebar');
+      const sidebarOverlay = document.getElementById('sidebarOverlay');
+
+      if (menuToggle && sidebar && sidebarOverlay) {
+        menuToggle.addEventListener('click', () => {
+          sidebar.classList.toggle('open');
+          sidebarOverlay.classList.toggle('active');
+        });
+
+        sidebarOverlay.addEventListener('click', () => {
+          sidebar.classList.remove('open');
+          sidebarOverlay.classList.remove('active');
+        });
+      }
+    });
+  </script>
 {% endblock %}

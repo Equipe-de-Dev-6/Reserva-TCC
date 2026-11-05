@@ -407,14 +407,16 @@
      1. AVISOS IMPORTANTES
      ====================================================== */
 
-  function checarAvisos(silencioso) {
+  async function checarAvisos(silencioso) {
 
     if (!temAvisos()) return;
 
     let lista = [];
 
     try {
-      lista = window.AvisosApp.getAvisos() || [];
+
+      lista = await window.AvisosApp.getAvisos() || [];
+
     } catch (e) {
       return;
     }
@@ -575,8 +577,8 @@
      INICIALIZAÇÃO
      ====================================================== */
 
-  function sincronizarTudo() {
-    checarAvisos(false);
+  async function sincronizarTudo() {
+    await checarAvisos(false);
     checarReservas(false);
     checarLembretes();
   }
@@ -607,7 +609,7 @@
 
   }
 
-  function iniciar() {
+  async function iniciar() {
 
     if (!suportado) {
       console.info('[notificacoes] este navegador não suporta notificações do sistema.');
@@ -615,12 +617,12 @@
     }
 
 
-
-    esperarReservas().then(comecar);
+    await esperarReservas();
+    await comecar();
 
   }
 
-  function comecar() {
+  async function comecar() {
 
     // Primeira execução: guarda o que já existe sem notificar,
     // para o usuário não receber uma enxurrada de avisos antigos.
@@ -628,20 +630,23 @@
     const primeira = !ler(KEYS.iniciado, false);
 
     if (primeira) {
-      checarAvisos(true);
+      await checarAvisos(true);
       checarReservas(true);
       salvar(KEYS.iniciado, true);
     }
 
     if (ativo()) {
-      registrarSW().then(sincronizarTudo);
+      await registrarSW();
+      await sincronizarTudo();
     } else {
       mostrarBanner();
     }
 
     // Reage a qualquer mudança feita pelas telas do sistema
     if (temAvisos() && window.AvisosApp.subscribe) {
-      window.AvisosApp.subscribe(() => checarAvisos(false));
+      window.AvisosApp.subscribe(async () => {
+        await checarAvisos(false);
+      });
     }
 
     if (temReservas() && window.ReservasApp.subscribe) {
@@ -652,8 +657,8 @@
     }
 
     // Mudanças vindas de outra aba (ex.: coordenador em outra janela)
-    window.addEventListener('storage', () => {
-      checarAvisos(false);
+    window.addEventListener('storage', async () => {
+      await checarAvisos(false);
       checarReservas(false);
       checarLembretes();
     });
