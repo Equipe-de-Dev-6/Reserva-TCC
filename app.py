@@ -61,7 +61,7 @@ from model import (
 MENU_COORDENADOR = [
     {"rota": "/home_admin", "icone": "home", "rotulo": "Início"},
     {"rota": "/reservar_admin", "icone": "reserved", "rotulo": "Reservar"},
-    {"rota": "/aprovar_reservas_adm", "icone": "reserved", "rotulo": "Aprovar Reservas"},
+    {"rota": "/aprovar_reservas_adm", "icone": "management", "rotulo": "Aprovar Reservas"},
     {"rota": "/gerenciar_recursos_adm", "icone": "classroom", "rotulo": "Gerenciar Recursos"},
     {"rota": "/avisos_adm", "icone": "warning", "rotulo": "Avisos"},
     {"rota": "/notificacoes_adm", "icone": "notification", "rotulo": "Notificações"},

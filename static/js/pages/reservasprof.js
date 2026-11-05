@@ -94,6 +94,13 @@
                     <p>${dataFormatada}</p>
                     <p>${horario}</p>
                   </div>
+
+                  ${r.motivo ? `
+                    <div class="reserva-comentario">
+                      <span class="reserva-comentario-label">Comentário:</span>
+                      ${ReservasApp.escapar(r.motivo)}
+                    </div>
+                  ` : ''}
                 </div>
               </div>
 
