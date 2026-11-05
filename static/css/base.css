@@ -56,6 +56,12 @@
   transition: transform 0.3s ease;
   }
 
+  .sidebar-top {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  }
+
   .logo {
   display: block;
   margin-bottom: 16px;
