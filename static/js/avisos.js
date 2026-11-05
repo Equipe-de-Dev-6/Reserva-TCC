@@ -35,6 +35,19 @@ const AvisosApp = (() => {
 
   const _listeners = [];
 
+  // ========================================================
+  // ESCAPE DE HTML (previne XSS)
+  // ========================================================
+
+  function escapar(texto) {
+    return String(texto ?? '')
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
+  }
+
 
   // ========================================================
   // UTILITÁRIOS INTERNOS

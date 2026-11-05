@@ -179,7 +179,18 @@
           }
 
           renderCalendario();
+          atualizarURL();
         });
+
+      function atualizarURL() {
+        // Atualiza a URL sem recarregar a página, permitindo
+        // compartilhar o link e recarregar mantendo o mês selecionado.
+        const url = new URL(window.location);
+        url.searchParams.set('ano', String(anoAtual));
+        url.searchParams.set('mes', String(mesAtual + 1)); // mês 1-based na URL
+        url.searchParams.set('dia', String(diaSelecionadoISO.split('-')[2]));
+        window.history.replaceState(null, '', url);
+      }
 
       document
         .getElementById('calPrev')
@@ -192,6 +203,7 @@
           }
 
           renderCalendario();
+          atualizarURL();
         });
 
       document
@@ -205,6 +217,7 @@
           }
 
           renderCalendario();
+          atualizarURL();
         });
 
       renderCalendario();

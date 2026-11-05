@@ -16,8 +16,14 @@ async function entrar(event) {
 
         const dados = await resposta.json();
 
-        if (!resposta.ok || dados.erro) {
-            alert(dados.erro || "Erro ao fazer login.");
+        const mensagemErro = dados.detail || dados.erro || "Erro ao fazer login.";
+
+        if (!resposta.ok) {
+            if (resposta.status === 429) {
+                alert("Muitas tentativas de login. Aguarde alguns minutos e tente novamente.");
+            } else {
+                alert(mensagemErro);
+            }
             return;
         }
 

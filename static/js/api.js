@@ -276,3 +276,23 @@ export async function alterarSenhaUsuario(id, senha) {
     ...corpoJson({ senha })
   });
 }
+
+// ============================================================
+// REDEFINIÇÃO DE SENHA
+// ============================================================
+
+/**
+ * Solicita redefinição de senha para o coordenador aprovar.
+ * Devolve { id, status } da pendência criada.
+ */
+export async function solicitarAlteracaoSenha(email, senha) {
+
+  const dados = new FormData();
+  dados.append('email', email);
+  dados.append('senha', senha);
+
+  return pedir('/senha/solicitar', {
+    method: 'POST',
+    body: dados
+  });
+}
