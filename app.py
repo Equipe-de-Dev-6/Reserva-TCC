@@ -60,6 +60,7 @@ from model import (
 
 MENU_COORDENADOR = [
     {"rota": "/home_admin", "icone": "home", "rotulo": "Início"},
+    {"rota": "/reservar_admin", "icone": "reserved", "rotulo": "Reservar"},
     {"rota": "/aprovar_reservas_adm", "icone": "reserved", "rotulo": "Aprovar Reservas"},
     {"rota": "/gerenciar_recursos_adm", "icone": "classroom", "rotulo": "Gerenciar Recursos"},
     {"rota": "/avisos_adm", "icone": "warning", "rotulo": "Avisos"},
@@ -73,7 +74,7 @@ MENU_COORDENADOR = [
 MENU_PROFESSOR = [
     {"rota": "/home", "icone": "home", "rotulo": "Início"},
     {"rota": "/reservar", "icone": "reserved", "rotulo": "Reservar"},
-    {"rota": "/reservas_prof", "icone": "calendar", "rotulo": "Minhas Reservas"},
+    {"rota": "/reservas_prof", "icone": "history", "rotulo": "Minhas Reservas"},
     {"rota": "/calendario_prof", "icone": "calendar", "rotulo": "Calendário"},
     {"rota": "/notificacoes_prof", "icone": "notification", "rotulo": "Notificações"},
     {"rota": "/avisos", "icone": "warning", "rotulo": "Avisos"},
@@ -111,6 +112,8 @@ ROTA_ATIVA = {
     "/professores_adm": "/professores_adm",
     "/configuracoes_adm": "/configuracoes_adm",
     "/gerenciar_recursos": "/gerenciar_recursos",
+    "/reservar_admin": "/reservar_admin",
+    "/reservas_admin": "/reservas_admin",
     "/cadastro": "/professores_adm",
 }
 
@@ -1043,12 +1046,16 @@ _criar_paginas_do_coordenador()
 def reservar_admin(request: Request):
     """Reserva do Coordenador.
 
-    A tela de reserva é a mesma para os dois perfis: o que muda depois é
-    a quem compete aprovar o pedido.
+    O Coordenador usa a mesma tela de reserva do Professor, mas mantendo
+    o menu e o contexto do Coordenador. Assim ele não é redirecionado
+    para a página do Professor.
     """
-    return pagina_do_coordenador(request) or RedirectResponse(
-        url="/reservar",
-        status_code=302
+    return pagina_do_coordenador(request) or renderizar(
+        request,
+        "professor/reservar_tela_prof.html",
+        pagina="Reservar",
+        busca_placeholder="Buscar sala, laboratório ou gabinete...",
+        subtitulo="Escolha o que deseja reservar"
     )
 
 
@@ -1056,12 +1063,16 @@ def reservar_admin(request: Request):
 def reservas_admin(request: Request):
     """Reservas do Coordenador.
 
-    A listagem é a mesma tela usada pelo professor e pelo Coordenador,
-    que nela enxerga os pedidos de todo mundo.
+    O Coordenador usa a mesma tela de reservas do Professor, mas mantendo
+    o menu e o contexto do Coordenador. Assim ele não é redirecionado
+    para a página do Professor.
     """
-    return pagina_do_coordenador(request) or RedirectResponse(
-        url="/reservas_prof",
-        status_code=302
+    return pagina_do_coordenador(request) or renderizar(
+        request,
+        "professor/reservasprof.html",
+        pagina="Minhas Reservas",
+        busca_placeholder="Buscar por sala ou professor...",
+        subtitulo="Acompanhe e gerencie suas reservas"
     )
 
 
