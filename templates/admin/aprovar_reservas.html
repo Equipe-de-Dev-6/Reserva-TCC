@@ -200,14 +200,19 @@
 
                 ${detalhes.map((texto) => `<span class="adm-detalhe">${escapar(texto)}</span>`).join('')}
               </div>
+
+              ${reserva.motivo ? `
+                <div class="adm-comentario">
+                  <span class="adm-comentario-label">Comentário:</span>
+                  ${escapar(reserva.motivo)}
+                </div>
+              ` : ''}
             </div>
 
             <span class="adm-selo adm-selo-${escapar(status)}">
               ${escapar(ROTULOS[status] || status)}
             </span>
           </div>
-
-          ${reserva.motivo ? `<p class="adm-motivo">${escapar(reserva.motivo)}</p>` : ''}
 
           ${podeDecidir ? `
             <div class="adm-card-actions">
