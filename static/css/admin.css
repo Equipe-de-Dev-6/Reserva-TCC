@@ -148,14 +148,12 @@
   /* ============================================================
    * GERENCIAR RECURSOS - Cards de recurso
    * Estilo proprio da tela de gerenciar_recursos.html.
-   * Cards em largura total (full-width) como a tela "Reservar",
-   * sem animacoes de hover nem borda vermelha.
    * ============================================================ */
 
   .cards-grid {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 20px;
   margin-top: 20px;
   }
 
@@ -170,19 +168,18 @@
   padding: 16px 20px;
   text-decoration: none;
   color: inherit;
+  transition: all 0.2s ease;
   cursor: pointer;
-  width: 100%;
   }
 
   .action-card:hover {
-  background: var(--white);
-  border-color: var(--border-color);
-  transform: none;
-  box-shadow: none;
+  border-color: var(--senai-red);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
   }
 
   .action-card:active {
-  transform: none;
+  transform: translateY(0);
   }
 
   .icon-box {
