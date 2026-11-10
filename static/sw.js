@@ -21,28 +21,17 @@ const isPWA = window.matchMedia('(display-mode: standalone)').matches;
 function showInstallNotification() {
   if (!('serviceWorker' in navigator)) return;
 
-  // Verificar se já foi mostrado antes ou se já está instalado
+  // Verificar se já está instalado como PWA
   if (isPWA) return;
 
-  // Verificar se o usuário já interagiu (para não spammar)
-  const hasInteracted = new Promise(resolve => {
-    const wrapped = () => {
-      resolve(true);
-      window.removeEventListener('click', wrapped);
-      window.removeEventListener('keydown', wrapped);
-    });
-    window.addEventListener('click', wrapped);
-    window.addEventListener('keydown', wrapped);
-  });
-
-  // Mostrar notificação após um pequeno atraso
-  setTimeout(async () => {
-    try {
-      const registration = await navigator.serviceWorker.ready;
-      const permission = await Notification.requestPermission();
-
+  // Não guardamos em localStorage para que a notificação
+  // sempre apareça para usuários que ainda não instalaram
+  
+  // Solicitar permissão e mostrar notificação
+  navigator.serviceWorker.ready.then((registration) => {
+    Notification.requestPermission().then((permission) => {
       if (permission === 'granted') {
-        const notification = await registration.showNotification(
+        const notification = registration.showNotification(
           'Reserva SENAI',
           {
             body: 'Instale o aplicativo para ter acesso rápido na tela inicial',
@@ -63,10 +52,8 @@ function showInstallNotification() {
           );
         };
       }
-    } catch (error) {
-      console.error('Erro ao mostrar notificação de instalação:', error);
-    }
-  }, 3000);
+    });
+  });
 }
 
 // Executar quando a página carregar
@@ -74,7 +61,7 @@ if ('serviceWorker' in navigator) {
   window.addEventListener('load', showInstallNotification);
 }
 
-// Lidar com clicks nas notificações
+// Lidar with clicks nas notificações
 self.addEventListener('notificationclick', (event) => {
   event.notification.close();
 
