@@ -83,8 +83,9 @@
     <script type="module">
       // Inicializar badge de notificações na sidebar
       function atualizarBadgeNotificacoes() {
-        const badge = document.getElementById('nav-notification-badge');
-        if (!badge) return;
+        const sidebarBadge = document.getElementById('nav-notification-badge');
+        const topBadge = document.getElementById('top-notification-badge');
+        if (!sidebarBadge && !topBadge) return;
         
         // Verificar se temos a API disponível
         fetch('/api/notificacoes')
@@ -92,18 +93,31 @@
           .then(data => {
             // Atualizar badge com contador
             const count = data.length || 0;
-            badge.textContent = count;
             
-            // Mostrar/ocultar badge baseado no contador
-            if (count > 0) {
-              badge.style.display = 'inline-block';
-            } else {
-              badge.style.display = 'none';
+            // Atualizar badge da sidebar
+            if (sidebarBadge) {
+              sidebarBadge.textContent = count;
+              if (count > 0) {
+                sidebarBadge.style.display = 'inline-block';
+              } else {
+                sidebarBadge.style.display = 'none';
+              }
+            }
+            
+            // Atualizar badge do topo
+            if (topBadge) {
+              topBadge.textContent = count;
+              if (count > 0) {
+                topBadge.style.display = 'inline-block';
+              } else {
+                topBadge.style.display = 'none';
+              }
             }
           })
           .catch(error => {
             console.error('Erro ao carregar notificações:', error);
-            badge.style.display = 'none';
+            if (sidebarBadge) sidebarBadge.style.display = 'none';
+            if (topBadge) topBadge.style.display = 'none';
           });
       }
       
