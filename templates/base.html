@@ -80,6 +80,40 @@
 
     {% include "components/_sidebar.html" %}
 
+    <script type="module">
+      // Inicializar badge de notificações na sidebar
+      function atualizarBadgeNotificacoes() {
+        const badge = document.getElementById('nav-notification-badge');
+        if (!badge) return;
+        
+        // Verificar se temos a API disponível
+        fetch('/api/notificacoes')
+          .then(response => response.json())
+          .then(data => {
+            // Atualizar badge com contador
+            const count = data.length || 0;
+            badge.textContent = count;
+            
+            // Mostrar/ocultar badge baseado no contador
+            if (count > 0) {
+              badge.style.display = 'inline-block';
+            } else {
+              badge.style.display = 'none';
+            }
+          })
+          .catch(error => {
+            console.error('Erro ao carregar notificações:', error);
+            badge.style.display = 'none';
+          });
+      }
+      
+      // Chamar ao carregar e quando a página for reaberta
+      document.addEventListener('DOMContentLoaded', atualizarBadgeNotificacoes);
+      
+      // Atualizar periodicamente (a cada 30 segundos)
+      setInterval(atualizarBadgeNotificacoes, 30000);
+    </script>
+
     {#-
       Fundo escurecido que aparece atras da barra lateral no celular.
 
