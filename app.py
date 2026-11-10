@@ -479,6 +479,7 @@ def renderizar(request: Request, nome_do_arquivo: str, **contexto):
                 INICIO_COORDENADOR if eh_admin else INICIO_PROFESSOR
             ),
             "rota_atual": ROTA_ATIVA.get(request.url.path, request.url.path),
+            "reserva_inicio": INICIO_COORDENADOR if eh_admin else INICIO_PROFESSOR,
             "rota_notificacoes": (
                 "/notificacoes_adm" if eh_admin else "/notificacoes_prof"
             ),
