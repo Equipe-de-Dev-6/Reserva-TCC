@@ -739,7 +739,8 @@ def main():
     check(
         "coordenador recebe o menu de administrador",
         itens == [
-            "/home_admin", "/aprovar_reservas_adm", "/gerenciar_recursos_adm",
+            "/home_admin", "/reservar_admin", "/aprovar_reservas_adm",
+            "/gerenciar_recursos_adm",
             "/avisos_adm", "/notificacoes_adm", "/calendario_adm",
             "/professores_adm", "/configuracoes_adm", "/ajuda",
         ],
