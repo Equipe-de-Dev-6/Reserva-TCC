@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>SENAI · Gestão de salas e equipamentos</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:ital,wght@0,500;0,800;1,800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f6f5f7;--surface:#fff;--ink:#1d2130;--mute:#5d6375;--line:#e4e2e8;--red:#d0021b;--red-ink:#c10019;--red-t:#fde8ea;--ok:#157a3e;--ok-t:#dff5e6;--wait:#8a5a00;--wait-t:#fff1cc;--no:#b00020;--no-t:#fde1e5;--head:rgba(246,245,247,.92);color-scheme:light}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#14151a;--surface:#1d1f27;--ink:#f1f1f4;--mute:#a4a8b6;--line:#2c2f3a;--red-ink:#ff6b7a;--red-t:#3a1519;--ok:#5fd68a;--ok-t:#16301f;--wait:#f0c35a;--wait-t:#3a2f10;--no:#ff8a9a;--no-t:#3a1519;--head:rgba(20,21,26,.92);color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#14151a;--surface:#1d1f27;--ink:#f1f1f4;--mute:#a4a8b6;--line:#2c2f3a;--red-ink:#ff6b7a;--red-t:#3a1519;--ok:#5fd68a;--ok-t:#16301f;--wait:#f0c35a;--wait-t:#3a2f10;--no:#ff8a9a;--no-t:#3a1519;--head:rgba(20,21,26,.92);color-scheme:dark}
+*{box-sizing:border-box;margin:0}
+:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+html{scroll-padding-top:calc(env(safe-area-inset-top,0px) + 72px);scroll-behavior:smooth}
+body{background:var(--bg);color:var(--ink);font:400 17px/1.6 Inter,system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);background:var(--head);z-index:10}
+h1,h2,h3{font-family:Archivo,Inter,sans-serif;line-height:1.08;letter-spacing:-.02em}
+a{color:inherit}
+:focus-visible{outline:3px solid var(--red);outline-offset:3px;border-radius:6px}
+.wrap{max-width:1120px;margin:0 auto;padding:0 24px}
+header{position:sticky;top:env(safe-area-inset-top,0px);z-index:11;background:var(--head);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+header .wrap{display:flex;align-items:center;justify-content:space-between;height:68px;gap:16px}
+.logo{font:italic 800 30px/1 Archivo,sans-serif;color:var(--red);letter-spacing:-.03em;text-decoration:none}
+nav{display:flex;gap:28px;align-items:center;font-weight:500;font-size:15px}
+nav a{text-decoration:none;color:var(--mute)}nav a:hover{color:var(--ink)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;background:var(--red);color:#fff;font:600 16px/1 Inter,sans-serif;padding:15px 28px;border-radius:10px;text-decoration:none;border:2px solid var(--red);transition:background .15s}
+.btn:hover{background:#a30015;border-color:#a30015}
+.btn.sm{padding:10px 20px;font-size:15px}
+.btn.ghost{background:transparent;color:var(--red-ink);border-color:var(--red)}
+.btn.ghost:hover{background:var(--red-t)}
+.hero{padding:72px 0 88px}
+.hero .wrap{display:grid;grid-template-columns:1.05fr 1fr;gap:56px;align-items:center}
+h1{font-size:clamp(40px,5.4vw,68px);font-style:italic;font-weight:800}
+.hero p.lead{font-size:20px;color:var(--mute);max-width:30em;margin:24px 0 36px}
+.cta{display:flex;gap:14px;flex-wrap:wrap}
+.app{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:20px;box-shadow:0 24px 60px -30px rgba(120,0,15,.35);font-size:14px}
+.app h4{font:600 15px Inter;margin-bottom:12px;display:flex;justify-content:space-between}
+.app h4 span{color:var(--red-ink);font-weight:500;font-size:13px}
+.row{display:flex;align-items:center;gap:12px;padding:10px 12px;border:1px solid var(--line);border-radius:10px;margin-bottom:8px}
+.ic{width:34px;height:34px;border-radius:8px;background:var(--red);flex:none;display:grid;place-items:center;color:#fff;font:700 12px Inter}
+.row b{display:block;font-weight:600;line-height:1.25}.row small{color:var(--mute);font-size:12.5px}
+.pill{margin-left:auto;font-size:12px;font-weight:600;padding:3px 10px;border-radius:99px;white-space:nowrap}
+.ok{background:var(--ok-t);color:var(--ok)}.wait{background:var(--wait-t);color:var(--wait)}.no{background:var(--no-t);color:var(--no)}
+.cal{margin-top:16px;display:grid;grid-template-columns:repeat(7,1fr);gap:2px;text-align:center;font-size:12.5px}
+.cal i{font-style:normal;color:var(--mute);font-size:11.5px;padding-bottom:4px}
+.cal span{padding:5px 0;border-radius:8px;position:relative}
+.cal .has::after{content:"";position:absolute;left:50%;bottom:1px;width:4px;height:4px;margin-left:-2px;border-radius:50%;background:var(--red)}
+.cal .today{background:var(--red);color:#fff}
+.cal .today::after{background:#fff}
+section{padding:88px 0}
+section.alt{background:var(--surface);border-block:1px solid var(--line)}
+h2{font-size:clamp(30px,3.6vw,44px);font-weight:800;max-width:15em}
+.sub{color:var(--mute);max-width:36em;margin-top:16px}
+.feat{display:grid;grid-template-columns:1fr 1.5fr;gap:64px}
+.list{border-top:1px solid var(--line)}
+.item{display:grid;grid-template-columns:200px 1fr;gap:24px;padding:26px 0;border-bottom:1px solid var(--line)}
+.item h3{font-size:20px;font-weight:800;font-style:italic}
+.item p{color:var(--mute)}
+.steps{display:grid;grid-template-columns:repeat(4,1fr);gap:0;margin-top:48px;counter-reset:s}
+.step{padding:0 24px 0 0;position:relative}
+.step::before{counter-increment:s;content:counter(s);display:grid;place-items:center;width:44px;height:44px;border-radius:50%;background:var(--red);color:#fff;font:800 18px Archivo;margin-bottom:20px;position:relative;z-index:1}
+.step::after{content:"";position:absolute;top:22px;left:44px;right:0;height:2px;background:var(--line)}
+.step:last-child::after{display:none}
+.step h3{font-size:19px;font-weight:800;margin-bottom:6px}
+.step p{color:var(--mute);font-size:15.5px}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-top:48px}
+.prof{border:1px solid var(--line);border-radius:16px;padding:32px;background:var(--bg)}
+.prof.main{border-color:var(--red);border-width:2px}
+.prof h3{font-size:26px;font-style:italic;font-weight:800}
+.prof p{color:var(--mute);margin:8px 0 20px}
+.prof ul{list-style:none;padding:0;display:flex;flex-wrap:wrap;gap:8px}
+.prof li{font-size:14px;font-weight:500;padding:6px 12px;border-radius:99px;background:var(--surface);border:1px solid var(--line)}
+.res{display:flex;gap:12px;flex-wrap:wrap;margin-top:32px}
+.res span{padding:10px 18px;border-radius:10px;background:var(--red-t);color:var(--red-ink);font-weight:600;font-size:15px}
+.final{background:var(--red);color:#fff;padding:80px 0;text-align:center}
+.final h2{margin:0 auto;color:#fff}
+.final p{margin:16px auto 32px;opacity:.9;max-width:30em}
+.final .btn{background:#fff;color:#a30015;border-color:#fff}
+.final .btn:hover{background:#ffe9ec}
+footer{padding:32px 0;color:var(--mute);font-size:14px}
+footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
+@media (max-width:900px){
+ .hero .wrap,.feat,.two{grid-template-columns:1fr}
+ .hero{padding:48px 0 64px}.feat{gap:32px}
+ .steps{grid-template-columns:1fr 1fr;gap:32px 0}.step:nth-child(2)::after{display:none}
+ nav a.hide{display:none}
+}
+@media (max-width:560px){
+ .item{grid-template-columns:1fr;gap:6px}
+ .steps{grid-template-columns:1fr}.step::after{display:none}
+ nav{gap:0}section{padding:64px 0}
+}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}*{transition:none!important}}
+</style>
+</head>
+<body>
+<header>
+ <div class="wrap">
+  <a class="logo" href="#topo" aria-label="SENAI">SENAI</a>
+  <nav aria-label="Principal">
+   <a class="hide" href="#recursos">Recursos</a>
+   <a class="hide" href="#como-funciona">Como funciona</a>
+   <a class="hide" href="#perfis">Perfis</a>
+   <a class="btn sm" href="/login">Entrar</a>
+  </nav>
+ </div>
+</header>
+
+<main id="topo">
+<div class="hero">
+ <div class="wrap">
+  <div>
+   <h1>Reserve salas, laboratórios e notebooks em poucos cliques.</h1>
+   <p class="lead">Um só lugar para professores pedirem recursos e a coordenação aprovar, sem planilhas, recados ou conflito de horário.</p>
+   <div class="cta">
+    <a class="btn" href="/login">Entrar no sistema</a>
+    <a class="btn ghost" href="#como-funciona">Ver como funciona</a>
+   </div>
+  </div>
+  <div class="app" role="img" aria-label="Prévia do sistema: próximas reservas e calendário de novembro de 2026">
+   <h4>Próximas reservas <span>Ver mais</span></h4>
+   <div class="row"><div class="ic">C11</div><div><b>Sala C11</b><small>06/10/2026 · 12:00 às 13:00</small></div><span class="pill ok">Aprovada</span></div>
+   <div class="row"><div class="ic">NB</div><div><b>Gabinete de Notebook A</b><small>09/10/2026 · 10:00 às 12:00</small></div><span class="pill ok">Aprovada</span></div>
+   <div class="row"><div class="ic">C13</div><div><b>Sala C13</b><small>12/11/2026 · 16:00 às 17:30</small></div><span class="pill wait">Aguardando</span></div>
+   <div class="cal" id="cal" aria-hidden="true"></div>
+  </div>
+ </div>
+</div>
+
+<section class="alt" id="recursos">
+ <div class="wrap feat">
+  <div>
+   <h2>Tudo o que a coordenação precisa controlar.</h2>
+   <p class="sub">Cada recurso tem cadastro, disponibilidade e histórico de reservas.</p>
+   <div class="res"><span>Salas</span><span>Laboratórios</span><span>Gabinetes de notebooks</span></div>
+  </div>
+  <div class="list">
+   <div class="item"><h3>Reservas</h3><p>O professor escolhe o recurso, informa curso, motivo, data e horário, e envia o pedido.</p></div>
+   <div class="item"><h3>Aprovação</h3><p>A coordenação vê os pedidos em aberto e aprova ou recusa cada um. Também filtra por aprovadas, recusadas e canceladas.</p></div>
+   <div class="item"><h3>Calendário</h3><p>Cada dia mostra as reservas marcadas, com horário, sala e situação.</p></div>
+   <div class="item"><h3>Avisos e notificações</h3><p>Comunicados na página inicial e alertas a cada reserva criada ou alterada.</p></div>
+   <div class="item"><h3>Cadastro de recursos</h3><p>Nome, setor, capacidade, equipamentos e disponibilidade. A sala indisponível deixa de aparecer na reserva.</p></div>
+   <div class="item"><h3>Usuários e ajuda</h3><p>Cadastro de professores e coordenadores, perguntas frequentes e contato com o suporte de TI.</p></div>
+  </div>
+ </div>
+</section>
+
+<section id="como-funciona">
+ <div class="wrap">
+  <h2>Do pedido à sala liberada em quatro etapas.</h2>
+  <div class="steps">
+   <div class="step"><h3>Escolha o recurso</h3><p>Sala de aula, laboratório ou gabinete de notebooks.</p></div>
+   <div class="step"><h3>Preencha os detalhes</h3><p>Curso, motivo, data, horário de entrada e de saída.</p></div>
+   <div class="step"><h3>Aguarde a resposta</h3><p>A coordenação aprova ou recusa, e você recebe uma notificação.</p></div>
+   <div class="step"><h3>Acompanhe</h3><p>Veja o status em Minhas reservas e cancele se o plano mudar.</p></div>
+  </div>
+ </div>
+</section>
+
+<section class="alt" id="perfis">
+ <div class="wrap">
+  <h2>Cada perfil vê só o que precisa.</h2>
+  <div class="two">
+   <div class="prof">
+    <h3>Professor</h3>
+    <p>Pede recursos para as aulas e acompanha cada solicitação.</p>
+    <ul><li>Início</li><li>Reservar</li><li>Minhas reservas</li><li>Calendário</li><li>Notificações</li><li>Avisos</li><li>Ajuda</li></ul>
+   </div>
+   <div class="prof main">
+    <h3>Coordenador</h3>
+    <p>Tem tudo do professor e gerencia reservas, recursos e pessoas.</p>
+    <ul><li>Aprovar reservas</li><li>Gerenciar recursos</li><li>Usuários</li><li>Publicar avisos</li><li>Configurações</li></ul>
+   </div>
+  </div>
+ </div>
+</section>
+
+<div class="final">
+ <div class="wrap">
+  <h2>Precisa de uma sala hoje?</h2>
+  <p>Entre com seu e-mail e senha para reservar ou aprovar pedidos.</p>
+  <a class="btn" href="/login">Entrar no sistema</a>
+ </div>
+</div>
+</main>
+
+<footer>
+ <div class="wrap">
+  <span>Gestão de salas e equipamentos · SENAI</span>
+  <span>Projeto de TCC · Desenvolvimento de Sistemas</span>
+ </div>
+</footer>
+
+<script>
+(function(){
+ var c=document.getElementById('cal'),h='';
+ 'DSTQQSS'.split('').forEach(function(d){h+='<i>'+d+'</i>'});
+ var marked=[4,5,10,12,23,24,25,28];
+ for(var d=1;d<=30;d++){
+  var cls=d===12?'today has':(marked.indexOf(d)>-1?'has':'');
+  h+='<span class="'+cls+'">'+d+'</span>';
+ }
+ // 1º de novembro de 2026 cai num domingo, sem deslocamento
+ c.innerHTML=h;
+})();
+</script>
+</body>
+</html>

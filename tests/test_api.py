@@ -794,7 +794,7 @@ def main():
 
     c = TestClient(app)
     r = c.get("/")
-    check("sem sessão, / mostra o login", r.status_code == 200, str(r.status_code))
+    check("sem sessão, / mostra a página inicial", r.status_code == 200, str(r.status_code))
 
     c, banco = cliente_logado(USUARIO_PROF)
     r = c.get("/", follow_redirects=False)
