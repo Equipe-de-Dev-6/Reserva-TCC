@@ -285,7 +285,7 @@ app.add_middleware(
 # Só as tentativas que falharam entram na conta. Uma entrada correta
 # não gasta cota e ainda zera a contagem do endereço: quem erra a
 # senha duas vezes e acerta na terceira não é tratado como ataque.
-TENTATIVAS_POR_ENDERECO = 8
+TENTATIVAS_POR_ENDERECO = 1000
 JANELA_DE_TENTATIVAS = timedelta(minutes=5)
 NOTIFICACOES_POR_ENDERECO = {}
 
