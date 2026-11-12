@@ -380,7 +380,7 @@ document.addEventListener('DOMContentLoaded', () => {
       function atualizarURLWidget() {
         const url = new URL(window.location);
         url.searchParams.set('ano', String(widgetAno));
-        url.searchParams.set('mes', String(widgetMes + 1));
+        url.searchParams.set('mes', String(widgetMes)); // 0-based, consistente com o calendarioprof.js
         window.history.replaceState(null, '', url);
       }
 
