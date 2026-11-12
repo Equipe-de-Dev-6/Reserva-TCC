@@ -292,6 +292,29 @@ NOTIFICACOES_POR_ENDERECO = {}
 # Janela de rate limiting para criação de notificações (5 minutos)
 JANELA_NOTIFICACOES = timedelta(minutes=5)
 
+# Limpeza ocasional do dicionário de rate limiting, para não crescer
+# indefinidamente com IPs que nunca mais voltam.
+_NOTIFICACOES_LIMPEZA_CONTADOR = 0
+
+
+def _limpar_notificacoes_antigas():
+    """Remove IPs cuja última criação já expirou a janela."""
+    global _NOTIFICACOES_LIMPEZA_CONTADOR
+    _NOTIFICACOES_LIMPEZA_CONTADOR += 1
+
+    # A cada 20 criações de notificação, tenta limpar entradas vencidas.
+    if _NOTIFICACOES_LIMPEZA_CONTADOR % 20 != 0:
+        return
+
+    agora = datetime.now()
+    expirados = [
+        ip
+        for ip, ultimo in NOTIFICACOES_POR_ENDERECO.items()
+        if agora - ultimo >= JANELA_NOTIFICACOES
+    ]
+    for ip in expirados:
+        del NOTIFICACOES_POR_ENDERECO[ip]
+
 
 def _janela_de_tentativas() -> str:
     """O instante que separa as tentativas que ainda contam."""
@@ -845,7 +868,7 @@ def redefinir_senha(request: Request):
 @app.get("/esqueceu_senha")
 def esqueceu_senha(request: Request):
     """Tela de redefinição de senha. O ID é gerado pelo servidor ao enviar o formulário."""
-    return renderizar(request, "/auth/redefsenha.html")
+    return renderizar(request, "auth/redefsenha.html")
 
 
 # ============================================================
@@ -2037,6 +2060,9 @@ async def criar_notificacao(request: Request):
                 status_code=429,
                 detail='Muitas notificações. Aguarde alguns minutos e tente novamente.'
             )
+    
+    # Limpeza ocasional de entradas vencidas
+    _limpar_notificacoes_antigas()
     
     # Validação de entrada de dados
     titulo = dados.get('titulo') or 'Notificacao'
