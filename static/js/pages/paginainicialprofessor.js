@@ -456,6 +456,18 @@ document.addEventListener('DOMContentLoaded', () => {
       // INICIALIZA CALENDÁRIO
       // ======================================================
 
-      renderCalendarioWidget();
+      try {
+        renderCalendarioWidget();
+        console.log('Calendário widget renderizado. Mês:', ReservasApp.mesLabel(widgetAno, widgetMes));
+      } catch (erro) {
+        console.error('Calendário widget: Erro ao renderizar:', erro);
+      }
 
-    });
+      ReservasApp.subscribe(() => {
+        try {
+          renderProximasReservas();
+          renderCalendarioWidget();
+        } catch (erro) {
+          console.error('Calendário widget: Erro no subscribe:', erro);
+        }
+      });

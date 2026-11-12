@@ -262,7 +262,19 @@
       // Renderiza imediatamente com os dados locais (pode estar vazio
       // se o localStorage não tiver nada). O subscribe garante
       // re-renderização assim que a sincronização com o banco terminar.
-      renderCalendario();
-      ReservasApp.subscribe(() => renderCalendario());
+      try {
+        renderCalendario();
+        console.log('Calendário renderizado. Mês:', ReservasApp.mesLabel(anoAtual, mesAtual));
+      } catch (erro) {
+        console.error('Calendário: Erro ao renderizar:', erro);
+      }
+
+      ReservasApp.subscribe(() => {
+        try {
+          renderCalendario();
+        } catch (erro) {
+          console.error('Calendário: Erro no subscribe:', erro);
+        }
+      });
     }); 
  

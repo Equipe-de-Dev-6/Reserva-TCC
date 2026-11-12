@@ -444,6 +444,11 @@ document.addEventListener('DOMContentLoaded', () => {
       // INICIALIZA CALENDÁRIO
       // ======================================================
 
-      renderCalendarioWidget();
+      try {
+        renderCalendarioWidget();
+        console.log('Calendário widget ADM renderizado. Mês:', ReservasApp.mesLabel(widgetAno, widgetMes));
+      } catch (erro) {
+        console.error('Calendário widget ADM: Erro ao renderizar:', erro);
+      }
 
     });
