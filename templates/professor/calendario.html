@@ -79,5 +79,9 @@
 {% block scripts %}
   <script src="/js/reservas.js"></script>
 
-    <script type="module" src="/js/pages/calendarioprof.js"></script>
+  <script>
+    ReservasApp.definirUsuario({{ usuario.id }});
+  </script>
+
+  <script type="module" src="/js/pages/calendarioprof.js"></script>
 {% endblock %}

@@ -474,6 +474,7 @@ def renderizar(request: Request, nome_do_arquivo: str, **contexto):
         nome_do_arquivo,
         {
             "usuario": {
+                "id": request.session.get("usuario_id"),
                 "nome": request.session.get("usuario_nome") or "",
                 "cargo": (
                     CARGO_COORDENADOR if eh_admin else "Professor"

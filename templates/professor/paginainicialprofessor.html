@@ -207,6 +207,11 @@
 
 {% block scripts %}
 <script src="/js/reservas.js"></script>
+
+<script>
+  ReservasApp.definirUsuario({{ usuario.id }});
+</script>
+
 <script src="/js/avisos.js"></script>
 <script src="/js/notificacoes-push.js"></script>
 
