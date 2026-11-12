@@ -17,6 +17,20 @@ document.addEventListener('DOMContentLoaded', () => {
       // quando a reserva e de laboratorio ou de gabinete.
       ReservasApp.pintarCategoria();
 
+      // ------------------------------------------------------
+      // NÃO PERMITE ESCOLHER UMA DATA QUE JÁ PASSOU
+      // ------------------------------------------------------
+      // O backend também recusa datas passadas. Aqui a trava é
+      // feita antes, para o professor não avançar no fluxo com uma
+      // data inválida e só descobrir o erro no final.
+      const campoData = document.getElementById('data');
+
+      if (campoData) {
+
+        campoData.min = ReservasApp.todayISO();
+
+      }
+
       const reservaForm = document.getElementById('reservaForm');
 
       if (reservaForm) {
@@ -28,6 +42,15 @@ document.addEventListener('DOMContentLoaded', () => {
           if (!reservaForm.checkValidity()) {
 
             reservaForm.reportValidity();
+
+            return;
+          }
+
+          if (campoData && campoData.value < ReservasApp.todayISO()) {
+
+            alert('Não é possível agendar em dias que já passaram. Escolha a data de hoje ou uma data futura.');
+
+            campoData.focus();
 
             return;
           }

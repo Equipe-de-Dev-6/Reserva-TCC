@@ -67,10 +67,25 @@ document.addEventListener('DOMContentLoaded', () => {
   // RENDERIZAR LISTA DE AVISOS
   // ======================================================
   async function renderAvisos() {
-    const lista = AvisosApp.getAvisos();
-
     const listaEl = document.getElementById('avisosList');
     const emptyEl = document.getElementById('avisosEmpty');
+
+    if (!listaEl || !emptyEl) {
+      return;
+    }
+
+    let lista = [];
+
+    try {
+      // getAvisos() é assíncrono: sem o await, "lista" seria uma
+      // Promise e a lista nunca seria montada.
+      lista = await AvisosApp.getAvisos();
+    } catch (erro) {
+      console.error('Erro ao carregar avisos:', erro);
+      listaEl.innerHTML = '';
+      emptyEl.style.display = 'flex';
+      return;
+    }
 
     if (lista.length === 0) {
       listaEl.innerHTML = '';

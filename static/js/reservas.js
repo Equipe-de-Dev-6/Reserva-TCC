@@ -357,7 +357,15 @@ const ReservasApp = (() => {
 
     if (!resposta.ok) {
 
-      throw new Error('Falha ao registrar a reserva');
+      // O status é guardado para o chamador distinguir uma recusa
+      // de validação (4xx) de uma falha de rede/servidor.
+      const corpo = await resposta.json().catch(() => ({}));
+
+      const erro = new Error(corpo.detail || 'Falha ao registrar a reserva');
+
+      erro.status = resposta.status;
+
+      throw erro;
 
     }
 
@@ -524,7 +532,14 @@ const ReservasApp = (() => {
 
       } catch (e) {
 
-        // Continua na fila para a próxima tentativa.
+        // Recusa de validação (4xx) não melhora com nova tentativa:
+        // descarta a reserva inválida. Falha de rede continua na
+        // fila para a próxima tentativa.
+        if (e && e.status >= 400 && e.status < 500) {
+
+          _descartarReservaRecusada(reserva);
+
+        }
 
       }
 
@@ -646,6 +661,10 @@ const ReservasApp = (() => {
       horaEntrada: rascunho.horaEntrada,
       horaSaida: rascunho.horaSaida,
       status: STATUS_AGUARDANDO,
+      // Marca o dono já na cópia local. Sem isso, o filtro por
+      // usuário esconderia a reserva recém-criada do próprio
+      // professor até a API responder.
+      usuarioId: usuarioId,
       categoria: rascunho.categoria,
       item: rascunho.item,
       // Vem nulo quando a tela de escolha gravou só o nome (gabinetes).
@@ -687,13 +706,52 @@ const ReservasApp = (() => {
 
     } catch (e) {
 
-      // A reserva fica na fila para ser reenviada, em vez de
-      // desaparecer da tela de quem a criou.
+      // 4xx = o servidor recusou a reserva (data passada, horário
+      // inválido, sala ocupada...). Reenviar não vai resolver, então
+      // a cópia local é descartada para não parecer que a reserva
+      // foi criada.
+      if (e && e.status >= 400 && e.status < 500) {
+
+        _descartarReservaRecusada(reserva);
+
+        if (typeof window !== 'undefined' && typeof window.alert === 'function') {
+
+          window.alert(e.message || 'Não foi possível registrar a reserva.');
+
+        }
+
+        return false;
+
+      }
+
+      // Falha de rede/servidor: a reserva fica na fila para ser
+      // reenviada, em vez de desaparecer da tela de quem a criou.
       _marcarPendente(reserva);
 
       return false;
 
     }
+
+  }
+
+
+  // Remove da lista local a reserva que o servidor recusou, junto
+  // com a notificação de "reserva criada" que já tinha sido gravada.
+  function _descartarReservaRecusada(reserva) {
+
+    _salvarReservas(
+      (reservas || []).filter((r) => r.id !== reserva.id)
+    );
+
+    _limparPendente(reserva.id);
+
+    notificacoes = getNotificacoes().filter(
+      (n) => !(n.reserva && n.reserva.id === reserva.id)
+    );
+
+    _gravar(CHAVE_NOTIFICACOES, notificacoes);
+
+    _notificar();
 
   }
 

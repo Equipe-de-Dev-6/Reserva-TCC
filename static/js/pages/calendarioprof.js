@@ -43,13 +43,37 @@ function iniciarCalendario() {
     ? parseInt(params.get('mes'), 10)
     : hoje.getMonth();
 
-  let diaSelecionadoISO = params.has('dia')
-    ? ReservasApp.toISODate(
-      anoAtual,
-      mesAtual,
-      parseInt(params.get('dia'), 10)
-    )
-    : hojeISO;
+  // Valores inválidos na URL não podem quebrar a tela.
+  if (!Number.isInteger(anoAtual)) {
+    anoAtual = hoje.getFullYear();
+  }
+
+  if (!Number.isInteger(mesAtual) || mesAtual < 0 || mesAtual > 11) {
+    mesAtual = hoje.getMonth();
+  }
+
+  // Monta o ISO de um dia do mês exibido, limitando o dia ao
+  // último dia do mês (ex: dia 31 em fevereiro).
+  function isoDoMes(ano, mes, dia) {
+    const ultimoDia = new Date(ano, mes + 1, 0).getDate();
+    const numero = parseInt(dia, 10);
+    const diaValido = Math.min(
+      Math.max(Number.isInteger(numero) ? numero : 1, 1),
+      ultimoDia
+    );
+
+    return ReservasApp.toISODate(new Date(ano, mes, diaValido));
+  }
+
+  let diaSelecionadoISO;
+
+  if (params.has('dia')) {
+    diaSelecionadoISO = isoDoMes(anoAtual, mesAtual, params.get('dia'));
+  } else if (anoAtual === hoje.getFullYear() && mesAtual === hoje.getMonth()) {
+    diaSelecionadoISO = hojeISO;
+  } else {
+    diaSelecionadoISO = isoDoMes(anoAtual, mesAtual, 1);
+  }
 
   function nomeCategoriaIcone(categoria) {
     const cat = (categoria || '').toLowerCase();
@@ -108,7 +132,7 @@ function iniciarCalendario() {
               </p>
 
               <p class="reserva-subtitulo">
-                ${r.motivo || ''}
+                ${ReservasApp.escapar(r.motivo || '')}
               </p>
 
               <span class="reserva-status-mini ${info.badgeClass}">
@@ -230,7 +254,7 @@ function iniciarCalendario() {
       if (anoAtual === hoje.getFullYear() && mesAtual === hoje.getMonth()) {
         diaSelecionadoISO = hojeISO;
       } else {
-        diaSelecionadoISO = ReservasApp.toISODate(anoAtual, mesAtual, 1);
+        diaSelecionadoISO = isoDoMes(anoAtual, mesAtual, 1);
       }
 
       renderCalendario();
@@ -252,7 +276,7 @@ function iniciarCalendario() {
       if (anoAtual === hoje.getFullYear() && mesAtual === hoje.getMonth()) {
         diaSelecionadoISO = hojeISO;
       } else {
-        diaSelecionadoISO = ReservasApp.toISODate(anoAtual, mesAtual, 1);
+        diaSelecionadoISO = isoDoMes(anoAtual, mesAtual, 1);
       }
 
       renderCalendario();

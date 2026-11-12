@@ -463,11 +463,4 @@ document.addEventListener('DOMContentLoaded', () => {
         console.error('Calendário widget: Erro ao renderizar:', erro);
       }
 
-      ReservasApp.subscribe(() => {
-        try {
-          renderProximasReservas();
-          renderCalendarioWidget();
-        } catch (erro) {
-          console.error('Calendário widget: Erro no subscribe:', erro);
-        }
-      });
+    });
