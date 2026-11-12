@@ -1,110 +1,110 @@
 // Busca o nome do usuário autenticado pela sessão do FastAPI.
 
-    document.addEventListener('DOMContentLoaded', () => {
+function iniciarCalendario() {
 
-      // Verifica se os elementos necessários existem no DOM
-      const requiredElements = [
-        'calMonthLabel',
-        'calendarGrid',
-        'dayPanelTitle',
-        'dayPanelSubtitle',
-        'dayPanelList'
-      ];
-      
-      const missingElements = requiredElements.filter(id =>
-        !document.getElementById(id)
-      );
-      
-      if (missingElements.length > 0) {
-        console.error('Calendário: Elementos obrigatórios ausentes no DOM:', missingElements);
-        return;
-      }
+  // Verifica se os elementos necessários existem no DOM
+  const requiredElements = [
+    'calMonthLabel',
+    'calendarGrid',
+    'dayPanelTitle',
+    'dayPanelSubtitle',
+    'dayPanelList'
+  ];
 
-      // Verifica se o ReservasApp está disponível (carregado via reservas.js)
-      if (typeof ReservasApp === 'undefined') {
-        console.error('Calendário: ReservasApp não definido. Verifique se /js/reservas.js foi carregado antes deste módulo.');
-        return;
-      }
-      
-      // ---------------------------------------------------------------
-      // Calendário
-      // ---------------------------------------------------------------
+  const missingElements = requiredElements.filter(id =>
+    !document.getElementById(id)
+  );
 
-      const hoje = new Date();
-      const hojeISO = ReservasApp.todayISO();
+  if (missingElements.length > 0) {
+    console.error('Calendário: Elementos obrigatórios ausentes no DOM:', missingElements);
+    return;
+  }
 
-      const params = new URLSearchParams(window.location.search);
+  // Verifica se o ReservasApp está disponível (carregado via reservas.js)
+  if (typeof ReservasApp === 'undefined') {
+    console.error('Calendário: ReservasApp não definido. Verifique se /js/reservas.js foi carregado antes deste módulo.');
+    return;
+  }
 
-      let anoAtual = params.has('ano')
-        ? parseInt(params.get('ano'), 10)
-        : hoje.getFullYear();
+  // ---------------------------------------------------------------
+  // Calendário
+  // ---------------------------------------------------------------
 
-      let mesAtual = params.has('mes')
-        ? parseInt(params.get('mes'), 10)
-        : hoje.getMonth();
+  const hoje = new Date();
+  const hojeISO = ReservasApp.todayISO();
 
-      let diaSelecionadoISO = params.has('dia')
-        ? ReservasApp.toISODate(
-          anoAtual,
-          mesAtual,
-          parseInt(params.get('dia'), 10)
-        )
-        : hojeISO;
+  const params = new URLSearchParams(window.location.search);
 
-      function nomeCategoriaIcone(categoria) {
-        const cat = (categoria || '').toLowerCase();
+  let anoAtual = params.has('ano')
+    ? parseInt(params.get('ano'), 10)
+    : hoje.getFullYear();
 
-        if (cat.includes('laborat')) {
-          return '/assets/icons/computer.png';
-        }
+  let mesAtual = params.has('mes')
+    ? parseInt(params.get('mes'), 10)
+    : hoje.getMonth();
 
-        if (cat.includes('gabinete')) {
-          return '/assets/icons/shopping-cart.png';
-        }
+  let diaSelecionadoISO = params.has('dia')
+    ? ReservasApp.toISODate(
+      anoAtual,
+      mesAtual,
+      parseInt(params.get('dia'), 10)
+    )
+    : hojeISO;
 
-        return '/assets/icons/classroom.png';
-      }
+  function nomeCategoriaIcone(categoria) {
+    const cat = (categoria || '').toLowerCase();
 
-      function renderPainelDia(iso) {
-        const titulo = document.getElementById('dayPanelTitle');
-        const subtitulo = document.getElementById('dayPanelSubtitle');
-        const lista = document.getElementById('dayPanelList');
+    if (cat.includes('laborat')) {
+      return '/assets/icons/computer.png';
+    }
 
-        const partes = iso.split('-');
-        const dia = parseInt(partes[2], 10);
-        const mesIndex = parseInt(partes[1], 10) - 1;
-        const ano = parseInt(partes[0], 10);
+    if (cat.includes('gabinete')) {
+      return '/assets/icons/shopping-cart.png';
+    }
 
-        titulo.textContent =
-          `Reservas - Dia ${dia < 10 ? '0' + dia : dia}`;
+    return '/assets/icons/classroom.png';
+  }
 
-        subtitulo.textContent =
-          `${dia} de ${ReservasApp.MESES[mesIndex]} de ${ano}`;
+  function renderPainelDia(iso) {
+    const titulo = document.getElementById('dayPanelTitle');
+    const subtitulo = document.getElementById('dayPanelSubtitle');
+    const lista = document.getElementById('dayPanelList');
 
-        const reservasDoDia = ReservasApp.getReservasPorData(iso);
+    const partes = iso.split('-');
+    const dia = parseInt(partes[2], 10);
+    const mesIndex = parseInt(partes[1], 10) - 1;
+    const ano = parseInt(partes[0], 10);
 
-        if (reservasDoDia.length === 0) {
-          lista.innerHTML =
-            '<p class="day-panel-empty">Nenhuma reserva para este dia.</p>';
-          return;
-        }
+    titulo.textContent =
+      `Reservas - Dia ${dia < 10 ? '0' + dia : dia}`;
 
-        lista.innerHTML = reservasDoDia.map((r) => {
-          const info = ReservasApp.statusInfo(r.status);
+    subtitulo.textContent =
+      `${dia} de ${ReservasApp.MESES[mesIndex]} de ${ano}`;
 
-          return `
+    const reservasDoDia = ReservasApp.getReservasPorData(iso);
+
+    if (reservasDoDia.length === 0) {
+      lista.innerHTML =
+        '<p class="day-panel-empty">Nenhuma reserva para este dia.</p>';
+      return;
+    }
+
+    lista.innerHTML = reservasDoDia.map((r) => {
+      const info = ReservasApp.statusInfo(r.status);
+
+      return `
             <div class="day-reserva-item">
               <p class="reserva-hora">
                 ${ReservasApp.formatHorario(
-            r.horaEntrada,
-            r.horaSaida
-          )}
+        r.horaEntrada,
+        r.horaSaida
+      )}
               </p>
 
               <p class="reserva-titulo">
                 ${ReservasApp.escapar(
-                                  r.item || r.categoria
-                                )}
+        r.item || r.categoria
+      )}
               </p>
 
               <p class="reserva-subtitulo">
@@ -116,50 +116,50 @@
               </span>
             </div>
           `;
-        }).join('');
+    }).join('');
+  }
+
+  function renderCalendario() {
+    document.getElementById('calMonthLabel').textContent =
+      ReservasApp.mesLabel(anoAtual, mesAtual);
+
+    const celulas = ReservasApp.construirMatrizMes(
+      anoAtual,
+      mesAtual
+    );
+
+    const gridEl = document.getElementById('calendarGrid');
+
+    gridEl.innerHTML = celulas.map((c) => {
+      const reservasDoDia = ReservasApp.getReservasPorData(c.iso);
+      const classes = ['calendar-day'];
+
+      if (!c.mesAtual) {
+        classes.push('muted');
       }
 
-      function renderCalendario() {
-        document.getElementById('calMonthLabel').textContent =
-          ReservasApp.mesLabel(anoAtual, mesAtual);
+      if (reservasDoDia.length > 0) {
+        classes.push('has-reservation');
+      }
 
-        const celulas = ReservasApp.construirMatrizMes(
-          anoAtual,
-          mesAtual
-        );
+      if (c.iso === hojeISO) {
+        classes.push('today');
+      }
 
-        const gridEl = document.getElementById('calendarGrid');
+      if (c.iso === diaSelecionadoISO) {
+        classes.push('selected');
+      }
 
-        gridEl.innerHTML = celulas.map((c) => {
-          const reservasDoDia = ReservasApp.getReservasPorData(c.iso);
-          const classes = ['calendar-day'];
-
-          if (!c.mesAtual) {
-            classes.push('muted');
-          }
-
-          if (reservasDoDia.length > 0) {
-            classes.push('has-reservation');
-          }
-
-          if (c.iso === hojeISO) {
-            classes.push('today');
-          }
-
-          if (c.iso === diaSelecionadoISO) {
-            classes.push('selected');
-          }
-
-          const badge = reservasDoDia.length > 0
-            ? `
+      const badge = reservasDoDia.length > 0
+        ? `
               <span class="day-reserva-count">
                 ${reservasDoDia.length}
                 Reserva${reservasDoDia.length > 1 ? 's' : ''}
               </span>
             `
-            : '';
+        : '';
 
-          return `
+      return `
             <div
               class="${classes.join(' ')}"
               data-iso="${c.iso}"
@@ -170,111 +170,119 @@
               ${badge}
             </div>
           `;
-        }).join('');
+    }).join('');
 
-        renderPainelDia(diaSelecionadoISO);
+    renderPainelDia(diaSelecionadoISO);
+  }
+
+  document
+    .getElementById('calendarGrid')
+    .addEventListener('click', (e) => {
+      const dayEl = e.target.closest('.calendar-day');
+
+      if (!dayEl) {
+        return;
       }
 
-      document
-        .getElementById('calendarGrid')
-        .addEventListener('click', (e) => {
-          const dayEl = e.target.closest('.calendar-day');
+      diaSelecionadoISO = dayEl.dataset.iso;
 
-          if (!dayEl) {
-            return;
-          }
+      const [anoIso, mesIso] = diaSelecionadoISO
+        .split('-')
+        .map(Number);
 
-          diaSelecionadoISO = dayEl.dataset.iso;
-
-          const [anoIso, mesIso] = diaSelecionadoISO
-            .split('-')
-            .map(Number);
-
-          if (
-            anoIso !== anoAtual ||
-            (mesIso - 1) !== mesAtual
-          ) {
-            anoAtual = anoIso;
-            mesAtual = mesIso - 1;
-          }
-
-          renderCalendario();
-          atualizarURL();
-        });
-
-      function atualizarURL() {
-        // Atualiza a URL sem recarregar a página, permitindo
-        // compartilhar o link e recarregar mantendo o mês selecionado.
-        // O mês é armazenado 0-based (como JavaScript) para consistência
-        // com a leitura inicial em parseInt(params.get('mes'), 10).
-        const url = new URL(window.location);
-        url.searchParams.set('ano', String(anoAtual));
-        url.searchParams.set('mes', String(mesAtual)); // 0-based, consistente com a leitura
-        url.searchParams.set('dia', String(diaSelecionadoISO.split('-')[2]));
-        window.history.replaceState(null, '', url);
+      if (
+        anoIso !== anoAtual ||
+        (mesIso - 1) !== mesAtual
+      ) {
+        anoAtual = anoIso;
+        mesAtual = mesIso - 1;
       }
 
-      document
-        .getElementById('calPrev')
-        .addEventListener('click', () => {
-          mesAtual -= 1;
+      renderCalendario();
+      atualizarURL();
+    });
 
-          if (mesAtual < 0) {
-            mesAtual = 11;
-            anoAtual -= 1;
-          }
+  function atualizarURL() {
+    // Atualiza a URL sem recarregar a página, permitindo
+    // compartilhar o link e recarregar mantendo o mês selecionado.
+    // O mês é armazenado 0-based (como JavaScript) para consistência
+    // com a leitura inicial em parseInt(params.get('mes'), 10).
+    const url = new URL(window.location);
+    url.searchParams.set('ano', String(anoAtual));
+    url.searchParams.set('mes', String(mesAtual)); // 0-based, consistente com a leitura
+    url.searchParams.set('dia', String(diaSelecionadoISO.split('-')[2]));
+    window.history.replaceState(null, '', url);
+  }
 
-          // Redefine o dia selecionado para hoje se for o mês atual,
-          // ou para o primeiro dia do mês, evitando datas inválidas
-          // (ex: dia 31 em fevereiro).
-          if (anoAtual === hoje.getFullYear() && mesAtual === hoje.getMonth()) {
-            diaSelecionadoISO = hojeISO;
-          } else {
-            diaSelecionadoISO = ReservasApp.toISODate(anoAtual, mesAtual, 1);
-          }
+  document
+    .getElementById('calPrev')
+    .addEventListener('click', () => {
+      mesAtual -= 1;
 
-          renderCalendario();
-          atualizarURL();
-        });
-
-      document
-        .getElementById('calNext')
-        .addEventListener('click', () => {
-          mesAtual += 1;
-
-          if (mesAtual > 11) {
-            mesAtual = 0;
-            anoAtual += 1;
-          }
-
-          // Redefine o dia selecionado para hoje se for o mês atual,
-          // ou para o primeiro dia do mês, evitando datas inválidas.
-          if (anoAtual === hoje.getFullYear() && mesAtual === hoje.getMonth()) {
-            diaSelecionadoISO = hojeISO;
-          } else {
-            diaSelecionadoISO = ReservasApp.toISODate(anoAtual, mesAtual, 1);
-          }
-
-          renderCalendario();
-          atualizarURL();
-        });
-
-      // Renderiza imediatamente com os dados locais (pode estar vazio
-      // se o localStorage não tiver nada). O subscribe garante
-      // re-renderização assim que a sincronização com o banco terminar.
-      try {
-        renderCalendario();
-        console.log('Calendário renderizado. Mês:', ReservasApp.mesLabel(anoAtual, mesAtual));
-      } catch (erro) {
-        console.error('Calendário: Erro ao renderizar:', erro);
+      if (mesAtual < 0) {
+        mesAtual = 11;
+        anoAtual -= 1;
       }
 
-      ReservasApp.subscribe(() => {
-        try {
-          renderCalendario();
-        } catch (erro) {
-          console.error('Calendário: Erro no subscribe:', erro);
-        }
-      });
-    }); 
- 
+      // Redefine o dia selecionado para hoje se for o mês atual,
+      // ou para o primeiro dia do mês, evitando datas inválidas
+      // (ex: dia 31 em fevereiro).
+      if (anoAtual === hoje.getFullYear() && mesAtual === hoje.getMonth()) {
+        diaSelecionadoISO = hojeISO;
+      } else {
+        diaSelecionadoISO = ReservasApp.toISODate(anoAtual, mesAtual, 1);
+      }
+
+      renderCalendario();
+      atualizarURL();
+    });
+
+  document
+    .getElementById('calNext')
+    .addEventListener('click', () => {
+      mesAtual += 1;
+
+      if (mesAtual > 11) {
+        mesAtual = 0;
+        anoAtual += 1;
+      }
+
+      // Redefine o dia selecionado para hoje se for o mês atual,
+      // ou para o primeiro dia do mês, evitando datas inválidas.
+      if (anoAtual === hoje.getFullYear() && mesAtual === hoje.getMonth()) {
+        diaSelecionadoISO = hojeISO;
+      } else {
+        diaSelecionadoISO = ReservasApp.toISODate(anoAtual, mesAtual, 1);
+      }
+
+      renderCalendario();
+      atualizarURL();
+    });
+
+  // Renderiza imediatamente com os dados locais (pode estar vazio
+  // se o localStorage não tiver nada). O subscribe garante
+  // re-renderização assim que a sincronização com o banco terminar.
+  try {
+    renderCalendario();
+    console.log('Calendário renderizado. Mês:', ReservasApp.mesLabel(anoAtual, mesAtual));
+  } catch (erro) {
+    console.error('Calendário: Erro ao renderizar:', erro);
+  }
+
+  ReservasApp.subscribe(() => {
+    try {
+      renderCalendario();
+    } catch (erro) {
+      console.error('Calendário: Erro no subscribe:', erro);
+    }
+  });
+}
+
+// Verifica se o HTML já foi carregado
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', iniciarCalendario, {
+    once: true
+  });
+} else {
+  iniciarCalendario();
+}
