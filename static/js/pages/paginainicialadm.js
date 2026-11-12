@@ -1,5 +1,11 @@
 document.addEventListener('DOMContentLoaded', () => {
 
+      // Verifica se o ReservasApp está disponível
+      if (typeof ReservasApp === 'undefined') {
+        console.error('Página Inicial ADM: ReservasApp não definido. Verifique se /js/reservas.js foi carregado.');
+        return;
+      }
+
       // ======================================================
       // NOME DO USUÁRIO LOGADO
       // ======================================================

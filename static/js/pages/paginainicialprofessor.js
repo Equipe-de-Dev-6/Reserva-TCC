@@ -1,6 +1,12 @@
 // ANIMAÇÕES E INTERAÇÃO
 document.addEventListener('DOMContentLoaded', () => {
 
+      // Verifica se o ReservasApp está disponível
+      if (typeof ReservasApp === 'undefined') {
+        console.error('Página Inicial Professor: ReservasApp não definido. Verifique se /js/reservas.js foi carregado.');
+        return;
+      }
+
       // ======================================================
       // NOME DO USUÁRIO LOGADO
       // ======================================================
