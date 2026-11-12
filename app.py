@@ -474,6 +474,7 @@ def renderizar(request: Request, nome_do_arquivo: str, **contexto):
         nome_do_arquivo,
         {
             "usuario": {
+                "id": request.session.get("usuario_id"),
                 "nome": request.session.get("usuario_nome") or "",
                 "cargo": (
                     CARGO_COORDENADOR if eh_admin else "Professor"
@@ -2008,6 +2009,21 @@ def listar_notificacoes(request: Request):
 @app.post('/api/notificacoes', status_code=201)
 async def criar_notificacao(request: Request):
     usuario = exigir_sessao(request)
+
+    # Lê o corpo da requisição JSON
+    try:
+        dados = await request.json()
+    except Exception:
+        raise HTTPException(
+            status_code=400,
+            detail='Corpo da requisição deve ser JSON válido'
+        )
+
+    if not isinstance(dados, dict):
+        raise HTTPException(
+            status_code=400,
+            detail='Corpo da requisição deve ser um objeto JSON'
+        )
 
     # Rate limiting por IP para evitar spam de notificações
     ip = request.client.host if request.client else 'desconhecido'

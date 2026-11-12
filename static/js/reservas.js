@@ -102,6 +102,11 @@ const ReservasApp = (() => {
 
   let notificacoes = null;
 
+  // ID do usuário logado. Quando definido, getReservas() filtra para
+  // mostrar apenas as reservas desse usuário. Não definido = Coordenador
+  // (vem todas, pois o Coordenador aprova tudo).
+  let usuarioId = null;
+
   const listeners = [];
 
 
@@ -262,6 +267,41 @@ const ReservasApp = (() => {
   }
 
 
+  // Define o ID do usuário logado. Quando definido, getReservas()
+  // retorna apenas as reservas desse usuário. Não definir = Coordenador
+  // (vem todas, pois o Coordenador aprova tudo).
+  function definirUsuario(id) {
+
+    usuarioId = id === undefined || id === null ? null : String(id);
+
+    // Re-salva já filtrado, para que dados de outro usuário que
+    // estiverem no localStorage não vazem para esta sessão.
+    if (reservas !== null) {
+
+      _salvarReservas(filtrarPorUsuario(reservas));
+
+    }
+
+    _notificar();
+
+  }
+
+
+  // Filtra uma lista de reservas pelo usuário logado. Se não houver
+  // usuário definido (Coordenador), retorna tudo.
+  function filtrarPorUsuario(lista) {
+
+    if (!usuarioId) {
+
+      return lista;
+
+    }
+
+    return lista.filter((r) => String(r.usuarioId || '') === usuarioId);
+
+  }
+
+
   // ========================================================
   // API
   // ========================================================
@@ -361,8 +401,10 @@ const ReservasApp = (() => {
 
     }
 
-    // Mais recentes primeiro.
-    return [...reservas].sort((a, b) => _ordenarPorData(b, a));
+    // Mais recentes primeiro, e apenas do usuário logado (se definido).
+    const lista = [...reservas].sort((a, b) => _ordenarPorData(b, a));
+
+    return filtrarPorUsuario(lista);
 
   }
 
@@ -449,6 +491,9 @@ const ReservasApp = (() => {
     // de sumir da tela.
     const idsRemotos = new Set(remotas.map((r) => String(r.id)));
 
+    // Mantém apenas locais que não estão remotos E pertencem ao
+    // usuário logado. Impede que dados de outro usuário (deixados
+    // no localStorage por outra sessão no mesmo navegador) vazem.
     const locais = getReservas().filter(
       (r) => !idsRemotos.has(String(r.id))
     );
@@ -1093,6 +1138,7 @@ const ReservasApp = (() => {
     clearNotificacoes,
 
     subscribe,
+    definirUsuario,
     sincronizar
   };
 
