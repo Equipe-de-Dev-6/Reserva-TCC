@@ -1,10 +1,17 @@
+
 import { cadastrarUsuario, listarUsuarios } from "./api.js";
 
-const formulario = document.querySelector("form");
+const formulario = document.getElementById("formUsuario");
+
+console.log("Cadastro.js carregado!");
+
+if (!formulario) {
+    console.error("Formulário formUsuario não encontrado!");
+} else {
+    formulario.addEventListener("submit", cadastrar);
+}
 
 async function cadastrar(event) {
-
-    // Impede o formulário de recarregar a página
     event.preventDefault();
 
     const nome = document.getElementById("nome").value.trim();
@@ -13,33 +20,38 @@ async function cadastrar(event) {
     const senha = document.getElementById("senha").value;
     const confirmarSenha = document.getElementById("confirmar-senha").value;
 
-    // Verifica se o cargo foi selecionado
-    if (!cargo) {
-        alert("Selecione o cargo!");
+    // Valida os campos
+    if (!nome || !email || !cargo || !senha || !confirmarSenha) {
+        alert("Preencha todos os campos!");
         return;
     }
 
-    // Verifica se as senhas são iguais
+    if (senha.length < 6) {
+        alert("A senha precisa ter pelo menos 6 caracteres!");
+        return;
+    }
+
     if (senha !== confirmarSenha) {
         alert("As senhas não são iguais!");
         return;
     }
 
     const dados = {
-        nome: nome,
-        email: email,
-        cargo: cargo,
-        senha: senha
+        nome,
+        email,
+        cargo,
+        senha
     };
 
+    const botao = document.getElementById("btn_cadastro");
+
     try {
+        // Evita múltiplos envios
+        botao.disabled = true;
+        botao.textContent = "Cadastrando...";
 
-        // A conferência de e-mail repetido é só para dar um retorno
-        // mais rápido na tela. A garantia real está no servidor, que
-        // recusa o segundo cadastro com o mesmo e-mail — e a mensagem
-        // que chega aqui já é a que a API devolveu.
+        // Verifica se o e-mail já está cadastrado
         try {
-
             const usuarios = await listarUsuarios();
 
             const usuarioExistente = usuarios.find(
@@ -50,28 +62,27 @@ async function cadastrar(event) {
                 alert("Usuário já cadastrado!");
                 return;
             }
-
         } catch (erro) {
-
-            // Sem a lista (o endpoint exige perfil de Coordenador),
-            // o cadastro segue e o servidor é quem decide.
-            // Não bloqueia o fluxo: a validação real está no backend.
-
+            console.warn("Não foi possível consultar os usuários:", erro);
         }
 
+        // Envia o cadastro para a API
         await cadastrarUsuario(dados);
 
         alert("Usuário cadastrado com sucesso!");
 
-    } catch (erro) {
+        formulario.reset();
 
-        // A API explica o motivo: "Usuário já cadastrado", "E-mail ou
-        // senha inválidos" e afins. Preferir essa mensagem a um texto
-        // genérico é o que faz a tela ser útil.
+        // Retorna para a página de gerenciamento
+        window.location.href = "/professores_adm";
+
+    } catch (erro) {
+        console.error("Erro no cadastro:", erro);
+
         alert(erro.message || "Erro ao cadastrar usuário!");
 
+    } finally {
+        botao.disabled = false;
+        botao.textContent = "Criar Conta";
     }
 }
-
-// Evento de envio do formulário
-formulario.addEventListener("submit", cadastrar);
