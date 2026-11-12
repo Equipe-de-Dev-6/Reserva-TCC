@@ -208,9 +208,11 @@
 {% block scripts %}
 <script src="/js/reservas.js"></script>
 
+{% if usuario.cargo != 'Coordenador' %}
 <script>
   ReservasApp.definirUsuario({{ usuario.id }});
 </script>
+{% endif %}
 
 <script src="/js/avisos.js"></script>
 <script src="/js/notificacoes-push.js"></script>
