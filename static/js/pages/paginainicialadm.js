@@ -1,5 +1,11 @@
 document.addEventListener('DOMContentLoaded', () => {
 
+      // Verifica se o ReservasApp está disponível
+      if (typeof ReservasApp === 'undefined') {
+        console.error('Página Inicial ADM: ReservasApp não definido. Verifique se /js/reservas.js foi carregado.');
+        return;
+      }
+
       // ======================================================
       // NOME DO USUÁRIO LOGADO
       // ======================================================
@@ -438,6 +444,11 @@ document.addEventListener('DOMContentLoaded', () => {
       // INICIALIZA CALENDÁRIO
       // ======================================================
 
-      renderCalendarioWidget();
+      try {
+        renderCalendarioWidget();
+        console.log('Calendário widget ADM renderizado. Mês:', ReservasApp.mesLabel(widgetAno, widgetMes));
+      } catch (erro) {
+        console.error('Calendário widget ADM: Erro ao renderizar:', erro);
+      }
 
     });
