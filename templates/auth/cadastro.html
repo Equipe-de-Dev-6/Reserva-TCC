@@ -119,6 +119,42 @@
 
             </form>
         </div>
+      </div>
+
+      <div class="adm-form-linha">
+        <div class="adm-form-campo">
+          <label for="cargo">Cargo</label>
+          <select id="cargo" name="cargo" required>
+            <option value="" selected disabled>Selecione o cargo...</option>
+            <option value="Professor">Professor</option>
+            <option value="Coordenador">Coordenador</option>
+          </select>
+        </div>
+
+        <div class="adm-form-campo">
+          <label for="senha">Senha</label>
+          <input type="password" id="senha" name="senha" required minlength="6" placeholder="Mínimo 6 caracteres">
+        </div>
+
+        <div class="adm-form-campo">
+          <label for="confirmar-senha">Confirmar senha</label>
+          <input type="password" id="confirmar-senha" name="confirmar-senha" required minlength="6"
+            placeholder="Repita a senha">
+        </div>
+      </div>
+
+      <div class="adm-form-acoes">
+        <a href="/professores_adm" class="adm-btn adm-btn-editar">
+          Voltar
+        </a>
+
+        <button type="submit" class="adm-btn-cadastrar" id="btn_cadastro">
+          Criar Conta
+        </button>
+      </div>
+
+    </form>
+  </div>
 
     </section>
 {% endblock %}
