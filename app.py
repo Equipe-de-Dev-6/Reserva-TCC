@@ -18,6 +18,7 @@ from fastapi.templating import Jinja2Templates
 from starlette.responses import JSONResponse
 import os
 import random
+import re
 
 from criptografia import hash_password, verify_password
 from consulta_salas import salas_para_tela
@@ -286,6 +287,10 @@ app.add_middleware(
 # senha duas vezes e acerta na terceira não é tratado como ataque.
 TENTATIVAS_POR_ENDERECO = 8
 JANELA_DE_TENTATIVAS = timedelta(minutes=5)
+NOTIFICACOES_POR_ENDERECO = {}
+
+# Janela de rate limiting para criação de notificações (5 minutos)
+JANELA_NOTIFICACOES = timedelta(minutes=5)
 
 
 def _janela_de_tentativas() -> str:
@@ -2004,24 +2009,78 @@ def listar_notificacoes(request: Request):
 async def criar_notificacao(request: Request):
     usuario = exigir_sessao(request)
 
-    dados = await request.json()
-
+    # Rate limiting por IP para evitar spam de notificações
+    ip = request.client.host if request.client else 'desconhecido'
+    agora = datetime.now()
+    ultima_criacao = NOTIFICACOES_POR_ENDERECO.get(ip)
+    
+    if ultima_criacao:
+        tempo_passado = agora - ultima_criacao
+        if tempo_passado < JANELA_NOTIFICACOES:
+            raise HTTPException(
+                status_code=429,
+                detail='Muitas notificações. Aguarde alguns minutos e tente novamente.'
+            )
+    
+    # Validação de entrada de dados
+    titulo = dados.get('titulo') or 'Notificacao'
+    mensagem = dados.get('mensagem') or ''
+    
+    # Validar tipo e tamanho do título
+    if not isinstance(titulo, str):
+        raise HTTPException(
+            status_code=400,
+            detail='Título deve ser uma string'
+        )
+    
+    if len(titulo) > 200:
+        raise HTTPException(
+            status_code=400,
+            detail='Título muito longo (máximo 200 caracteres)'
+        )
+    
+    # Validar tipo e tamanho da mensagem
+    if not isinstance(mensagem, str):
+        raise HTTPException(
+            status_code=400,
+            detail='Mensagem deve ser uma string'
+        )
+    
+    if len(mensagem) > 1000:
+        raise HTTPException(
+            status_code=400,
+            detail='Mensagem muito longa (máximo 1000 caracteres)'
+        )
+    
+    # Proteção básica contra XSS - verificar tags perigosas
+    perigosas = ['<script', '</script', 'onload', 'onerror', 'onfocus', 'onblur']
+    titulo_lower = titulo.lower()
+    mensagem_lower = mensagem.lower()
+    if any(p in titulo_lower for p in perigosas) or any(p in mensagem_lower for p in perigosas):
+        raise HTTPException(
+            status_code=400,
+            detail='Conteúdo contém caracteres que podem ser perigosos'
+        )
+    
     insercao = {
         'usuario_id': usuario['id'],
-        'titulo': dados.get('titulo') or 'Notificacao',
-        'mensagem': dados.get('mensagem') or '',
+        'titulo': titulo,
+        'mensagem': mensagem,
     }
-
+    
+    # Atualizar timestamp do rate limiting
+    NOTIFICACOES_POR_ENDERECO[ip] = agora
+    
     resposta = (
         supabase
         .table('notificacoes')
         .insert(insercao)
         .execute()
     )
-
+    
     if not resposta.data:
         raise HTTPException(status_code=502, detail='Nao foi possivel criar a notificacao')
-
+    
     return resposta.data[0]
 
 

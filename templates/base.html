@@ -97,6 +97,7 @@
             // Atualizar badge da sidebar
             if (sidebarBadge) {
               sidebarBadge.textContent = count;
+              // Mostrar badge apenas se houver notificações (count > 0)
               if (count > 0) {
                 sidebarBadge.style.display = 'inline-block';
               } else {
@@ -107,6 +108,7 @@
             // Atualizar badge do topo
             if (topBadge) {
               topBadge.textContent = count;
+              // Mostrar badge apenas se houver notificações (count > 0)
               if (count > 0) {
                 topBadge.style.display = 'inline-block';
               } else {
@@ -116,12 +118,13 @@
           })
           .catch(error => {
             console.error('Erro ao carregar notificações:', error);
+            // Em caso de erro, esconder ambos os badges
             if (sidebarBadge) sidebarBadge.style.display = 'none';
             if (topBadge) topBadge.style.display = 'none';
           });
       }
       
-      // Chamar ao carregar e quando a página for reaberta
+      // Chamar ao carregar a página
       document.addEventListener('DOMContentLoaded', atualizarBadgeNotificacoes);
       
       // Atualizar periodicamente (a cada 30 segundos)
