@@ -701,11 +701,9 @@ async def inicio(request: Request):
 
         return RedirectResponse(url=destino, status_code=302)
 
-    return renderizar(
-        request,
-        "auth/login.html",
-        pagina="Login"
-    )
+    # Página de apresentação do sistema, antes da tela de login.
+    # O botão "Entrar" leva para /login.
+    return renderizar(request, "landing.html")
 
 
 @app.get("/login")
