@@ -215,6 +215,49 @@
   margin: 0;
   }
 
+  /* ============================================================
+   * SETA DE VOLTA PARA A PAGINA PUBLICA
+   *
+   * Login e recuperacao de senha nao tem menu lateral. Esta seta
+   * fica fixa no canto superior esquerdo e leva para a landing,
+   * que e a unica tela publica do sistema.
+   * ============================================================ */
+
+  .voltar-inicio {
+  position: fixed;
+  top: 22px;
+  left: 22px;
+  z-index: 50;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border: 1px solid var(--cor-borda);
+  border-radius: 50%;
+  background-color: var(--cor-fundo);
+  color: var(--cor-texto);
+  box-shadow: var(--sombra);
+  transition: background-color 0.2s ease, color 0.2s ease,
+        border-color 0.2s ease, transform 0.2s ease;
+  }
+
+  .voltar-inicio:hover {
+  background-color: var(--cor-texto);
+  border-color: var(--cor-texto);
+  color: var(--cor-fundo);
+  transform: translateX(-2px);
+  }
+
+  .voltar-inicio:focus-visible {
+  outline: 3px solid var(--cor-texto);
+  outline-offset: 3px;
+  }
+
+  .voltar-inicio svg {
+  width: 20px;
+  height: 20px;
+  }
+
 /* ============================================================
  * OS PONTOS DE QUEBRA
  *
@@ -230,6 +273,13 @@
  * ============================================================ */
 
 @media (max-width: 600px) {
+  .voltar-inicio {
+  top: 14px;
+  left: 14px;
+  width: 40px;
+  height: 40px;
+  }
+
   .container {
   padding: 30px 20px;
   }
