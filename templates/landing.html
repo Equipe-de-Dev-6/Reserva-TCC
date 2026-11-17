@@ -3,207 +3,501 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>SENAI · Gestão de salas e equipamentos</title>
+<title>SENAI · Reserva de salas, laboratórios e gabinetes</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Archivo:ital,wght@0,500;0,800;1,800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <style>
-:root{--bg:#f6f5f7;--surface:#fff;--ink:#1d2130;--mute:#5d6375;--line:#e4e2e8;--red:#d0021b;--red-ink:#c10019;--red-t:#fde8ea;--ok:#157a3e;--ok-t:#dff5e6;--wait:#8a5a00;--wait-t:#fff1cc;--no:#b00020;--no-t:#fde1e5;--head:rgba(246,245,247,.92);color-scheme:light}
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#14151a;--surface:#1d1f27;--ink:#f1f1f4;--mute:#a4a8b6;--line:#2c2f3a;--red-ink:#ff6b7a;--red-t:#3a1519;--ok:#5fd68a;--ok-t:#16301f;--wait:#f0c35a;--wait-t:#3a2f10;--no:#ff8a9a;--no-t:#3a1519;--head:rgba(20,21,26,.92);color-scheme:dark}}
-:root[data-theme="dark"]{--bg:#14151a;--surface:#1d1f27;--ink:#f1f1f4;--mute:#a4a8b6;--line:#2c2f3a;--red-ink:#ff6b7a;--red-t:#3a1519;--ok:#5fd68a;--ok-t:#16301f;--wait:#f0c35a;--wait-t:#3a2f10;--no:#ff8a9a;--no-t:#3a1519;--head:rgba(20,21,26,.92);color-scheme:dark}
-*{box-sizing:border-box;margin:0}
-:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
-html{scroll-padding-top:calc(env(safe-area-inset-top,0px) + 72px);scroll-behavior:smooth}
-body{background:var(--bg);color:var(--ink);font:400 17px/1.6 Inter,system-ui,sans-serif;-webkit-font-smoothing:antialiased}
-body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);background:var(--head);z-index:10}
-h1,h2,h3{font-family:Archivo,Inter,sans-serif;line-height:1.08;letter-spacing:-.02em}
-a{color:inherit}
-:focus-visible{outline:3px solid var(--red);outline-offset:3px;border-radius:6px}
-.wrap{max-width:1120px;margin:0 auto;padding:0 24px}
-header{position:sticky;top:env(safe-area-inset-top,0px);z-index:11;background:var(--head);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
-header .wrap{display:flex;align-items:center;justify-content:space-between;height:68px;gap:16px}
-.logo{font:italic 800 30px/1 Archivo,sans-serif;color:var(--red);letter-spacing:-.03em;text-decoration:none}
-nav{display:flex;gap:28px;align-items:center;font-weight:500;font-size:15px}
-nav a{text-decoration:none;color:var(--mute)}nav a:hover{color:var(--ink)}
-.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;background:var(--red);color:#fff;font:600 16px/1 Inter,sans-serif;padding:15px 28px;border-radius:10px;text-decoration:none;border:2px solid var(--red);transition:background .15s}
-.btn:hover{background:#a30015;border-color:#a30015}
-.btn.sm{padding:10px 20px;font-size:15px}
-.btn.ghost{background:transparent;color:var(--red-ink);border-color:var(--red)}
-.btn.ghost:hover{background:var(--red-t)}
-.hero{padding:72px 0 88px}
-.hero .wrap{display:grid;grid-template-columns:1.05fr 1fr;gap:56px;align-items:center}
-h1{font-size:clamp(40px,5.4vw,68px);font-style:italic;font-weight:800}
-.hero p.lead{font-size:20px;color:var(--mute);max-width:30em;margin:24px 0 36px}
-.cta{display:flex;gap:14px;flex-wrap:wrap}
-.app{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:20px;box-shadow:0 24px 60px -30px rgba(120,0,15,.35);font-size:14px}
-.app h4{font:600 15px Inter;margin-bottom:12px;display:flex;justify-content:space-between}
-.app h4 span{color:var(--red-ink);font-weight:500;font-size:13px}
-.row{display:flex;align-items:center;gap:12px;padding:10px 12px;border:1px solid var(--line);border-radius:10px;margin-bottom:8px}
-.ic{width:34px;height:34px;border-radius:8px;background:var(--red);flex:none;display:grid;place-items:center;color:#fff;font:700 12px Inter}
-.row b{display:block;font-weight:600;line-height:1.25}.row small{color:var(--mute);font-size:12.5px}
-.pill{margin-left:auto;font-size:12px;font-weight:600;padding:3px 10px;border-radius:99px;white-space:nowrap}
-.ok{background:var(--ok-t);color:var(--ok)}.wait{background:var(--wait-t);color:var(--wait)}.no{background:var(--no-t);color:var(--no)}
-.cal{margin-top:16px;display:grid;grid-template-columns:repeat(7,1fr);gap:2px;text-align:center;font-size:12.5px}
-.cal i{font-style:normal;color:var(--mute);font-size:11.5px;padding-bottom:4px}
-.cal span{padding:5px 0;border-radius:8px;position:relative}
-.cal .has::after{content:"";position:absolute;left:50%;bottom:1px;width:4px;height:4px;margin-left:-2px;border-radius:50%;background:var(--red)}
-.cal .today{background:var(--red);color:#fff}
-.cal .today::after{background:#fff}
-section{padding:88px 0}
-section.alt{background:var(--surface);border-block:1px solid var(--line)}
-h2{font-size:clamp(30px,3.6vw,44px);font-weight:800;max-width:15em}
-.sub{color:var(--mute);max-width:36em;margin-top:16px}
-.feat{display:grid;grid-template-columns:1fr 1.5fr;gap:64px}
-.list{border-top:1px solid var(--line)}
-.item{display:grid;grid-template-columns:200px 1fr;gap:24px;padding:26px 0;border-bottom:1px solid var(--line)}
-.item h3{font-size:20px;font-weight:800;font-style:italic}
-.item p{color:var(--mute)}
-.steps{display:grid;grid-template-columns:repeat(4,1fr);gap:0;margin-top:48px;counter-reset:s}
-.step{padding:0 24px 0 0;position:relative}
-.step::before{counter-increment:s;content:counter(s);display:grid;place-items:center;width:44px;height:44px;border-radius:50%;background:var(--red);color:#fff;font:800 18px Archivo;margin-bottom:20px;position:relative;z-index:1}
-.step::after{content:"";position:absolute;top:22px;left:44px;right:0;height:2px;background:var(--line)}
-.step:last-child::after{display:none}
-.step h3{font-size:19px;font-weight:800;margin-bottom:6px}
-.step p{color:var(--mute);font-size:15.5px}
-.two{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-top:48px}
-.prof{border:1px solid var(--line);border-radius:16px;padding:32px;background:var(--bg)}
-.prof.main{border-color:var(--red);border-width:2px}
-.prof h3{font-size:26px;font-style:italic;font-weight:800}
-.prof p{color:var(--mute);margin:8px 0 20px}
-.prof ul{list-style:none;padding:0;display:flex;flex-wrap:wrap;gap:8px}
-.prof li{font-size:14px;font-weight:500;padding:6px 12px;border-radius:99px;background:var(--surface);border:1px solid var(--line)}
-.res{display:flex;gap:12px;flex-wrap:wrap;margin-top:32px}
-.res span{padding:10px 18px;border-radius:10px;background:var(--red-t);color:var(--red-ink);font-weight:600;font-size:15px}
-.final{background:var(--red);color:#fff;padding:80px 0;text-align:center}
-.final h2{margin:0 auto;color:#fff}
-.final p{margin:16px auto 32px;opacity:.9;max-width:30em}
-.final .btn{background:#fff;color:#a30015;border-color:#fff}
-.final .btn:hover{background:#ffe9ec}
-footer{padding:32px 0;color:var(--mute);font-size:14px}
+:root{
+  --senai-red:#E30613;
+  --senai-red-dark:#C00511;
+  --bg:#F4F5F7;
+  --white:#FFFFFF;
+  --text-dark:#1F2937;
+  --text-gray:#6B7280;
+  --border:#E5E7EB;
+  --green-bg:#D1FAE5;
+  --green-text:#059669;
+  --red-bg:#FEE2E2;
+  --red-text:#DC2626;
+  --yellow-bg:#FEF3C7;
+  --yellow-text:#B45309;
+  --shadow:0 2px 4px rgba(0,0,0,.02);
+  --shadow-lg:0 24px 60px -30px rgba(227,6,19,.28);
+  --filter-white:brightness(0) invert(1);
+  --filter-red:brightness(0) invert(15%) sepia(100%) saturate(6000%) hue-rotate(352deg) brightness(88%) contrast(104%);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;scroll-padding-top:88px}
+body{background:var(--bg);color:var(--text-dark);font-family:'Inter',system-ui,sans-serif;line-height:1.6;-webkit-font-smoothing:antialiased}
+a{color:inherit;text-decoration:none}
+img{display:block;max-width:100%}
+.wrap{max-width:1160px;margin:0 auto;padding:0 24px}
+h1,h2,h3{line-height:1.1;letter-spacing:-.02em}
+h1{font-size:clamp(34px,4.6vw,56px);font-weight:800}
+h1 em{font-style:italic;color:var(--senai-red)}
+h2{font-size:clamp(28px,3.3vw,40px);font-weight:800}
+h3{font-weight:700}
+
+/* ---------- header ---------- */
+.site-header{position:sticky;top:0;z-index:50;background:rgba(255,255,255,.94);backdrop-filter:blur(8px);border-bottom:1px solid var(--border)}
+.site-header .wrap{display:flex;align-items:center;justify-content:space-between;height:72px;gap:16px}
+.brand img{height:40px;width:auto}
+.site-nav{display:flex;align-items:center;gap:26px;font-size:14px;font-weight:500;color:var(--text-gray)}
+.site-nav a:hover{color:var(--text-dark)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;background:var(--senai-red);color:#fff;font-weight:600;font-size:15px;padding:13px 24px;border-radius:10px;border:1px solid var(--senai-red);transition:.15s;cursor:pointer}
+.btn:hover{background:var(--senai-red-dark);border-color:var(--senai-red-dark)}
+.btn-sm{padding:9px 18px;font-size:14px}
+.btn-ghost{background:var(--white);color:var(--senai-red);border-color:var(--border)}
+.btn-ghost:hover{background:#FEF2F2;border-color:var(--senai-red)}
+.eyebrow{display:inline-flex;align-items:center;gap:8px;font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--senai-red);background:#FEF2F2;border:1px solid #FECACA;padding:6px 12px;border-radius:99px;margin-bottom:18px}
+.eyebrow::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--senai-red)}
+
+/* ---------- hero ---------- */
+.hero{padding:60px 0 80px;background:linear-gradient(180deg,#fff 0%,var(--bg) 100%)}
+.hero-grid{display:grid;grid-template-columns:1.02fr 1fr;gap:48px;align-items:center}
+.lead{font-size:18px;color:var(--text-gray);margin:20px 0 28px;max-width:34em}
+.cta{display:flex;gap:12px;flex-wrap:wrap}
+.hero-bullets{display:flex;flex-wrap:wrap;gap:8px;list-style:none;margin-top:26px}
+.hero-bullets li{display:flex;align-items:center;gap:7px;font-size:12.5px;font-weight:600;color:var(--text-gray);background:#fff;border:1px solid var(--border);padding:7px 12px;border-radius:99px}
+.hero-bullets li::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--senai-red)}
+
+/* ---------- mock do sistema ---------- */
+.mock{background:var(--white);border:1px solid var(--border);border-radius:16px;box-shadow:var(--shadow-lg);overflow:hidden;display:grid;grid-template-columns:148px 1fr;font-size:11px}
+.mock-sidebar{background:#fff;border-right:1px solid var(--border);padding:14px 10px;display:flex;flex-direction:column;gap:4px}
+.mock-sidebar .mock-logo{height:26px;width:auto;margin:0 auto 12px}
+.mock-nav{display:flex;flex-direction:column;gap:2px}
+.mock-nav span{display:flex;align-items:center;gap:7px;padding:6px 8px;border-radius:6px;color:var(--text-gray);font-size:10px;font-weight:500}
+.mock-nav span.active{background:var(--red-bg);color:var(--text-dark);font-weight:700;border-left:3px solid var(--senai-red)}
+.mock-nav img{width:13px;height:13px;object-fit:contain}
+.mock-main{padding:16px;background:var(--bg);min-width:0}
+.mock-greeting{font-size:13px;font-weight:800;margin-bottom:2px}
+.mock-sub{font-size:9px;color:var(--text-gray);margin-bottom:10px}
+.mock-actions{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px}
+.mock-action{background:#fff;border:1px solid var(--border);border-radius:8px;padding:8px;display:flex;flex-direction:column;gap:6px;box-shadow:var(--shadow)}
+.mock-action .icon{width:26px;height:26px;border-radius:6px;background:var(--senai-red);display:grid;place-items:center}
+.mock-action .icon img{width:16px;height:16px;object-fit:contain;filter:var(--filter-white)}
+.mock-action b{font-size:9px;line-height:1.2}
+.mock-action small{font-size:8px;color:var(--text-gray);line-height:1.25}
+.mock-section-title{display:flex;justify-content:space-between;align-items:center;font-size:10px;font-weight:800;margin:10px 0 6px}
+.mock-section-title span{color:var(--senai-red);font-weight:600;font-size:9px}
+.mock-res{background:#fff;border:1px solid var(--border);border-radius:8px;padding:7px 8px;display:flex;align-items:center;gap:8px;margin-bottom:6px;box-shadow:var(--shadow)}
+.mock-res .ico{width:24px;height:24px;border-radius:6px;background:var(--red-bg);display:grid;place-items:center;flex:none}
+.mock-res .ico img{width:14px;height:14px;object-fit:contain;filter:var(--filter-red)}
+.mock-res b{display:block;font-size:9px;line-height:1.25}
+.mock-res small{font-size:8px;color:var(--text-gray)}
+.badge{margin-left:auto;font-size:8px;font-weight:700;padding:2px 7px;border-radius:99px;white-space:nowrap}
+.badge.green{background:var(--green-bg);color:var(--green-text)}
+.badge.yellow{background:var(--yellow-bg);color:var(--yellow-text)}
+.badge.red{background:var(--red-bg);color:var(--red-text)}
+.mock-cal{background:#fff;border:1px solid var(--border);border-radius:8px;padding:8px;margin-top:8px;box-shadow:var(--shadow)}
+.mock-cal-head{display:flex;justify-content:space-between;align-items:center;font-size:9px;font-weight:800;margin-bottom:6px}
+.mock-cal-head span{color:var(--senai-red);font-weight:700}
+.mock-cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;text-align:center;font-size:8px;color:var(--text-gray)}
+.mock-cal-grid .d{font-weight:800;font-size:7px}
+.mock-cal-grid span{padding:2px 0;border-radius:4px;position:relative}
+.mock-cal-grid .has::after{content:"";position:absolute;left:50%;bottom:0;width:3px;height:3px;margin-left:-1.5px;border-radius:50%;background:var(--senai-red)}
+.mock-cal-grid .today{background:var(--senai-red);color:#fff}
+.mock-cal-grid .today::after{background:#fff}
+.mock-notice{background:#fff;border:1px solid var(--border);border-left:3px solid var(--senai-red);border-radius:6px;padding:7px 9px;margin-top:8px;box-shadow:var(--shadow)}
+.mock-notice b{display:flex;align-items:center;gap:5px;font-size:9px;margin-bottom:2px}
+.mock-notice b img{width:11px;height:11px}
+.mock-notice p{font-size:8px;color:var(--text-gray);line-height:1.3}
+
+/* ---------- seções ---------- */
+.section{padding:80px 0}
+.section.alt{background:#fff;border-block:1px solid var(--border)}
+.section-head{max-width:640px;margin-bottom:36px}
+.section-head p{color:var(--text-gray);margin-top:12px;font-size:16px}
+.resource-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+.resource-card{background:var(--white);border:1px solid var(--border);border-radius:14px;padding:24px;box-shadow:var(--shadow);transition:transform .2s}
+.section.alt .resource-card{background:var(--bg)}
+.resource-card:hover{transform:translateY(-3px)}
+.resource-card .icon-box{width:46px;height:46px;border-radius:10px;background:var(--senai-red);display:grid;place-items:center;margin-bottom:16px}
+.resource-card .icon-box img{width:26px;height:26px;object-fit:contain;filter:var(--filter-white)}
+.resource-card h3{font-size:18px;margin-bottom:6px}
+.resource-card p{font-size:14px;color:var(--text-gray);margin-bottom:14px}
+.resource-card ul{list-style:none;display:flex;flex-wrap:wrap;gap:6px}
+.resource-card li{font-size:11px;font-weight:600;background:#F3F4F6;border:1px solid var(--border);color:var(--text-gray);padding:4px 9px;border-radius:99px}
+
+.split{display:grid;grid-template-columns:1fr 1fr;gap:56px;align-items:center}
+.split.reverse .mock-panel{order:-1}
+.split p{color:var(--text-gray);margin-top:14px;font-size:15.5px}
+.check-list{list-style:none;margin-top:20px;display:flex;flex-direction:column;gap:12px}
+.check-list li{display:flex;gap:10px;align-items:flex-start;font-size:15px;color:var(--text-gray)}
+.check-list li::before{content:"✓";flex:none;width:22px;height:22px;border-radius:50%;background:var(--green-bg);color:var(--green-text);display:grid;place-items:center;font-size:12px;font-weight:800;margin-top:1px}
+
+/* ---------- painéis de demonstração ---------- */
+.mock-panel{background:var(--white);border:1px solid var(--border);border-radius:16px;box-shadow:var(--shadow-lg);overflow:hidden}
+.panel-head{display:flex;justify-content:space-between;align-items:center;padding:16px 18px;border-bottom:1px solid var(--border);gap:10px}
+.panel-head h3{font-size:14px}
+.btn-mini{font-size:11px;font-weight:700;background:var(--senai-red);color:#fff;padding:7px 12px;border-radius:7px;white-space:nowrap}
+.panel-tabs{display:flex;gap:4px;padding:10px 14px 0;border-bottom:1px solid var(--border);overflow-x:auto}
+.panel-tabs span{font-size:11px;font-weight:600;color:var(--text-gray);padding:7px 10px;border-radius:7px 7px 0 0;white-space:nowrap}
+.panel-tabs span.active{background:#FEF2F2;color:var(--senai-red);border-bottom:2px solid var(--senai-red)}
+.panel-list{padding:12px 14px;display:flex;flex-direction:column;gap:8px}
+.panel-row{display:flex;align-items:center;gap:10px;border:1px solid var(--border);border-radius:9px;padding:10px 12px}
+.panel-row .ico{width:30px;height:30px;border-radius:7px;background:var(--red-bg);display:grid;place-items:center;flex:none}
+.panel-row .ico img{width:17px;height:17px;object-fit:contain;filter:var(--filter-red)}
+.panel-row b{display:block;font-size:11px;line-height:1.25}
+.panel-row small{font-size:9.5px;color:var(--text-gray)}
+.panel-row .badge{font-size:9px}
+.panel-actions{display:flex;gap:5px;margin-left:auto}
+.btn-approve{background:var(--green-bg);color:var(--green-text);font-size:9px;font-weight:700;padding:4px 8px;border-radius:6px;white-space:nowrap}
+.btn-reject{background:var(--red-bg);color:var(--red-text);font-size:9px;font-weight:700;padding:4px 8px;border-radius:6px;white-space:nowrap}
+
+/* ---------- etapas ---------- */
+.steps{display:grid;grid-template-columns:repeat(4,1fr);gap:20px;margin-top:40px}
+.step{background:#fff;border:1px solid var(--border);border-radius:14px;padding:22px;box-shadow:var(--shadow)}
+.section.alt .step{background:var(--bg)}
+.step .num{width:38px;height:38px;border-radius:50%;background:var(--senai-red);color:#fff;font-weight:800;display:grid;place-items:center;margin-bottom:14px;font-size:15px}
+.step h3{font-size:16px;margin-bottom:6px}
+.step p{font-size:13.5px;color:var(--text-gray)}
+
+/* ---------- perfis ---------- */
+.profiles{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-top:36px}
+.profile{background:#fff;border:1px solid var(--border);border-radius:16px;padding:28px}
+.section.alt .profile{background:var(--bg)}
+.profile.main{border:2px solid var(--senai-red)}
+.profile h3{font-size:22px;margin-bottom:6px}
+.profile p{color:var(--text-gray);font-size:14px;margin-bottom:16px}
+.profile ul{list-style:none;display:flex;flex-wrap:wrap;gap:7px}
+.profile li{font-size:12px;font-weight:600;background:#fff;border:1px solid var(--border);padding:5px 10px;border-radius:99px}
+
+/* ---------- CTA final / rodapé ---------- */
+.final{background:var(--senai-red);color:#fff;padding:72px 0;text-align:center}
+.final h2{color:#fff;margin:0 auto;max-width:16em}
+.final p{margin:14px auto 28px;max-width:32em;opacity:.92}
+.final .btn{background:#fff;color:var(--senai-red);border-color:#fff}
+.final .btn:hover{background:#FFE4E6;border-color:#FFE4E6}
+footer{padding:28px 0;color:var(--text-gray);font-size:13px;background:#fff;border-top:1px solid var(--border)}
 footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
-@media (max-width:900px){
- .hero .wrap,.feat,.two{grid-template-columns:1fr}
- .hero{padding:48px 0 64px}.feat{gap:32px}
- .steps{grid-template-columns:1fr 1fr;gap:32px 0}.step:nth-child(2)::after{display:none}
- nav a.hide{display:none}
+
+@media(max-width:960px){
+  .hero-grid,.split{grid-template-columns:1fr}
+  .split.reverse .mock-panel{order:0}
+  .resource-grid{grid-template-columns:1fr 1fr}
+  .steps{grid-template-columns:1fr 1fr}
+  .site-nav a:not(.btn){display:none}
+  .hero{padding:40px 0 56px}
 }
-@media (max-width:560px){
- .item{grid-template-columns:1fr;gap:6px}
- .steps{grid-template-columns:1fr}.step::after{display:none}
- nav{gap:0}section{padding:64px 0}
+@media(max-width:640px){
+  .resource-grid,.profiles,.steps{grid-template-columns:1fr}
+  .mock{grid-template-columns:1fr}
+  .mock-sidebar{display:none}
+  .mock-actions{grid-template-columns:1fr}
+  .section{padding:56px 0}
+  .hero-bullets{display:none}
 }
-@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}*{transition:none!important}}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*{transition:none!important}}
 </style>
 </head>
 <body>
-<header>
- <div class="wrap">
-  <a class="logo" href="#topo" aria-label="SENAI">SENAI</a>
-  <nav aria-label="Principal">
-   <a class="hide" href="#recursos">Recursos</a>
-   <a class="hide" href="#como-funciona">Como funciona</a>
-   <a class="hide" href="#perfis">Perfis</a>
-   <a class="btn sm" href="/login">Entrar</a>
-  </nav>
- </div>
+
+<header class="site-header">
+  <div class="wrap">
+    <a class="brand" href="/" aria-label="SENAI · Reserva de recursos">
+      <img src="/assets/img/Logo senai.png" alt="SENAI" width="150" height="50">
+    </a>
+    <nav class="site-nav" aria-label="Principal">
+      <a href="#recursos">Recursos</a>
+      <a href="#gestao">Gestão</a>
+      <a href="#aprovacao">Aprovação</a>
+      <a href="#como-funciona">Como funciona</a>
+      <a class="btn btn-sm" href="/login">Entrar</a>
+    </nav>
+  </div>
 </header>
 
-<main id="topo">
-<div class="hero">
- <div class="wrap">
-  <div>
-   <h1>Reserve salas, laboratórios e notebooks em poucos cliques.</h1>
-   <p class="lead">Um só lugar para professores pedirem recursos e a coordenação aprovar, sem planilhas, recados ou conflito de horário.</p>
-   <div class="cta">
-    <a class="btn" href="/login">Entrar no sistema</a>
-    <a class="btn ghost" href="#como-funciona">Ver como funciona</a>
-   </div>
-  </div>
-  <div class="app" role="img" aria-label="Prévia do sistema: próximas reservas e calendário de novembro de 2026">
-   <h4>Próximas reservas <span>Ver mais</span></h4>
-   <div class="row"><div class="ic">C11</div><div><b>Sala C11</b><small>06/10/2026 · 12:00 às 13:00</small></div><span class="pill ok">Aprovada</span></div>
-   <div class="row"><div class="ic">NB</div><div><b>Gabinete de Notebook A</b><small>09/10/2026 · 10:00 às 12:00</small></div><span class="pill ok">Aprovada</span></div>
-   <div class="row"><div class="ic">C13</div><div><b>Sala C13</b><small>12/11/2026 · 16:00 às 17:30</small></div><span class="pill wait">Aguardando</span></div>
-   <div class="cal" id="cal" aria-hidden="true"></div>
-  </div>
- </div>
-</div>
+<main>
 
-<section class="alt" id="recursos">
- <div class="wrap feat">
-  <div>
-   <h2>Tudo o que a coordenação precisa controlar.</h2>
-   <p class="sub">Cada recurso tem cadastro, disponibilidade e histórico de reservas.</p>
-   <div class="res"><span>Salas</span><span>Laboratórios</span><span>Gabinetes de notebooks</span></div>
-  </div>
-  <div class="list">
-   <div class="item"><h3>Reservas</h3><p>O professor escolhe o recurso, informa curso, motivo, data e horário, e envia o pedido.</p></div>
-   <div class="item"><h3>Aprovação</h3><p>A coordenação vê os pedidos em aberto e aprova ou recusa cada um. Também filtra por aprovadas, recusadas e canceladas.</p></div>
-   <div class="item"><h3>Calendário</h3><p>Cada dia mostra as reservas marcadas, com horário, sala e situação.</p></div>
-   <div class="item"><h3>Avisos e notificações</h3><p>Comunicados na página inicial e alertas a cada reserva criada ou alterada.</p></div>
-   <div class="item"><h3>Cadastro de recursos</h3><p>Nome, setor, capacidade, equipamentos e disponibilidade. A sala indisponível deixa de aparecer na reserva.</p></div>
-   <div class="item"><h3>Usuários e ajuda</h3><p>Cadastro de professores e coordenadores, perguntas frequentes e contato com o suporte de TI.</p></div>
-  </div>
- </div>
-</section>
+  <!-- HERO -->
+  <section class="hero">
+    <div class="wrap hero-grid">
+      <div>
+        <span class="eyebrow">Sistema de reservas · SENAI</span>
+        <h1>Salas, laboratórios e notebooks <em>reservados em poucos cliques.</em></h1>
+        <p class="lead">O professor escolhe o recurso, informa data e horário, e a coordenação aprova. Tudo em um só lugar — sem planilhas, recados ou conflito de horário.</p>
+        <div class="cta">
+          <a class="btn" href="/login">Entrar no sistema</a>
+          <a class="btn btn-ghost" href="#recursos">Conhecer os recursos</a>
+        </div>
+        <ul class="hero-bullets">
+          <li>Salas de aula</li>
+          <li>Laboratórios</li>
+          <li>Gabinetes de notebooks</li>
+          <li>Aprovação da coordenação</li>
+        </ul>
+      </div>
 
-<section id="como-funciona">
- <div class="wrap">
-  <h2>Do pedido à sala liberada em quatro etapas.</h2>
-  <div class="steps">
-   <div class="step"><h3>Escolha o recurso</h3><p>Sala de aula, laboratório ou gabinete de notebooks.</p></div>
-   <div class="step"><h3>Preencha os detalhes</h3><p>Curso, motivo, data, horário de entrada e de saída.</p></div>
-   <div class="step"><h3>Aguarde a resposta</h3><p>A coordenação aprova ou recusa, e você recebe uma notificação.</p></div>
-   <div class="step"><h3>Acompanhe</h3><p>Veja o status em Minhas reservas e cancele se o plano mudar.</p></div>
-  </div>
- </div>
-</section>
+      <!-- prévia fiel da tela inicial do sistema -->
+      <div class="mock" role="img" aria-label="Prévia da tela inicial: menu lateral, ações de reserva, próximas reservas e calendário">
+        <aside class="mock-sidebar">
+          <img class="mock-logo" src="/assets/img/Logo senai.png" alt="">
+          <nav class="mock-nav">
+            <span class="active"><img src="/assets/icons/home.png" alt="">Início</span>
+            <span><img src="/assets/icons/reserved.png" alt="">Reservar</span>
+            <span><img src="/assets/icons/history.png" alt="">Minhas Reservas</span>
+            <span><img src="/assets/icons/calendar.png" alt="">Calendário</span>
+            <span><img src="/assets/icons/notification.png" alt="">Notificações</span>
+            <span><img src="/assets/icons/warning.png" alt="">Avisos</span>
+            <span><img src="/assets/icons/gear.png" alt="">Configurações</span>
+          </nav>
+        </aside>
 
-<section class="alt" id="perfis">
- <div class="wrap">
-  <h2>Cada perfil vê só o que precisa.</h2>
-  <div class="two">
-   <div class="prof">
-    <h3>Professor</h3>
-    <p>Pede recursos para as aulas e acompanha cada solicitação.</p>
-    <ul><li>Início</li><li>Reservar</li><li>Minhas reservas</li><li>Calendário</li><li>Notificações</li><li>Avisos</li><li>Ajuda</li></ul>
-   </div>
-   <div class="prof main">
-    <h3>Coordenador</h3>
-    <p>Tem tudo do professor e gerencia reservas, recursos e pessoas.</p>
-    <ul><li>Aprovar reservas</li><li>Gerenciar recursos</li><li>Usuários</li><li>Publicar avisos</li><li>Configurações</li></ul>
-   </div>
-  </div>
- </div>
-</section>
+        <div class="mock-main">
+          <p class="mock-greeting">Olá, Professor</p>
+          <p class="mock-sub">O que você deseja reservar hoje?</p>
 
-<div class="final">
- <div class="wrap">
-  <h2>Precisa de uma sala hoje?</h2>
-  <p>Entre com seu e-mail e senha para reservar ou aprovar pedidos.</p>
-  <a class="btn" href="/login">Entrar no sistema</a>
- </div>
-</div>
+          <div class="mock-actions">
+            <div class="mock-action">
+              <span class="icon"><img src="/assets/icons/classroom.png" alt=""></span>
+              <b>Salas</b>
+              <small>Aula, reunião e treinamento</small>
+            </div>
+            <div class="mock-action">
+              <span class="icon"><img src="/assets/icons/computer.png" alt=""></span>
+              <b>Laboratórios</b>
+              <small>Informática e automação</small>
+            </div>
+            <div class="mock-action">
+              <span class="icon"><img src="/assets/icons/shopping-cart.png" alt=""></span>
+              <b>Gabinetes</b>
+              <small>Notebooks e equipamentos</small>
+            </div>
+          </div>
+
+          <div class="mock-section-title">Próximas reservas <span>Ver mais →</span></div>
+
+          <div class="mock-res">
+            <span class="ico"><img src="/assets/icons/classroom.png" alt=""></span>
+            <div><b>Sala C11</b><small>06/10/2026 · 12:00 às 13:00</small></div>
+            <span class="badge green">Aprovada</span>
+          </div>
+          <div class="mock-res">
+            <span class="ico"><img src="/assets/icons/shopping-cart.png" alt=""></span>
+            <div><b>Gabinete de Notebook A</b><small>09/10/2026 · 10:00 às 12:00</small></div>
+            <span class="badge green">Aprovada</span>
+          </div>
+          <div class="mock-res">
+            <span class="ico"><img src="/assets/icons/classroom.png" alt=""></span>
+            <div><b>Sala C13</b><small>12/11/2026 · 16:00 às 17:30</small></div>
+            <span class="badge yellow">Aguardando</span>
+          </div>
+
+          <div class="mock-cal">
+            <div class="mock-cal-head">Calendário <span>Novembro 2026</span></div>
+            <div class="mock-cal-grid" id="mockCal" aria-hidden="true"></div>
+          </div>
+
+          <div class="mock-notice">
+            <b><img src="/assets/icons/warning.png" alt="">Aviso importante</b>
+            <p>Laboratório 2 indisponível para manutenção nesta sexta-feira.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- RECURSOS -->
+  <section class="section alt" id="recursos">
+    <div class="wrap">
+      <div class="section-head">
+        <span class="eyebrow">Recursos</span>
+        <h2>Um catálogo para cada tipo de espaço.</h2>
+        <p>Cada recurso tem cadastro, capacidade, equipamentos, disponibilidade e histórico de reservas.</p>
+      </div>
+
+      <div class="resource-grid">
+        <article class="resource-card">
+          <span class="icon-box"><img src="/assets/icons/classroom.png" alt=""></span>
+          <h3>Salas de aula</h3>
+          <p>Salas para aulas, reuniões e treinamentos, com capacidade e setor cadastrados.</p>
+          <ul><li>Capacidade</li><li>Setor</li><li>Equipamentos</li></ul>
+        </article>
+
+        <article class="resource-card">
+          <span class="icon-box"><img src="/assets/icons/computer.png" alt=""></span>
+          <h3>Laboratórios</h3>
+          <p>Laboratórios de informática, automação, mecânica e outras especialidades.</p>
+          <ul><li>Computadores</li><li>Bancadas</li><li>Softwares</li></ul>
+        </article>
+
+        <article class="resource-card">
+          <span class="icon-box"><img src="/assets/icons/shopping-cart.png" alt=""></span>
+          <h3>Gabinetes de notebooks</h3>
+          <p>Notebooks e equipamentos móveis para levar até a sala de aula.</p>
+          <ul><li>Notebooks</li><li>Carrinhos</li><li>Projetores</li></ul>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- GESTÃO DE RECURSOS -->
+  <section class="section" id="gestao">
+    <div class="wrap split">
+      <div>
+        <span class="eyebrow">Gestão de recursos</span>
+        <h2>Cadastre, disponibilize e acompanhe.</h2>
+        <p>A coordenação mantém o catálogo atualizado. O recurso indisponível deixa de aparecer para reserva, e cada sala guarda o seu histórico.</p>
+        <ul class="check-list">
+          <li>Cadastro de nome, setor, capacidade e equipamentos</li>
+          <li>Controle de disponibilidade por recurso</li>
+          <li>Edição e exclusão com proteção contra reservas ativas</li>
+          <li>Histórico de reservas por sala, laboratório ou gabinete</li>
+        </ul>
+      </div>
+
+      <div class="mock-panel">
+        <div class="panel-head">
+          <h3>Gerenciar recursos</h3>
+          <span class="btn-mini">+ Novo recurso</span>
+        </div>
+        <div class="panel-tabs">
+          <span class="active">Salas</span>
+          <span>Laboratórios</span>
+          <span>Gabinetes</span>
+        </div>
+        <div class="panel-list">
+          <div class="panel-row">
+            <span class="ico"><img src="/assets/icons/classroom.png" alt=""></span>
+            <div><b>Sala C11</b><small>Sala de aula · 40 lugares · Setor A</small></div>
+            <span class="badge green">Disponível</span>
+          </div>
+          <div class="panel-row">
+            <span class="ico"><img src="/assets/icons/classroom.png" alt=""></span>
+            <div><b>Sala C13</b><small>Sala de aula · 35 lugares · Setor A</small></div>
+            <span class="badge green">Disponível</span>
+          </div>
+          <div class="panel-row">
+            <span class="ico"><img src="/assets/icons/computer.png" alt=""></span>
+            <div><b>Laboratório 2</b><small>Informática · 30 computadores · Setor B</small></div>
+            <span class="badge green">Disponível</span>
+          </div>
+          <div class="panel-row">
+            <span class="ico"><img src="/assets/icons/shopping-cart.png" alt=""></span>
+            <div><b>Gabinete de Notebook A</b><small>20 notebooks · 1 carrinho</small></div>
+            <span class="badge red">Indisponível</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- APROVAÇÃO -->
+  <section class="section alt" id="aprovacao">
+    <div class="wrap split reverse">
+      <div class="mock-panel">
+        <div class="panel-head">
+          <h3>Aprovar reservas</h3>
+          <span class="badge yellow">3 pendentes</span>
+        </div>
+        <div class="panel-list">
+          <div class="panel-row">
+            <span class="ico"><img src="/assets/icons/classroom.png" alt=""></span>
+            <div><b>Sala C13 · Prof. Gabriel</b><small>12/11/2026 · 16:00 às 17:30</small></div>
+            <div class="panel-actions"><span class="btn-approve">Aprovar</span><span class="btn-reject">Recusar</span></div>
+          </div>
+          <div class="panel-row">
+            <span class="ico"><img src="/assets/icons/computer.png" alt=""></span>
+            <div><b>Laboratório 2 · Prof. João</b><small>13/11/2026 · 08:00 às 10:00</small></div>
+            <div class="panel-actions"><span class="btn-approve">Aprovar</span><span class="btn-reject">Recusar</span></div>
+          </div>
+          <div class="panel-row">
+            <span class="ico"><img src="/assets/icons/shopping-cart.png" alt=""></span>
+            <div><b>Gabinete A · Prof. Guilherme</b><small>14/11/2026 · 10:00 às 12:00</small></div>
+            <span class="badge green">Aprovada</span>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <span class="eyebrow">Aprovação</span>
+        <h2>O coordenador decide. O professor acompanha.</h2>
+        <p>Cada pedido nasce como <strong>Aguardando</strong>. A coordenação aprova ou recusa, e o professor vê o status em Minhas Reservas e no calendário.</p>
+        <ul class="check-list">
+          <li>Fila de pedidos pendentes com filtros por status</li>
+          <li>Aprovação e recusa em um clique</li>
+          <li>Notificação para o professor a cada mudança</li>
+          <li>Cancelamento pelo próprio professor</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- COMO FUNCIONA -->
+  <section class="section" id="como-funciona">
+    <div class="wrap">
+      <div class="section-head">
+        <span class="eyebrow">Como funciona</span>
+        <h2>Do pedido à sala liberada em quatro etapas.</h2>
+      </div>
+      <div class="steps">
+        <div class="step"><span class="num">1</span><h3>Escolha o recurso</h3><p>Sala de aula, laboratório ou gabinete de notebooks.</p></div>
+        <div class="step"><span class="num">2</span><h3>Preencha os detalhes</h3><p>Curso, motivo, data, horário de entrada e de saída.</p></div>
+        <div class="step"><span class="num">3</span><h3>Aguarde a resposta</h3><p>A coordenação aprova ou recusa, e você recebe uma notificação.</p></div>
+        <div class="step"><span class="num">4</span><h3>Acompanhe</h3><p>Veja o status em Minhas Reservas e cancele se o plano mudar.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PERFIS -->
+  <section class="section alt" id="perfis">
+    <div class="wrap">
+      <div class="section-head">
+        <span class="eyebrow">Perfis</span>
+        <h2>Cada perfil vê só o que precisa.</h2>
+      </div>
+      <div class="profiles">
+        <div class="profile">
+          <h3>Professor</h3>
+          <p>Pede recursos para as aulas e acompanha cada solicitação.</p>
+          <ul><li>Início</li><li>Reservar</li><li>Minhas reservas</li><li>Calendário</li><li>Notificações</li><li>Avisos</li><li>Ajuda</li></ul>
+        </div>
+        <div class="profile main">
+          <h3>Coordenador</h3>
+          <p>Tem tudo do professor e gerencia reservas, recursos e pessoas.</p>
+          <ul><li>Aprovar reservas</li><li>Gerenciar recursos</li><li>Usuários</li><li>Publicar avisos</li><li>Configurações</li></ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA FINAL -->
+  <section class="final">
+    <div class="wrap">
+      <h2>Precisa de uma sala hoje?</h2>
+      <p>Entre com seu e-mail e senha para reservar uma sala, laboratório ou gabinete — ou aprovar os pedidos da coordenação.</p>
+      <a class="btn" href="/login">Entrar no sistema</a>
+    </div>
+  </section>
+
 </main>
 
 <footer>
- <div class="wrap">
-  <span>Gestão de salas e equipamentos · SENAI</span>
-  <span>Projeto de TCC · Desenvolvimento de Sistemas</span>
- </div>
+  <div class="wrap">
+    <span>Gestão de salas, laboratórios e equipamentos · SENAI</span>
+    <span>Projeto de TCC · Desenvolvimento de Sistemas</span>
+  </div>
 </footer>
 
 <script>
-(function(){
- var c=document.getElementById('cal'),h='';
- 'DSTQQSS'.split('').forEach(function(d){h+='<i>'+d+'</i>'});
- var marked=[4,5,10,12,23,24,25,28];
- for(var d=1;d<=30;d++){
-  var cls=d===12?'today has':(marked.indexOf(d)>-1?'has':'');
-  h+='<span class="'+cls+'">'+d+'</span>';
- }
- // 1º de novembro de 2026 cai num domingo, sem deslocamento
- c.innerHTML=h;
+(function () {
+  var cal = document.getElementById('mockCal');
+  if (!cal) return;
+
+  var html = '';
+  'DSTQQSS'.split('').forEach(function (d) {
+    html += '<span class="d">' + d + '</span>';
+  });
+
+  var marcados = [4, 5, 10, 12, 23, 24, 25, 28];
+  for (var dia = 1; dia <= 30; dia++) {
+    var classe = dia === 12 ? 'today has' : (marcados.indexOf(dia) > -1 ? 'has' : '');
+    html += '<span class="' + classe + '">' + dia + '</span>';
+  }
+
+  cal.innerHTML = html;
 })();
 </script>
 </body>
