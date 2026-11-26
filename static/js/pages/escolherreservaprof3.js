@@ -50,6 +50,8 @@ document.addEventListener('DOMContentLoaded', () => {
     card.classList.add('selected');
 
     // Guarda a escolha no sessionStorage para o passo 02.
+    // Gabinetes ainda não têm cadastro próprio, então categoria é
+    // gravada como 'Gabinete' (texto fixo, sem id de banco).
     sessionStorage.setItem(
       'salaSelecionada',
       JSON.stringify({
