@@ -15,20 +15,20 @@ self.addEventListener('activate', (event) => {
 });
 
 // Verificar se o navegador suporta Service Worker e PWA
-const isPWA = window.matchMedia('(display-mode: standalone)').matches;
+const isPWA = self.matchMedia ? self.matchMedia('(display-mode: standalone)').matches : false;
 
 // Mostrar notificação de instalação se não for PWA
 function showInstallNotification() {
-  if (!('serviceWorker' in navigator)) return;
+  if (!('serviceWorker' in self)) return;
 
   // Verificar se já está instalado como PWA
   if (isPWA) return;
 
   // Não guardamos em localStorage para que a notificação
   // sempre apareça para usuários que ainda não instalaram
-  
+
   // Solicitar permissão e mostrar notificação
-  navigator.serviceWorker.ready.then((registration) => {
+  self.registration.ready.then((registration) => {
     Notification.requestPermission().then((permission) => {
       if (permission === 'granted') {
         const notification = registration.showNotification(
@@ -56,31 +56,17 @@ function showInstallNotification() {
   });
 }
 
-// Executar quando a página carregar
-if ('serviceWorker' in navigator) {
-  window.addEventListener('load', showInstallNotification);
+// Executar quando o service worker ativar
+if ('serviceWorker' in self) {
+  // Aguarda o controle dos clientes antes de mostrar a notificação
+  self.clients.matchAll().then(() => {
+    showInstallNotification();
+  });
 }
 
-// Lidar with clicks nas notificações
 self.addEventListener('notificationclick', (event) => {
   event.notification.close();
-
-  const destino =
-    (event.notification.data && event.notification.data.url) || '/home';
-
   event.waitUntil(
-    clients
-      .matchAll({ type: 'window', includeUncontrolled: true })
-      .then((janelas) => {
-        for (const janela of janelas) {
-          if ('focus' in janela) {
-            if ('navigate' in janela) {
-              return janela.navigate(destino).then((j) => (j || janela).focus());
-            }
-            return janela.focus();
-          }
-        }
-        return self.clients.openWindow(destino);
-      })
+    clients.openWindow(event.notification.data.url || '/home')
   );
 });
