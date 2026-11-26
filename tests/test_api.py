@@ -742,7 +742,8 @@ def main():
             "/home_admin", "/reservar_admin", "/aprovar_reservas_adm",
             "/gerenciar_recursos_adm",
             "/avisos_adm", "/notificacoes_adm", "/calendario_adm",
-            "/professores_adm", "/configuracoes_adm", "/ajuda",
+            "/professores_adm", "/pendencias_adm", "/configuracoes_adm",
+            "/ajuda",
         ],
         str(itens),
     )
@@ -872,6 +873,60 @@ def main():
     banco.respostas.append([{"id": 2}])
     r = c.post("/api/notificacoes", json={"titulo": "Aviso", "mensagem": "Teste"})
     check("outro usuário no mesmo IP não é bloqueado", r.status_code == 201, r.text)
+    fechar(c)
+
+    print("\n[17] Configurações do professor e pedidos de senha")
+
+    c, banco = cliente_logado(USUARIO_PROF)
+
+    # Só nome vai ao update. O cargo é descartado pela rota, mesmo que
+    # o navegador (ou um cliente malicioso) tente enviá-lo.
+    banco.respostas.append([{
+        "id": 10, "nome": "Nome Atualizado",
+        "email": USUARIO_PROF["email"], "cargo": "Professor"
+    }])
+    r = c.put("/usuarios/me", json={
+        "nome": "Nome Atualizado", "cargo": "Coordenador"
+    })
+    check("professor salva o próprio perfil", r.status_code == 200, r.text)
+    check("professor não se promove a coordenador",
+          r.json().get("cargo") == "Professor" if r.status_code == 200 else False,
+          r.text)
+    atualizacoes = [x for x in banco.registros if x["operacao"] == "update"]
+    check("cargo não chega ao banco",
+          bool(atualizacoes) and "cargo" not in atualizacoes[-1]["dados"],
+          str(atualizacoes[-1]["dados"] if atualizacoes else {}))
+    r = c.get("/usuario_logado")
+    check("cabeçalho usa o nome novo da sessão",
+          r.status_code == 200 and r.json().get("nome") == "Nome Atualizado",
+          r.text)
+
+    # Rota administrativa continua fechada para o professor.
+    r = c.put("/usuarios/10", json={"nome": "Outro Nome"})
+    check("professor não edita usuário pela rota admin", r.status_code == 403, r.text)
+    fechar(c)
+
+    c, banco = cliente_logado(USUARIO_COORD)
+
+    r = c.get("/pendencias_adm")
+    check("tela de pedidos de senha abre para o coordenador",
+          r.status_code == 200 and "Pedidos de Senha" in r.text, r.text[:200])
+
+    banco.respostas.append([{
+        "id": 3, "usuario_id": 10, "status": "pendente",
+        "solicitado_em": "2026-11-26T10:00:00"
+    }])
+    r = c.get("/pendencias")
+    check("pendências trazem data do pedido",
+          r.status_code == 200 and r.json()[0].get("solicitado_em") is not None,
+          r.text)
+    fechar(c)
+
+    c, _ = cliente_logado(USUARIO_PROF)
+    # follow_redirects=False: sem isso o TestClient segue o 302 para
+    # /home e o teste veria 200, escondendo o bloqueio da tela.
+    r = c.get("/pendencias_adm", follow_redirects=False)
+    check("professor não vê a tela de pedidos", r.status_code == 302, r.text[:200])
     fechar(c)
 
     print(f"\n{estado['passou']} passaram, {estado['falhou']} falharam\n")
