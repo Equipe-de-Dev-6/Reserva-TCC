@@ -537,6 +537,11 @@ def montar_horario(data: str, hora: str) -> str:
     A coluna é TIMESTAMPTZ, e o valor vai sem fuso porque é o horário
     que o professor leu no relógio da parede. O banco guarda como UTC e
     devolve sempre em UTC, que é como a API e as telas leem de volta.
+
+    Fluxo:
+    1. Valida que "data hora" segue o formato "%Y-%m-%d %H:%M".
+    2. Se inválido, levanta HTTPException 400.
+    3. Devolve "AAAA-MM-DDTHH:MM:00".
     """
     try:
         datetime.strptime(
@@ -559,6 +564,13 @@ def sala_para_json(dados: dict) -> dict:
     "caracteristica" separado em setor, capacidade, equipamentos e
     descrição, e a categoria da sala, classificada no servidor para
     que o navegador não precise repetir a conta.
+
+    Fluxo:
+    1. Converte a linha bruta para o modelo Sala.
+    2. Classifica a categoria a partir da característica.
+    3. Devolve um dicionário com id, campos da Sala, reservavel,
+       contexto (setor, quantidade, equipamentos, descrição),
+       categoria e categoriaRotulo.
     """
     sala = Sala.fromJson(dados)
 
@@ -581,6 +593,14 @@ def ler_contexto(caracteristica: str) -> dict:
     "Quantidade de alunos: 32; Setor: TSI; Equipamentos: Projetor;
     Descrição: Sala de aula". Uma sala fora do padrão rende um contexto
     vazio, em vez de derrubar a tela inteira.
+
+    Fluxo:
+    1. Inicializa o contexto com valores vazios/padrão.
+    2. Separa a característica por ";".
+    3. Para cada pedaço com ":", extrai chave e valor.
+    4. Mapeia cada chave para o campo correspondente do contexto.
+    5. Para quantidade, valida que seja um número puro.
+    6. Devolve o dicionário de contexto.
     """
     contexto = {
         CHAVE_SETOR: '',
@@ -636,6 +656,13 @@ def reserva_para_json(dados: dict) -> dict:
     "salas(nome)"), e não da coluna "item", que é uma cópia do nome
     feita no momento da reserva: renomear a sala deixaria as reservas
     antigas mostrando o nome velho.
+
+    Fluxo:
+    1. Extrai data_inicio e data_fim da linha bruta.
+    2. Extrai o objeto salas (embutido na consulta) para obter o nome.
+    3. Devolve dicionário com data, horaEntrada, horaSaida, timestamps
+       crus, status, categoria, item, sala_nome, professor, curso,
+       motivo, criadoEm, atualizadoEm, salaId, usuarioId.
     """
     inicio = str(dados.get("data_inicio") or "")
     fim = str(dados.get("data_fim") or "")
@@ -664,6 +691,7 @@ def reserva_para_json(dados: dict) -> dict:
 
 
 def carrinho_para_json(dados: dict) -> dict:
+    """Converte uma linha de "carrinhos" no formato das telas."""
     return {
         "id": dados.get("id"),
         **Carrinho.fromJson(dados).toJson()
@@ -696,6 +724,8 @@ DECISOES_RESERVA = (
 
 @app.get("/")
 async def inicio(request: Request):
+    """Página de entrada. Se já houver sessão, redireciona para a home
+    do perfil; caso contrário, mostra a landing page."""
     if request.session.get("usuario_id"):
         destino = "/home_admin" if eh_coordenador(request) else "/home"
 
@@ -722,7 +752,22 @@ async def login_get(request: Request):
 
 @app.post('/login')
 async def login_post(request: Request):
-    """Processa login do usuário"""
+    """Processa login do usuário.
+
+    Fluxo:
+    1. Obtém o endereço IP do cliente (para limite de tentativas).
+    2. Verifica se ainda há tentativas restantes para esse IP.
+    3. Lê o formulário (email, senha).
+    4. Busca o usuário por e-mail no Supabase.
+    5. Se não encontrar, registra tentativa e devolve 401 (mesmo erro
+       da senha errada, para não revelar e-mails existentes).
+    6. Se encontrar, verifica a senha com bcrypt.verify_password.
+    7. Se a senha estiver errada, registra tentativa e devolve 401.
+    8. Se acertar, zera as tentativas do IP, limpa a sessão anterior e
+       grava os dados do usuário na sessão criptografada.
+    9. Devolve JSON com o cargo ('coordenador' ou 'prof') para o
+       frontend navegar para a home correta.
+    """
     endereco = _endereco_de(request)
 
     if _tentativas_restantes(endereco) <= 0:
@@ -794,7 +839,7 @@ async def logout(request: Request):
 
 @app.get("/usuario_logado")
 async def usuario_logado(request: Request):
-    """Retorna os dados do usuário armazenados na sessão"""
+    """Retorna os dados do usuário armazenados na sessão."""
 
     nome = request.session.get("usuario_nome")
 
@@ -967,6 +1012,7 @@ def _criar_paginas():
 
 
 _criar_paginas()
+
 
 # ============================================================
 # PÁGINAS DO COORDENADOR
@@ -1142,6 +1188,13 @@ def buscar_id_para_redefinicao(email: str, request: Request):
     login. Devolve apenas o ID (nunca nome, cargo ou senha) e usa o
     mesmo limite de tentativas do login, para dificultar que alguém
     teste e-mails em massa para descobrir quem tem conta.
+
+    Fluxo:
+    1. Obtém o endereço IP do cliente.
+    2. Verifica o limite de tentativas.
+    3. Busca o usuário por e-mail (normalizado).
+    4. Se não encontrar, registra tentativa e devolve 404.
+    5. Se encontrar, devolve apenas o id.
     """
     endereco = _endereco_de(request)
 
@@ -1927,7 +1980,6 @@ async def recusar_pendencia(pendencia_id: int, request: Request):
         )
 
     return {"mensagem": "Solicitação negada com sucesso"}
-
 
 
 # ============================================================
