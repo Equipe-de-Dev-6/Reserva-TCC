@@ -7,48 +7,11 @@ document.addEventListener('DOMContentLoaded', () => {
       }
 
       // ======================================================
-      // NOME DO USUÁRIO LOGADO
+      // PESQUISA (gerenciada por app.js / search.js)
       // ======================================================
-// ======================================================
-      // PESQUISA
-      // ======================================================
-
-      
 
       const itemsToSearch =
         document.querySelectorAll('.searchable');
-
-      
-
-      // ======================================================
-      // DROPDOWN DO USUÁRIO
-      // ======================================================
-
-      
-
-      
-
-      
-
-      
-
-      
-
-      // ======================================================
-      // MENU MOBILE
-      // ======================================================
-
-      
-
-      
-
-      
-
-      
-
-      
-
-      
 
       // ======================================================
       // ÍCONE DA CATEGORIA
@@ -169,23 +132,14 @@ document.addEventListener('DOMContentLoaded', () => {
       // ======================================================
       // AÇÕES DAS RESERVAS
       // ======================================================
-
-      const listaReservas =
-        document.getElementById(
-          'proximasReservasList'
-        );
-
-      if (listaReservas) {
-
-        // O coordenador so aprova ou recusa reservas na tela de
-        // aprovar_reservas_adm. Nao exclui nem cancela daqui.
-
-      }
+      //
+      // O coordenador só aprova ou recusa reservas na tela de
+      // aprovar_reservas_adm. Não exclui nem cancela daqui.
 
       renderProximasReservas();
 
       // ======================================================
-      // ATUALIZAÇÃO DAS RESERVAS
+      // ATUALIZAÇÃO DAS RESERVAS (re-render ao mudar)
       // ======================================================
 
       ReservasApp.subscribe(() => {
@@ -282,7 +236,7 @@ document.addEventListener('DOMContentLoaded', () => {
       renderAvisosPreview();
 
       // ======================================================
-      // ATUALIZAÇÃO DOS AVISOS
+      // ATUALIZAÇÃO DOS AVISOS (re-render ao mudar)
       // ======================================================
 
       AvisosApp.subscribe(() => {
@@ -292,7 +246,7 @@ document.addEventListener('DOMContentLoaded', () => {
       });
 
       // ======================================================
-      // CALENDÁRIO
+      // CALENDÁRIO WIDGET
       // ======================================================
 
       const hoje = new Date();
@@ -441,7 +395,7 @@ document.addEventListener('DOMContentLoaded', () => {
       }
 
       // ======================================================
-      // INICIALIZA CALENDÁRIO
+      // INICIALIZA CALENDÁRIO WIDGET
       // ======================================================
 
       try {
