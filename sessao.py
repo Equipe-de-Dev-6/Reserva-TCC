@@ -2,7 +2,7 @@
 
 O FastAPI traz uma sessão própria (a SessionMiddleware do Starlette), mas
 ela apenas **assina** o cookie: quem abrir o DevTools lê o conteúdo
-inteiro. No caso do Reserva SENHA, isso expõe o e-mail, o nome e o cargo
+inteiro. No caso do Reserva SENAI, isso expõe o e-mail, o nome e o cargo
 de quem está logado para qualquer pessoa com acesso ao navegador.
 
 Aqui a sessão é gravada com o Fernet, que cifra *e* autentica. Sem a
@@ -16,12 +16,12 @@ todas as abas ao mesmo tempo exigiria uma lista de revogação, que não
 existe — ver o README.
 """
 
-import base64
-import hashlib
-import json
+import base64  # converte o digest SHA-256 para o alfabeto que o Fernet exige
+import hashlib  # transforma a SECRET_KEY em 32 bytes
+import json  # serializa o dicionário da sessão dentro do token
 
-from cryptography.fernet import Fernet, InvalidToken
-from starlette.middleware.base import BaseHTTPMiddleware
+from cryptography.fernet import Fernet, InvalidToken  # cifra/autentica o cookie
+from starlette.middleware.base import BaseHTTPMiddleware  # intercepta request/response
 
 
 # ============================================================
@@ -36,8 +36,11 @@ def derivar_chave(segredo: str) -> Fernet:
     uma chave do tamanho certo, sem precisar exigir um formato
     específico de quem configura.
     """
+    # O digest é determinístico: a mesma SECRET_KEY sempre gera a mesma
+    # chave, o que mantém as sessões válidas entre reinícios do servidor.
     digest = hashlib.sha256(segredo.encode("utf-8")).digest()
 
+    # O Fernet trabalha com chaves de 32 bytes em base64 url-safe.
     return Fernet(base64.urlsafe_b64encode(digest))
 
 
@@ -55,22 +58,28 @@ class Sessao(dict):
     """
 
     def __init__(self, *args, **kwargs):
+        # O dict normal guarda os dados; "alterado" só controla se o
+        # middleware precisa reescrever o cookie no fim da requisição.
         super().__init__(*args, **kwargs)
         self.alterado = bool(args or kwargs)
 
     def __setitem__(self, chave, valor):
+        # Usado pelo login: request.session["usuario_id"] = ...
         super().__setitem__(chave, valor)
         self.alterado = True
 
     def __delitem__(self, chave):
+        # Remove um dado da sessão e também exige reescrita do cookie.
         super().__delitem__(chave)
         self.alterado = True
 
     def update(self, *args, **kwargs):
+        # Escreve vários campos de uma vez (compatibilidade com o dict).
         super().update(*args, **kwargs)
         self.alterado = True
 
     def clear(self):
+        # Usado no logout e no login (para descartar sessão anterior).
         super().clear()
         self.alterado = True
 
@@ -106,8 +115,11 @@ class SessaoMiddleware(BaseHTTPMiddleware):
         https_only: bool = False,
         caminho: str = "/",
     ):
+        # BaseHTTPMiddleware envolve a aplicação e tem acesso ao request
+        # antes da rota e à response depois dela.
         super().__init__(app)
 
+        # Uma única instância do Fernet serve para todas as requisições.
         self._fernet = derivar_chave(segredo)
         self._nome = nome_do_cookie
         # O ttl do Fernet faz o próprio token expirar, além do
@@ -144,8 +156,9 @@ class SessaoMiddleware(BaseHTTPMiddleware):
         if not isinstance(dados, dict):
             return Sessao()
 
+        # Sessao(dados) marcará "alterado = True"; aqui ele é desligado
+        # porque os dados vieram do próprio cookie e ainda não mudaram.
         sessao = Sessao(dados)
-        # Já veio do cookie, então ainda não precisa ser reescrito.
         sessao.alterado = False
 
         return sessao
@@ -156,11 +169,15 @@ class SessaoMiddleware(BaseHTTPMiddleware):
 
     def _fechar(self, sessao: Sessao) -> str:
         """Cifra a sessão e devolve o valor do cookie."""
+        # dict(sessao) tira o atributo "alterado": só os dados da sessão
+        # entram no token. Os separadores curtos deixam o cookie menor.
         bruto = json.dumps(
             dict(sessao),
             separators=(",", ":"),
         ).encode("utf-8")
 
+        # Fernet já assina e cifra; o resultado é texto em base64, pronto
+        # para o cabeçalho Set-Cookie.
         return self._fernet.encrypt(bruto).decode("utf-8")
 
     # ------------------------------------------------------------
@@ -176,6 +193,8 @@ class SessaoMiddleware(BaseHTTPMiddleware):
         # colocada, e as rotas a acessam como um dicionário comum.
         request.scope["session"] = sessao
 
+        # A rota lê e escreve em request.session como se fosse um dict
+        # comum; o middleware é quem converte isso para o cookie.
         resposta = await call_next(request)
 
         if not sessao:
