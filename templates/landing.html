@@ -8,9 +8,9 @@
 
   <title>SENAI · Reserva de salas, laboratórios e gabinetes</title>
 
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <!-- A landing não baixa fontes de terceiros: se houver Inter instalada
+       no equipamento ela é usada; senão entra a fonte do sistema. Assim a
+       apresentação funciona mesmo sem internet. -->
 
   <!-- Mesmo favicon e manifest das telas internas do sistema. -->
   <link rel="icon" type="image/png" href="/static/assets/img/favicon.png?v=2">
@@ -21,7 +21,8 @@
   <meta property="og:title" content="SENAI · Reserva de salas, laboratórios e gabinetes">
   <meta property="og:description" content="Solicite salas, laboratórios e gabinetes, acompanhe o status e deixe a aprovação com a coordenação.">
 
-  <link rel="stylesheet" href="/css/landing.css?v=1">
+  <!-- A versão no query string evita que o navegador reaproveite o CSS antigo. -->
+  <link rel="stylesheet" href="/css/landing.css?v=2">
 
   <script>
     // Aplica o tema antes de pintar a tela para evitar o "flash" branco.
@@ -256,7 +257,8 @@
                     <div class="mock-cal">
                       <div class="mock-cal-head">
                         Calendário
-                        <span id="mockCalLabel">Novembro 2026</span>
+                        <!-- O landing.js substitui pelo mês e ano atuais. -->
+                        <span id="mockCalLabel">Mês atual</span>
                       </div>
                       <div class="mock-cal-grid" id="mockCalGrid" aria-hidden="true"></div>
                     </div>
@@ -468,6 +470,11 @@
               <li class="module-item">
                 <img src="/assets/icons/user (3).png" alt="">
                 <span><b>Usuários</b><small>Cadastrar professores e coordenadores.</small></span>
+              </li>
+              <!-- Item que faltava na vitrine, mas já existe no menu real. -->
+              <li class="module-item">
+                <img src="/assets/icons/warning.png" alt="">
+                <span><b>Pedidos de Senha</b><small>Analisar trocas de senha solicitadas no login.</small></span>
               </li>
               <li class="module-item">
                 <img src="/assets/icons/gear.png" alt="">
@@ -695,7 +702,8 @@
         <div class="calendar-demo">
           <div class="calendar-demo-card">
             <div class="calendar-demo-head">
-              <h3 id="demoMonthLabel">Novembro 2026</h3>
+              <!-- Texto neutro até o landing.js calcular o mês atual. -->
+              <h3 id="demoMonthLabel">Mês atual</h3>
               <div class="calendar-nav">
                 <button type="button" id="demoPrev" aria-label="Mês anterior">
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
@@ -724,7 +732,8 @@
           <aside class="calendar-demo-panel">
             <h3 id="demoDayTitle">Reservas - Dia --</h3>
             <p class="day-sub" id="demoDaySubtitle">Selecione um dia no calendário.</p>
-            <div id="demoDayList" class="demo-day-list"></div>
+            <!-- Avisa leitores de tela quando o dia selecionado muda. -->
+            <div id="demoDayList" class="demo-day-list" aria-live="polite"></div>
             <a class="btn btn-ghost btn-sm demo-enter" href="/login">Entrar para reservar</a>
           </aside>
         </div>
@@ -841,13 +850,18 @@
             </p>
           </details>
 
+          <!-- Texto atualizado para o fluxo real: a nova senha é enviada no
+               formulário e só vale depois da aprovação do coordenador. -->
           <details>
             <summary>Esqueci minha senha. O que faço?</summary>
             <p>
               Na tela de login, clique em <strong>Esqueci minha senha</strong> e informe
-              seu e-mail. O sistema gera um ID de redefinição; com esse ID, procure a
-              coordenação para redefinir a senha. Não existe autocadastro: as contas
-              são criadas pelo coordenador em <strong>Usuários</strong>.
+              seu e-mail, a nova senha (mínimo de 6 caracteres) e a confirmação. O
+              sistema registra o pedido, mostra o número da solicitação e guarda a
+              senha como <strong>hash</strong> — ela não é enviada por e-mail e só é
+              aplicada quando o coordenador aprova em <strong>Pedidos de Senha</strong>.
+              Não existe autocadastro: as contas são criadas pelo coordenador em
+              <strong>Usuários</strong>.
             </p>
           </details>
 
@@ -855,9 +869,9 @@
             <summary>O que o coordenador gerencia?</summary>
             <p>
               Reservas (aprovar ou recusar), recursos (salas, laboratórios e
-              gabinetes), usuários (professores e coordenadores), avisos,
-              calendário, notificações e configurações. O professor vê apenas as
-              próprias reservas; o coordenador vê todas.
+              gabinetes), usuários (professores e coordenadores), pedidos de troca
+              de senha, avisos, calendário, notificações e configurações. O professor
+              vê apenas as próprias reservas; o coordenador vê todas.
             </p>
           </details>
         </div>
@@ -918,12 +932,13 @@
       </div>
 
       <div class="footer-bottom">
-        <span>© 2026 SENAI · Gestão de salas e equipamentos</span>
+        <!-- O landing.js preenche o ano para o rodapé não ficar datado. -->
+        <span>© <span data-ano-atual>2026</span> SENAI · Gestão de salas e equipamentos</span>
         <span>Projeto de TCC · Desenvolvimento de Sistemas</span>
       </div>
     </div>
   </footer>
 
-  <script src="/js/landing.js?v=1" defer></script>
+  <script src="/js/landing.js?v=2" defer></script>
 </body>
 </html>
