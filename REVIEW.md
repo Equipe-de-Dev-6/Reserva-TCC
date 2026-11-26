@@ -45,11 +45,13 @@ python -m compileall -q app.py model.py db.py consulta.py consulta_salas.py crip
  71 verificações em test_reservas.js   — 0 falhas
   6 verificações em test_avisos.js     — 0 falhas
  14 verificações em test_calendario.js — 0 falhas
- 51 verificações em check_frontend.js — 0 falhas
+ 58 verificações em check_frontend.js — 0 falhas
  36 verificações em check_migrations.js— 0 falhas
 check_wiring.js: 0 rotas quebradas, 25/25 templates, 21/21 CSS, 0 links quebrados
 node --check e compileall: sem erros
 python tests/run.py: "tudo certo", código de saída 0
+Lighthouse na landing: acessibilidade 1, boas práticas 1, SEO 1, sem falhas
+Layout em 320/375/768/1024/1440px: sem overflow horizontal ou imagens quebradas
 ```
 
 Nenhum teste acessa o Supabase de verdade: o cliente é substituído por um
@@ -177,6 +179,31 @@ usuário não precisava ver. O que mudou:
 Validação real da landing em servidor local: página e assets com HTTP 200,
 nenhum erro de console, 35 células no calendário do mês corrente, uma única
 célula selecionada/tabbable, menu e navegação por seta verificados no DOM.
+
+### Landing pública (terceira rodada — revisão visual)
+
+A pedido (“corrija todos os problemas visuais”), a página passou por uma nova
+inspeção no navegador, com Lighthouse e larguras de 320 a 1440px:
+
+- **Celular**: a prévia decorativa do sistema (textos abaixo de 9px e quase
+  uma tela de altura) foi escondida em `max-width: 640px`. O conteúdo real
+  chega primeiro e não compete com uma ilustração.
+- **Tablet**: os cards de módulos não colapsam mais em uma coluna aos
+  1024px — permanecem em duas até 640px, evitando o dobro de altura.
+- **Tema escuro**: o logotipo da prévia ganhou fundo branco, deixando de
+  aparecer como um retângulo solto dentro da barra escura.
+- **Acessibilidade**: rodapé usa `h3` (não pula de `h2` para `h4`), o logo
+  do cabeçalho não tem `aria-label` divergente do texto visível, e o contador
+  do calendário é desenhado por `::after` com `data-count`. Assim o número
+  continua visível sem duplicar o texto dentro do botão; o `aria-label`
+  descreve data e quantidade.
+- **Textos**: “Comunicados publicados no sistema aparecem na página inicial”
+  (a publicação não é feita só pela coordenação) e “As contas são criadas e
+  as trocas de senha aprovadas pela coordenação”.
+- **Cache**: CSS e JS passaram de `?v=3` para `?v=4`.
+
+Resultado: Lighthouse 1/1/1 sem falhas, 58 verificações em `check_frontend.js`
+e nenhum overflow nas larguras testadas.
 
 ---
 
