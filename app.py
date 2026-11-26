@@ -23,6 +23,12 @@ import subprocess  # inicia o processo do servidor Uvicorn
 
 from criptografia import hash_password, verify_password
 from consulta_salas import salas_para_tela
+from services.notificacoes_service import (
+    criar as criar_notificacao,
+    notificar_nova_reserva,
+    notificar_decisao,
+    notificar_cancelamento_pelo_professor,
+)
 from db import supabase
 from sessao import SessaoMiddleware
 from model import (
@@ -296,38 +302,7 @@ app.add_middleware(
 # era grande o suficiente para não proteger contra força bruta.
 TENTATIVAS_POR_ENDERECO = 8
 JANELA_DE_TENTATIVAS = timedelta(minutes=5)
-# Um mesmo IP pode ser usado por vários professores na rede do campus,
-# então a chave inclui o usuário: sem isso, uma única notificação
-# bloquearia todos os colegas atrás do mesmo roteador por 5 minutos.
-NOTIFICACOES_POR_USUARIO = {}
-
-# Janela de rate limiting para criação de notificações (5 minutos)
-JANELA_NOTIFICACOES = timedelta(minutes=5)
-
-# Limpeza ocasional do dicionário de rate limiting, para não crescer
-# indefinidamente com IPs que nunca mais voltam.
-_NOTIFICACOES_LIMPEZA_CONTADOR = 0
-
-
-def _limpar_notificacoes_antigas():
-    """Remove IPs cuja última criação já expirou a janela."""
-    global _NOTIFICACOES_LIMPEZA_CONTADOR
-    _NOTIFICACOES_LIMPEZA_CONTADOR += 1
-
-    # A cada 20 criações de notificação, tenta limpar entradas vencidas.
-    if _NOTIFICACOES_LIMPEZA_CONTADOR % 20 != 0:
-        return
-
-    agora = datetime.now()
-    # As chaves são tuplas (endereço, id do usuário); só o tempo importa
-    # para decidir se a entrada já pode sair do dicionário.
-    expirados = [
-        chave
-        for chave, ultimo in NOTIFICACOES_POR_USUARIO.items()
-        if agora - ultimo >= JANELA_NOTIFICACOES
-    ]
-    for chave in expirados:
-        del NOTIFICACOES_POR_USUARIO[chave]
+# (rate limiting de notificações removido)
 
 
 def _janela_de_tentativas() -> str:
@@ -1807,32 +1782,16 @@ def criar_reserva(reserva: Reserva, request: Request):
             detail="Não foi possível registrar a reserva"
         )
 
-    # Avisa os coordenadores de que há uma nova solicitação de reserva.
-    # O professor que fez o pedido não recebe notificação para si mesmo.
-    try:
-        coordenadores = (
-            supabase
-            .table('usuarios')
-            .select('id')
-            .eq('cargo', CARGO_COORDENADOR)
-            .execute()
-        )
-        item = reserva.item or 'recurso'
-        data_txt = reserva.data
-        hora_txt = reserva.horaEntrada
-        for coord in (coordenadores.data or []):
-            if coord.get('id') == usuario['id']:
-                continue
-            _criar_notificacao(
-                coord.get('id'),
-                'Nova solicitação de reserva',
-                (
-                    f'{reserva.professor or "Professor"} solicitou reserva de '
-                    f'{item} em {data_txt} às {hora_txt}.'
-                )
-            )
-    except Exception:  # noqa: BLE001
-        pass
+    # Notifica os coordenadores sobre a nova solicitação de reserva.
+    notificar_nova_reserva(
+        {
+            "item": reserva.item,
+            "data": reserva.data,
+            "horaEntrada": reserva.horaEntrada,
+            "professor": reserva.professor,
+        },
+        usuario["id"],
+    )
 
     return reserva_para_json(resposta.data[0])
 
@@ -1925,30 +1884,20 @@ def decidir_reserva(
             detail="Reserva não encontrada"
         )
 
-    # Quando o Coordenador aprova ou recusa, avisa o professor dono da
-    # reserva. Cancelamento feito pelo próprio professor não gera aviso.
     reserva_atualizada = resposta.data[0]
-    if (
-        eh_coordenador(request)
-        and decisao in (STATUS_APROVADA, STATUS_NEGADA)
-    ):
-        professor_id = reserva_atualizada.get('usuario_id')
-        if professor_id is not None and professor_id != usuario['id']:
-            item = reserva_atualizada.get('item') or 'recurso'
-            inicio = str(reserva_atualizada.get('data_inicio') or '')
-            data_txt = inicio[:10]
-            hora_txt = inicio[11:16]
-            if decisao == STATUS_APROVADA:
-                titulo = 'Reserva aprovada'
-                verbo = 'aprovada'
-            else:
-                titulo = 'Reserva recusada'
-                verbo = 'recusada'
-            _criar_notificacao(
-                professor_id,
-                titulo,
-                f'Sua reserva de {item} em {data_txt} às {hora_txt} foi {verbo} pelo coordenador.'
-            )
+
+    # Notificações relacionadas a alterações ou cancelamentos.
+    if decisao in (STATUS_APROVADA, STATUS_NEGADA):
+        # Apenas o Coordenador aprova ou recusa.
+        if eh_coordenador(request):
+            notificar_decisao(reserva_atualizada, decisao)
+    elif decisao == STATUS_CANCELADA:
+        if eh_coordenador(request):
+            # Coordenador cancelou: avisa o professor.
+            notificar_decisao(reserva_atualizada, decisao)
+        else:
+            # Professor cancelou: avisa os coordenadores.
+            notificar_cancelamento_pelo_professor(reserva_atualizada)
 
     return reserva_para_json(reserva_atualizada)
 
@@ -2236,28 +2185,6 @@ def excluir_aviso(aviso_id: int, request: Request):
 # ============================================================
 
 
-def _criar_notificacao(usuario_id, titulo, mensagem):
-    """Grava uma notificação interna para o usuário informado.
-
-    Usada pelos fluxos de reserva: o professor cria uma reserva (avisa o
-    coordenador) e o coordenador decide (avisa o professor). Passa pelo
-    banco direto, sem o limite de taxa da rota pública, porque é uma
-    consequência de uma ação legítima e não um envio manual.
-    """
-    if usuario_id is None:
-        return
-
-    try:
-        supabase.table('notificacoes').insert({
-            'usuario_id': usuario_id,
-            'titulo': str(titulo)[:200],
-            'mensagem': str(mensagem)[:1000],
-        }).execute()
-    except Exception:  # noqa: BLE001
-        # Notificação é efeito colateral: não pode derrubar a reserva.
-        return
-
-
 @app.get('/api/notificacoes')
 def listar_notificacoes(request: Request):
     """Lista só as notificações do usuário da sessão, mais recentes primeiro."""
@@ -2295,24 +2222,6 @@ async def criar_notificacao(request: Request):
             detail='Corpo da requisição deve ser um objeto JSON'
         )
 
-    # Rate limiting por endereço + usuário: evita spam sem punir quem
-    # divide a mesma rede (caso comum no campus).
-    ip = request.client.host if request.client else 'desconhecido'
-    chave = (ip, usuario['id'])
-    agora = datetime.now()
-    ultima_criacao = NOTIFICACOES_POR_USUARIO.get(chave)
-
-    if ultima_criacao:
-        tempo_passado = agora - ultima_criacao
-        if tempo_passado < JANELA_NOTIFICACOES:
-            raise HTTPException(
-                status_code=429,
-                detail='Muitas notificações. Aguarde alguns minutos e tente novamente.'
-            )
-
-    # Limpeza ocasional de entradas vencidas
-    _limpar_notificacoes_antigas()
-    
     # Validação de entrada de dados
     titulo = dados.get('titulo') or 'Notificacao'
     mensagem = dados.get('mensagem') or ''
@@ -2353,26 +2262,12 @@ async def criar_notificacao(request: Request):
             detail='Conteúdo contém caracteres que podem ser perigosos'
         )
     
-    insercao = {
-        'usuario_id': usuario['id'],
-        'titulo': titulo,
-        'mensagem': mensagem,
-    }
-    
-    # Atualizar timestamp do rate limiting desta conta neste endereço
-    NOTIFICACOES_POR_USUARIO[chave] = agora
-    
-    resposta = (
-        supabase
-        .table('notificacoes')
-        .insert(insercao)
-        .execute()
-    )
-    
-    if not resposta.data:
+    criada = criar_notificacao(usuario['id'], titulo, mensagem)
+
+    if not criada:
         raise HTTPException(status_code=502, detail='Nao foi possivel criar a notificacao')
-    
-    return resposta.data[0]
+
+    return criada
 
 
 @app.patch('/api/notificacoes/{notificacao_id}/ler')

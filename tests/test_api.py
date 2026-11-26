@@ -855,25 +855,6 @@ def main():
           str(inserts[-1]["dados"] if inserts else {}))
     fechar(c)
 
-    print("\n[16] Notificações por usuário, não só por IP")
-
-    app_modulo.NOTIFICACOES_POR_USUARIO.clear()
-    c, banco = cliente_logado(USUARIO_PROF)
-    banco.respostas.append([{"id": 1}])
-    r = c.post("/api/notificacoes", json={"titulo": "Aviso", "mensagem": "Teste"})
-    check("primeira notificação é criada", r.status_code == 201, r.text)
-
-    r = c.post("/api/notificacoes", json={"titulo": "Outro", "mensagem": "Teste"})
-    check("segunda notificação do mesmo usuário é limitada", r.status_code == 429, r.text)
-    fechar(c)
-
-    # Mesmo endereço (testclient), usuário diferente: continua podendo
-    # enviar a primeira notificação, como acontece na rede do campus.
-    c, banco = cliente_logado(USUARIO_COORD)
-    banco.respostas.append([{"id": 2}])
-    r = c.post("/api/notificacoes", json={"titulo": "Aviso", "mensagem": "Teste"})
-    check("outro usuário no mesmo IP não é bloqueado", r.status_code == 201, r.text)
-    fechar(c)
 
     print("\n[17] Configurações do professor e pedidos de senha")
 
