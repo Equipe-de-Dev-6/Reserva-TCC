@@ -56,15 +56,21 @@
 
                         <div class="form-group">
 
+                            {# Somente leitura: o professor não altera o
+                               próprio cargo. A tela dos administradores
+                               é quem muda essa informação. #}
                             <label for="cargo">
                                 Cargo / Função
                             </label>
 
                             <div class="input-container">
 
-                                <input type="text" id="cargo" name="cargo">
+                                <input type="text" id="cargo"
+                       value="{{ usuario.cargo }}" disabled>
 
                             </div>
+
+                            <small>Alterado apenas pelo coordenador.</small>
 
                         </div>
 

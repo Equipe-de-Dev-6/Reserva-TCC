@@ -52,7 +52,7 @@ function criarElemento(id) {
   };
 }
 
-function criarContexto(search) {
+function criarContexto(search, reservas = []) {
   const elementos = new Map();
 
   const document = {
@@ -109,14 +109,26 @@ function criarContexto(search) {
         };
       });
     },
-    getReservasPorData() {
-      return [];
+    getReservasPorData(iso) {
+      return reservas.filter((r) => r.data === iso);
     },
     statusInfo() {
       return { label: 'Aguardando', badgeClass: 'badge-yellow' };
     },
+    formatHorario(entrada, saida) {
+      if (!entrada) return '';
+      return saida ? `${entrada} às ${saida}` : `a partir de ${entrada}`;
+    },
+    // Cópia do escape usado em reservas.js. Deixar uma função identidade
+    // aqui escondia XSS: o teste passava mesmo sem escapar nada.
     escapar(texto) {
-      return String(texto ?? '');
+      return String(texto ?? '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;')
+        .replace(/`/g, '&#96;');
     },
     subscribe() {},
   };
@@ -137,8 +149,8 @@ function criarContexto(search) {
   return { contexto, document, elementos };
 }
 
-function carregarCalendario(search) {
-  const { contexto, document } = criarContexto(search);
+function carregarCalendario(search, reservas = []) {
+  const { contexto, document } = criarContexto(search, reservas);
   const arquivo = path.join(
     __dirname,
     '..',
@@ -228,6 +240,35 @@ console.log('[4] Navegação entre meses');
     'próximo mês',
     document.getElementById('calMonthLabel').textContent === 'Novembro 2026',
     document.getElementById('calMonthLabel').textContent
+  );
+}
+
+console.log('[5] Texto vindo do banco é escapado no painel do dia');
+{
+  const { document } = carregarCalendario('?ano=2026&mes=10&dia=12', [{
+    data: '2026-11-12',
+    item: '<img src=x onerror=alert(1)>',
+    motivo: '<script>alert(2)</script>',
+    horaEntrada: '08:00',
+    horaSaida: '09:00',
+    status: 'aprovada',
+  }]);
+  const html = document.getElementById('dayPanelList').innerHTML;
+
+  check(
+    'tag de imagem não entra como HTML',
+    !html.includes('<img src=x'),
+    html
+  );
+  check(
+    'script não entra como HTML',
+    !html.includes('<script>'),
+    html
+  );
+  check(
+    'texto escapado aparece na tela',
+    html.includes('&lt;img src=x onerror=alert(1)&gt;'),
+    html
   );
 }
 

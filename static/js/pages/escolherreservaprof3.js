@@ -1,14 +1,16 @@
 // ============================================================
-// escolherreservaprof3.js  —  tela de escolha de gabinetes
+// escolherreservaprof3.js — tela de escolha de gabinetes
 // ============================================================
 //
-// Esta tela monta os cards de gabinete pelo "/js/salas.js", que lê
-// GET /salas e escreve dentro de [data-lista-salas]. A escolha e o
-// avanço para o passo 02 também são feitos pelo salas.js.
+// Este arquivo não registra mais clique nos cards.
 //
-// Este arquivo registra o listener de clique nos cards após a API
-// responder, garantindo que a seleção funcione mesmo quando os cards
-// são montados de forma assíncrona.
+// O motivo: o salas.js já cria cada card com o próprio listener e,
+// antes de navegar, busca a sala na API (selecionarSala()). O listener
+// duplicado daqui gravava categoria fixa "Gabinete", sobrescrevia o
+// contexto vindo do servidor e chamava window.location duas vezes.
+//
+// A tela continua carregando este arquivo para manter o histórico dos
+// scripts da página, mas todo o comportamento está em salas.js.
 // ============================================================
 
 document.addEventListener('DOMContentLoaded', () => {

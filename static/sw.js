@@ -1,12 +1,17 @@
 /* =========================================================
-   sw.js — Service Worker de notificações e PWA
+   sw.js — Service Worker do Reserva SENAI
    ---------------------------------------------------------
-   Este arquivo precisa ficar na RAIZ do site
-   (ex.: public/sw.js -> https://seusite.com/sw.js).
-   Se ficar dentro de /js, o escopo dele não cobre o site todo.
+   Este arquivo roda em outro contexto: não existe window nem
+   navigator aqui. Por isso ele só cuida do que é do SW:
+   ativação imediata e clique em notificações.
+
+   Pedido de permissão e aviso de instalação ficam em
+   /js/notificacoes-push.js, que roda na página.
    ========================================================= */
 
 self.addEventListener('install', () => {
+  // Sem skipWaiting, uma versão antiga continua respondendo até a
+  // última aba fechar — e a correção do clique nunca apareceria.
   self.skipWaiting();
 });
 

@@ -1,35 +1,18 @@
-{#- Tela de redefinição de senha: esqueleto herdado de base_auth.html. -#}
+{#- Tela pública de redefinição de senha: esqueleto herdado de
+      base_auth.html. O pedido fica pendente até o coordenador aprovar. -#}
 {% extends "auth/base_auth.html" %}
 
 {% block head_extra %}
 <link rel="stylesheet" href="/css/redefsenha.css">
 <style>
-    .resultado {
+    .aviso {
         display: none;
-        margin-top: 1.5rem;
+        margin-top: 1rem;
         text-align: center;
     }
-
-    .resultado.visivel {
-        display: block;
-    }
-
-    .id-senha {
-        display: inline-block;
-        margin: 0.5rem 0 1rem;
-        padding: 0.6rem 1.2rem;
-        font-family: monospace;
-        font-size: 1.4rem;
-        font-weight: bold;
-        letter-spacing: 0.1em;
-        border: 2px dashed currentColor;
-        border-radius: 8px;
-        user-select: all;
-    }
-
-    .instrucao {
-        margin: 0;
-    }
+    .aviso.visivel { display: block; }
+    .aviso.erro { color: #b00020; }
+    .aviso.sucesso { color: #0a6b3d; }
 </style>
 {% endblock %}
 
@@ -42,58 +25,36 @@
     </div>
     <div class="hr"></div>
     <div class="form-container">
-        <h2>Informe o e-mail da sua conta.</h2>
+        <h2>Informe seu e-mail e a nova senha.</h2>
+        <p class="instrucao">
+            O pedido é analisado pelo coordenador. A senha enviada continua
+            em aberto até a aprovação: não use uma senha que já esteja em
+            outro sistema.
+        </p>
         <div class="hr"></div>
 
-        <form id="form-redefinir" action="/senha/id" method="GET">
+        <form id="form-esqueceu-senha" novalidate>
             <div class="input-container">
-                <input type="email" id="email" name="email" placeholder="seuemail@exemplo.com" required>
+                <input type="email" id="email" name="email"
+           placeholder="seuemail@exemplo.com" required>
             </div>
-            <button type="submit">Confirmar</button>
+            <div class="input-container">
+                <input type="password" id="senha" name="senha"
+           placeholder="Nova senha (mínimo 6 caracteres)" required>
+            </div>
+            <div class="input-container">
+                <input type="password" id="confirmar-senha"
+           placeholder="Confirme a nova senha" required>
+            </div>
+            <button type="submit" id="btn-solicitar">Solicitar troca</button>
         </form>
 
-        <div id="resultado" class="resultado" aria-live="polite">
-            <h2>Seu ID de redefinição:</h2>
-            <div class="id-senha" id="id-usuario"></div>
-            <p class="instrucao">Vá até a sala do coordenador e peça para redefinir a senha com este ID.</p>
-        </div>
+        <div id="aviso" class="aviso" aria-live="polite"></div>
     </div>
     <a class="links" href="/login">Voltar ao login</a>
 </div>
 
-<script>
-    (function () {
-        const form = document.getElementById('form-redefinir');
-        const campoEmail = document.getElementById('email');
-        const resultado = document.getElementById('resultado');
-        const id_usuario = document.getElementById('id-usuario');
-
-        async function buscarId(email) {
-            const url = `/senha/id?email=${encodeURIComponent(email)}`;
-
-            try {
-                const resposta = await fetch(url);
-                const dados = await resposta.json().catch(() => ({}));
-
-                if (!resposta.ok) {
-                    // FastAPI devolve o texto do erro em "detail"
-                    return { erro: dados.detail || 'Erro ao buscar o ID' };
-                }
-
-                return { id: dados.id };
-            } catch (e) {
-                return { erro: 'Falha de conexão. Tente de novo.' };
-            }
-        }
-
-        form.addEventListener('submit', async function (evento) {
-            evento.preventDefault();
-
-            const { id, erro } = await buscarId(campoEmail.value.trim());
-
-            id_usuario.textContent = erro ? erro : id;
-            resultado.classList.add('visivel');
-        });
-    })();
-</script>
+{#- Módulo separado: o mesmo arquivo é usado em qualquer tela que
+    precise pedir a troca, e a lógica fica fora do HTML. -#}
+<script type="module" src="/js/esqueceu_senha.js"></script>
 {% endblock %}

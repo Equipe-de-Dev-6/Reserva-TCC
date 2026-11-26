@@ -329,46 +329,10 @@
 
     document.addEventListener('DOMContentLoaded', () => {
       carregarUsuario();
-
-      // ======================================================
-      // DROPDOWN DO USUÁRIO
-      // ======================================================
-      const userProfile = document.getElementById('userProfile');
-      const userDropdown = document.getElementById('userDropdown');
-
-      if (userProfile && userDropdown) {
-        userProfile.addEventListener('click', (e) => {
-          e.stopPropagation();
-          userDropdown.classList.toggle('active');
-        });
-
-        document.addEventListener('click', (e) => {
-          if (!userProfile.contains(e.target)) {
-            userDropdown.classList.remove('active');
-          }
-        });
-      }
-
-      // ======================================================
-      // MENU MOBILE
-      // ======================================================
-      const menuToggle = document.getElementById('menuToggle');
-      const sidebar = document.querySelector('.sidebar');
-      const sidebarOverlay = document.getElementById('sidebarOverlay');
-
-      if (menuToggle && sidebar && sidebarOverlay) {
-        menuToggle.addEventListener('click', () => {
-          sidebar.classList.toggle('open');
-          sidebarOverlay.classList.toggle('active');
-        });
-
-        sidebarOverlay.addEventListener('click', () => {
-          sidebar.classList.remove('open');
-          sidebarOverlay.classList.remove('active');
-        });
-      }
-
       carregarReservas();
     });
+    {#- Dropdown do perfil e menu mobile são de app.js, carregado pelo
+        base.html. Repetir os listeners aqui fazia o clique abrir e
+        fechar na mesma interação. -#}
   </script>
 {% endblock %}
