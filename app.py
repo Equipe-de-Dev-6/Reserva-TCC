@@ -2190,14 +2190,18 @@ def listar_notificacoes(request: Request):
     """Lista só as notificações do usuário da sessão, mais recentes primeiro."""
     usuario = exigir_sessao(request)
 
-    resposta = (
-        supabase
-        .table('notificacoes')
-        .select('*')
-        .eq('usuario_id', usuario['id'])
-        .order('criado_em', desc=True)
-        .execute()
-    )
+    try:
+        resposta = (
+            supabase
+            .table('notificacoes')
+            .select('*')
+            .eq('usuario_id', usuario['id'])
+            .order('criado_em', desc=True)
+            .execute()
+        )
+    except Exception:  # noqa: BLE001
+        # Tabela ausente ou falha no banco: não derruba a tela.
+        return []
 
     return resposta.data or []
 

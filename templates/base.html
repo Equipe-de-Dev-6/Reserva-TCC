@@ -164,6 +164,10 @@
   </div>
 
   {% block scripts %}{% endblock %}
+
+  {#- Notificações do sistema (Windows/Android/Chrome). Carrega em todas
+      as telas para que o usuário receba os avisos mesmo fora da home. -#}
+  <script src="/js/notificacoes-push.js"></script>
 </body>
 
 </html>
