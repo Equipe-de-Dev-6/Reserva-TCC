@@ -228,6 +228,10 @@
   <script>
     document.addEventListener("DOMContentLoaded", () => {
 
+      // Guardado depois de /usuario_logado para o botão salvar saber
+      // qual registro do coordenador atualizar.
+      let usuarioId = null;
+
       async function carregarUsuarioLogado() {
         try {
           const resposta = await fetch("/usuario_logado", {
@@ -242,6 +246,7 @@
             throw new Error("Erro ao buscar usuário.");
           }
           const usuario = await resposta.json();
+          usuarioId = usuario.id;
           const nomeUsuario = document.getElementById("nomeUsuario");
           if (nomeUsuario) {
             nomeUsuario.textContent = usuario.nome || "";
@@ -261,33 +266,8 @@
 
       carregarUsuarioLogado();
 
-      const userProfile = document.getElementById("userProfile");
-      const userDropdown = document.getElementById("userDropdown");
-      if (userProfile && userDropdown) {
-        userProfile.addEventListener("click", (e) => {
-          e.stopPropagation();
-          userDropdown.classList.toggle("active");
-        });
-        document.addEventListener("click", (e) => {
-          if (!userProfile.contains(e.target)) {
-            userDropdown.classList.remove("active");
-          }
-        });
-      }
-
-      const menuToggle = document.getElementById("menuToggle");
-      const sidebar = document.querySelector(".sidebar");
-      const sidebarOverlay = document.getElementById("sidebarOverlay");
-      if (menuToggle && sidebar && sidebarOverlay) {
-        menuToggle.addEventListener("click", () => {
-          sidebar.classList.toggle("open");
-          sidebarOverlay.classList.toggle("active");
-        });
-        sidebarOverlay.addEventListener("click", () => {
-          sidebar.classList.remove("open");
-          sidebarOverlay.classList.remove("active");
-        });
-      }
+      {#- Dropdown e menu mobile já vêm de app.js (via base.html).
+          Registrar de novo aqui fazia o clique abrir e fechar. -#}
 
       const btnCancelar = document.getElementById("btnCancelar");
       if (btnCancelar) {
@@ -301,8 +281,48 @@
 
       const btnSalvar = document.getElementById("btnSalvar");
       if (btnSalvar) {
-        btnSalvar.addEventListener("click", () => {
-          alert("A funcionalidade de salvar configurações ainda precisa ser conectada à API.");
+        btnSalvar.addEventListener("click", async () => {
+          if (!usuarioId) {
+            alert("Usuário não identificado. Recarregue a página.");
+            return;
+          }
+
+          const dados = {};
+          const nome = document.getElementById("nome").value.trim();
+          const email = document.getElementById("email").value.trim();
+          const cargo = document.getElementById("cargo").value.trim();
+
+          if (nome) dados.nome = nome;
+          if (email) dados.email = email;
+          if (cargo) dados.cargo = cargo;
+
+          if (!Object.keys(dados).length) {
+            alert("Preencha ao menos um campo para salvar.");
+            return;
+          }
+
+          btnSalvar.disabled = true;
+          try {
+            // Coordenador pode alterar o próprio cargo/nome/e-mail
+            // pela rota administrativa; a validação é feita no back.
+            const resposta = await fetch("/usuarios/" + usuarioId, {
+              method: "PUT",
+              credentials: "same-origin",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify(dados)
+            });
+
+            if (!resposta.ok) {
+              const erro = await resposta.json().catch(() => ({}));
+              throw new Error(erro.detail || "Não foi possível salvar.");
+            }
+
+            alert("Configurações salvas com sucesso!");
+          } catch (erro) {
+            alert(erro.message || "Não foi possível salvar.");
+          } finally {
+            btnSalvar.disabled = false;
+          }
         });
       }
 
