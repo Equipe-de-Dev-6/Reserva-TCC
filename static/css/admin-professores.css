@@ -5,114 +5,174 @@
  * comuns as telas do Coordinator estao em admin.css.
  * ============================================================ */
 
-  .adm-table-wrapper {
-  background: var(--card-bg, #fff);
-  border: 1px solid var(--border-color, #e5e7eb);
-  border-radius: 12px;
-  overflow: hidden;
-  }
+.adm-table-wrapper {
+background: var(--card-bg, #fff);
+border: 1px solid var(--border-color, #e5e7eb);
+border-radius: 12px;
+overflow: hidden;
+}
 
-  .adm-table {
-  border-collapse: collapse;
-  width: 100%;
-  }
+.adm-table {
+border-collapse: collapse;
+width: 100%;
+}
 
-  .adm-table th,
+.adm-table th,
     .adm-table td {
-  border-bottom: 1px solid var(--border-color, #e5e7eb);
-  font-size: 14px;
-  padding: 14px 18px;
-  text-align: left;
-  }
+border-bottom: 1px solid var(--border-color, #e5e7eb);
+font-size: 14px;
+padding: 14px 18px;
+text-align: left;
+}
 
-  .adm-table th {
-  background: var(--bg-color, #f9fafb);
-  color: var(--text-secondary, #6b7280);
-  font-size: 12px;
-  font-weight: 700;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  }
+.adm-table th {
+background: var(--bg-color, #f9fafb);
+color: var(--text-secondary, #6b7280);
+font-size: 12px;
+font-weight: 700;
+letter-spacing: 0.04em;
+text-transform: uppercase;
+}
 
-  .adm-table tr:last-child td {
-  border-bottom: none;
-  }
+.adm-table tr:last-child td {
+border-bottom: none;
+}
 
-  .adm-acoes {
-  display: flex;
-  gap: 6px;
-  }
+.adm-acoes {
+display: flex;
+gap: 6px;
+}
 
-  .adm-btn-adm {
-  border: 1px solid var(--border-color, #e5e7eb);
-  border-radius: 8px;
-  cursor: pointer;
-  font-family: inherit;
-  font-size: 12px;
-  font-weight: 600;
-  padding: 7px 12px;
-  }
+.adm-btn-adm {
+border: 1px solid var(--border-color, #e5e7eb);
+border-radius: 8px;
+cursor: pointer;
+font-family: inherit;
+font-size: 12px;
+font-weight: 600;
+padding: 7px 12px;
+}
 
-  .adm-btn-adm.salvar {
-  background: var(--primary-color, #b91c1c);
-  border-color: var(--primary-color, #b91c1c);
-  color: #fff;
-  }
+.adm-btn-adm.salvar {
+background: var(--primary-color, #b91c1c);
+border-color: var(--primary-color, #b91c1c);
+color: #fff;
+}
 
-  .adm-btn-adm.excluir {
-  color: #991b1b;
-  }
+.adm-btn-adm.excluir {
+color: #991b1b;
+}
 
-  .adm-btn-adm:disabled {
-  cursor: not-allowed;
-  opacity: 0.55;
-  }
+.adm-btn-adm:disabled {
+cursor: not-allowed;
+opacity: 0.55;
+}
 
-  /* Modal de edição */
+/* Modal de edição */
 
     .adm-modal {
-  align-items: center;
-  background: rgba(17, 24, 39, 0.45);
-  display: flex;
-  inset: 0;
-  justify-content: center;
-  padding: 20px;
-  position: fixed;
-  z-index: 50;
-  }
+align-items: center;
+background: rgba(17, 24, 39, 0.45);
+display: flex;
+inset: 0;
+justify-content: center;
+padding: 20px;
+position: fixed;
+z-index: 50;
+}
 
+.adm-modal-caixa {
+background: var(--card-bg, #fff);
+border-radius: 14px;
+max-width: 420px;
+padding: 24px;
+width: 100%;
+}
+
+.adm-modal-caixa h3 {
+font-size: 17px;
+font-weight: 700;
+}
+
+.adm-modal-subtitulo {
+color: var(--text-secondary, #6b7280);
+font-size: 12px;
+margin-top: 6px;
+}
+
+.adm-form-campo input {
+border: 1px solid var(--border-color, #e5e7eb);
+border-radius: 8x;
+font-family: inherit;
+font-size: 13px;
+padding: 9px 11px;
+}
+
+.adm-form-campo input:focus {
+border-color: var(--primary-color, #b91c1c);
+outline: none;
+}
+
+.adm-form-acoes {
+margin-top: 4px;
+}
+
+/* ============================================================
+ * RESPONSIVIDADE
+ * ============================================================ */
+
+@media (max-width: 1024px) {
+  .adm-table th,
+    .adm-table td {
+    padding: 12px 16px;
+    font-size: 13px;
+  }
+  .adm-table th {
+    font-size: 11px;
+  }
+}
+
+@media (max-width: 860px) {
   .adm-modal-caixa {
-  background: var(--card-bg, #fff);
-  border-radius: 14px;
-  max-width: 420px;
-  padding: 24px;
-  width: 100%;
+    margin: 16px;
+    padding: 20px;
   }
-
   .adm-modal-caixa h3 {
-  font-size: 17px;
-  font-weight: 700;
+    font-size: 16px;
   }
-
   .adm-modal-subtitulo {
-  color: var(--text-secondary, #6b7280);
-  font-size: 12px;
-  margin-top: 6px;
+    font-size: 11px;
   }
-
   .adm-form-campo input {
-  border: 1px solid var(--border-color, #e5e7eb);
-  border-radius: 8px;
-  font-family: inherit;
-  font-size: 13px;
-  padding: 9px 11px;
+    font-size: 12px;
+    padding: 8px 10px;
   }
+}
 
-  .adm-form-campo input:focus {
-  border-color: var(--primary-color, #b91c1c);
-  outline: none;
+@media (max-width: 600px) {
+  .adm-table-wrapper {
+    overflow-x: auto;
   }
-
-  .adm-form-acoes {
-  margin-top: 4px;
+  .adm-table th,
+    .adm-table td {
+    padding: 10px 8px;
+    font-size: 12px;
   }
+  .adm-table th {
+    font-size: 10px;
+  }
+  .adm-btn-adm {
+    font-size: 11px;
+    padding: 6px 10px;
+  }
+  .adm-modal-caixa {
+    margin: 12px;
+    padding: 16px;
+  }
+  .adm-modal-caixa h3 {
+    font-size: 15px;
+  }
+  .adm-modal-subtitulo {
+    font-size: 10px;
+  }
+}

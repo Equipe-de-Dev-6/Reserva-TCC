@@ -279,13 +279,13 @@
   background-color: #CC0000;
   }
 
-@media (max-width: 1200px) {
+@media (max-width: 1024px) {
   .calendar-page-layout {
   grid-template-columns: 1fr 280px;
   }
 }
 
-@media (max-width: 900px) {
+@media (max-width: 860px) {
 
 .calendar-page-layout {
   grid-template-columns: 1fr;

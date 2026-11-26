@@ -435,10 +435,9 @@ img {
   border-radius: 6px;
   }
 
-@media (max-width: 1000px) {
+@media (max-width: 1024px) {
 
-  /* Daqui para baixo a tela estreita: a barra sai da tela e o
-     botao de menu aparece. */
+  /* De 1024px para baixo: sidebar sai da tela e aparece botao de menu */
 
   .sidebar {
   transform: translateX(-100%);
@@ -453,13 +452,8 @@ img {
   .main-content {
   width: 100%;
   margin-left: 0;
-  padding: 25px;
+  padding: 20px;
   }
-
-  /* Estas tres nao estavam no de 860px dos arquivos de tela, e sem
-     elas a tela fica presa: o body continua com overflow hidden e o
-     .main-content com height 100vh - que sao dois rolagens, um
-     dentro do outro, e o rodape da tela de salas fica inalcancavel. */
 
   body, html {
   height: auto;
@@ -480,7 +474,7 @@ img {
   align-items: center;
   justify-content: center;
   }
-  .header {
+  .Header {
   gap: 20px;
   }
   .greeting {
@@ -501,7 +495,7 @@ img {
   }
 }
 
-@media (max-width: 700px) {
+@media (max-width: 860px) {
 
   /* Tela bem estreita: o cabecalho quebra em duas linhas e o nome
      do usuario sai. */
@@ -521,12 +515,12 @@ img {
   }
 }
 
-@media (max-width: 500px) {
+@media (max-width: 600px) {
 
   /* Celular. */
 
   .main-content {
-  padding: 20px;
+  padding: 16px;
   }
 }
 
