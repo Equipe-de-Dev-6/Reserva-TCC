@@ -9,6 +9,8 @@
  *   4. calendario reduzido do mockup do hero
  *   5. calendario de exemplo da secao "Calendario"
  *   6. datas futuras nos cartoes de exemplo
+ *   7. ano atual no rodape
+ *   8. fechamento do menu ao clicar fora dele
  *
  * A pagina nao carrega o app.js nem o reservas.js do sistema:
  * ela e publica, sem sessao e sem menu lateral. Por isso este
@@ -215,6 +217,20 @@
       }
     });
 
+    // Clicar fora também fecha. O botão fica de fora da checagem para
+    // não desfazer o clique que acabou de abrir o menu.
+    document.addEventListener('click', function (evento) {
+      if (!menuAberto()) {
+        return;
+      }
+
+      if (menuMovel.contains(evento.target) || botaoMenu.contains(evento.target)) {
+        return;
+      }
+
+      fecharMenu();
+    });
+
     document.addEventListener('keydown', function (evento) {
       if (evento.key === 'Escape' && menuAberto()) {
         fecharMenu();
@@ -257,6 +273,18 @@
    * ------------------------------------------------------------ */
 
   var hoje = new Date();
+
+  // O HTML traz 2026 apenas como texto de reserva. Aqui o ano é
+  // recalculado para o rodapé não ficar desatualizado no próximo ano.
+  function preencherAnoAtual() {
+    var alvos = document.querySelectorAll('[data-ano-atual]');
+
+    for (var i = 0; i < alvos.length; i += 1) {
+      alvos[i].textContent = hoje.getFullYear();
+    }
+  }
+
+  preencherAnoAtual();
 
   function preencherDatasDeExemplo() {
     var alvos = document.querySelectorAll('[data-data-offset]');
@@ -458,7 +486,9 @@
   var botaoAnterior = document.getElementById('demoPrev');
   var botaoProximo = document.getElementById('demoNext');
 
-  if (gradeDemo && rotuloDemo) {
+  // Todos os nós do painel precisam existir: renderizarPainel(); escreve
+  // no título, na legenda e na lista, não só na grade.
+  if (gradeDemo && rotuloDemo && tituloDia && subtituloDia && listaDia) {
     var demoAno = hoje.getFullYear();
     var demoMes = hoje.getMonth();
 
