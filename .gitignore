@@ -15,9 +15,5 @@ temp/
 # Pastas de build/compilação
 dist/
 build/
-# Dois nomes de ambientes virtuais usados no projeto
-venv/
-.venv/
-
-# Bytecode gerado pelo Python
-__pycache__/
+venv
+__pycache__

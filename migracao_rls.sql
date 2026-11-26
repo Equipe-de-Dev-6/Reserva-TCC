@@ -12,9 +12,7 @@
 -- ler ou alterar as tabelas sem passar pelo login do FastAPI. Ligar o
 -- RLS sem nenhuma policy nega esse acesso e não afeta a aplicação.
 --
--- Rode depois de migracao_schema.sql, migracao_avisos.sql,
--- migracao_notificacoes.sql e migracao_pendencias.sql, no SQL Editor do
--- Supabase: o ALTER TABLE falha se a tabela ainda não existir.
+-- Rode depois de migracao_schema.sql, no SQL Editor do Supabase.
 -- ============================================================================
 
 
@@ -26,9 +24,6 @@
 -- aplicação continuam funcionando porque a chave secreta passa por
 -- cima do RLS.
 --
--- login_tentativas guarda endereços IP e pendencias_senhas guarda hashes
--- de novas senhas: deixar essas duas fora seria um buraco, porque um
--- visitante poderia apagar as tentativas para zerar o limite de login.
 ALTER TABLE public.usuarios ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.salas ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.reservas ENABLE ROW LEVEL SECURITY;
@@ -38,8 +33,6 @@ ALTER TABLE public.caracteristicas ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.sala_caracteristicas ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.avisos ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.notificacoes ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.login_tentativas ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.pendencias_senhas ENABLE ROW LEVEL SECURITY;
 
 
 -- ===========================================================================
@@ -48,9 +41,7 @@ ALTER TABLE public.pendencias_senhas ENABLE ROW LEVEL SECURITY;
 --
 -- Depois de rodar, a checagem é simples. Com a chave anônima do projeto
 -- (a "anon public key", no painel em Project Settings -> API), uma
--- consulta normalmente responde 200 com uma lista vazia: sem policy, o
--- Postgres não devolve linha alguma. Um 401/403 só aparece se os grants
--- para "anon" também foram revogados. O importante é nenhuma linha vazar.
+-- consulta tem que responder 401/403 e nenhuma linha:
 --
 --     curl -H "apikey: <ANON_KEY>" \
 --          -H "Authorization: Bearer <ANON_KEY>" \

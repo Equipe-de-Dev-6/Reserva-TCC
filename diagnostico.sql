@@ -4,10 +4,11 @@
 --
 -- Consulta somente de leitura. Não altera nada.
 --
--- Serve para conferir o que existe de fato: as migrations foram escritas
--- a partir do arquivo reserva-Tcc.sql, que é uma referência ("não deve
--- ser executado"), e o banco real pode ter mudado desde então.
--- Rode também depois das migrations para conferir o resultado.
+-- Serve para conferir, antes de rodar migracao_schema.sql, o que
+-- existe de fato: as migrations escritas a partir do arquivo
+-- reserva-Tcc.sql podem esbarrar em diferença, porque aquele arquivo é
+-- uma referência ("não deve ser executado") e o banco real pode ter
+-- mudado desde então.
 --
 -- Como usar: SQL Editor -> New query -> cola tudo -> Run. Depois
 -- compare com o que a migração espera.
@@ -42,12 +43,8 @@ SELECT
     pg_get_constraintdef(oid) AS definicao
 FROM pg_constraint
 WHERE connamespace = 'public'::regnamespace
-  -- Comparar por oid (regclass), não por texto: o texto devolvido por
-  -- ::regclass muda conforme o search_path da sessão.
-  AND conrelid IN (
-      'public.salas'::regclass, 'public.usuarios'::regclass,
-      'public.reservas'::regclass, 'public.carrinhos'::regclass,
-      'public.sala_caracteristicas'::regclass
+  AND conrelid::regclass::text IN (
+      'salas', 'usuarios', 'reservas', 'carrinhos', 'sala_caracteristicas'
   )
 ORDER BY tabela, nome;
 
@@ -69,12 +66,8 @@ SELECT
     tgname AS trigger,
     pg_get_triggerdef(oid) AS definicao
 FROM pg_trigger
-JOIN pg_class ON pg_class.oid = pg_trigger.tgrelid
-JOIN pg_namespace ON pg_namespace.oid = pg_class.relnamespace
 WHERE NOT tgisinternal
-  -- Com "public" no search_path, tgrelid::regclass devolve só "salas";
-  -- filtrar por texto com "public.%" esconderia os triggers da migração.
-  AND pg_namespace.nspname = 'public'
+  AND tgrelid::regclass::text LIKE 'public.%'
 ORDER BY 1, 2;
 
 
@@ -92,8 +85,6 @@ ORDER BY relname;
 
 -- 6) Quantas linhas existem. A trava de horário sobreposto só pode ser
 --    criada se a tabela estiver vazia ou sem dados conflitantes.
---    As últimas quatro tabelas são as que as migrations mais recentes
---    acrescentaram; se faltarem, é aqui que aparece a ausência.
 SELECT
     'salas' AS tabela, COUNT(*) AS linhas FROM public.salas
 UNION ALL SELECT 'usuarios', COUNT(*) FROM public.usuarios
@@ -101,8 +92,4 @@ UNION ALL SELECT 'reservas', COUNT(*) FROM public.reservas
 UNION ALL SELECT 'carrinhos', COUNT(*) FROM public.carrinhos
 UNION ALL SELECT 'sala_caracteristicas', COUNT(*) FROM public.sala_caracteristicas
 UNION ALL SELECT 'notebooks', COUNT(*) FROM public.notebooks
-UNION ALL SELECT 'avisos', COUNT(*) FROM public.avisos
-UNION ALL SELECT 'notificacoes', COUNT(*) FROM public.notificacoes
-UNION ALL SELECT 'login_tentativas', COUNT(*) FROM public.login_tentativas
-UNION ALL SELECT 'pendencias_senhas', COUNT(*) FROM public.pendencias_senhas
 ORDER BY 1;

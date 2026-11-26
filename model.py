@@ -5,10 +5,9 @@ moram aqui (e-mail com formato, cargo controlado, tamanho da senha), para
 que nenhuma rota precise repetir a checagem.
 """
 
-from typing import Literal  # restringe cargo/decisão a valores conhecidos
-import re  # expressão regular para a quantidade de alunos
+from typing import Literal
+import re
 
-# Pydantic: validação de campos, configuração de strings, e-mail e validadores
 from pydantic import BaseModel, ConfigDict, EmailStr, Field, field_validator
 
 
@@ -26,12 +25,8 @@ MAX_SENHA_BYTES = 72
 
 def _validar_tamanho_senha(valor: str) -> str:
     """Recusa senha longa demais, que o bcrypt recusaria com erro 500."""
-    # encode() é necessário porque o limite do bcrypt é em bytes, e não
-    # no número de caracteres da string.
     tamanho = len(valor.encode('utf-8'))
 
-    # Validação acontece antes do hash; um ValueError do Pydantic vira
-    # 422 na API, em vez de uma exceção não tratada dentro da rota.
     if tamanho > MAX_SENHA_BYTES:
         raise ValueError(
             f'A senha deve ter no máximo {MAX_SENHA_BYTES} bytes.'
@@ -46,24 +41,20 @@ def _validar_tamanho_senha(valor: str) -> str:
 class Usuario(BaseModel):
     """Cadastro de usuário."""
 
-    # Remove espaços das pontas de todas as strings antes de validar.
     model_config = ConfigDict(str_strip_whitespace=True)
 
     nome: str = Field(min_length=1, max_length=60)
-    email: EmailStr  # o Pydantic confere o formato do e-mail
+    email: EmailStr
     senha: str
-    cargo: Cargo = 'Professor'  # quem não escolhe cargo vira Professor
+    cargo: Cargo = 'Professor'
 
     @field_validator('senha')
     @classmethod
     def checar_senha(cls, valor: str) -> str:
-        # Usa a mesma regra de bytes do hash, para não aceitar uma senha
-        # que o bcrypt recusaria depois.
         return _validar_tamanho_senha(valor)
 
     @classmethod
     def fromJson(cls, json: dict):
-        """Converte um dicionário (por exemplo, de um teste) no modelo."""
         return cls(
             nome=json['nome'],
             email=json['email'],
@@ -72,7 +63,7 @@ class Usuario(BaseModel):
         )
 
     def toJson(self):
-        """Devolve a senha em texto para a rota aplicar o hash antes do insert."""
+        """Dados que vão para o banco, sem o hash no lugar da senha."""
         return {
             'nome': self.nome,
             'email': self.email,
@@ -96,11 +87,7 @@ class UsuarioAtualizacao(BaseModel):
     cargo: Cargo | None = None
 
     def toJson(self):
-        """Só os campos preenchidos entram na consulta de atualização.
-
-        None é usado como "não mexer neste campo"; um dictionary vazio
-        significa que a rota deve recusar a chamada (nada a atualizar).
-        """
+        """Só os campos preenchidos entram na consulta de atualização."""
         return {
             campo: valor
             for campo, valor in {
@@ -121,15 +108,7 @@ class UsuarioSenha(BaseModel):
 
     model_config = ConfigDict(str_strip_whitespace=True)
 
-    # Validação de bytes feita no validador abaixo: max_length conta
-    # caracteres e deixaria passar senhas acentuadas que o bcrypt recusa.
-    senha: str = Field(min_length=6)
-
-    @field_validator('senha')
-    @classmethod
-    def checar_senha(cls, valor: str) -> str:
-        """Aplica a mesma regra de 72 bytes do cadastro e do login."""
-        return _validar_tamanho_senha(valor)
+    senha: str = Field(min_length=6, max_length=72)
 
 
 # ============================================================
@@ -145,8 +124,6 @@ class Sala(BaseModel):
     trasnformador normaliza o que vier.
     """
 
-    # Valores padrão tolerantes: uma linha antiga com coluna nula não
-    # derruba a listagem de salas.
     nome: str = ''
     caracteristica: str = ''
     disponibilidade: bool = True
@@ -154,7 +131,6 @@ class Sala(BaseModel):
 
     @classmethod
     def fromJson(cls, json: dict):
-        """Normaliza uma linha do banco antes de devolver ao navegador."""
         return cls(
             nome=json.get('nome') or '',
             caracteristica=json.get('caracteristica') or '',
@@ -226,7 +202,6 @@ class SalaEdicao(BaseModel):
         return '; '.join(partes)
 
     def toJson(self):
-        """Formato aceito pela tabela "salas" (característica em texto)."""
         return {
             'nome': self.nome,
             'caracteristica': self.caracteristica(),
@@ -240,21 +215,18 @@ class SalaEdicao(BaseModel):
 # ============================================================
 
 class Carrinho(BaseModel):
-    """Carrinho de equipamentos, lido da tabela "carrinhos"."""
 
     nome: str = ''
     disponibilidade: bool = True
 
     @classmethod
     def fromJson(cls, json: dict):
-        """Converte uma linha do banco, tolerando colunas nulas."""
         return cls(
             nome=json.get('nome') or '',
             disponibilidade=bool(json.get('disponibilidade', True))
         )
 
     def toJson(self):
-        """Formato usado pela API ao devolver um carrinho."""
         return {
             'nome': self.nome,
             'disponibilidade': self.disponibilidade
@@ -275,8 +247,6 @@ class Reserva(BaseModel):
 
     model_config = ConfigDict(str_strip_whitespace=True)
 
-    # data vem no formato AAAA-MM-DD; as horas em HH:MM. O servidor
-    # valida os dois formatos em app.montar_horario() antes de gravar.
     data: str
     horaEntrada: str
     horaSaida: str
@@ -296,11 +266,7 @@ class Reserva(BaseModel):
 # ============================================================
 
 class DecisaoReserva(BaseModel):
-    """Resposta do administrador sobre uma reserva pendente.
-
-    O Literal funciona como lista permitida: qualquer outro valor é rejeitado pelo
-    Pydantic com 422 antes de chegar ao banco.
-    """
+    """Resposta do administrador sobre uma reserva pendente."""
 
     decisao: Literal['aprovada', 'negada', 'cancelada']
 
@@ -376,12 +342,6 @@ def categoria_da_sala(caracteristica: str) -> tuple[str, str]:
 #====================================
 
 class EsqueciMinhaSenhaIn(BaseModel):
-    """Modelo antigo do fluxo de senha, mantido por compatibilidade.
-
-    A rota atual (/senha/solicitar) lê um formulário diretamente e grava
-    só o hash; este modelo não é mais usado pelas rotas.
-    """
-
     email: str
     senha_nova: str
 
@@ -402,12 +362,9 @@ class AvisoCriacao(BaseModel):
     @field_validator('data')
     @classmethod
     def validar_data(cls, valor):
-        """Aceita vazio (sem data) ou uma data ISO AAAA-MM-DD."""
         if valor is None or valor == '':
             return None
 
-        # Import local para não carregar datetime quem só importa o modelo
-        # para outras operações; datetime.date valida mês/dia de verdade.
         from datetime import date
 
         try:
