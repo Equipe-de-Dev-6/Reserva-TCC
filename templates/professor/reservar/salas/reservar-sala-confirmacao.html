@@ -12,7 +12,11 @@
 {% block conteudo %}
 
       <!-- Conteúdo -->
-      <section class="quick-actions-section">
+      {#- "data-rota-reservar" diz ao reservas.js para onde voltar se o
+          servidor recusar a reserva (ex.: data que já passou). Vem do
+          contexto para cada perfil voltar à própria tela "Reservar". -#}
+      <section class="quick-actions-section"
+               data-rota-reservar="{{ rota_reservar }}">
 
         <div class="booking-layout">
 
