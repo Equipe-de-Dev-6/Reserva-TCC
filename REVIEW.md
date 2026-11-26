@@ -1,12 +1,13 @@
 # Revisão técnica — Reserva SENAI
 
-Revisão completa feita na branch `General-Review` antes da apresentação.
-O objetivo foi percorrer backend, SQL, documentação, templates e JavaScript,
-comentar o que cada trecho faz, corrigir bugs e falhas de segurança e deixar
-uma suíte de testes que rode sem dependências externas.
+Revisão completa feita na branch ativa `main` antes da apresentação (o
+checkout mudou externamente de `General-Review` para `main` durante a
+revisão). O objetivo foi percorrer backend, SQL, documentação, templates e
+JavaScript, comentar o que cada trecho faz, corrigir bugs e falhas de
+segurança e deixar uma suíte de testes que rode sem dependências externas.
 
 > **Importante:** nada foi enviado (`push`) para o repositório remoto. Todo o
-> trabalho está nos commits locais da branch `General-Review`.
+> trabalho está nos commits locais da branch `main`.
 
 ---
 
@@ -44,7 +45,7 @@ python -m compileall -q app.py model.py db.py consulta.py consulta_salas.py crip
  71 verificações em test_reservas.js   — 0 falhas
   6 verificações em test_avisos.js     — 0 falhas
  14 verificações em test_calendario.js — 0 falhas
- 24 verificações em check_frontend.js  — 0 falhas
+ 51 verificações em check_frontend.js — 0 falhas
  36 verificações em check_migrations.js— 0 falhas
 check_wiring.js: 0 rotas quebradas, 25/25 templates, 21/21 CSS, 0 links quebrados
 node --check e compileall: sem erros
@@ -137,6 +138,46 @@ dublê que registra as consultas, e o navegador por equivalentes em `vm`.
 - Novo `check_frontend.js` cobre manifest, service worker, menus duplicados
   e os contratos corrigidos entre telas e API.
 
+### Landing pública (segunda rodada)
+
+A landing foi reescrita porque continha informação falsa e elementos que o
+usuário não precisava ver. O que mudou:
+
+- **Veracidade**: a prévia do hero passou a ter o selo visível
+  “Ilustração · dados fictícios” e a URL local `localhost:8000/home`.
+  Sairam os contadores de sucesso, os cards flutuantes, os “bullets”,
+  o “Ver mais” falso e a busca que não existe no sistema.
+- **Fluxo real**: o texto agora fala em criação, aprovação, recusa e
+  cancelamento — não em edição de reserva. O formulário tem 3 telas,
+  com nome do professor, curso, motivo, data, entrada e saída;
+  datas passadas são bloqueadas no front e no servidor.
+- **Aprovação**: fila com dois pedidos “Aguardando” (antes eram três),
+  decisão com confirmação e nenhuma promessa de estado “somente leitura”.
+- **Calendário**: o painel de exemplo mostra horário, recurso, motivo e
+  situação, sem nome de professor, com aviso explícito de dado fictício
+  e texto de que a coordenação vê todas as reservas.
+- **FAQ e CTA**: removeu o detalhe técnico de hash e o CTA duplicado de
+  senha; entrou a dúvida real sobre não haver edição de reserva.
+- **CSS**: folha reescrita com as classes novas, sem seletores mortos,
+  foco visível em azul (branco sobre o CTA vermelho), menu mobile com
+  fundo opaco, ícone de fechar e altura limitada. O breakpoint passou
+  a 1024px, igual ao do JavaScript.
+- **JavaScript**: matriz de calendário com número variável de semanas,
+  `roving tabindex`, setas/Home/End/PageUp/PageDown, `aria-current` no dia
+  selecionado, rótulo com dia da semana e quantidade de reservas, foco
+  devolvido ao destino após clicar no menu, fechamento ao rolar e nome
+  acessível estável no botão de tema. A única região `aria-live` ficou
+  no subtítulo do dia.
+- **Correções descobertas pela suíte nesta branch**: `db.py` tinha um
+  bloco de docstring duplicado que impediu a importação do app;
+  `static/sw.js` ainda pedia permissão e atribuía um handler direto na
+  notificação dentro do worker; `escolherreservaprof3.js` registrava um
+  clique duplicado nos cards de gabinete. Os três foram corrigidos.
+
+Validação real da landing em servidor local: página e assets com HTTP 200,
+nenhum erro de console, 35 células no calendário do mês corrente, uma única
+célula selecionada/tabbable, menu e navegação por seta verificados no DOM.
+
 ---
 
 ## 3. Orientações para a apresentação
@@ -159,15 +200,12 @@ dublê que registra as consultas, e o navegador por equivalentes em `vm`.
 
 ## 4. Estado do Git
 
-- Branch local: `General-Review`, com os commits de revisão (padrão
+- Branch local ativa: `main`, com os commits de revisão (padrão
   `docs(<arquivo>): adiciona comentários explicativos`, um commit por arquivo).
 - Nenhum `push` foi feito.
-- O remoto teve um merge da revisão seguido de revert. Ao mesclar `main`
-  na `General-Review`, os conflitos apareceram em `app.py`,
-  `tests/test_api.py` e `wiring_output.txt`, e a mesclagem também traria
-  de volta o revert nos demais arquivos. A resolução manteve o conteúdo
-  revisado da `General-Review` em todos eles e registrou o merge local
-  (`36b9da8`). `git merge-tree --write-tree main General-Review` agora não
-  aponta conflito: o PR para `main` pode ser aberto sem conflitos.
-- `General-Review` está à frente de `origin/General-Review`; o push ainda
-  não foi feito. Para a apresentação, use esta árvore local.
+- A primeira rodada de revisão tinha sido feita em `General-Review`; como o
+  checkout passou a apontar para `main`, as correções desta rodada foram
+  aplicadas diretamente na árvore ativa, incluindo os problemas antigos
+  que a suíte acusou em `db.py`, `sw.js` e `escolherreservaprof3.js`.
+- `main` fica à frente de `origin/main`; para a apresentação, use esta
+  árvore local. Não foi criado merge nem push automático.
