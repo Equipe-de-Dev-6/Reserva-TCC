@@ -18,8 +18,6 @@ from fastapi.templating import Jinja2Templates  # renderiza os HTML
 from starlette.responses import JSONResponse  # resposta de erro do login
 import os  # variáveis de ambiente (SECRET_KEY, CORS_ORIGINS, etc.)
 import random  # limpeza ocasional das tentativas antigas
-import socket  # obtém o IP local da máquina para exibição no console
-import subprocess  # inicia o processo do servidor Uvicorn
 
 from criptografia import hash_password, verify_password
 from consulta_salas import salas_para_tela
@@ -150,10 +148,6 @@ app = FastAPI()
 # de onde o servidor foi iniciado. Sem isso, `uvicorn --app-dir outro`
 # quebra o StaticFiles e todas as páginas respondem 404.
 BASE_DIR = Path(__file__).resolve().parent
-
-# Diretório da aplicação (mesmo que BASE_DIR), mantido com nome separado
-# para clareza no bloco de inicialização do servidor.
-APP_DIR = BASE_DIR
 
 # Cargo que a aplicação reconhece como administrador. O banco guarda o
 # texto com inicial maiúscula ("Coordenador"), e a comparação é feita
@@ -2338,79 +2332,3 @@ def excluir_notificacao(notificacao_id: int, request: Request):
         raise HTTPException(status_code=404, detail='Notificacao nao encontrada')
 
     return {'mensagem': 'Notificacao excluida'}
-
-
-# ============================================================
-# UTILITÁRIOS DE REDE
-# ============================================================
-
-def obter_ip_local() -> str:
-    """Descobre o endereço IP local da máquina na rede.
-
-    Abre um socket UDP temporário para um endereço externo (não envia
-    dados) apenas para forçar o SO a escolher a interface de rede
-    correta, e devolve o IP vinculado a ela. Se falhar, retorna
-    '127.0.0.1' como fallback seguro.
-    """
-    try:
-        with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as s:
-            s.connect(('10.255.255.255', 1))
-            return s.getsockname()[0]
-    except Exception:
-        return '127.0.0.1'
-
-
-# ============================================================
-# INICIALIZAÇÃO DO SERVIDOR
-# ============================================================
-
-# Este bloco só é executado quando o arquivo é iniciado diretamente
-# (`python app.py`), evitando que outro servidor suba em importações.
-if __name__ == "__main__":
-
-    # Identifica o IP local da máquina.
-    ip = obter_ip_local()
-
-    # Exibe as informações de acesso ao sistema.
-    print("\n" + "=" * 45)
-    print("       SERVIDOR 3D FÁCIL")
-    print("=" * 45)
-    print(f" Local:  http://localhost:8000")
-    print(f" Rede:   http://{ip}:8000")
-    print("=" * 45 + "\n", flush=True)
-
-    # Tenta iniciar o servidor Uvicorn.
-    try:
-        subprocess.run(
-            [
-                "uvicorn",
-                "app:app",
-                "--host", "0.0.0.0",
-                "--port", "8000"
-            ],
-            cwd=APP_DIR,
-            check=True
-        )
-
-    # Erro quando o executável Uvicorn não é encontrado.
-    except FileNotFoundError:
-        print("[ERRO] Uvicorn não encontrado.")
-        print("Verifique se está instalado no ambiente virtual:")
-        print("pip install uvicorn")
-
-    # Erro quando o processo Uvicorn termina com código diferente de zero.
-    except subprocess.CalledProcessError as erro:
-        print("\n[ERRO] O servidor Uvicorn encerrou com falha.")
-        print(f"Código de saída: {erro.returncode}")
-        print("Verifique as mensagens acima para identificar a causa.")
-
-    # Permite encerrar o servidor utilizando CTRL + C.
-    except KeyboardInterrupt:
-        print("\n[INFO] Servidor encerrado pelo usuário.")
-
-    # Captura outros erros inesperados.
-    except Exception as erro:
-        print(
-            f"\n[ERRO INESPERADO] "
-            f"{type(erro).__name__}: {erro}"
-        )
