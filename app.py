@@ -284,7 +284,9 @@ app.add_middleware(
 # Só as tentativas que falharam entram na conta. Uma entrada correta
 # não gasta cota e ainda zera a contagem do endereço: quem erra a
 # senha duas vezes e acerta na terceira não é tratado como ataque.
-TENTATIVAS_POR_ENDERECO = 1000
+# O valor acompanha o que o README documenta (8 em 5 minutos); 1000
+# era grande o suficiente para não proteger contra força bruta.
+TENTATIVAS_POR_ENDERECO = 8
 JANELA_DE_TENTATIVAS = timedelta(minutes=5)
 NOTIFICACOES_POR_ENDERECO = {}
 
@@ -1151,10 +1153,15 @@ def buscar_id_para_redefinicao(email: str, request: Request):
 
     Quem esqueceu a senha não tem sessão, então esta rota não exige
     login. Devolve apenas o ID (nunca nome, cargo ou senha) e usa o
-    mesmo limite de tentativas do login, para dificultar que alguém
-    teste e-mails em massa para descobrir quem tem conta.
+    limite de tentativas próprio (com o mesmo tamanho e janela do login),
+    para dificultar que alguém teste e-mails em massa para descobrir quem
+    tem conta sem atrapalhar o contador de login.
     """
     endereco = _endereco_de(request)
+
+    # O prefixo mantém esta contagem separada da contagem do /login: um
+    # coordenador consultando e-mails não gasta a cota de login de ninguém.
+    endereco = f"senha-id:{_endereco_de(request)}"
 
     if _tentativas_restantes(endereco) <= 0:
         raise HTTPException(
@@ -1171,12 +1178,17 @@ def buscar_id_para_redefinicao(email: str, request: Request):
     )
 
     if not resposta.data:
+        # Cada e-mail inexistente conta como tentativa, para não virar uma
+        # consulta ilimitada à lista de usuários.
         _registrar_tentativa(endereco)
 
         raise HTTPException(
             status_code=404,
             detail="Usuário não encontrado"
         )
+
+    # Consulta com e-mail existente não é ataque: limpa a própria cota.
+    _limpar_tentativas(endereco)
 
     return {"id": resposta.data[0]["id"]}
 
