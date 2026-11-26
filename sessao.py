@@ -1,8 +1,8 @@
-"""Sessão do usuário em cookie criptografado.
+"""Sessão do usuário em cookie criptografado (Fernet).
 
 O FastAPI traz uma sessão própria (a SessionMiddleware do Starlette), mas
 ela apenas **assina** o cookie: quem abrir o DevTools lê o conteúdo
-inteiro. No caso do Reserva SENHA, isso expõe o e-mail, o nome e o cargo
+inteiro. No caso do Reserva SENAI, isso expõe o e-mail, o nome e o cargo
 de quem está logado para qualquer pessoa com acesso ao navegador.
 
 Aqui a sessão é gravada com o Fernet, que cifra *e* autentica. Sem a
@@ -10,7 +10,7 @@ chave, o cookie é um texto sem sentido e não dá para adulterar. Como o
 Fernet já faz a verificação de integridade, não é preciso assinar nada
 em cima.
 
-O cookie continua sendo um stateless (não há tabela de sessões): o que
+O cookie continua sendo stateless (não há tabela de sessões): o que
 muda é que agora ele não é legível. Como antes, encerrar a sessão em
 todas as abas ao mesmo tempo exigiria uma lista de revogação, que não
 existe — ver o README.
@@ -35,6 +35,12 @@ def derivar_chave(segredo: str) -> Fernet:
     de comprimento variável, então ela passa por um SHA-256 para virar
     uma chave do tamanho certo, sem precisar exigir um formato
     específico de quem configura.
+
+    Fluxo:
+    1. Codifica o segredo para bytes (UTF-8).
+    2. Aplica SHA-256, que sempre produz 32 bytes.
+    3. Codifica os 32 bytes em base64 (urlsafe), formato exigido pelo Fernet.
+    4. Devolve o objeto Fernet pronto para cifrar/decifrar.
     """
     digest = hashlib.sha256(segredo.encode("utf-8")).digest()
 
@@ -52,6 +58,12 @@ class Sessao(dict):
     (`request.session["usuario_id"]`, `.get()`, `.clear()`). Esta classe
     só acrescenta o registro de alterações, para que o middleware saiba
     se vale a pena reescrever o cookie.
+
+    Fluxo:
+    - __init__: marca alterado=True se recebeu dados iniciais.
+    - __setitem__ / __delitem__ / update / clear: marcam alterado=True.
+    - mark_accessed: existe apenas para compatibilidade com o Starlette;
+      aqui quem controla a reescrita é o atributo "alterado".
     """
 
     def __init__(self, *args, **kwargs):
@@ -94,6 +106,13 @@ class SessaoMiddleware(BaseHTTPMiddleware):
     Se o cookie estiver ausente, adulterado ou vencido, a requisição
     segue como visitante comum — nunca com erro, e nunca com um dicionário
     meio preenchido.
+
+    Fluxo do dispatch:
+    1. Abre o cookie (descriptografa).
+    2. Coloca a sessão no scope da requisição.
+    3. Chama a próxima camada (call_next).
+    4. Se a sessão estiver vazia, remove o cookie se houver.
+    5. Se a sessão foi alterada, reescreve o cookie cifrado.
     """
 
     def __init__(
@@ -108,13 +127,15 @@ class SessaoMiddleware(BaseHTTPMiddleware):
     ):
         super().__init__(app)
 
+        # Objeto Fernet derivado da SECRET_KEY.
         self._fernet = derivar_chave(segredo)
+        # Nome do cookie enviado ao navegador.
         self._nome = nome_do_cookie
-        # O ttl do Fernet faz o próprio token expirar, além do
-        # max-age do cookie. Os dois cobrem casos diferentes: um
-        # cookie pode sobreviver no navegador além do token.
+        # Tempo de vida do token Fernet e do cookie (8 horas por padrão).
         self._max_age = max_age
+        # Se True, o cookie só é enviado sobre HTTPS.
         self._https_only = https_only
+        # Caminho do cookie no navegador.
         self._caminho = caminho
 
     # ------------------------------------------------------------
@@ -169,6 +190,7 @@ class SessaoMiddleware(BaseHTTPMiddleware):
 
     async def dispatch(self, request, call_next):
 
+        # Lê o cookie e descriptografa.
         sessao = self._abrir(request.cookies.get(self._nome, ""))
 
         # `request.session` é uma property somente-leitura do Starlette,
