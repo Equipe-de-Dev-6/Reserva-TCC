@@ -1,16 +1,5 @@
--- AVISO: este arquivo é apenas documentação do esquema de referência.
--- Não deve ser executado: não usa IF NOT EXISTS e algumas definições
--- abaixo são legado que as migrations corrigem. Para preparar o banco,
--- siga a ordem de migrations no README.md.
---
--- Legado corrigido por migracao_schema.sql:
---   * sala_caracteristicas.sala_id é uma FK, não uma identity;
---   * reservas.sala_id pode ser nulo (gabinete/carrinho não têm cadastro);
---   * status e datas passam a ser obrigatórios e controlados;
---   * as FKs de reservas usam ON DELETE RESTRICT.
--- Legado corrigido por migracao_pendencias.sql: a tabela de troca de
--- senha usada por app.py não aparece nesta referência.
--- WARNING original: this schema is for context only and is not meant to be run.
+-- WARNING: This schema is for context only and is not meant to be run.
+-- Table order and constraints may not be valid for execution.
 
 CREATE TABLE public.salas (
   id bigint GENERATED ALWAYS AS IDENTITY NOT NULL,
@@ -34,7 +23,6 @@ CREATE TABLE public.caracteristicas (
   nome character varying NOT NULL UNIQUE,
   CONSTRAINT caracteristicas_pkey PRIMARY KEY (id)
 );
--- Legado: sala_id é a FK para public.salas; a migration remove o IDENTITY.
 CREATE TABLE public.sala_caracteristicas (
   sala_id bigint NOT NULL,
   caracteristicas_id bigint NOT NULL,
@@ -50,14 +38,6 @@ CREATE TABLE public.notebooks (
   disponibilidade boolean,
   CONSTRAINT notebooks_pkey PRIMARY KEY (id)
 );
-CREATE TABLE public.carrinhos (
-  id bigint GENERATED ALWAYS AS IDENTITY NOT NULL,
-  nome character varying,
-  disponibilidade boolean,
-  CONSTRAINT carrinhos_pkey PRIMARY KEY (id)
-);
--- Legado: sala_id virou opcional, e status/datas ganharam NOT NULL e CHECK
--- nas migrations. As FKs também passaram a usar ON DELETE RESTRICT.
 CREATE TABLE public.reservas (
   id bigint GENERATED ALWAYS AS IDENTITY NOT NULL,
   usuario_id bigint NOT NULL,

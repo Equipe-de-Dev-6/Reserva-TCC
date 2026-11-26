@@ -189,8 +189,8 @@ flowchart LR
 ### 1. Clone o repositório
 
 ```bash
-git clone https://github.com/Equipe-de-Dev-6/Reserva-TCC.git
-cd Reserva-TCC
+git clone https://github.com/seu-usuario/reserva-senai.git
+cd reserva-senai
 ```
 
 ### 2. Crie um ambiente virtual
@@ -223,35 +223,23 @@ pip install -r requirements.txt
 
 ### 4. Prepare o banco
 
-O projeto Supabase já contém as tabelas básicas (`salas`, `usuarios`,
-`reservas`, `carrinhos`, `notebooks`, `caracteristicas` e
-`sala_caracteristicas`). `reserva-Tcc.sql` documenta esse esquema de
-referência e **não deve ser executado**. Para adequar um banco existente
-ao código, rode no SQL Editor do Supabase, **nesta ordem**:
+Rode, no SQL Editor do Supabase, os arquivos abaixo **nesta ordem**:
 
 | Arquivo | O que faz |
 |---|---|
+| `reserva-Tcc.sql` | Esquema de referência. O próprio arquivo avisa que não deve ser executado; ele documenta as tabelas como estão. |
 | `migracao_reservas.sql` | Acrescenta as colunas que o formulário de reserva preenche. |
 | `migracao_schema.sql` | Ajustes que o código exige: status controlado, índices, `sala_id` opcional, trava de horário sobreposto, coluna `reservavel` e tabela de tentativas de login. |
-| `migracao_avisos.sql` | Cria a tabela de avisos do campus. |
-| `migracao_notificacoes.sql` | Cria a tabela de notificações por usuário. |
-| `migracao_pendencias.sql` | Cria a tabela de pedidos de troca de senha aprovados pelo coordenador. |
 | `migracao_rls.sql` | Liga a Row Level Security, que fecha o acesso anônimo direto ao banco. |
 
-Todos os arquivos de migração podem ser rodados mais de uma vez.
-`diagnostico.sql` é somente leitura: serve para conferir o que existe no
-banco antes e depois das migrações.
+Todos os arquivos podem ser rodados mais de uma vez.
 
 ### 5. Configure as variáveis de ambiente
 
 Copie o `.env.example` para `.env` e preencha:
 
 ```bash
-# Windows (PowerShell)
 copy .env.example .env
-
-# Linux ou macOS
-cp .env.example .env
 ```
 
 ```env
@@ -260,15 +248,9 @@ SUPABASE_URL=https://seu-projeto.supabase.co
 # Chave secreta do projeto (Project Settings -> API).
 SUPABASE_KEY=sua-chave-secreta
 
-# Chave usada para cifrar o cookie de sessão (Fernet).
+# Chave usada para assinar o cookie de sessão.
 # Gere com: python -c "import secrets; print(secrets.token_urlsafe(48))"
 SECRET_KEY=uma-chave-aleatoria-longa
-
-# Opcionais: horas da sessão (padrão 8), HTTPS no cookie em produção e
-# origens liberadas caso exista um front em outro domínio.
-SESSION_HOURS=8
-COOKIE_HTTPS=1
-CORS_ORIGINS=https://exemplo.com
 ```
 
 > **Importante:** o arquivo `.env` não deve ser enviado para o GitHub, e a
@@ -296,8 +278,7 @@ http://127.0.0.1:8000
 - O cookie de sessão é **criptografado** com `SECRET_KEY` (Fernet), uma chave
   separada da chave do banco: quem abrir o DevTools não lê o e-mail, o nome e
   o cargo de quem está logado, e não consegue forjar um cookie sem a chave.
-- A sessão é renovada a cada login e expira em 8 horas por padrão
-  (configurável por `SESSION_HOURS`).
+- A sessão é renovada a cada login e expira em 8 horas.
 - E-mail inexistente e senha errada recebem a mesma resposta, para não
   revelar quem tem conta no sistema.
 - O login aceita 8 tentativas **por endereço** a cada 5 minutos. A contagem
@@ -309,14 +290,13 @@ http://127.0.0.1:8000
 - As rotas de dados exigem sessão; as de administração exigem o cargo de
   Coordenador, e o professor que abrir uma delas volta para a home dele.
 - O RLS ligado no banco nega o acesso direto pelo PostgREST com a chave
-  anônima, que é pública. Isso inclui as tabelas de tentativas de login
-  e de pedidos de senha, que também contêm dados sensíveis.
+  anônima, que é pública.
 
 ## 📡 Endpoints principais
 
 | Método | Rota | Acesso | Descrição |
 |---|---|---|---|
-| `GET` | `/` | público | Página inicial de apresentação (leva ao login) |
+| `GET` | `/` | público | Página de login |
 | `POST` | `/login` | público | Autenticação |
 | `POST` | `/logout` | sessão | Encerra a sessão |
 | `GET` | `/usuario_logado` | sessão | Dados do usuário da sessão |
@@ -358,10 +338,7 @@ python tests/test_api.py      # rotas, sessão, autorização, reservas
 node tests/test_reservas.js   # módulo de reservas no navegador
 node tests/test_avisos.js     # módulo de avisos no navegador
 node tests/check_wiring.js    # rotas chamadas pelas telas que existem
-node tests/check_migrations.js # migrations reexecutáveis e colunas válidas
 ```
-
-`python tests/run.py` executa as cinco suítes acima, uma de cada vez.
 
 Nenhum teste toca o banco de verdade: o cliente do Supabase é trocado por
 um dublê que registra as consultas, e o do navegador por equivalentes em
@@ -373,8 +350,9 @@ A camada JavaScript foi separada em módulos para facilitar manutenção e teste
 
 ```text
 static/js/
-├── api.js                 # Comunicação com a API e usuarioLogado()
+├── api.js                 # Comunicação com a API
 ├── reservas.js            # Estado, sincronização e notificações das reservas
+├── usuario.js             # Dados do usuário autenticado
 ├── menu.js                # Menu de perfil e menu mobile
 ├── faq.js                 # Acordeão de perguntas frequentes
 ├── search.js              # Utilitário de busca
@@ -388,8 +366,7 @@ static/js/
   funcionando sem internet. As leituras são síncronas, para os renders
   atuais não precisarem esperar a API.
 
-- `api.js` exporta `usuarioLogado()`, que consulta `/usuario_logado`; não
-  existe um módulo `usuario.js`.
+- `usuario.js` exporta `carregarUsuario()`, chamada pelo módulo compartilhado.
 - `pages/` contém apenas a lógica específica de cada tela.
 - `salas.js` monta os cards das telas de escolha a partir de `GET /salas`.
 - Os módulos compartilhados são carregados antes dos módulos de página.
@@ -409,11 +386,7 @@ static/js/
 ├── consulta_salas.py      # Filtro das salas que aparecem na reserva
 ├── migracao_reservas.sql  # Colunas usadas pelo formulário de reserva
 ├── migracao_schema.sql    # Ajustes de esquema exigidos pelo código
-├── migracao_avisos.sql    # Tabela de avisos
-├── migracao_notificacoes.sql # Tabela de notificações
-├── migracao_pendencias.sql # Pedidos de troca de senha
 ├── migracao_rls.sql       # Row Level Security
-├── diagnostico.sql        # Consultas de conferência do banco
 ├── reserva-Tcc.sql        # Esquema de referência (não executar)
 ├── static/
 │   ├── css/               # Estilos das páginas

@@ -90,8 +90,8 @@ ALTER TABLE public.reservas
 --
 -- A trava abaixo impede o absurdo (os três recursos na mesma reserva),
 -- mas não exige sala_id: gabinete e carrinho ainda não têm cadastro
--- próprio, e a reserva guarda o nome escolhido em "item". O 0 é válido
--- de propósito; exigir um recurso aqui quebraria essas reservas.
+-- próprio, e a reserva guarda o nome escolhido em "item". Quando essas
+-- telas passarem a enviar o id, basta trocar o <= 1 por um = 1.
 --
 ALTER TABLE public.reservas
     ALTER COLUMN sala_id DROP NOT NULL;
@@ -110,8 +110,6 @@ ALTER TABLE public.reservas
 -- Uma mesma sala não aceita duas reservas com horário sobreposto. O
 -- EXCLUDE só considera as reservas que ainda valem; as canceladas e as
 -- recusadas liberam o horário para outro professor.
--- Limitação conhecida: sala_id NULL (gabinete/carrinho) não colide,
--- porque não há id para comparar. A trava cobre apenas salas cadastradas.
 CREATE EXTENSION IF NOT EXISTS btree_gist;
 
 ALTER TABLE public.reservas
@@ -244,16 +242,10 @@ ALTER TABLE public.sala_caracteristicas
 -- O banco guarda 'Professor' e 'Coordenador' (com inicial maiúscula),
 -- que são os valores que a tela de cadastro oferece.
 --
--- A API compara o cargo sem diferenciar maiúsculas, então um
--- 'coordenador' gravado em minúsculo continua sendo administrador.
--- A limpeza abaixo preserva esse valor em vez de rebaixá-lo.
 UPDATE public.usuarios
-    SET cargo = CASE
-        WHEN lower(btrim(cargo)) = 'coordenador' THEN 'Coordenador'
-        ELSE 'Professor'
-    END
+    SET cargo = 'Professor'
     WHERE cargo IS NULL
-       OR cargo NOT IN ('Professor', 'Coordenador');
+       OR lower(btrim(cargo)) NOT IN ('professor', 'coordenador');
 
 ALTER TABLE public.usuarios
     ALTER COLUMN cargo SET DEFAULT 'Professor';
@@ -268,28 +260,8 @@ ALTER TABLE public.usuarios
 -- O login confere o e-mail depois de normalizar, e a busca de duplicidade
 -- também. Gravar o e-mail já normalizado evita duas contas que diferem
 -- só por maiúsculas ou espaços.
---
--- Se já existirem duplicatas, criar o índice abortaria o restante do
--- arquivo. Nesse caso avisamos e o índice é criado na próxima execução,
--- depois que alguém corrigir os dados manualmente.
-DO $$
-DECLARE
-    grupos_repetidos bigint;
-BEGIN
-    SELECT COUNT(*) INTO grupos_repetidos
-    FROM (
-        SELECT lower(btrim(email)) AS email_normalizado
-        FROM public.usuarios
-        GROUP BY 1
-        HAVING COUNT(*) > 1
-    ) repetidos;
-
-    IF grupos_repetidos > 0 THEN
-        RAISE NOTICE 'Existem % e-mail(s) repetido(s); índice único não criado. Corrija os dados e rode a migração de novo.', grupos_repetidos;
-    ELSE
-        EXECUTE 'CREATE UNIQUE INDEX IF NOT EXISTS idx_usuarios_email_normalizado ON public.usuarios (lower(btrim(email)))';
-    END IF;
-END $$;
+CREATE UNIQUE INDEX IF NOT EXISTS idx_usuarios_email_normalizado
+    ON public.usuarios (lower(btrim(email)));
 
 
 -- ===========================================================================
@@ -365,8 +337,6 @@ ALTER TABLE public.usuarios
 --
 -- A coluna nasce marcada com os mesmos ids que a lista antiga aceitava,
 -- para que a migração não mude o comportamento de quem já usa.
--- Esta lista deve continuar igual à constante SALAS_RESERVAVEIS_INICIAL
--- em consulta_salas.py.
 --
 ALTER TABLE public.salas
     ADD COLUMN IF NOT EXISTS reservavel BOOLEAN;
