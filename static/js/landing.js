@@ -1,18 +1,18 @@
 /* ============================================================
  * landing.js
  *
- * Comportamentos da pagina publica:
+ * Comportamentos da página pública (landing page):
  *
  *   1. tema claro/escuro (gravado em localStorage)
  *   2. menu do celular
- *   3. sombra do cabecalho ao rolar
- *   4. calendario reduzido do mockup do hero
- *   5. calendario de exemplo da secao "Calendario"
- *   6. datas futuras nos cartoes de exemplo
+ *   3. sombra do cabeçalho ao rolar
+ *   4. calendário reduzido do mockup do hero
+ *   5. calendário de exemplo da seção "Calendário"
+ *   6. datas futuras nos cards de exemplo
  *
- * A pagina nao carrega o app.js nem o reservas.js do sistema:
- * ela e publica, sem sessao e sem menu lateral. Por isso este
- * arquivo e independente e usa apenas DOM e Intl.
+ * A página não carrega o app.js nem o reservas.js do sistema:
+ * ela é pública, sem sessão e sem menu lateral. Por isso este
+ * arquivo é independente e usa apenas DOM e Intl.
  * ============================================================ */
 
 (function () {
@@ -47,8 +47,8 @@
   }
 
   function dataLocal(ano, mes, dia) {
-    // Meio-dia evita que o fuso horario empurre a data para o dia
-    // anterior ou seguinte quando o horario de verao muda.
+    // Meio-dia evita que o fuso horário empurre a data para o dia
+    // anterior ou seguinte quando o horário de verão muda.
     return new Date(ano, mes, dia, 12, 0, 0);
   }
 
@@ -72,8 +72,8 @@
   }
 
   /**
-   * Matriz de 6 semanas comecando no domingo. Cada celula sabe a
-   * que mes pertence, para o calendario poder navegar ao clicar
+   * Matriz de 6 semanas começando no domingo. Cada célula sabe a
+   * que mês pertence, para o calendário poder navegar ao clicar
    * em um dia das bordas.
    */
   function construirMatriz(ano, mes) {
@@ -117,7 +117,7 @@
     try {
       localStorage.setItem(CHAVE_TEMA, tema);
     } catch (erro) {
-      /* navegador sem localStorage: o tema vale so nesta visita */
+      /* navegador sem localStorage: o tema vale só nesta visita */
     }
   }
 
@@ -151,8 +151,8 @@
     });
   }
 
-  // Se a pessoa nunca escolheu um tema, acompanha a preferencia do
-  // sistema operacional enquanto a pagina estiver aberta.
+  // Se a pessoa nunca escolheu um tema, acompanha a preferência do
+  // sistema operacional enquanto a página estiver aberta.
   if (window.matchMedia) {
     var consultaEscuro = window.matchMedia('(prefers-color-scheme: dark)');
 
@@ -230,7 +230,7 @@
   }
 
   /* ------------------------------------------------------------
-   * CABECALHO AO ROLAR
+   * CABEÇALHO AO ROLAR
    * ------------------------------------------------------------ */
 
   var cabecalho = document.querySelector('.site-header');
@@ -253,7 +253,7 @@
   }
 
   /* ------------------------------------------------------------
-   * DATAS DOS CARTOES DE EXEMPLO
+   * DATAS DOS CARTÕES DE EXEMPLO
    * ------------------------------------------------------------ */
 
   var hoje = new Date();
@@ -279,10 +279,10 @@
   /* ------------------------------------------------------------
    * RESERVAS DE EXEMPLO
    *
-   * Dados ficticios, so para a previa do calendario. O proprio
-   * texto da secao avisa que as reservas reais aparecem depois
-   * do login. Os dias mudam um pouco de um mes para o outro para
-   * a navegacao nao parecer congelada.
+   * Dados fictícios, só para a prévia do calendário. O próprio
+   * texto da seção avisa que as reservas reais aparecem depois
+   * do login. Os dias mudam um pouco de um mês para o outro para
+   * a navegação não parecer congelada.
    * ------------------------------------------------------------ */
 
   var MODELOS = [
@@ -389,7 +389,7 @@
   }
 
   /* ------------------------------------------------------------
-   * CALENDARIO REDUZIDO DO HERO
+   * CALENDÁRIO REDUZIDO DO HERO
    * ------------------------------------------------------------ */
 
   function montarCalendarioDoMockup() {
@@ -447,7 +447,7 @@
   montarCalendarioDoMockup();
 
   /* ------------------------------------------------------------
-   * CALENDARIO DE EXEMPLO
+   * CALENDÁRIO DE EXEMPLO
    * ------------------------------------------------------------ */
 
   var gradeDemo = document.getElementById('demoCalGrid');
@@ -465,8 +465,8 @@
     var porDiaAtual = reservasDoMes(demoAno, demoMes);
     var isoHoje = isoDe(hoje.getFullYear(), hoje.getMonth(), hoje.getDate());
 
-    // Comeca no dia de hoje quando ele tem reservas; senao, no
-    // primeiro dia com reservas do mes; senao, no dia 1.
+    // Começa no dia de hoje quando ele tem reservas; senão, no
+    // primeiro dia com reservas do mês; senão, no dia 1.
     var demoSelecionado = isoHoje;
 
     if (!porDiaAtual[demoSelecionado]) {
