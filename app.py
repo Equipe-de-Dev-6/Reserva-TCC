@@ -1806,7 +1806,19 @@ def decidir_reserva(
 
 @app.post('/senha/solicitar', status_code=201)
 async def solicitar_redefinicao(request: Request):
-    """Registra um pedido de troca de senha, pendente de aprovação."""
+    """Registra um pedido de troca de senha, pendente de aprovação.
+
+    A rota é pública (quem esqueceu a senha não tem sessão), então usa um
+    contador próprio para e-mails inexistentes, separado do /login.
+    """
+    endereco = f"senha-solicitar:{_endereco_de(request)}"
+
+    if _tentativas_restantes(endereco) <= 0:
+        raise HTTPException(
+            status_code=429,
+            detail="Muitas tentativas. Aguarde alguns minutos e tente de novo."
+        )
+
     dados = await request.form()
     email = (dados.get("email") or "").strip().lower()
     nova_senha = dados.get("senha") or ""
@@ -1817,6 +1829,13 @@ async def solicitar_redefinicao(request: Request):
             detail="A nova senha precisa ter pelo menos 6 caracteres"
         )
 
+    # hash_password conta bytes (limite do bcrypt). Sem o try, uma senha
+    # longa com acentos viraria ValueError -> 500; aqui vira 400.
+    try:
+        nova_hash = hash_password(nova_senha)
+    except ValueError as erro:
+        raise HTTPException(status_code=400, detail=str(erro))
+
     usuario = (
         supabase
         .table('usuarios')
@@ -1826,6 +1845,10 @@ async def solicitar_redefinicao(request: Request):
     )
 
     if not usuario.data:
+        # Conta como tentativa falha: e-mail inexistente não pode ser
+        # testado sem limite para descobrir quem tem conta no sistema.
+        _registrar_tentativa(endereco)
+
         raise HTTPException(
             status_code=404,
             detail="Usuário não encontrado"
@@ -1856,7 +1879,8 @@ async def solicitar_redefinicao(request: Request):
         .insert({
             "usuario_id": usuario_id,
             "status": "pendente",
-            "nova_senha_hash": hash_password(nova_senha)
+            # O banco nunca recebe a senha em texto, nem neste fluxo.
+            "nova_senha_hash": nova_hash
         })
         .execute()
     )
@@ -1866,6 +1890,9 @@ async def solicitar_redefinicao(request: Request):
             status_code=502,
             detail="Não foi possível registrar a solicitação"
         )
+
+    # Pedido registrado com sucesso não consome a cota do endereço.
+    _limpar_tentativas(endereco)
 
     return {"id": resposta.data[0]["id"]}
 
