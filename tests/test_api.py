@@ -806,6 +806,74 @@ def main():
     check("coordenador logado vai para /home_admin", r.headers.get("location") == "/home_admin", str(r.headers.get("location")))
     fechar(c)
 
+    print("\n[15] Limites de tentativas e senha longa")
+
+    check("limite de login é 8", app_modulo.TENTATIVAS_POR_ENDERECO == 8,
+          str(app_modulo.TENTATIVAS_POR_ENDERECO))
+
+    # Força o contador a zero sem depender de uma sequência longa de
+    # respostas do banco: o que se testa aqui é o bloqueio, não a contagem.
+    original_restantes = app_modulo._tentativas_restantes
+    app_modulo._tentativas_restantes = lambda endereco: 0
+    try:
+        c = TestClient(app)
+        r = entrar(c, USUARIO_PROF["email"], SENHA_PROF)
+        check("login com cota esgotada responde 429", r.status_code == 429, r.text)
+
+        r = c.get("/senha/id", params={"email": USUARIO_PROF["email"]})
+        check("/senha/id também limita consultas", r.status_code == 429, r.text)
+
+        r = c.post("/senha/solicitar", data={
+            "email": USUARIO_PROF["email"], "senha": "senha-valida"
+        })
+        check("/senha/solicitar também limita", r.status_code == 429, r.text)
+    finally:
+        app_modulo._tentativas_restantes = original_restantes
+
+    c, banco = cliente_logado(USUARIO_PROF)
+
+    # 40 caracteres "ã" ocupam 80 bytes em UTF-8: o Pydantic de campo
+    # deixaria passar, mas o bcrypt recusaria com ValueError.
+    banco.respostas.insert(0, [])
+    r = c.post("/senha/solicitar", data={
+        "email": USUARIO_PROF["email"], "senha": "ã" * 40
+    })
+    check("senha acima de 72 bytes vira 400", r.status_code == 400, r.text)
+
+    # Ordem das respostas: contagem, usuário, pendência, insert, limpeza.
+    banco.respostas.extend([
+        [], [USUARIO_PROF], [], [{"id": 77}], []
+    ])
+    r = c.post("/senha/solicitar", data={
+        "email": USUARIO_PROF["email"], "senha": "senha-de-teste-123"
+    })
+    check("pedido de senha válido é registrado", r.status_code == 201, r.text)
+    inserts = [x for x in banco.registros if x["operacao"] == "insert"]
+    check("banco recebe o hash, nunca a senha",
+          bool(inserts) and inserts[-1]["dados"].get("nova_senha_hash", "").startswith("$2"),
+          str(inserts[-1]["dados"] if inserts else {}))
+    fechar(c)
+
+    print("\n[16] Notificações por usuário, não só por IP")
+
+    app_modulo.NOTIFICACOES_POR_USUARIO.clear()
+    c, banco = cliente_logado(USUARIO_PROF)
+    banco.respostas.append([{"id": 1}])
+    r = c.post("/api/notificacoes", json={"titulo": "Aviso", "mensagem": "Teste"})
+    check("primeira notificação é criada", r.status_code == 201, r.text)
+
+    r = c.post("/api/notificacoes", json={"titulo": "Outro", "mensagem": "Teste"})
+    check("segunda notificação do mesmo usuário é limitada", r.status_code == 429, r.text)
+    fechar(c)
+
+    # Mesmo endereço (testclient), usuário diferente: continua podendo
+    # enviar a primeira notificação, como acontece na rede do campus.
+    c, banco = cliente_logado(USUARIO_COORD)
+    banco.respostas.append([{"id": 2}])
+    r = c.post("/api/notificacoes", json={"titulo": "Aviso", "mensagem": "Teste"})
+    check("outro usuário no mesmo IP não é bloqueado", r.status_code == 201, r.text)
+    fechar(c)
+
     print(f"\n{estado['passou']} passaram, {estado['falhou']} falharam\n")
     return 0 if estado["falhou"] == 0 else 1
 
