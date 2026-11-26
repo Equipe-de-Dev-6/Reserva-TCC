@@ -37,8 +37,12 @@ const codigo = fs.readFileSync(__dirname + '/../static/js/avisos.js', 'utf8');
     const app = vm.runInContext('AvisosApp', ctx);
     const criado = await app.addAviso({ titulo: 'Manutencao', descricao: 'Sala C20', data: '2026-10-20' });
     check('aviso criado', criado && criado.id === 1);
-    const lista = [{ id: 1, titulo: 'Manutencao' }];
-    check('lista tem o aviso', lista.length === 1);
+
+    // Antes este teste criava um array local e sempre passava, mesmo
+    // que addAviso() não tivesse gravado nada. Aqui a lista volta da
+    // própria API, como acontece quando a tela recarrega.
+    const lista = await app.getAvisos();
+    check('lista tem o aviso', lista.length === 1 && lista[0].id === 1, JSON.stringify(lista));
   }
 
   // 3. Exclui aviso

@@ -4,6 +4,10 @@
 -- Os avisos publicados por professores ficam visíveis para todos os
 -- professores e coordenadores. Não há envio de e-mail: tudo é tratado
 -- dentro do sistema.
+--
+-- ON DELETE CASCADE é intencional aqui: se a conta for excluída, os
+-- avisos dela desaparecem junto. Reservas usam RESTRICT porque são
+-- histórico e não podem ser apagadas sem decisão do coordenador.
 
 CREATE TABLE IF NOT EXISTS public.avisos (
     id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,

@@ -142,43 +142,8 @@
 
     document.addEventListener('DOMContentLoaded', () => {
 
-      // ======================================================
-      // DROPDOWN DO USUÁRIO
-      // ======================================================
-      const userProfile = document.getElementById('userProfile');
-      const userDropdown = document.getElementById('userDropdown');
-
-      if (userProfile && userDropdown) {
-        userProfile.addEventListener('click', (e) => {
-          e.stopPropagation();
-          userDropdown.classList.toggle('active');
-        });
-
-        document.addEventListener('click', (e) => {
-          if (!userProfile.contains(e.target)) {
-            userDropdown.classList.remove('active');
-          }
-        });
-      }
-
-      // ======================================================
-      // MENU MOBILE
-      // ======================================================
-      const menuToggle = document.getElementById('menuToggle');
-      const sidebar = document.querySelector('.sidebar');
-      const sidebarOverlay = document.getElementById('sidebarOverlay');
-
-      if (menuToggle && sidebar && sidebarOverlay) {
-        menuToggle.addEventListener('click', () => {
-          sidebar.classList.toggle('open');
-          sidebarOverlay.classList.toggle('active');
-        });
-
-        sidebarOverlay.addEventListener('click', () => {
-          sidebar.classList.remove('open');
-          sidebarOverlay.classList.remove('active');
-        });
-      }
+      {#- Dropdown e menu mobile ficam só em app.js, carregado pelo
+          base.html. Duplicar aqui cancelava o toggle. -#}
 
       // ======================================================
       // LISTA DE PROFESSORES
@@ -284,19 +249,10 @@
         modal.style.display = 'none';
       }
 
-      // A caixa de edicao nao tem HTML nesta tela: modalEditar,
-      // formProfessor, profNome, profEmail e os botoes sao procurados
-      // aqui e nao existem no template. Sem o bloco isolado, a linha
-      // "modal.addEventListener" estourava um TypeError na carga, a
-      // excecao parava o script no meio, e a busca e o resto da tela
-      // ficavam sem registro. O botao "editar" das linhas tambem
-      // quebrava.
-      //
-      // Nao se inventa a caixa aqui: o conteudo dela e decisao de
-      // tela. O bloco fica isolado e pronto para quando o markup
-      // existir.
+      // O modal de edição existe nesta tela; o if protege o script
+      // caso o markup seja removido numa reformulação da tela.
       if (modal && formProfessor) {
-      const btnCancelarProfessor =
+        const btnCancelarProfessor =
           document.getElementById('btnCancelarProfessor');
 
       if (btnCancelarProfessor) {

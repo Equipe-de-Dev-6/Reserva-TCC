@@ -1,161 +1,155 @@
 // Busca o nome do usuário autenticado pela sessão do FastAPI.
 
-    document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', () => {
 
-      
+  // Retorna o ícone da categoria da reserva (laboratório, gabinete ou sala).
+  function iconeDaCategoria(categoria) {
+    const cat = (categoria || '').toLowerCase();
 
-      
+    if (cat.includes('laborat')) {
+      return '/assets/icons/computer.png';
+    }
 
-      
+    if (cat.includes('gabinete')) {
+      return '/assets/icons/shopping-cart.png';
+    }
 
-      function iconeDaCategoria(categoria) {
-        const cat = (categoria || '').toLowerCase();
+    return '/assets/icons/classroom.png';
+  }
 
-        if (cat.includes('laborat')) {
-          return '/assets/icons/computer.png';
-        }
+  let filtroAtual = 'todas';
 
-        if (cat.includes('gabinete')) {
-          return '/assets/icons/shopping-cart.png';
-        }
+  function renderReservas() {
+    const lista = ReservasApp.getReservas();
+    const listaEl = document.getElementById('reservasList');
+    const emptyEl = document.getElementById('reservasEmpty');
 
-        return '/assets/icons/classroom.png';
-      }
+    const filtradas =
+      filtroAtual === 'todas'
+        ? lista
+        : lista.filter((r) => r.status === filtroAtual);
 
-      let filtroAtual = 'todas';
+    if (lista.length === 0) {
+      listaEl.innerHTML = '';
+      emptyEl.style.display = 'flex';
+      return;
+    }
 
-      function renderReservas() {
-        const lista = ReservasApp.getReservas();
-        const listaEl = document.getElementById('reservasList');
-        const emptyEl = document.getElementById('reservasEmpty');
+    emptyEl.style.display = 'none';
 
-        const filtradas =
-          filtroAtual === 'todas'
-            ? lista
-            : lista.filter((r) => r.status === filtroAtual);
+    if (filtradas.length === 0) {
+      listaEl.innerHTML =
+        '<p style="color:#6B7280;font-size:13px;padding:12px 4px;">Nenhuma reserva encontrada para este filtro.</p>';
+      return;
+    }
 
-        if (lista.length === 0) {
-          listaEl.innerHTML = '';
-          emptyEl.style.display = 'flex';
-          return;
-        }
+    listaEl.innerHTML = filtradas.map((r) => {
+      const info = ReservasApp.statusInfo(r.status);
+      const dataFormatada = ReservasApp.formatDateBR(r.data);
 
-        emptyEl.style.display = 'none';
+      const horario = ReservasApp.formatHorario(
+        r.horaEntrada,
+        r.horaSaida
+      );
 
-        if (filtradas.length === 0) {
-          listaEl.innerHTML =
-            '<p style="color:#6B7280;font-size:13px;padding:12px 4px;">Nenhuma reserva encontrada para este filtro.</p>';
-          return;
-        }
+      const acoes =
+        r.status === 'cancelada'
+          ? ''
+          : '<button class="btn-cancelar-reserva" data-cancel-id="' +
+          r.id +
+          '">Cancelar Reserva</button>';
 
-        listaEl.innerHTML = filtradas.map((r) => {
-          const info = ReservasApp.statusInfo(r.status);
-          const dataFormatada = ReservasApp.formatDateBR(r.data);
-
-          const horario = ReservasApp.formatHorario(
-            r.horaEntrada,
-            r.horaSaida
-          );
-
-          const acoes =
-            r.status === 'cancelada'
-              ? ''
-              : '<button class="btn-cancelar-reserva" data-cancel-id="' +
-              r.id +
-              '">Cancelar Reserva</button>';
-
-          return `
-            <div
-              class="reserva-card searchable"
-              data-id="${r.id}"
-            >
-              <div class="reserva-left">
-                <div class="reserva-icon">
-                  <img
-                    src="${iconeDaCategoria(r.categoria)}"
-                    alt=""
-                  >
-                </div>
-
-                <div class="reserva-info">
-                  <h4>
-                    ${ReservasApp.escapar(
-                            r.item || r.categoria
-                          )}
-                  </h4>
-
-                  <p>
-                    ${ReservasApp.escapar(r.curso)
-                          ? ReservasApp.escapar(r.curso) + ' · ' : ''}
-                    ${ReservasApp.escapar(r.professor)}
-                  </p>
-
-                  <div class="reserva-meta">
-                    <p>${dataFormatada}</p>
-                    <p>${horario}</p>
-                  </div>
-
-                  ${r.motivo ? `
-                    <div class="reserva-comentario">
-                      <span class="reserva-comentario-label">Comentário:</span>
-                      ${ReservasApp.escapar(r.motivo)}
-                    </div>
-                  ` : ''}
-                </div>
-              </div>
-
-              <div class="reserva-right">
-                <span class="${info.badgeClass}">
-                  ${info.label}
-                </span>
-
-                ${acoes}
-              </div>
+      return `
+        <div
+          class="reserva-card searchable"
+          data-id="${r.id}"
+        >
+          <div class="reserva-left">
+            <div class="reserva-icon">
+              <img
+                src="${iconeDaCategoria(r.categoria)}"
+                alt=""
+              >
             </div>
-          `;
-        }).join('');
-      }
 
-      const filterTabs = document.querySelectorAll('.filter-tab');
+            <div class="reserva-info">
+              <h4>
+                ${ReservasApp.escapar(
+                        r.item || r.categoria
+                      )}
+              </h4>
 
-      filterTabs.forEach((tab) => {
-        tab.addEventListener('click', () => {
-          filterTabs.forEach((t) => t.classList.remove('active'));
+              <p>
+                ${ReservasApp.escapar(r.curso)
+                      ? ReservasApp.escapar(r.curso) + ' · ' : ''}
+                ${ReservasApp.escapar(r.professor)}
+              </p>
 
-          tab.classList.add('active');
-          filtroAtual = tab.dataset.filter;
+              <div class="reserva-meta">
+                <p>${dataFormatada}</p>
+                <p>${horario}</p>
+              </div>
 
-          renderReservas();
-        });
-      });
+              ${r.motivo ? `
+                <div class="reserva-comentario">
+                  <span class="reserva-comentario-label">Comentário:</span>
+                  ${ReservasApp.escapar(r.motivo)}
+                </div>
+              ` : ''}
+            </div>
+          </div>
 
-      document
-        .getElementById('reservasList')
-        .addEventListener('click', (e) => {
+          <div class="reserva-right">
+            <span class="${info.badgeClass}">
+              ${info.label}
+            </span>
 
-          const btn = e.target.closest('[data-cancel-id]');
+            ${acoes}
+          </div>
+        </div>
+      `;
+    }).join('');
+  }
 
-          if (!btn) {
-            return;
-          }
+  const filterTabs = document.querySelectorAll('.filter-tab');
 
-          const confirmar = window.confirm(
-            'Tem certeza que deseja cancelar esta reserva?'
-          );
+  filterTabs.forEach((tab) => {
+    tab.addEventListener('click', () => {
+      filterTabs.forEach((t) => t.classList.remove('active'));
 
-          if (!confirmar) {
-            return;
-          }
-
-          ReservasApp.cancelReserva(
-            btn.dataset.cancelId
-          );
-
-          renderReservas();
-        });
-
-
+      tab.classList.add('active');
+      filtroAtual = tab.dataset.filter;
 
       renderReservas();
-      ReservasApp.subscribe(() => renderReservas());
     });
+  });
+
+  document
+    .getElementById('reservasList')
+    .addEventListener('click', (e) => {
+
+      const btn = e.target.closest('[data-cancel-id]');
+
+      if (!btn) {
+        return;
+      }
+
+      const confirmar = window.confirm(
+        'Tem certeza que deseja cancelar esta reserva?'
+      );
+
+      if (!confirmar) {
+        return;
+      }
+
+      ReservasApp.cancelReserva(
+        btn.dataset.cancelId
+      );
+
+      renderReservas();
+    });
+
+
+  renderReservas();
+  ReservasApp.subscribe(() => renderReservas());
+});

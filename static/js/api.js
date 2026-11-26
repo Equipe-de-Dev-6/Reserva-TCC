@@ -4,12 +4,11 @@
 //
 // Comunicação com o backend. Todas as funções devolvem os dados já
 // convertidos (json) e levantam um erro quando a rota responde com
-// falha, para que a tela treat o erro em um lugar só.
+// falha, para que a tela trate o erro em um lugar só.
 //
 // As rotas chamadas aqui são as que existem no app.py. Endpoint que
 // não existe voltaria 404 em silêncio nas telas, por isso esta lista
 // acompanha a API de perto.
-//
 // ============================================================
 
 
@@ -24,6 +23,13 @@
  * que é onde a rota explica o que aconteceu ("Sala não encontrada",
  * "E-mail ou senha inválidos"). Sem isso, a tela mostraria sempre
  * "erro na requisição", que não ajuda ninguém a entender.
+ *
+ * Fluxo:
+ * 1. Faz o fetch com as opções dadas.
+ * 2. Tenta ler o corpo como JSON (se falhar, fica null).
+ * 3. Se a resposta não foi ok (status >= 400), monta um Error com o
+ *    detalhe extraído do corpo e lança.
+ * 4. Se foi ok, devolve o corpo já convertido.
  */
 async function pedir(url, opcoes = {}) {
 
@@ -209,7 +215,24 @@ export async function cadastrarUsuario(dados) {
 
 export async function atualizarUsuario(id, dados) {
 
+  // Rota do coordenador. A tela do professor usa atualizarMe(), que
+  // retira o cargo e usa a sessão como identidade.
   return pedir(`/usuarios/${id}`, {
+    method: 'PUT',
+    ...corpoJson(dados)
+  });
+
+}
+
+/**
+ * Atualiza nome e/ou e-mail do próprio usuário.
+ *
+ * O id não vai na URL: vem da sessão, então o professor não precisa
+ * saber (nem pode trocar) o id de outra conta.
+ */
+export async function atualizarMe(dados) {
+
+  return pedir('/usuarios/me', {
     method: 'PUT',
     ...corpoJson(dados)
   });
@@ -283,7 +306,10 @@ export async function alterarSenhaUsuario(id, senha) {
 
 /**
  * Solicita redefinição de senha para o coordenador aprovar.
- * Devolve { id, status } da pendência criada.
+ *
+ * A rota devolve só `{ id }`: o status "pendente" é um detalhe do
+ * banco, não do contrato HTTP. Qualquer falha já levanta erro em
+ * pedir(), então a tela não precisa adivinhar status.
  */
 export async function solicitarAlteracaoSenha(email, senha) {
 
@@ -295,4 +321,70 @@ export async function solicitarAlteracaoSenha(email, senha) {
     method: 'POST',
     body: dados
   });
+
+}
+
+
+// ============================================================
+// PEDIDOS DE SENHA (COORDENADOR)
+// ============================================================
+
+/** Lista pedidos aguardando decisão do coordenador. */
+export async function listarPendencias() {
+
+  return pedir('/pendencias');
+
+}
+
+/** Aplica a nova senha e fecha o pedido como aprovado. */
+export async function aceitarPendencia(id) {
+
+  return pedir(`/pendencias/${id}/aceitar`, { method: 'POST' });
+
+}
+
+/** Fecha o pedido como negado, sem mexer na senha do usuário. */
+export async function recusarPendencia(id) {
+
+  return pedir(`/pendencias/${id}/recusar`, { method: 'POST' });
+
+}
+
+
+// ============================================================
+// NOTIFICAÇÕES
+// ============================================================
+//
+// Antes a tela lia só o cache local de reservas.js, que não sabia das
+// notificações gravadas no banco. Estas funções falam direto com a API.
+
+/** Notificações do usuário da sessão, mais recentes primeiro. */
+export async function listarNotificacoes() {
+
+  return pedir('/api/notificacoes');
+
+}
+
+/** Cria notificação para o usuário da sessão. */
+export async function criarNotificacao(titulo, mensagem) {
+
+  return pedir('/api/notificacoes', {
+    method: 'POST',
+    ...corpoJson({ titulo, mensagem })
+  });
+
+}
+
+/** Marca uma notificação do próprio usuário como lida. */
+export async function marcarNotificacaoLida(id) {
+
+  return pedir(`/api/notificacoes/${id}/ler`, { method: 'PATCH' });
+
+}
+
+/** Exclui uma notificação do próprio usuário. */
+export async function excluirNotificacao(id) {
+
+  return pedir(`/api/notificacoes/${id}`, { method: 'DELETE' });
+
 }

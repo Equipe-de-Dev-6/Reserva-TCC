@@ -20,7 +20,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // =====================================================
-  // DROPDOWN DO USUÁRIO
+  // DROPDOWN DO USUÁRIO (gerenciado por app.js)
   // =====================================================
 
 });

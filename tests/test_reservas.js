@@ -309,7 +309,18 @@ async function main() {
 
     const info = app.statusInfo('aguardando');
     check('badge de aguardando é amarela', info.label === 'Aguardando' && info.badgeClass === 'badge-yellow');
-    check('status desconhecido não quebra', app.statusInfo('xyz').badgeClass === 'badge-yellow');
+    // O rótulo também era conferido? Não: antes o teste só olhava a
+    // classe e deixava passar um valor cru que depois ia para innerHTML.
+    const desconhecido = app.statusInfo('xyz');
+    check(
+      'status desconhecido não quebra',
+      desconhecido.badgeClass === 'badge-yellow'
+    );
+    check(
+      'status desconhecido não é ecoado',
+      desconhecido.label === 'Aguardando',
+      desconhecido.label
+    );
   }
 
   console.log('\n[6] Rascunho incompleto e listeners');

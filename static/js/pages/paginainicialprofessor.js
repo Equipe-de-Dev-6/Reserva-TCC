@@ -8,25 +8,22 @@ document.addEventListener('DOMContentLoaded', () => {
       }
 
       // ======================================================
-      // NOME DO USUÁRIO LOGADO
-      // ======================================================
-// ======================================================
-      // PESQUISA
+      // NOME DO USUÁRIO LOGADO (vindo do contexto do app.py)
       // ======================================================
 
-      
+      // ======================================================
+      // PESQUISA
+      // ======================================================
 
       const itemsToSearch =
         document.querySelectorAll('.searchable');
 
-      
-
       // ======================================================
-      // DROPDOWN DO USUÁRIO
+      // DROPDOWN DO USUÁRIO (gerenciado por app.js)
       // ======================================================
 
       // ======================================================
-      // MENU MOBILE
+      // MENU MOBILE (gerenciado por app.js)
       // ======================================================
 
       // ======================================================
@@ -197,7 +194,7 @@ document.addEventListener('DOMContentLoaded', () => {
       renderProximasReservas();
 
       // ======================================================
-      // ATUALIZAÇÃO DAS RESERVAS
+      // ATUALIZAÇÃO DAS RESERVAS (re-render ao mudar)
       // ======================================================
 
       ReservasApp.subscribe(() => {
@@ -294,7 +291,7 @@ document.addEventListener('DOMContentLoaded', () => {
       renderAvisosPreview();
 
       // ======================================================
-      // ATUALIZAÇÃO DOS AVISOS
+      // ATUALIZAÇÃO DOS AVISOS (re-render ao mudar)
       // ======================================================
 
       AvisosApp.subscribe(() => {
@@ -304,7 +301,7 @@ document.addEventListener('DOMContentLoaded', () => {
       });
 
       // ======================================================
-      // CALENDÁRIO
+      // CALENDÁRIO WIDGET
       // ======================================================
 
       const hoje = new Date();
@@ -453,7 +450,7 @@ document.addEventListener('DOMContentLoaded', () => {
       }
 
       // ======================================================
-      // INICIALIZA CALENDÁRIO
+      // INICIALIZA CALENDÁRIO WIDGET
       // ======================================================
 
       try {
