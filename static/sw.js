@@ -1,12 +1,17 @@
 /* =========================================================
-   sw.js — Service Worker de notificações e PWA
+   sw.js — Service Worker do Reserva SENAI
    ---------------------------------------------------------
-   Este arquivo precisa ficar na RAIZ do site
-   (ex.: public/sw.js -> https://seusite.com/sw.js).
-   Se ficar dentro de /js, o escopo dele não cobre o site todo.
+   Este arquivo roda em outro contexto: não existe window nem
+   navigator aqui. Por isso ele só cuida do que é do SW:
+   ativação imediata e clique em notificações.
+
+   Pedido de permissão e aviso de instalação ficam em
+   /js/notificacoes-push.js, que roda na página.
    ========================================================= */
 
 self.addEventListener('install', () => {
+  // Sem skipWaiting, uma versão antiga continua respondendo até a
+  // última aba fechar — e a correção do clique nunca apareceria.
   self.skipWaiting();
 });
 
@@ -14,68 +19,23 @@ self.addEventListener('activate', (event) => {
   event.waitUntil(self.clients.claim());
 });
 
-// Verificar se o navegador suporta Service Worker e PWA
-const isPWA = window.matchMedia('(display-mode: standalone)').matches;
-
-// Mostrar notificação de instalação se não for PWA
-function showInstallNotification() {
-  if (!('serviceWorker' in navigator)) return;
-
-  // Verificar se já está instalado como PWA
-  if (isPWA) return;
-
-  // Não guardamos em localStorage para que a notificação
-  // sempre apareça para usuários que ainda não instalaram
-  
-  // Solicitar permissão e mostrar notificação
-  navigator.serviceWorker.ready.then((registration) => {
-    Notification.requestPermission().then((permission) => {
-      if (permission === 'granted') {
-        const notification = registration.showNotification(
-          'Reserva SENAI',
-          {
-            body: 'Instale o aplicativo para ter acesso rápido na tela inicial',
-            icon: '/static/assets/img/logo-pwa.png',
-            badge: '/static/assets/img/logo-pwa.png',
-            vibrate: [200, 100, 200],
-            data: {
-              url: '/home'
-            }
-          }
-        );
-
-        // Quando o usuário clicar na notificação
-        notification.onclick = (event) => {
-          event.notification.close();
-          event.waitUntil(
-            clients.openWindow(notification.data.url)
-          );
-        };
-      }
-    });
-  });
-}
-
-// Executar quando a página carregar
-if ('serviceWorker' in navigator) {
-  window.addEventListener('load', showInstallNotification);
-}
-
-// Lidar with clicks nas notificações
 self.addEventListener('notificationclick', (event) => {
   event.notification.close();
 
+  // A URL vem dos dados da notificação criada na página. Se não
+  // houver, a home do perfil é um destino seguro.
   const destino =
     (event.notification.data && event.notification.data.url) || '/home';
 
   event.waitUntil(
-    clients
+    self.clients
       .matchAll({ type: 'window', includeUncontrolled: true })
       .then((janelas) => {
+        // Reaproveita uma aba já aberta em vez de abrir outra.
         for (const janela of janelas) {
           if ('focus' in janela) {
             if ('navigate' in janela) {
-              return janela.navigate(destino).then((j) => (j || janela).focus());
+              return janela.navigate(destino).then((alvo) => (alvo || janela).focus());
             }
             return janela.focus();
           }

@@ -41,7 +41,10 @@ for (const arq of varrerHtml('templates')) {
   console.log(`  ${arq}: pede ${pedidos.length} -> ${faltando.length ? 'FALTAM ' + faltando.join(', ') : 'tudo existe'}`);
   if (faltando.length) problemas++;
 }
-for (const arq of ['static/js/cadastro.js','static/js/salas.js']) {
+// A lista era fixa (cadastro.js e salas.js), então um módulo novo que
+// importasse uma função inexistente passava despercebido. Percorre todos
+// os módulos, inclusive os de static/js/pages.
+for (const arq of varrer('static/js')) {
   const src = fs.readFileSync(arq,'utf8');
   const m = src.match(/import\s*\{([^}]*)\}\s*from\s*['"][^'"]*api\.js['"]/);
   if (!m) continue;
@@ -61,17 +64,51 @@ const rotas = new Set([...app.matchAll(/@app\.(?:get|post|put|delete|patch)\(\s*
 const criados = [...app.matchAll(/"(\/[a-z_0-9\-]+)":\s*\(?\s*"([^"]+)"/g)].map(m => m[1]);
 criados.forEach(r => rotas.add(r));
 const chamadas = new Set();
+
+// As chamadas com id são template literals (`/usuarios/${id}`) ou
+// concatenação ("/usuarios/" + id). Capturar só o primeiro segmento
+// gerava os falsos positivos "/usuarios/" e "/senha": as rotas reais
+// existem, mas têm parâmetros. Aqui o caminho inteiro é capturado e
+// normalizado antes da comparação.
+const normalizar = (u) => u
+  .replace(/[?#].*$/, '')          // query string e âncora não são caminho
+  .replace(/\$\{[^}]*\}/g, '{}')    // ${id} do JavaScript
+  .replace(/\{[^}]*\}/g, '{}')      // {usuario_id} do FastAPI
+  .replace(/\/+$/, '')             // barra final não muda a rota
+  || '/';
+
 for (const arq of varrer('static/js')) {
   const src = fs.readFileSync(arq,'utf8');
-  for (const m of src.matchAll(/[`'"](\/(?:[a-z_][a-z_0-9\-]*))(?:\/\$\{[^}]*\})?[`'"]/g)) chamadas.add(m[1]);
+  const re = /[`'"](\/[a-zA-Z_][a-zA-Z_0-9\-]*(?:\/(?:[a-zA-Z_][a-zA-Z_0-9\-]*|\$\{[^}]*\}))*(?:\?[^`'"]*)?)[`'"]/g;
+  for (const m of src.matchAll(re)) chamadas.add(m[1]);
 }
 for (const arq of varrerHtml('templates')) {
   const html = fs.readFileSync(arq,'utf8');
-  for (const m of html.matchAll(/(?:href|action)=["'](\/[a-zA-Z_][a-zA-Z_0-9\-]*)/g)) chamadas.add(m[1]);
-  for (const m of html.matchAll(/fetch\(\s*[`'"]([^`'"]+)/g)) { const u = m[1].replace(/\$\{[^}]*\}.*/, ''); if (u.startsWith('/')) chamadas.add(u); }
+  for (const m of html.matchAll(/(?:href|action)=["'](\/[^"'#?]*)/g)) chamadas.add(m[1]);
+  for (const m of html.matchAll(/fetch\(\s*[`'"](\/[^`'"]*)/g)) chamadas.add(m[1]);
 }
+
 const estaticos = /^\/(css|js|assets|templates|static)/;
-const quebradas = [...chamadas].filter(u => !estaticos.test(u) && !rotas.has(u));
+
+// Uma rota do FastAPI com {id} vira um segmento curinga. A chamada já
+// normalizou os placeholders, então basta comparar os pedaços.
+const comoRegex = (u) => new RegExp('^' + u.split('/').map(s =>
+  s === '{}' ? '[^/]+' : s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+).join('/') + '$');
+
+const rotasRegex = [...rotas].map(r => ({ original: r, re: comoRegex(normalizar(r)) }));
+
+const quebradas = [...chamadas].filter(u => {
+  if (estaticos.test(u)) return false;
+  const caminho = normalizar(u);
+  if (rotasRegex.some(r => r.re.test(caminho))) return false;
+
+  // "/usuarios/" termina em barra porque o id é concatenado depois.
+  // Nesse caso basta que exista uma rota que comece por ele.
+  if (u.endsWith('/') && rotasRegex.some(r => r.original.startsWith(caminho + '/'))) return false;
+
+  return true;
+});
 console.log('\nrotas chamadas pelo front que NAO existem no app.py: ' + (quebradas.length ? quebradas.join(', ') : 'nenhuma'));
 
 // 3) Todo template citado no app.py precisa existir na pasta. Quando as
@@ -85,19 +122,22 @@ const RAIZ_TEMPLATES = path.join(__dirname, '..', 'templates');
 // usada para ler o proprio app.py na parte das rotas.
 const fonte = fs.readFileSync(path.join(__dirname, '..', 'app.py'), 'utf8');
 
-const citados = new Set([...fonte.matchAll(/pagina\(\s*"([^"]+)"/g)].map(m => m[1]));
+// As páginas são renderizadas por renderizar(request, "arquivo.html").
+// O nome antigo era pagina("arquivo.html"); mantido aqui para não perder
+// chamada que tenha ficado em algum arquivo.
+const citados = new Set([
+  ...fonte.matchAll(/renderizar\(\s*request\s*,\s*["']([^"']+\.html)["']/g),
+  ...fonte.matchAll(/pagina\(\s*["']([^"']+\.html)["']/g),
+].map(m => m[1]));
 
-// Só interessa o caminho do template. Uma entrada pode trazer ainda
-// um terceiro item com o contexto extra da tela (ver
-// "_criar_paginas_do_coordenador"), e ele é preenchido com
-// "rotulo": "Laboratório" — texto que não é caminho de arquivo e não
-// deve ser procurado em templates/. O filtro pelo ".html" no fim
-// separa os dois casos.
-const ehCaminho = (s) => s.endsWith('.html');
-
-for (const bloco of fonte.matchAll(/PAGINAS_DO_(?:PROFESSOR|COORDENADOR)\s*=\s*\{([\s\S]*?)\}/g)) {
-  for (const m of bloco[1].matchAll(/:\s*"([^"]+)"/g)) {
-    if (ehCaminho(m[1])) citados.add(m[1]);
+// As páginas em lote vêm de tuplas: `"/home": (\n "professor/x.html", ...)`.
+// O padrão antigo procurava `:\s*"` e não encontrava nada, porque entre os
+// dois há um `(`; por isso o teste reportava "0/0 templates".
+// O fechamento `\n}` pega o fim do dicionário sem parar no contexto extra
+// (um dict dentro da tupla em PAGINAS_DO_COORDENADOR).
+for (const bloco of fonte.matchAll(/PAGINAS_DO_(?:PROFESSOR|COORDENADOR)\s*=\s*\{([\s\S]*?)\n\}/g)) {
+  for (const m of bloco[1].matchAll(/:\s*\(\s*\n?\s*["']([^"']+\.html)["']/g)) {
+    citados.add(m[1]);
   }
 }
 

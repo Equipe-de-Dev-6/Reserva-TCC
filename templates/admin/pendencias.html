@@ -1,0 +1,40 @@
+{#- Tela do coordenador para aprovar ou recusar trocas de senha. -#}
+{% extends "base.html" %}
+
+{% block head_extra %}
+  <link rel="stylesheet" href="/css/admin.css">
+{% endblock %}
+
+{% block titulo %}Pedidos de Senha{% endblock %}
+
+{% block conteudo %}
+<section class="adm-section">
+  <div class="adm-page-header">
+    <div>
+      <h2>Pedidos de troca de senha</h2>
+      <p>
+        Solicitações feitas na tela “Redefinir senha”. A senha nova já está
+        cifrada no banco; aqui apenas aprovamos ou recusamos o pedido.
+      </p>
+    </div>
+  </div>
+
+  <div class="adm-list" id="listaPendencias">
+    <!-- Preenchido por /js/pages/pendencias.js -->
+  </div>
+
+  <div class="adm-empty" id="listaVazia" style="display: none;">
+    <img src="/assets/icons/notification.png" alt="" width="40" height="40">
+    <p>Nenhum pedido de senha aguardando decisão.</p>
+  </div>
+
+  <div class="adm-empty" id="listaErro" style="display: none;">
+    <img src="/assets/icons/warning.png" alt="" width="40" height="40">
+    <p id="listaErroTexto">Não foi possível carregar os pedidos.</p>
+  </div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script type="module" src="/js/pages/pendencias.js"></script>
+{% endblock %}

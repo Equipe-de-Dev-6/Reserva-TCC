@@ -1,16 +1,4 @@
 document.addEventListener('DOMContentLoaded', () => {
-
-      
-      
-
-      
-
-      
-      
-      
-
-      
-
       // Troca o icone e o titulo do cartao de categoria pelo que foi
       // escolhido no passo 01 (laboratorio, gabinete ou sala). Sem
       // esta chamada a tela mostra o icone e o titulo de sala mesmo

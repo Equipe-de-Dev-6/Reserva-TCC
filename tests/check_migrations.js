@@ -12,11 +12,16 @@ const fs = require('fs');
 const path = require('path');
 
 const RAIZ = path.join(__dirname, '..');
+
+// Todas as migrations que o README manda rodar. Se uma ficar de fora,
+// o teste passa e o banco ainda quebra na hora da apresentação.
 const ARQUIVOS = [
   'migracao_reservas.sql',
   'migracao_schema.sql',
-  'migracao_rls.sql',
   'migracao_avisos.sql',
+  'migracao_notificacoes.sql',
+  'migracao_pendencias.sql',
+  'migracao_rls.sql',
 ];
 
 let passou = 0;
@@ -148,6 +153,11 @@ const COLUNAS = {
   sala_caracteristicas: ['sala_id', 'caracteristicas_id'],
   login_tentativas: ['id', 'endereco', 'tentativa'],
   avisos: ['id', 'usuario_id', 'titulo', 'descricao', 'data', 'criado_em', 'atualizado_em'],
+  // migracao_rls.sql altera notificacoes; sem esta entrada o teste
+  // reclamava de "tabela desconhecida" e terminava com código 1.
+  notificacoes: ['id', 'usuario_id', 'titulo', 'mensagem', 'lida', 'criado_em'],
+  pendencias_senhas: ['id', 'usuario_id', 'status', 'nova_senha_hash',
+    'solicitado_em', 'resolvido_em', 'resolvido_por'],
 };
 
 for (const arquivo of ARQUIVOS) {

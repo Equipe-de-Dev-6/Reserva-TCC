@@ -4,6 +4,7 @@
 #     node tests/test_reservas.js
 #     node tests/test_avisos.js
 #     node tests/check_wiring.js
+#     node tests/check_frontend.js
 #     node tests/check_migrations.js
 #
 # Ou tudo de uma vez, com o venv ativado:
@@ -32,16 +33,20 @@ SUITES_NODE = [
     os.path.join(RAIZ, "tests", "test_reservas.js"),
     os.path.join(RAIZ, "tests", "test_avisos.js"),
     os.path.join(RAIZ, "tests", "check_wiring.js"),
+    os.path.join(RAIZ, "tests", "check_frontend.js"),
     os.path.join(RAIZ, "tests", "check_migrations.js"),
 ]
 
 
-def executar(executavel, arquivos) -> bool:
+def executar(executavel, arquivo) -> bool:
+    """Roda um arquivo de teste e devolve True quando ele passa."""
 
-    print(f"\n=== {', '.join(os.path.basename(a) for a in arquivos)} ===\n")
+    print(f"\n=== {os.path.basename(arquivo)} ===\n")
 
+    # Cada suíte é um processo separado: `node a.js b.js` executa só o
+    # primeiro arquivo e ignoraria os outros três sem avisar.
     resultado = subprocess.run(
-        [executavel, *arquivos],
+        [executavel, arquivo],
         cwd=RAIZ,
     )
 
@@ -52,8 +57,12 @@ def main() -> int:
 
     # Os arquivos de JavaScript leem o projeto a partir do diretório
     # atual, então os testes rodam de dentro da raiz.
-    passou = executar(sys.executable, SUITES_PYTHON)
-    passou = executar("node", SUITES_NODE) and passou
+    passou = all(executar(sys.executable, arquivo) for arquivo in SUITES_PYTHON)
+
+    # `all()` com generator pararia no primeiro False; o loop abaixo
+    # roda todas as suítes para mostrar todos os problemas de uma vez.
+    for arquivo in SUITES_NODE:
+        passou = executar("node", arquivo) and passou
 
     print("\n" + ("tudo certo" if passou else "houve falhas"))
 

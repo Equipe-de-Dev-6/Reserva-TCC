@@ -47,7 +47,7 @@
               aprovarem seu pedido. Se aprovado, ele será
               confirmado na aba
 
-              <a href="/reservas_prof" class="link-highlight">
+              <a href="{{ rota_reservas }}" class="link-highlight">
                 “Reservas”
               </a>.
 
@@ -55,11 +55,14 @@
 
             <div class="success-actions">
 
-              <a href="/reservas_prof" class="btn-ver-reservas">
+              {#- O coordenador também passa por esta tela ao reservar.
+                  Os destinos vêm do contexto para cada perfil não cair
+                  no fluxo do outro. -#}
+              <a href="{{ rota_reservas }}" class="btn-ver-reservas">
                 Ver minhas reservas
               </a>
 
-              <a href="/home" class="btn-inicio">
+              <a href="{{ rota_inicio }}" class="btn-inicio">
                 Voltar ao início
               </a>
 

@@ -6,19 +6,18 @@ por fim as rotas de dados (que exigem sessão, e as de administrativo
 exigem também o cargo de Coordenador).
 """
 
-from datetime import datetime, timedelta
-from pathlib import Path
+from datetime import datetime, timedelta  # datas das reservas e janelas de tempo
+from pathlib import Path  # caminhos absolutos dos templates e arquivos estáticos
 
-from dotenv import load_dotenv
-from fastapi import FastAPI, HTTPException, Request
-from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import FileResponse, RedirectResponse
-from fastapi.staticfiles import StaticFiles
-from fastapi.templating import Jinja2Templates
-from starlette.responses import JSONResponse
-import os
-import random
-import re
+from dotenv import load_dotenv  # lê as variáveis de ambiente do .env
+from fastapi import FastAPI, HTTPException, Request  # framework e erros HTTP
+from fastapi.middleware.cors import CORSMiddleware  # libera origens configuradas
+from fastapi.responses import FileResponse, RedirectResponse  # sw.js e redirects
+from fastapi.staticfiles import StaticFiles  # serve CSS/JS/imagens
+from fastapi.templating import Jinja2Templates  # renderiza os HTML
+from starlette.responses import JSONResponse  # resposta de erro do login
+import os  # variáveis de ambiente (SECRET_KEY, CORS_ORIGINS, etc.)
+import random  # limpeza ocasional das tentativas antigas
 
 from criptografia import hash_password, verify_password
 from consulta_salas import salas_para_tela
@@ -68,6 +67,7 @@ MENU_COORDENADOR = [
     {"rota": "/notificacoes_adm", "icone": "notification", "rotulo": "Notificações"},
     {"rota": "/calendario_adm", "icone": "calendar", "rotulo": "Calendário"},
     {"rota": "/professores_adm", "icone": "user (3)", "rotulo": "Usuários"},
+    {"rota": "/pendencias_adm", "icone": "warning", "rotulo": "Pedidos de Senha"},
     {"rota": "/configuracoes_adm", "icone": "gear", "rotulo": "Configurações"},
     {"rota": "/ajuda", "icone": "interrogation", "rotulo": "Ajuda"},
 ]
@@ -110,6 +110,7 @@ ROTA_ATIVA = {
     "/notificacoes_adm": "/notificacoes_adm",
     "/calendario_adm": "/calendario_adm",
     "/professores_adm": "/professores_adm",
+    "/pendencias_adm": "/pendencias_adm",
     "/configuracoes_adm": "/configuracoes_adm",
     "/gerenciar_recursos": "/gerenciar_recursos",
     "/reservar_admin": "/reservar_admin",
@@ -285,9 +286,14 @@ app.add_middleware(
 # Só as tentativas que falharam entram na conta. Uma entrada correta
 # não gasta cota e ainda zera a contagem do endereço: quem erra a
 # senha duas vezes e acerta na terceira não é tratado como ataque.
-TENTATIVAS_POR_ENDERECO = 1000
+# O valor acompanha o que o README documenta (8 em 5 minutos); 1000
+# era grande o suficiente para não proteger contra força bruta.
+TENTATIVAS_POR_ENDERECO = 8
 JANELA_DE_TENTATIVAS = timedelta(minutes=5)
-NOTIFICACOES_POR_ENDERECO = {}
+# Um mesmo IP pode ser usado por vários professores na rede do campus,
+# então a chave inclui o usuário: sem isso, uma única notificação
+# bloquearia todos os colegas atrás do mesmo roteador por 5 minutos.
+NOTIFICACOES_POR_USUARIO = {}
 
 # Janela de rate limiting para criação de notificações (5 minutos)
 JANELA_NOTIFICACOES = timedelta(minutes=5)
@@ -307,13 +313,15 @@ def _limpar_notificacoes_antigas():
         return
 
     agora = datetime.now()
+    # As chaves são tuplas (endereço, id do usuário); só o tempo importa
+    # para decidir se a entrada já pode sair do dicionário.
     expirados = [
-        ip
-        for ip, ultimo in NOTIFICACOES_POR_ENDERECO.items()
+        chave
+        for chave, ultimo in NOTIFICACOES_POR_USUARIO.items()
         if agora - ultimo >= JANELA_NOTIFICACOES
     ]
-    for ip in expirados:
-        del NOTIFICACOES_POR_ENDERECO[ip]
+    for chave in expirados:
+        del NOTIFICACOES_POR_USUARIO[chave]
 
 
 def _janela_de_tentativas() -> str:
@@ -507,6 +515,11 @@ def renderizar(request: Request, nome_do_arquivo: str, **contexto):
             "rota_inicio": (
                 INICIO_COORDENADOR if eh_admin else INICIO_PROFESSOR
             ),
+            # A tela de confirmação de reserva é compartilhada: sem este
+            # destino, o coordenador era mandado para /reservas_prof.
+            "rota_reservas": (
+                "/reservas_admin" if eh_admin else "/reservas_prof"
+            ),
             "rota_atual": ROTA_ATIVA.get(request.url.path),
             "reserva_inicio": INICIO_COORDENADOR if eh_admin else INICIO_PROFESSOR,
             "rota_notificacoes": (
@@ -664,6 +677,7 @@ def reserva_para_json(dados: dict) -> dict:
 
 
 def carrinho_para_json(dados: dict) -> dict:
+    """Converte uma linha de "carrinhos" no formato usado pelas telas."""
     return {
         "id": dados.get("id"),
         **Carrinho.fromJson(dados).toJson()
@@ -949,7 +963,12 @@ PAGINAS_DO_PROFESSOR = {
 
 
 def _criar_paginas():
-    """Registra uma rota protegida por sessão para cada página."""
+    """Registra uma rota protegida por sessão para cada página.
+
+    Os valores são passados como argumentos padrão da função interna: sem
+    isso, todas as rotas veriam o último item do dicionário (late binding
+    do Python).
+    """
     for caminho, (arquivo, busca, frase) in PAGINAS_DO_PROFESSOR.items():
 
         def rota(request: Request, arquivo=arquivo, busca=busca, frase=frase):
@@ -1024,6 +1043,10 @@ PAGINAS_DO_COORDENADOR = {
         "admin/professores.html",
         "Buscar professor por nome ou e-mail..."
     ),
+    "/pendencias_adm": (
+        "admin/pendencias.html",
+        "Buscar pedido por id..."
+    ),
     "/configuracoes_adm": (
         "admin/configuracoes.html",
         "Buscar uma configuração..."
@@ -1032,6 +1055,11 @@ PAGINAS_DO_COORDENADOR = {
 
 
 def _criar_paginas_do_coordenador():
+    """Registra as páginas restritas ao Coordenador.
+
+    O mesmo cuidado com argumentos padrão de _criar_paginas() se aplica
+    aqui, para cada rota guardar o seu próprio template e contexto.
+    """
     # Cada entrada é (arquivo, busca) e, se a tela precisar saber de
     # que tipo de recurso ela trata, um terceiro item com o contexto
     # extra. É o que faz "/gerenciar_laboratorios_adm" e
@@ -1103,6 +1131,7 @@ def reservas_admin(request: Request):
 
 @app.get("/usuarios")
 def listar_usuarios(request: Request):
+    """Lista usuários para o painel administrativo, sem expor o hash."""
 
     exigir_coordenador(request)
 
@@ -1140,10 +1169,15 @@ def buscar_id_para_redefinicao(email: str, request: Request):
 
     Quem esqueceu a senha não tem sessão, então esta rota não exige
     login. Devolve apenas o ID (nunca nome, cargo ou senha) e usa o
-    mesmo limite de tentativas do login, para dificultar que alguém
-    teste e-mails em massa para descobrir quem tem conta.
+    limite de tentativas próprio (com o mesmo tamanho e janela do login),
+    para dificultar que alguém teste e-mails em massa para descobrir quem
+    tem conta sem atrapalhar o contador de login.
     """
     endereco = _endereco_de(request)
+
+    # O prefixo mantém esta contagem separada da contagem do /login: um
+    # coordenador consultando e-mails não gasta a cota de login de ninguém.
+    endereco = f"senha-id:{_endereco_de(request)}"
 
     if _tentativas_restantes(endereco) <= 0:
         raise HTTPException(
@@ -1160,12 +1194,17 @@ def buscar_id_para_redefinicao(email: str, request: Request):
     )
 
     if not resposta.data:
+        # Cada e-mail inexistente conta como tentativa, para não virar uma
+        # consulta ilimitada à lista de usuários.
         _registrar_tentativa(endereco)
 
         raise HTTPException(
             status_code=404,
             detail="Usuário não encontrado"
         )
+
+    # Consulta com e-mail existente não é ataque: limpa a própria cota.
+    _limpar_tentativas(endereco)
 
     return {"id": resposta.data[0]["id"]}
 
@@ -1231,24 +1270,11 @@ def cadastrar_usuario(usuario: Usuario, request: Request):
 # ATUALIZAR USUÁRIO
 # ------------------------------------------------------------
 
-@app.put("/usuarios/{usuario_id}")
-def atualizar_usuario(
-    usuario_id: int,
-    alteracao: UsuarioAtualizacao,
-    request: Request
-):
-
-    exigir_coordenador(request)
-
-    dados = alteracao.toJson()
-
-    if not dados:
-        raise HTTPException(
-            status_code=400,
-            detail="Nenhum campo para atualizar"
-        )
-
+def _atualizar_dados_usuario(usuario_id: int, dados: dict) -> dict:
+    """Aplica nome/e-mail/cargo ao banco. Autorização é feita pela rota."""
     if "email" in dados:
+        # O login normaliza o e-mail; gravar em minúsculas evita duas
+        # contas que só diferem por caixa.
         dados["email"] = dados["email"].strip().lower()
 
         repetido = (
@@ -1275,7 +1301,6 @@ def atualizar_usuario(
     )
 
     if not resposta.data:
-
         raise HTTPException(
             status_code=404,
             detail="Usuário não encontrado"
@@ -1287,6 +1312,59 @@ def atualizar_usuario(
         "email": dados.get("email", resposta.data[0].get("email")),
         "cargo": dados.get("cargo", resposta.data[0].get("cargo"))
     }
+
+
+@app.put("/usuarios/me")
+def atualizar_me(alteracao: UsuarioAtualizacao, request: Request):
+    """Permite que o professor edite o próprio nome e e-mail.
+
+    A tela de configurações do professor não pode chamar
+    PUT /usuarios/{id}: essa rota é exclusiva do coordenador. Aqui a
+    identidade vem da sessão e o cargo é removido do corpo, para que
+    ninguém promova a si mesmo a coordenador.
+    """
+    usuario = exigir_sessao(request)
+
+    dados = alteracao.toJson()
+    dados.pop("cargo", None)
+
+    if not dados:
+        raise HTTPException(
+            status_code=400,
+            detail="Nenhum campo para atualizar"
+        )
+
+    resultado = _atualizar_dados_usuario(usuario["id"], dados)
+
+    # O cookie guarda nome e e-mail: sem atualizá-los, o cabeçalho
+    # continuaria mostrando o valor antigo até o próximo login.
+    if "nome" in dados:
+        request.session["usuario_nome"] = resultado["nome"]
+    if "email" in dados:
+        request.session["usuario_email"] = resultado["email"]
+
+    return resultado
+
+
+@app.put("/usuarios/{usuario_id}")
+def atualizar_usuario(
+    usuario_id: int,
+    alteracao: UsuarioAtualizacao,
+    request: Request
+):
+    """Edita qualquer usuário; apenas o coordenador pode usar."""
+
+    exigir_coordenador(request)
+
+    dados = alteracao.toJson()
+
+    if not dados:
+        raise HTTPException(
+            status_code=400,
+            detail="Nenhum campo para atualizar"
+        )
+
+    return _atualizar_dados_usuario(usuario_id, dados)
 
 
 # ------------------------------------------------------------
@@ -1324,6 +1402,7 @@ def alterar_senha_usuario(
 
 @app.delete("/usuarios/{usuario_id}")
 def excluir_usuario(usuario_id: int, request: Request):
+    """Exclui um usuário, impedindo que o coordenador apague a si mesmo."""
 
     usuario = exigir_coordenador(request)
 
@@ -1363,6 +1442,7 @@ def excluir_usuario(usuario_id: int, request: Request):
 
 @app.get("/salas")
 def listar_salas(request: Request):
+    """Devolve só as salas marcadas como reserváveis no cadastro."""
 
     exigir_sessao(request)
 
@@ -1378,6 +1458,7 @@ def listar_salas(request: Request):
 
 @app.get("/admin/salas")
 def listar_salas_admin(request: Request):
+    """Devolve todas as salas, inclusive as desligadas da reserva."""
 
     exigir_coordenador(request)
 
@@ -1514,6 +1595,7 @@ def excluir_sala(sala_id: int, request: Request):
 
 @app.get("/carrinhos")
 def listar_carrinhos(request: Request):
+    """Lista os carrinhos cadastrados, em formato simples para as telas."""
 
     exigir_sessao(request)
 
@@ -1773,6 +1855,19 @@ def decidir_reserva(
 
 @app.post('/senha/solicitar', status_code=201)
 async def solicitar_redefinicao(request: Request):
+    """Registra um pedido de troca de senha, pendente de aprovação.
+
+    A rota é pública (quem esqueceu a senha não tem sessão), então usa um
+    contador próprio para e-mails inexistentes, separado do /login.
+    """
+    endereco = f"senha-solicitar:{_endereco_de(request)}"
+
+    if _tentativas_restantes(endereco) <= 0:
+        raise HTTPException(
+            status_code=429,
+            detail="Muitas tentativas. Aguarde alguns minutos e tente de novo."
+        )
+
     dados = await request.form()
     email = (dados.get("email") or "").strip().lower()
     nova_senha = dados.get("senha") or ""
@@ -1783,6 +1878,13 @@ async def solicitar_redefinicao(request: Request):
             detail="A nova senha precisa ter pelo menos 6 caracteres"
         )
 
+    # hash_password conta bytes (limite do bcrypt). Sem o try, uma senha
+    # longa com acentos viraria ValueError -> 500; aqui vira 400.
+    try:
+        nova_hash = hash_password(nova_senha)
+    except ValueError as erro:
+        raise HTTPException(status_code=400, detail=str(erro))
+
     usuario = (
         supabase
         .table('usuarios')
@@ -1792,6 +1894,10 @@ async def solicitar_redefinicao(request: Request):
     )
 
     if not usuario.data:
+        # Conta como tentativa falha: e-mail inexistente não pode ser
+        # testado sem limite para descobrir quem tem conta no sistema.
+        _registrar_tentativa(endereco)
+
         raise HTTPException(
             status_code=404,
             detail="Usuário não encontrado"
@@ -1822,7 +1928,8 @@ async def solicitar_redefinicao(request: Request):
         .insert({
             "usuario_id": usuario_id,
             "status": "pendente",
-            "nova_senha_hash": hash_password(nova_senha)
+            # O banco nunca recebe a senha em texto, nem neste fluxo.
+            "nova_senha_hash": nova_hash
         })
         .execute()
     )
@@ -1833,17 +1940,21 @@ async def solicitar_redefinicao(request: Request):
             detail="Não foi possível registrar a solicitação"
         )
 
+    # Pedido registrado com sucesso não consome a cota do endereço.
+    _limpar_tentativas(endereco)
+
     return {"id": resposta.data[0]["id"]}
 
 
 @app.get('/pendencias')
 async def listar_pendencias(request: Request):
+    """Lista pedidos de troca de senha aguardando decisão do coordenador."""
     exigir_coordenador(request)
 
     consulta = (
         supabase
         .table('pendencias_senhas')
-        .select('id, usuario_id, status')
+        .select('id, usuario_id, status, solicitado_em')
         .eq('status', 'pendente')
         .execute()
     )
@@ -1853,6 +1964,7 @@ async def listar_pendencias(request: Request):
 
 @app.post('/pendencias/{pendencia_id}/aceitar')
 async def aceitar_pendencia(pendencia_id: int, request: Request):
+    """Aprova um pedido, trocando a senha antes de fechar a pendência."""
     coordenador = exigir_coordenador(request)
 
     consulta = (
@@ -1905,6 +2017,7 @@ async def aceitar_pendencia(pendencia_id: int, request: Request):
 
 @app.post('/pendencias/{pendencia_id}/recusar')
 async def recusar_pendencia(pendencia_id: int, request: Request):
+    """Recusa um pedido sem alterar a senha do usuário."""
     coordenador = exigir_coordenador(request)
 
     consulta_pendencia = (
@@ -1936,6 +2049,7 @@ async def recusar_pendencia(pendencia_id: int, request: Request):
 
 @app.get('/api/avisos')
 def listar_avisos(request: Request):
+    """Lista os avisos do campus, mais recentes primeiro."""
     exigir_sessao(request)
 
     resposta = (
@@ -1951,6 +2065,7 @@ def listar_avisos(request: Request):
 
 @app.post('/api/avisos', status_code=201)
 def criar_aviso(aviso: AvisoCriacao, request: Request):
+    """Publica um aviso; o autor vem da sessão, não do corpo da requisição."""
     usuario = exigir_sessao(request)
 
     dados = {
@@ -1975,6 +2090,7 @@ def criar_aviso(aviso: AvisoCriacao, request: Request):
 
 @app.delete('/api/avisos/{aviso_id}')
 def excluir_aviso(aviso_id: int, request: Request):
+    """Apaga um aviso: o dono pode, e o coordenador pode apagar qualquer um."""
     usuario = exigir_sessao(request)
 
     consulta = (
@@ -2013,6 +2129,7 @@ def excluir_aviso(aviso_id: int, request: Request):
 
 @app.get('/api/notificacoes')
 def listar_notificacoes(request: Request):
+    """Lista só as notificações do usuário da sessão, mais recentes primeiro."""
     usuario = exigir_sessao(request)
 
     resposta = (
@@ -2029,6 +2146,7 @@ def listar_notificacoes(request: Request):
 
 @app.post('/api/notificacoes', status_code=201)
 async def criar_notificacao(request: Request):
+    """Cria notificação para o usuário logado, com limite por IP e usuário."""
     usuario = exigir_sessao(request)
 
     # Lê o corpo da requisição JSON
@@ -2046,11 +2164,13 @@ async def criar_notificacao(request: Request):
             detail='Corpo da requisição deve ser um objeto JSON'
         )
 
-    # Rate limiting por IP para evitar spam de notificações
+    # Rate limiting por endereço + usuário: evita spam sem punir quem
+    # divide a mesma rede (caso comum no campus).
     ip = request.client.host if request.client else 'desconhecido'
+    chave = (ip, usuario['id'])
     agora = datetime.now()
-    ultima_criacao = NOTIFICACOES_POR_ENDERECO.get(ip)
-    
+    ultima_criacao = NOTIFICACOES_POR_USUARIO.get(chave)
+
     if ultima_criacao:
         tempo_passado = agora - ultima_criacao
         if tempo_passado < JANELA_NOTIFICACOES:
@@ -2058,7 +2178,7 @@ async def criar_notificacao(request: Request):
                 status_code=429,
                 detail='Muitas notificações. Aguarde alguns minutos e tente novamente.'
             )
-    
+
     # Limpeza ocasional de entradas vencidas
     _limpar_notificacoes_antigas()
     
@@ -2108,8 +2228,8 @@ async def criar_notificacao(request: Request):
         'mensagem': mensagem,
     }
     
-    # Atualizar timestamp do rate limiting
-    NOTIFICACOES_POR_ENDERECO[ip] = agora
+    # Atualizar timestamp do rate limiting desta conta neste endereço
+    NOTIFICACOES_POR_USUARIO[chave] = agora
     
     resposta = (
         supabase
@@ -2126,6 +2246,7 @@ async def criar_notificacao(request: Request):
 
 @app.patch('/api/notificacoes/{notificacao_id}/ler')
 def marcar_lida(notificacao_id: int, request: Request):
+    """Marca como lida apenas uma notificação pertencente ao usuário."""
     usuario = exigir_sessao(request)
 
     resposta = (
@@ -2145,6 +2266,7 @@ def marcar_lida(notificacao_id: int, request: Request):
 
 @app.delete('/api/notificacoes/{notificacao_id}')
 def excluir_notificacao(notificacao_id: int, request: Request):
+    """Remove uma notificação do próprio usuário (nunca a de outro)."""
     usuario = exigir_sessao(request)
 
     resposta = (

@@ -966,12 +966,13 @@ const ReservasApp = (() => {
 
   function statusInfo(status) {
 
-    return (
-      STATUS[status] || {
-        label: status || 'Aguardando',
-        badgeClass: 'badge-yellow'
-      }
-    );
+    // Nunca ecoar um status desconhecido: esse valor chega ao HTML
+    // pelas telas que usam innerHTML. O banco já restringe os valores,
+    // mas isto é defesa em profundidade contra dado inesperado.
+    return STATUS[status] || {
+      label: 'Aguardando',
+      badgeClass: 'badge-yellow'
+    };
 
   }
 
