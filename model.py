@@ -25,9 +25,14 @@ MAX_SENHA_BYTES = 72
 
 
 def _validar_tamanho_senha(valor: str) -> str:
-    """Recusa senha longa demais, que o bcrypt recusaria com erro 500."""
-    # encode() é necessário porque o limite do bcrypt é em bytes, e não
-    # no número de caracteres da string.
+    """Recusa senha longa demais, que o bcrypt recusaria com erro 500.
+
+    Fluxo:
+    1. Mede o tamanho em bytes (UTF-8), não em caracteres.
+    2. Se exceder 72 bytes, levanta ValueError.
+    3. Se estiver em branco, levanta ValueError.
+    4. Caso contrário, devolve o próprio valor.
+    """
     tamanho = len(valor.encode('utf-8'))
 
     # Validação acontece antes do hash; um ValueError do Pydantic vira
@@ -44,7 +49,11 @@ def _validar_tamanho_senha(valor: str) -> str:
 
 
 class Usuario(BaseModel):
-    """Cadastro de usuário."""
+    """Cadastro de usuário.
+
+    Usado tanto para criar quanto para validar os dados de entrada de
+    um novo usuário no sistema.
+    """
 
     # Remove espaços das pontas de todas as strings antes de validar.
     model_config = ConfigDict(str_strip_whitespace=True)
@@ -63,7 +72,7 @@ class Usuario(BaseModel):
 
     @classmethod
     def fromJson(cls, json: dict):
-        """Converte um dicionário (por exemplo, de um teste) no modelo."""
+        """Cria uma instância a partir de um dicionário (JSON)."""
         return cls(
             nome=json['nome'],
             email=json['email'],
@@ -72,7 +81,11 @@ class Usuario(BaseModel):
         )
 
     def toJson(self):
-        """Devolve a senha em texto para a rota aplicar o hash antes do insert."""
+        """Dados que vão para o banco, com a senha ainda em texto plano.
+
+        A rota de cadastro (app.py) substitui a senha pelo hash antes de
+        gravar no banco.
+        """
         return {
             'nome': self.nome,
             'email': self.email,
@@ -98,8 +111,8 @@ class UsuarioAtualizacao(BaseModel):
     def toJson(self):
         """Só os campos preenchidos entram na consulta de atualização.
 
-        None é usado como "não mexer neste campo"; um dictionary vazio
-        significa que a rota deve recusar a chamada (nada a atualizar).
+        Campos None são ignorados, para que editar só o nome, por
+        exemplo, não apague o e-mail nem o cargo.
         """
         return {
             campo: valor
@@ -142,7 +155,7 @@ class Sala(BaseModel):
     As colunas são str, bool e dict no banco (a migração garante que não
     aceitam nulo), mas a API não deve quebrar se uma linha antiga ainda
     estiver fora do padrão: por isso os campos são tolerantes e o
-    trasnformador normaliza o que vier.
+    transformador normaliza o que vier.
     """
 
     # Valores padrão tolerantes: uma linha antiga com coluna nula não
@@ -318,7 +331,6 @@ class DecisaoReserva(BaseModel):
 # As telas (e o "salas.js") leem esses campos separados, em "contexto".
 # O texto é separado em ";" e cada pedaço em ":", uma vez só, porque a
 # descrição da sala nunca traz ";" dentro dela.
-#
 CHAVE_SETOR = 'setor'
 CHAVE_QUANTIDADE = 'quantidade_alunos'
 CHAVE_EQUIPAMENTOS = 'equipamentos'
@@ -359,6 +371,11 @@ def categoria_da_sala(caracteristica: str) -> tuple[str, str]:
     O identificador ("laboratorio") é o que a tela usa para filtrar a
     lista; o rótulo ("Laboratório") é o que aparece no cartão e na
     reserva. Uma sala sem nenhuma palavra conhecida cai em "sala".
+
+    Fluxo:
+    1. Normaliza o texto para minúsculas.
+    2. Percorre CATEGORIAS em ordem; a primeira palavra encontrada vence.
+    3. Se nenhuma casar, devolve o padrão ("sala", "Sala").
     """
     texto = str(caracteristica or '').lower()
 

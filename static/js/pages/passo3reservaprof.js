@@ -19,5 +19,8 @@ document.addEventListener('DOMContentLoaded', () => {
     return;
   }
 
-  // Dropdown do perfil e menu mobile: app.js (via base.html).
+  // =====================================================
+  // DROPDOWN DO USUÁRIO (gerenciado por app.js)
+  // =====================================================
+
 });

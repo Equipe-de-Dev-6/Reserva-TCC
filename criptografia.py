@@ -1,4 +1,11 @@
-"""Funções de segurança para hash e verificação de senhas com bcrypt."""
+"""Funções de segurança para hash e verificação de senhas com bcrypt.
+
+Este módulo é responsável por:
+- Gerar um hash bcrypt de uma senha em texto plano (hash_password).
+- Verificar se uma senha informada corresponde a um hash armazenado (verify_password).
+
+Nunca armazene a senha original: apenas o hash bcrypt é gravado no banco.
+"""
 
 import bcrypt  # biblioteca de hash lento, próprio para senhas
 
@@ -14,6 +21,12 @@ def hash_password(password: str) -> str:
 
     A senha original nunca deve ser armazenada. O valor retornado é um
     hash seguro, adequado para ser salvo no banco de dados da aplicação.
+
+    Fluxo:
+    1. Converte a senha para bytes (UTF-8).
+    2. Recusa senhas com mais de 72 bytes (limite do bcrypt).
+    3. Gera um salt aleatório e aplica bcrypt.hashpw.
+    4. Devolve o hash como string UTF-8.
     """
     # Converte para bytes antes de medir: o tamanho em caracteres não
     # protege contra senhas com acentos ou emojis.
@@ -39,8 +52,14 @@ def hash_password(password: str) -> str:
 def verify_password(password: str, password_hash: str) -> bool:
     """Verifica se a senha informada corresponde ao hash bcrypt.
 
-    Retorna ``False`` quando a senha não corresponde, em vez de armazenar
+    Retorna False quando a senha não corresponde, em vez de armazenar
     novamente a senha ou realizar qualquer comparação direta.
+
+    Fluxo:
+    1. Converte a senha para bytes (UTF-8).
+    2. Recusa senhas com mais de 72 bytes (limite do bcrypt).
+    3. Chama bcrypt.checkpw, que compara o hash sem expor a senha.
+    4. Retorna True ou False. Hash inválido também retorna False.
     """
     # Mesma regra do hash: entradas maiores que 72 bytes não podem ter
     # sido geradas por hash_password, então já são recusadas aqui.

@@ -3,6 +3,13 @@
 // ======================================================
 
 document.addEventListener('DOMContentLoaded', () => {
+// ======================================================
+  // DROPDOWN DO USUÁRIO (gerenciado por app.js)
+  // ======================================================
+
+  // ======================================================
+  // MENU MOBILE (gerenciado por app.js)
+  // ======================================================
 
   // ======================================================
   // ABRIR / FECHAR FORMULÁRIO DE NOVO AVISO
@@ -125,6 +132,9 @@ document.addEventListener('DOMContentLoaded', () => {
       .replace(/'/g, '&#39;');
   }
 
+  // ======================================================
+  // BUSCA (gerenciada por app.js / search.js)
+  // ======================================================
   // A busca é feita pelo app.js global no campo #search-input; depois
   // de redesenhar a lista, basta avisar que o conteúdo mudou.
   const campoBusca = document.getElementById('search-input');

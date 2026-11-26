@@ -611,21 +611,21 @@
     checarLembretes();
   }
 
-  // O retrato inicial ("primeira execucao") e tirado de
-  // ReservasApp.getReservas(), e essa funcao devolve a copia guardada
-  // no localStorage - e nao a lista que veio do banco.
+  // O retrato inicial ("primeira execucao") é tirado de
+  // ReservasApp.getReservas(), e essa função devolve a cópia guardada
+  // no localStorage - e não a lista que veio do banco.
   //
-  // O problema e a ordem: o "reservas.js" dispara a sincronizacao com
-  // a API ja no fim do arquivo, e sincronizar() comeca com um "await"
-  // (o fetch de GET /reservas). Enquanto esse await nao volta, a lista
-  // ainda e a do cache. Como este arquivo e o proximo <script> da
-  // pagina, ele roda antes de a sincronizacao terminar, e tirava o
-  // retrato do cache. Pouco depois a sincronizacao concluia, os
-  // listeners disparavam checarReservas(false), e TODA reserva que ja
-  // existia no banco era tratada como nova: uma notificacao para
+  // O problema é a ordem: o "reservas.js" dispara a sincronização com
+  // a API já no fim do arquivo, e sincronizar() começa com um "await"
+  // (o fetch de GET /reservas). Enquanto esse await não volta, a lista
+  // ainda é a do cache. Como este arquivo é o próximo <script> da
+  // página, ele roda antes de a sincronização terminar, e tirava o
+  // retrato do cache. Pouco depois a sincronização concluía, os
+  // listeners disparavam checarReservas(false), e TODA reserva que já
+  // existia no banco era tratada como nova: uma notificação para
   // cada uma delas.
   //
-  // Por isso a inicializacao espera a promessa antes do retrato.
+  // Por isso a inicialização espera a promessa antes do retrato.
   function esperarReservas() {
 
     if (!temReservas() || !window.ReservasApp.sincronizacao) {

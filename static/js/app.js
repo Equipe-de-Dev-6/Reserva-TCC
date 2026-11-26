@@ -7,11 +7,10 @@
 // Antes, o menu de perfil e o menu lateral do celular estavam
 // copiados em 12 dos 14 arquivos de static/js/pages/. Mudar o
 // comportamento do menu exigia editar 12 arquivos, e qualquer
-//screen que ficasse de fora ficava sem menu.
+// tela que ficasse de fora ficava sem menu.
 //
 // Aqui fica uma vez só. O resto dos scripts de página cuida apenas do
 // que é específico dela.
-//
 // ============================================================
 
 

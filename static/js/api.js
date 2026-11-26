@@ -4,12 +4,11 @@
 //
 // Comunicação com o backend. Todas as funções devolvem os dados já
 // convertidos (json) e levantam um erro quando a rota responde com
-// falha, para que a tela treat o erro em um lugar só.
+// falha, para que a tela trate o erro em um lugar só.
 //
 // As rotas chamadas aqui são as que existem no app.py. Endpoint que
 // não existe voltaria 404 em silêncio nas telas, por isso esta lista
 // acompanha a API de perto.
-//
 // ============================================================
 
 
@@ -24,6 +23,13 @@
  * que é onde a rota explica o que aconteceu ("Sala não encontrada",
  * "E-mail ou senha inválidos"). Sem isso, a tela mostraria sempre
  * "erro na requisição", que não ajuda ninguém a entender.
+ *
+ * Fluxo:
+ * 1. Faz o fetch com as opções dadas.
+ * 2. Tenta ler o corpo como JSON (se falhar, fica null).
+ * 3. Se a resposta não foi ok (status >= 400), monta um Error com o
+ *    detalhe extraído do corpo e lança.
+ * 4. Se foi ok, devolve o corpo já convertido.
  */
 async function pedir(url, opcoes = {}) {
 
@@ -315,6 +321,7 @@ export async function solicitarAlteracaoSenha(email, senha) {
     method: 'POST',
     body: dados
   });
+
 }
 
 
