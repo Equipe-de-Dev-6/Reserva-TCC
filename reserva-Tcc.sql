@@ -14,18 +14,19 @@
 
 CREATE TABLE public.salas (
   id bigint GENERATED ALWAYS AS IDENTITY NOT NULL,
-  nome character varying,
-  caracteristica character varying,
-  disponibilidade boolean,
-  historico json,
+  nome character varying NOT NULL,
+  caracteristica character varying NOT NULL,
+  disponibilidade boolean NOT NULL DEFAULT true,
+  historico json NOT NULL DEFAULT '{}'::json,
+  reservavel boolean NOT NULL DEFAULT false,
   CONSTRAINT salas_pkey PRIMARY KEY (id)
 );
 CREATE TABLE public.usuarios (
   id bigint GENERATED ALWAYS AS IDENTITY NOT NULL,
   nome character varying NOT NULL,
-  email character varying UNIQUE,
-  senha character varying,
-  cargo character varying,
+  email character varying NOT NULL UNIQUE CHECK (email::text = btrim(email::text) AND email::text ~~ '%_@_%._%'::text AND char_length(email::text) <= 100),
+  senha character varying CHECK (senha IS NULL OR char_length(senha::text) >= 59 AND char_length(senha::text) <= 61),
+  cargo character varying DEFAULT 'Professor'::character varying CHECK (cargo::text = ANY (ARRAY['Professor'::character varying, 'Coordenador'::character varying]::text[])),
   CONSTRAINT usuarios_pkey PRIMARY KEY (id)
 );
 CREATE TABLE public.caracteristicas (
@@ -35,7 +36,7 @@ CREATE TABLE public.caracteristicas (
 );
 -- Legado: sala_id é a FK para public.salas; a migration remove o IDENTITY.
 CREATE TABLE public.sala_caracteristicas (
-  sala_id bigint GENERATED ALWAYS AS IDENTITY NOT NULL,
+  sala_id bigint NOT NULL,
   caracteristicas_id bigint NOT NULL,
   CONSTRAINT sala_caracteristicas_pkey PRIMARY KEY (sala_id, caracteristicas_id),
   CONSTRAINT sala_caracteristicas_sala_id_fkey FOREIGN KEY (sala_id) REFERENCES public.salas(id),
@@ -60,15 +61,48 @@ CREATE TABLE public.carrinhos (
 CREATE TABLE public.reservas (
   id bigint GENERATED ALWAYS AS IDENTITY NOT NULL,
   usuario_id bigint NOT NULL,
-  sala_id bigint NOT NULL,
+  sala_id bigint,
   notebooks_id bigint,
   carrinho_id bigint,
-  data_inicio timestamp with time zone,
-  data_fim timestamp with time zone,
-  status character varying,
+  data_inicio timestamp with time zone NOT NULL,
+  data_fim timestamp with time zone NOT NULL,
+  status character varying NOT NULL DEFAULT 'aguardando'::character varying CHECK (status::text = ANY (ARRAY['aguardando'::character varying, 'aprovada'::character varying, 'negada'::character varying, 'cancelada'::character varying]::text[])),
+  categoria character varying,
+  item character varying,
+  professor character varying,
+  curso character varying,
+  motivo text,
+  criado_em timestamp without time zone DEFAULT CURRENT_TIMESTAMP,
+  atualizado_em timestamp without time zone DEFAULT CURRENT_TIMESTAMP,
   CONSTRAINT reservas_pkey PRIMARY KEY (id),
-  CONSTRAINT reservas_usuario_id_fkey FOREIGN KEY (usuario_id) REFERENCES public.usuarios(id),
-  CONSTRAINT reservas_sala_id_fkey FOREIGN KEY (sala_id) REFERENCES public.salas(id),
   CONSTRAINT reservas_notebooks_id_fkey FOREIGN KEY (notebooks_id) REFERENCES public.notebooks(id),
-  CONSTRAINT reservas_carrinho_id_fkey FOREIGN KEY (carrinho_id) REFERENCES public.carrinhos(id)
+  CONSTRAINT reservas_sala_id_fkey FOREIGN KEY (sala_id) REFERENCES public.salas(id),
+  CONSTRAINT reservas_usuario_id_fkey FOREIGN KEY (usuario_id) REFERENCES public.usuarios(id)
+);
+CREATE TABLE public.login_tentativas (
+  id bigint GENERATED ALWAYS AS IDENTITY NOT NULL,
+  endereco text NOT NULL,
+  tentativa timestamp with time zone NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT login_tentativas_pkey PRIMARY KEY (id)
+);
+CREATE TABLE public.pendencia_senhas (
+  id bigint GENERATED ALWAYS AS IDENTITY NOT NULL,
+  usuario_id integer NOT NULL,
+  nova_senha_hash character varying NOT NULL,
+  status character varying NOT NULL DEFAULT 'pendente'::character varying CHECK (status::text = ANY (ARRAY['pendente'::character varying, 'aprovada'::character varying, 'recusada'::character varying]::text[])),
+  criado_em timestamp with time zone NOT NULL DEFAULT now(),
+  resolvido_em timestamp with time zone,
+  resolvido_por integer,
+  CONSTRAINT pendencia_senhas_pkey PRIMARY KEY (id),
+  CONSTRAINT pendencia_senhas_usuario_id_fkey FOREIGN KEY (usuario_id) REFERENCES public.usuarios(id),
+  CONSTRAINT pendencia_senhas_resolvido_por_fkey FOREIGN KEY (resolvido_por) REFERENCES public.usuarios(id)
+);
+CREATE TABLE public.carrinhos (
+  id bigint GENERATED ALWAYS AS IDENTITY NOT NULL,
+  nome character varying,
+  caracteristica character varying,
+  disponibilidade boolean DEFAULT true,
+  historico json,
+  reservavel boolean DEFAULT false,
+  CONSTRAINT carrinhos_pkey PRIMARY KEY (id)
 );
