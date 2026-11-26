@@ -106,7 +106,9 @@
             <p>
               Você ainda não tem reservas.
 
-              <a href="/reservar">
+              {#- Esta home é só do coordenador: o fluxo dele começa
+                  em /reservar_admin, não na tela do professor. -#}
+              <a href="/reservar_admin">
                 Fazer uma reserva -&gt;
               </a>
             </p>
