@@ -6,19 +6,18 @@ por fim as rotas de dados (que exigem sessão, e as de administrativo
 exigem também o cargo de Coordenador).
 """
 
-from datetime import datetime, timedelta
-from pathlib import Path
+from datetime import datetime, timedelta  # datas das reservas e janelas de tempo
+from pathlib import Path  # caminhos absolutos dos templates e arquivos estáticos
 
-from dotenv import load_dotenv
-from fastapi import FastAPI, HTTPException, Request
-from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import FileResponse, RedirectResponse
-from fastapi.staticfiles import StaticFiles
-from fastapi.templating import Jinja2Templates
-from starlette.responses import JSONResponse
-import os
-import random
-import re
+from dotenv import load_dotenv  # lê as variáveis de ambiente do .env
+from fastapi import FastAPI, HTTPException, Request  # framework e erros HTTP
+from fastapi.middleware.cors import CORSMiddleware  # libera origens configuradas
+from fastapi.responses import FileResponse, RedirectResponse  # sw.js e redirects
+from fastapi.staticfiles import StaticFiles  # serve CSS/JS/imagens
+from fastapi.templating import Jinja2Templates  # renderiza os HTML
+from starlette.responses import JSONResponse  # resposta de erro do login
+import os  # variáveis de ambiente (SECRET_KEY, CORS_ORIGINS, etc.)
+import random  # limpeza ocasional das tentativas antigas
 
 from criptografia import hash_password, verify_password
 from consulta_salas import salas_para_tela
@@ -664,6 +663,7 @@ def reserva_para_json(dados: dict) -> dict:
 
 
 def carrinho_para_json(dados: dict) -> dict:
+    """Converte uma linha de "carrinhos" no formato usado pelas telas."""
     return {
         "id": dados.get("id"),
         **Carrinho.fromJson(dados).toJson()
@@ -949,7 +949,12 @@ PAGINAS_DO_PROFESSOR = {
 
 
 def _criar_paginas():
-    """Registra uma rota protegida por sessão para cada página."""
+    """Registra uma rota protegida por sessão para cada página.
+
+    Os valores são passados como argumentos padrão da função interna: sem
+    isso, todas as rotas veriam o último item do dicionário (late binding
+    do Python).
+    """
     for caminho, (arquivo, busca, frase) in PAGINAS_DO_PROFESSOR.items():
 
         def rota(request: Request, arquivo=arquivo, busca=busca, frase=frase):
@@ -1032,6 +1037,11 @@ PAGINAS_DO_COORDENADOR = {
 
 
 def _criar_paginas_do_coordenador():
+    """Registra as páginas restritas ao Coordenador.
+
+    O mesmo cuidado com argumentos padrão de _criar_paginas() se aplica
+    aqui, para cada rota guardar o seu próprio template e contexto.
+    """
     # Cada entrada é (arquivo, busca) e, se a tela precisar saber de
     # que tipo de recurso ela trata, um terceiro item com o contexto
     # extra. É o que faz "/gerenciar_laboratorios_adm" e
@@ -1103,6 +1113,7 @@ def reservas_admin(request: Request):
 
 @app.get("/usuarios")
 def listar_usuarios(request: Request):
+    """Lista usuários para o painel administrativo, sem expor o hash."""
 
     exigir_coordenador(request)
 
@@ -1237,6 +1248,7 @@ def atualizar_usuario(
     alteracao: UsuarioAtualizacao,
     request: Request
 ):
+    """Edita nome, e-mail e/ou cargo; senha é tratada em outra rota."""
 
     exigir_coordenador(request)
 
@@ -1324,6 +1336,7 @@ def alterar_senha_usuario(
 
 @app.delete("/usuarios/{usuario_id}")
 def excluir_usuario(usuario_id: int, request: Request):
+    """Exclui um usuário, impedindo que o coordenador apague a si mesmo."""
 
     usuario = exigir_coordenador(request)
 
@@ -1363,6 +1376,7 @@ def excluir_usuario(usuario_id: int, request: Request):
 
 @app.get("/salas")
 def listar_salas(request: Request):
+    """Devolve só as salas marcadas como reserváveis no cadastro."""
 
     exigir_sessao(request)
 
@@ -1378,6 +1392,7 @@ def listar_salas(request: Request):
 
 @app.get("/admin/salas")
 def listar_salas_admin(request: Request):
+    """Devolve todas as salas, inclusive as desligadas da reserva."""
 
     exigir_coordenador(request)
 
@@ -1514,6 +1529,7 @@ def excluir_sala(sala_id: int, request: Request):
 
 @app.get("/carrinhos")
 def listar_carrinhos(request: Request):
+    """Lista os carrinhos cadastrados, em formato simples para as telas."""
 
     exigir_sessao(request)
 
@@ -1773,6 +1789,7 @@ def decidir_reserva(
 
 @app.post('/senha/solicitar', status_code=201)
 async def solicitar_redefinicao(request: Request):
+    """Registra um pedido de troca de senha, pendente de aprovação."""
     dados = await request.form()
     email = (dados.get("email") or "").strip().lower()
     nova_senha = dados.get("senha") or ""
@@ -1838,6 +1855,7 @@ async def solicitar_redefinicao(request: Request):
 
 @app.get('/pendencias')
 async def listar_pendencias(request: Request):
+    """Lista pedidos de troca de senha aguardando decisão do coordenador."""
     exigir_coordenador(request)
 
     consulta = (
@@ -1853,6 +1871,7 @@ async def listar_pendencias(request: Request):
 
 @app.post('/pendencias/{pendencia_id}/aceitar')
 async def aceitar_pendencia(pendencia_id: int, request: Request):
+    """Aprova um pedido, trocando a senha antes de fechar a pendência."""
     coordenador = exigir_coordenador(request)
 
     consulta = (
@@ -1905,6 +1924,7 @@ async def aceitar_pendencia(pendencia_id: int, request: Request):
 
 @app.post('/pendencias/{pendencia_id}/recusar')
 async def recusar_pendencia(pendencia_id: int, request: Request):
+    """Recusa um pedido sem alterar a senha do usuário."""
     coordenador = exigir_coordenador(request)
 
     consulta_pendencia = (
@@ -1936,6 +1956,7 @@ async def recusar_pendencia(pendencia_id: int, request: Request):
 
 @app.get('/api/avisos')
 def listar_avisos(request: Request):
+    """Lista os avisos do campus, mais recentes primeiro."""
     exigir_sessao(request)
 
     resposta = (
@@ -1951,6 +1972,7 @@ def listar_avisos(request: Request):
 
 @app.post('/api/avisos', status_code=201)
 def criar_aviso(aviso: AvisoCriacao, request: Request):
+    """Publica um aviso; o autor vem da sessão, não do corpo da requisição."""
     usuario = exigir_sessao(request)
 
     dados = {
@@ -1975,6 +1997,7 @@ def criar_aviso(aviso: AvisoCriacao, request: Request):
 
 @app.delete('/api/avisos/{aviso_id}')
 def excluir_aviso(aviso_id: int, request: Request):
+    """Apaga um aviso: o dono pode, e o coordenador pode apagar qualquer um."""
     usuario = exigir_sessao(request)
 
     consulta = (
@@ -2013,6 +2036,7 @@ def excluir_aviso(aviso_id: int, request: Request):
 
 @app.get('/api/notificacoes')
 def listar_notificacoes(request: Request):
+    """Lista só as notificações do usuário da sessão, mais recentes primeiro."""
     usuario = exigir_sessao(request)
 
     resposta = (
@@ -2029,6 +2053,7 @@ def listar_notificacoes(request: Request):
 
 @app.post('/api/notificacoes', status_code=201)
 async def criar_notificacao(request: Request):
+    """Cria notificação para o usuário logado, com limite por IP e usuário."""
     usuario = exigir_sessao(request)
 
     # Lê o corpo da requisição JSON
@@ -2126,6 +2151,7 @@ async def criar_notificacao(request: Request):
 
 @app.patch('/api/notificacoes/{notificacao_id}/ler')
 def marcar_lida(notificacao_id: int, request: Request):
+    """Marca como lida apenas uma notificação pertencente ao usuário."""
     usuario = exigir_sessao(request)
 
     resposta = (
@@ -2145,6 +2171,7 @@ def marcar_lida(notificacao_id: int, request: Request):
 
 @app.delete('/api/notificacoes/{notificacao_id}')
 def excluir_notificacao(notificacao_id: int, request: Request):
+    """Remove uma notificação do próprio usuário (nunca a de outro)."""
     usuario = exigir_sessao(request)
 
     resposta = (
