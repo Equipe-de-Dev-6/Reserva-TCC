@@ -151,5 +151,26 @@ console.log('\n[4] Fluxos corrigidos');
         !/href="\/home"/.test(confirmacao));
 }
 
+console.log('\n[5] Landing pública');
+{
+  const landing = ler('templates/landing.html');
+  const jsLanding = ler('static/js/landing.js');
+
+  check('sem fonte externa', !/fonts\.(googleapis|gstatic)\.com/.test(landing));
+  check('sem mês fixo no HTML', !/Novembro 2026/.test(landing));
+  check('módulo de pedidos de senha na vitrine',
+        /Pedidos de Senha/.test(landing));
+  check('FAQ descreve o fluxo atual',
+        /nova senha \(mínimo de 6 caracteres\)/.test(landing) &&
+        /senha como <strong>hash<\/strong>/.test(landing) &&
+        !/ID de redefinição/.test(landing));
+  check('rodapé usa ano dinâmico',
+        /data-ano-atual/.test(landing) && /data-ano-atual/.test(jsLanding));
+  check('painel do calendário anuncia mudanças',
+        /id="demoDayList"[^>]*aria-live="polite"/.test(landing));
+  check('assets da landing usam versão atual',
+        /landing\.css\?v=2/.test(landing) && /landing\.js\?v=2/.test(landing));
+}
+
 console.log(`\n${ok} passaram, ${falhas} falharam`);
 process.exit(falhas === 0 ? 0 : 1);
