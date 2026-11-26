@@ -39,7 +39,7 @@ supabase = create_client(
 # ============================================================
 
 def consultar_usuarios():
-    """Retorna todos os usuários"""
+    """Retorna todos os usuários."""
     resposta = (
         supabase
         .table(TABELA)
