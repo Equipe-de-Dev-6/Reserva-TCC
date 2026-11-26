@@ -1,10 +1,14 @@
-api.js exporta 18 funcoes
+api.js exporta 26 funcoes
   templates\admin\aprovar_reservas.html: pede 2 -> tudo existe
   templates\admin\gerenciar_recurso.html: pede 4 -> tudo existe
   templates\admin\gerenciar_salas.html: pede 4 -> tudo existe
   templates\admin\professores.html: pede 4 -> tudo existe
-  static/js/cadastro.js: pede cadastrarUsuario, listarUsuarios -> tudo existe
-  static/js/salas.js: pede listarSalas, buscarSala -> tudo existe
+  static\js\cadastro.js: pede cadastrarUsuario, listarUsuarios -> tudo existe
+  static\js\esqueceu_senha.js: pede solicitarAlteracaoSenha -> tudo existe
+  static\js\pages\configuracoes.js: pede usuarioLogado, atualizarMe -> tudo existe
+  static\js\pages\notificacoesprof.js: pede listarNotificacoes, marcarNotificacaoLida, excluirNotificacao -> tudo existe
+  static\js\pages\pendencias.js: pede listarPendencias, aceitarPendencia, recusarPendencia -> tudo existe
+  static\js\salas.js: pede listarSalas, buscarSala -> tudo existe
 
 rotas chamadas pelo front que NAO existem no app.py: nenhuma
 
@@ -15,6 +19,7 @@ Templates citados no app.py:
   ok     admin/gerenciar_recursos.html
   ok     admin/gerenciar_salas.html
   ok     admin/home.html
+  ok     admin/pendencias.html
   ok     admin/professores.html
   ok     ajuda.html
   ok     auth/cadastro.html
@@ -33,7 +38,7 @@ Templates citados no app.py:
   ok     professor/reservar/salas/reservar-sala.html
   ok     professor/reservar_tela_prof.html
   ok     professor/reservasprof.html
-  -> 24/24 templates encontrados
+  -> 25/25 templates encontrados
 
 Templates Jinja2 (extends/include):
   ok    templates\admin\aprovar_reservas.html
@@ -42,6 +47,7 @@ Templates Jinja2 (extends/include):
   ok    templates\admin\gerenciar_recursos.html
   ok    templates\admin\gerenciar_salas.html
   ok    templates\admin\home.html
+  ok    templates\admin\pendencias.html
   ok    templates\admin\professores.html
   ok    templates\ajuda.html
   ok    templates\auth\base_auth.html
@@ -61,7 +67,7 @@ Templates Jinja2 (extends/include):
   ok    templates\professor\reservar\salas\reservar-sala.html
   ok    templates\professor\reservar_tela_prof.html
   ok    templates\professor\reservasprof.html
-  -> 25 telas herdam de base.html
+  -> 26 telas herdam de base.html
 
 Componentes: _header.html, _sidebar.html
 
@@ -71,6 +77,7 @@ Estilo das telas:
   ok       admin/gerenciar_recurso.html: admin.css, admin-gerenciar-salas.css
   ok       admin/gerenciar_recursos.html: admin.css
   ok       admin/gerenciar_salas.html: admin.css, admin-gerenciar-salas.css
+  ok       admin/pendencias.html: admin.css
   ok       admin/professores.html: admin.css, admin-professores.css
   ok       ajuda.html: ajuda.css
   ok       auth/base_auth.html: auth.css
