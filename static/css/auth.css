@@ -1,53 +1,14 @@
 /* ============================================================
  * Estilo comum as telas de acesso.
- * 
+ *
  * Login, cadastro, redefinir senha e recuperar senha
  * compartilham o cartao, o logo, o campo com icone, o botao e
  * o separador "ou".
- * 
- * Seletor com texto diferente em cada tela entra aqui so com
- * as declaracoes iguais; o que sobra fica no CSS da tela.
- * 
- * Entra pelo base_auth.html, antes do CSS da tela, para uma
- * propriedade continuar sendo decidida pelo mesmo lugar.
+ *
+ * Entra pelo base_auth.html, antes do CSS da tela.
  * ============================================================ */
 
-  /* ============================================================
-   * AS VARIAVEIS DE COR DAS TELAS DE ACESSO
-   *
-   * Os cinco arquivos desta pasta (auth, login, cadastro,
-   * redefsenha e esqueceu_senha) usam um conjunto proprio de nomes --
-   * --cor-texto, --cor-fundo, --cor-principal -- que nunca chegou a
-   * ser declarado. Sem declaracao, o "var(--cor-texto)" vira uma
-   * regra invalida: o navegador joga fora a propriedade e usa o valor
-   * inicial. Foi assim que o login e o cadastro ficaram sem a cor do
-   * campo, sem a cor do botao, sem o arredondamento e sem a
-   * divisoria.
-   *
-   * O "base_auth.html" nao carrega o "base.css" -- sao telas sem menu
-   * --, entao o ":root" do esqueleto nao chega aqui. Por isso as
-   * variaveis sao declaradas neste arquivo.
-   *
-   * Os valores NAO foram inventados. O desenho original se deduce do
-   * proprio codigo:
-   *
-   *   - o campo era escuro: o placeholder e "rgba(255,255,255,0.9)"
-   *     (auth.css) e a seta do <select> e branca em SVG (cadastro.css);
-   *   - o texto sobre o campo era claro: "color: var(--cor-fundo)"
-   *     no input, e "color: var(--cor-fundo)" no icone;
-   *   - o botao era escuro com texto claro: "background: var(--cor-texto)"
-   *     junto de "color: var(--cor-fundo)";
-   *   - as opcoes do <select> tinham fundo claro e texto escuro.
-   *
-   * A escala de cinza e a mesma que o projeto inteiro ja usa
-   * (--text-dark #1F2937, --text-gray #6B7280, --border-color #E5E7EB,
-   * e #D1D5DB / #9CA3AF em base.css e reservar-sala.css).
-   * ============================================================ */
-
-  :root {
-  /* O "--cor-texto" e o "--cor-principal" sao o vermelho do SENAI, o
-     mesmo "--senai-red" que o resto do sistema usa. Sao eles que
-     pintam o campo, o botao, a divisoria e o titulo. */
+:root {
   --cor-fundo: #FFFFFF;
   --cor-texto: #E30613;
   --cor-secundaria: #6B7280;
@@ -57,176 +18,204 @@
   --cor-ativa: #9B0009;
   --sombra: 0 4px 12px rgba(0, 0, 0, 0.08);
   --border-radius: 10px;
-  }
+}
 
-  /* Mesma fonte das telas com menu. As telas de acesso nao declaravam
-     fonte nenhuma: login, cadastro e redefinicao saiam na Times New
-     Roman, e o login ainda pegava uma Montserrat instalada na
-     maquina. */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
 
-  body {
+html,
+body {
+  height: 100%;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
   font-family: 'Inter', sans-serif;
-  }
-  /* Campo de formulario nao herda a fonte: o navegador da a ele a
-     propria, que no Chrome e Arial. Por isso isto esta aqui e nao
-     so no body. Antes eram seis copias de "button { font-family }",
-     uma por arquivo, e os input, select e textarea ficavam de
-     fora. */
+  min-height: 100dvh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding:
+    max(16px, env(safe-area-inset-top))
+    max(16px, env(safe-area-inset-right))
+    max(16px, env(safe-area-inset-bottom))
+    max(16px, env(safe-area-inset-left));
+  overflow-x: hidden;
+  background-color: var(--cor-fundo);
+}
 
-  button, input, select, textarea {
+button, input, select, textarea {
   font-family: 'Inter', sans-serif;
-  }
+  touch-action: manipulation;
+}
 
+img {
+  max-width: 100%;
+  height: auto;
+}
 
-  .container {
+.container {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   width: 100%;
   max-width: 400px;
-  /* Sem isto o cartao ficava encostado na borda esquerda da janela,
-     porque um bloco com "max-width" nao se centraliza sozinho. */
-  margin: 0 auto;
-  padding: 60px 40px;
-  }
+  margin: auto;
+  padding: clamp(24px, 6vw, 60px) clamp(20px, 6vw, 40px);
+}
 
-  .logo {
-  margin-bottom: 30px;
+.logo {
+  margin-bottom: clamp(16px, 4vw, 30px);
   display: flex;
   justify-content: center;
   align-items: center;
-  }
+}
 
-  .logo img {
-  width: 320px;
+.logo img {
+  width: min(320px, 100%);
   height: auto;
-  }
+}
 
-  .hr {
+.hr {
   width: 100%;
   height: 2px;
   background-color: var(--cor-texto);
-  margin-bottom: 30px;
-  }
+  margin-bottom: clamp(16px, 4vw, 30px);
+}
 
-  .form-container {
+.form-container {
   display: flex;
   flex-direction: column;
   width: 100%;
-  }
-
-  form {
-    display: flex;
-    flex-direction: column;
-    width: 100%;
-    gap: 12px;
 }
 
-  .input-container i {
+form {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  gap: 12px;
+}
+
+.input-container i {
   display: flex;
   align-items: center;
   justify-content: center;
   color: var(--cor-fundo);
   font-size: 24px;
   flex-shrink: 0;
-  }
+}
 
-  .input-container input::placeholder {
+.input-container img {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+  filter: brightness(0) invert(1);
+  opacity: 0.9;
+}
+
+.input-container input::placeholder {
   color: rgba(255, 255, 255, 0.9);
-  }
+}
 
-  .input-container:focus-within {
+.input-container:focus-within {
   background-color: var(--cor-hover);
-  }
+}
 
-  button[type="submit"]:hover {
+button[type="submit"]:hover {
   background-color: var(--cor-hover);
-  }
+}
 
-  button[type="submit"]:active {
+button[type="submit"]:active {
   background-color: var(--cor-ativa);
   transform: scale(0.98);
-  }
+}
 
-  .links a {
+.links a {
   color: var(--cor-texto);
   font-weight: 600;
-  transition: color 0.3s ease,
-        text-decoration 0.3s ease;
-  }
+  transition: color 0.3s ease, text-decoration 0.3s ease;
+}
 
-  .links a:hover {
+.links a:hover {
   color: var(--cor-principal);
   text-decoration: underline;
-  }
+}
 
-  .form-container h2 {
-  font-size: 19px;
+.form-container h2 {
+  font-size: clamp(18px, 4vw, 19px);
   font-weight: 600;
   text-align: center;
   margin-bottom: 20px;
-  }
-
-  .input-container {
-    display: flex;
-    align-items: center;
-    box-sizing: border-box;
-    width: 100%;
-    height: 52px;
-    padding: 0 16px;
-    gap: 12px;
-    background-color: var(--cor-principal);
-    border-radius: var(--border-radius);
-    transition: background-color 0.3s ease;
+  line-height: 1.3;
 }
 
-  .input-container input {
+.input-container {
+  display: flex;
+  align-items: center;
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 52px;
+  padding: 0 16px;
+  gap: 12px;
+  background-color: var(--cor-principal);
+  border-radius: var(--border-radius);
+  transition: background-color 0.3s ease;
+}
+
+.input-container input {
   width: 100%;
   border: none;
   outline: none;
   background: transparent;
   color: var(--cor-fundo);
-  font-size: 14px;
-  }
-
-  button[type="submit"] {
-    box-sizing: border-box;
-    width: 100%;
-    padding: 14px 16px;
-    border: none;
-    border-radius: var(--border-radius);
-    background-color: var(--cor-texto);
-    color: var(--cor-fundo);
-    font-size: 14px;
-    cursor: pointer;
-    transition: background-color 0.3s ease,
-        transform 0.2s ease;
+  font-size: 16px;
+  min-height: 44px;
 }
 
-  .links {
+button[type="submit"] {
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 48px;
+  padding: 14px 16px;
+  border: none;
+  border-radius: var(--border-radius);
+  background-color: var(--cor-texto);
+  color: var(--cor-fundo);
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.links {
   display: flex;
   flex-direction: column;
   text-align: center;
-  }
+  gap: 8px;
+}
 
-  .links p {
+.links p {
   font-weight: 600;
   margin: 0;
-  }
+  font-size: 14px;
+}
 
-  /* ============================================================
-   * SETA DE VOLTA PARA A PAGINA PUBLICA
-   *
-   * Login e recuperacao de senha nao tem menu lateral. Esta seta
-   * fica fixa no canto superior esquerdo e leva para a landing,
-   * que e a unica tela publica do sistema.
-   * ============================================================ */
+/* ============================================================
+ * SETA DE VOLTA PARA A PAGINA PUBLICA
+ * ============================================================ */
 
-  .voltar-inicio {
+.voltar-inicio {
   position: fixed;
-  top: 22px;
-  left: 22px;
+  top: max(14px, env(safe-area-inset-top));
+  left: max(14px, env(safe-area-inset-left));
   z-index: 50;
   display: grid;
   place-items: center;
@@ -239,136 +228,70 @@
   box-shadow: var(--sombra);
   transition: background-color 0.2s ease, color 0.2s ease,
         border-color 0.2s ease, transform 0.2s ease;
-  }
+}
 
-  .voltar-inicio:hover {
+.voltar-inicio:hover {
   background-color: var(--cor-texto);
   border-color: var(--cor-texto);
   color: var(--cor-fundo);
   transform: translateX(-2px);
-  }
+}
 
-  .voltar-inicio:focus-visible {
+.voltar-inicio:focus-visible {
   outline: 3px solid var(--cor-texto);
   outline-offset: 3px;
-  }
+}
 
-  .voltar-inicio svg {
+.voltar-inicio svg {
   width: 20px;
   height: 20px;
-  }
+}
 
-@media (max-width: 1024px) {
-  .voltar-inicio {
-  top: 14px;
-  left: 14px;
-  width: 40px;
-  height: 40px;
-  }
-
+/* Ajustes para telas maiores: volta ao tamanho original do design. */
+@media (min-width: 601px) {
   .container {
-  padding: 30px 20px;
-  }
-
-  .hr {
-  margin-bottom: 25px;
-  }
-
-  .input-container i {
-  font-size: 22px;
-  }
-
-  .links a {
-  font-weight: 600;
+    padding: 60px 40px;
   }
 
   .logo {
-  margin-bottom: 25px;
+    margin-bottom: 30px;
   }
 
   .logo img {
-  width: 240px;
+    width: 320px;
   }
 
-  body {
-  padding: 20px;
+  .hr {
+    margin-bottom: 30px;
   }
 
-  button[type="submit"], .google-btn {
-  font-size: 13px;
-  padding: 12px 14px;
+  .form-container h2 {
+    font-size: 19px;
+  }
+
+  .input-container {
+    min-height: 52px;
+    padding: 0 16px;
+    gap: 12px;
+  }
+
+  .input-container input {
+    font-size: 14px;
+  }
+
+  button[type="submit"] {
+    font-size: 14px;
+    padding: 14px 16px;
+  }
+
+  .links p {
+    font-size: 13px;
   }
 }
 
-@media (max-width: 600px) {
+@media (prefers-reduced-motion: reduce) {
+  button[type="submit"],
   .voltar-inicio {
-  top: 14px;
-  left: 14px;
-  width: 40px;
-  height: 40px;
-  }
-
-  .container {
-  padding: 20px;
-  }
-
-  .hr {
-  margin-bottom: 20px;
-  }
-
-  .input-container i {
-  font-size: 18px;
-  }
-
-  .links a {
-  font-weight: 600;
-  }
-
-  .logo {
-  margin-bottom: 15px;
-  }
-
-  .logo img {
-  width: 200px;
-  }
-
-  body {
-  padding: 15px;
-  }
-
-  button[type="submit"], .google-btn {
-  font-size: 12px;
-  padding: 10px 12px;
+    transition: none;
   }
 }
-
-  .hr {
-  margin-bottom: 25px;
-  }
-
-  .input-container i {
-  font-size: 22px;
-  }
-
-  .links a {
-  font-weight: 600;
-  }
-
-  .logo {
-  margin-bottom: 25px;
-  }
-
-  .logo img {
-  width: 240px;
-  }
-
-  body {
-  padding: 20px;
-  }
-
-  button[type="submit"], .google-btn {
-  font-size: 13px;
-  padding: 12px 14px;
-  }
-}
-
