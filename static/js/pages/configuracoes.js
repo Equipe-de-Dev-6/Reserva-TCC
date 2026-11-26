@@ -34,11 +34,11 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 
   // ==================================================
-  // DROPDOWN DO USUÁRIO
+  // DROPDOWN DO USUÁRIO (gerenciado por app.js)
   // ==================================================
 
   // ==================================================
-  // MENU MOBILE
+  // MENU MOBILE (gerenciado por app.js)
   // ==================================================
 
   // ==================================================
