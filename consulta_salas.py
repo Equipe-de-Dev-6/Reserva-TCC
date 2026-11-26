@@ -34,6 +34,12 @@ def salas_para_tela(supabase_cliente=None):
     O filtro acontece na consulta ao banco (WHERE reservavel), e não
     depois no frontend, para que o navegador receba apenas as salas
     reserváveis.
+
+    Fluxo:
+    1. Usa o cliente passado ou o cliente global do db.py.
+    2. Consulta a tabela "salas" com WHERE reservavel = true.
+    3. Ordena por id.
+    4. Devolve a lista de dados (ou lista vazia se não houver).
     """
     cliente = supabase_cliente or supabase
 
