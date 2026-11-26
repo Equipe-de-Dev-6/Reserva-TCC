@@ -29,7 +29,6 @@
 //
 // 5. ReservasApp.subscribe(fn) permite que uma página "escute"
 //    mudanças e sempre se re-renderize sem chamar o render na mão.
-//
 // ============================================================
 
 const ReservasApp = (() => {
@@ -52,7 +51,7 @@ const ReservasApp = (() => {
 
   const CHAVE_PENDENTES = 'reservasPendentesSenai';
 
-  // A lista de notificações é uma_ws notificação para cada ação
+  // A lista de notificações é uma notificação para cada ação
   // recente. Passar disso só ocupa espaço sem ajudar a tela.
   const LIMITE_NOTIFICACOES = 50;
 
@@ -1069,16 +1068,16 @@ const ReservasApp = (() => {
   // CATEGORIA MOSTRADA NA TELA
   // ========================================================
   //
-  // O cartao de categoria das telas de detalhe (passo 02) e de
-  // confirmacao (passo 03) era fixo em "classroom.png" e "Salas de
-  // aula, reuniões e treinamentos". Como as tres telas de escolha
-  // (salas, laboratorios e gabinetes) levam todas ao mesmo passo 02,
-  // escolher um laboratorio abria a tela com o icone e o titulo de uma
+  // O cartão de categoria das telas de detalhe (passo 02) e de
+  // confirmação (passo 03) era fixo em "classroom.png" e "Salas de
+  // aula, reuniões e treinamentos". Como as três telas de escolha
+  // (salas, laboratórios e gabinetes) levam todas ao mesmo passo 02,
+  // escolher um laboratório abria a tela com o ícone e o título de uma
   // sala. O mesmo acontecia com os gabinetes.
   //
-  // A escolha ja esta no sessionStorage, com a categoria que o
-  // servidor classificou: "Sala", "Laboratorio" ou "Gabinete".
-  // Aqui essa categoria vira o icone e o texto certainos.
+  // A escolha já está no sessionStorage, com a categoria que o
+  // servidor classificou: "Sala", "Laboratório" ou "Gabinete".
+  // Aqui essa categoria vira o ícone e o texto certos.
 
   const CATEGORIA_NA_TELA = {
     sala: {
@@ -1113,9 +1112,9 @@ const ReservasApp = (() => {
     return CATEGORIA_NA_TELA[chave] || CATEGORIA_NA_TELA.sala;
   }
 
-  // Escreve o icone e o titulo no DOM. Os elementos sao os que
+  // Escreve o ícone e o título no DOM. Os elementos são os que
   // carregam "data-categoria-icone" e "data-categoria-titulo"; sem
-  // nenhum dos dois, a funcao nao faz nada e a tela segue com o texto
+  // nenhum dos dois, a função não faz nada e a tela segue com o texto
   // fixo do template.
   function pintarCategoria() {
     const tela = telaDaCategoria();
@@ -1140,16 +1139,16 @@ const ReservasApp = (() => {
   // ESCAPAR TEXTO
   // ========================================================
   //
-  // Nome do laboratorio, curso, motivo e descricao sao texto livre
-  // digitado pelo professor e arrives aqui pela API. As telas montam o
-  // cartao com innerHTML, entao esse texto precisa ir escapado: sem
+  // Nome do laboratório, curso, motivo e descrição são texto livre
+  // digitado pelo professor e chegam aqui pela API. As telas montam o
+  // card com innerHTML, então esse texto precisa ir escapado: sem
   // isso, um "<img onerror=...>" em qualquer um desses campos vira
-  // script rodando no navegador de quem abre a tela - inclusive no do
+  // script rodando no navegador de quem abre a tela — inclusive no do
   // Coordenador, que enxerga as reservas de todo mundo.
   //
-  // Fica aqui, e nao em cada tela, porque ja existiam cinco copias
-  // dessa funcao (quatro em templates e uma em "notificacoesprof.js")
-  // e oito pontos de injecao que esqueceram de chamar qualquer uma
+  // Fica aqui, e não em cada tela, porque já existiam cinco cópias
+  // dessa função (quatro em templates e uma em "notificacoesprof.js")
+  // e oito pontos de injeção que esqueceram de chamar qualquer uma
   // delas.
   function escapar(texto) {
     return String(texto ?? '')
