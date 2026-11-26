@@ -28,7 +28,7 @@ import { listarSalas, buscarSala } from '/js/api.js';
  * laboratórios, "Gabinete..." para a de gabinetes).
  *
  * Antes cada tela repetia essa conta por conta própria, e uma sala que
- * mudasse de categoria Depending umas telas e outras não.
+ * mudasse de categoria dependendo umas telas e outras não.
  */
 function categorizar(sala) {
 
@@ -60,7 +60,7 @@ function tituloDaSala(sala) {
  *
  * Salas sem capacidade informada (o banco traz "Não informado" ou
  * o campo vazio) ficam sem essa linha, em vez de mostrar um texto
- *ivariado que quebraria o padrão.
+ * variado que quebraria o padrão.
  */
 function detalheDaSala(sala) {
 
