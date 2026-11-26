@@ -4,34 +4,31 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#E30613">
-  <meta name="description" content="Sistema de reserva de salas, laboratórios e gabinetes do SENAI. Solicite, acompanhe e aprove reservas em um só lugar.">
+  <meta name="description" content="Sistema de reserva de salas, laboratórios e gabinetes do SENAI. Solicite, acompanhe e deixe a decisão com a coordenação.">
 
   <title>SENAI · Reserva de salas, laboratórios e gabinetes</title>
 
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-
-  <!-- Mesmo favicon e manifest das telas internas do sistema. -->
-  <link rel="icon" type="image/png" href="/static/assets/img/favicon.png?v=2">
+  <!-- Sem fontes de terceiros: Inter local, se existir, ou fonte do sistema. -->
+  <link rel="icon" type="image/png" href="/static/assets/img/favicon.png?v=3">
   <link rel="apple-touch-icon" href="/static/assets/img/logo-pwa.png">
   <link rel="manifest" href="/static/manifest.json">
 
   <meta property="og:type" content="website">
   <meta property="og:title" content="SENAI · Reserva de salas, laboratórios e gabinetes">
-  <meta property="og:description" content="Solicite salas, laboratórios e gabinetes, acompanhe o status e deixe a aprovação com a coordenação.">
+  <meta property="og:description" content="Solicite salas, laboratórios e gabinetes e acompanhe a decisão da coordenação.">
 
-  <link rel="stylesheet" href="/css/landing.css?v=1">
+  <!-- v=3 força o navegador a buscar o CSS depois da reescrita da página. -->
+  <link rel="stylesheet" href="/css/landing.css?v=3">
 
   <script>
-    // Aplica o tema antes de pintar a tela para evitar o "flash" branco.
+    // Tema aplicado antes da primeira pintura para evitar flash branco.
     (function () {
       try {
         var salvo = localStorage.getItem('reserva-tema');
         var escuro = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
         var tema = salvo === 'dark' || salvo === 'light' ? salvo : (escuro ? 'dark' : 'light');
         document.documentElement.setAttribute('data-theme', tema);
-      } catch (erro) { /* localStorage indisponível: mantém o tema claro */ }
+      } catch (erro) { /* sem localStorage: mantém o tema claro */ }
     })();
   </script>
 </head>
@@ -55,6 +52,7 @@
       <nav class="site-nav" aria-label="Principal">
         <a href="#recursos">Recursos</a>
         <a href="#sistema">Sistema</a>
+        <a href="#fluxo">Como funciona</a>
         <a href="#gestao">Gestão</a>
         <a href="#aprovacao">Aprovação</a>
         <a href="#calendario">Calendário</a>
@@ -63,7 +61,7 @@
 
       <div class="header-actions">
         <button class="theme-toggle" id="themeToggle" type="button"
-                aria-label="Ativar modo escuro" aria-pressed="false" title="Alternar tema">
+                aria-label="Alternar tema" aria-pressed="false" title="Alternar tema">
           <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
             <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
@@ -79,9 +77,13 @@
 
         <button class="menu-toggle" id="menuToggle" type="button"
                 aria-label="Abrir menu" aria-expanded="false" aria-controls="mobileMenu">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+          <svg class="icon-menu" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                stroke-linecap="round" aria-hidden="true">
             <path d="M3 6h18M3 12h18M3 18h18"></path>
+          </svg>
+          <svg class="icon-close" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+               stroke-linecap="round" aria-hidden="true">
+            <path d="M6 6l12 12M18 6L6 18"></path>
           </svg>
         </button>
       </div>
@@ -91,19 +93,20 @@
       <nav aria-label="Menu do celular">
         <a href="#recursos">Recursos</a>
         <a href="#sistema">Sistema</a>
+        <a href="#fluxo">Como funciona</a>
         <a href="#gestao">Gestão</a>
         <a href="#aprovacao">Aprovação</a>
         <a href="#calendario">Calendário</a>
         <a href="#faq">Dúvidas</a>
-        <a class="btn" href="/login">Entrar no sistema</a>
+        <a class="btn" href="/login">Acessar minha conta</a>
       </nav>
     </div>
   </header>
 
-  <main id="conteudo">
+  <main id="conteudo" tabindex="-1">
 
     <!-- ============================================================
-         HERO
+         HERO — a prévia é explicitamente ilustrativa
          ============================================================ -->
     <section class="hero">
       <div class="wrap hero-grid">
@@ -132,45 +135,24 @@
             </a>
             <a class="btn btn-ghost" href="#recursos">Conhecer os recursos</a>
           </div>
-
-          <ul class="hero-bullets">
-            <li>Salas de aula</li>
-            <li>Laboratórios</li>
-            <li>Gabinetes de notebooks</li>
-            <li>Aprovação da coordenação</li>
-          </ul>
-
-          <dl class="hero-stats">
-            <div>
-              <dt>3</dt>
-              <dd>tipos de recursos</dd>
-            </div>
-            <div>
-              <dt>4</dt>
-              <dd>status de reserva</dd>
-            </div>
-            <div>
-              <dt>2</dt>
-              <dd>perfis de acesso</dd>
-            </div>
-          </dl>
         </div>
 
         <div class="hero-visual">
-          <div class="mock" role="img"
-               aria-label="Prévia da tela inicial do sistema: menu lateral, ações de reserva, próximas reservas, calendário e aviso importante">
+          <!-- Selo visível: a tela abaixo não é captura de dados reais. -->
+          <span class="mock-badge">Ilustração · dados fictícios</span>
 
+          <div class="mock" role="img"
+               aria-label="Ilustração da tela inicial: menu lateral, ações de reserva, próximas reservas e calendário. Dados fictícios.">
             <div class="mock-chrome" aria-hidden="true">
               <span class="mock-dots"><span></span><span></span><span></span></span>
-              <span class="mock-url">reserva.senai.br/home</span>
+              <span class="mock-url">localhost:8000/home</span>
             </div>
 
-            <div class="mock-body">
-              <aside class="mock-sidebar" aria-hidden="true">
+            <div class="mock-body" aria-hidden="true">
+              <aside class="mock-sidebar">
                 <span class="mock-logo">
                   <img src="/assets/img/Logo senai.png" alt="" width="120" height="40">
                 </span>
-
                 <nav class="mock-nav">
                   <span class="active"><img src="/assets/icons/home.png" alt="">Início</span>
                   <span><img src="/assets/icons/reserved.png" alt="">Reservar</span>
@@ -184,14 +166,14 @@
               </aside>
 
               <div class="mock-main">
-                <div class="mock-topbar" aria-hidden="true">
+                <div class="mock-topbar">
                   <span class="mock-search">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                          stroke-linecap="round" aria-hidden="true">
                       <circle cx="11" cy="11" r="7"></circle>
                       <path d="M21 21l-4.3-4.3"></path>
                     </svg>
-                    Buscar por sala...
+                    Buscar sala ou professor
                   </span>
                   <span class="mock-avatar"></span>
                 </div>
@@ -199,7 +181,7 @@
                 <p class="mock-greeting">Olá, Professor</p>
                 <p class="mock-sub">O que você deseja reservar hoje?</p>
 
-                <div class="mock-actions" aria-hidden="true">
+                <div class="mock-actions">
                   <div class="mock-action">
                     <span class="mock-action-icon"><img src="/assets/icons/classroom.png" alt=""></span>
                     <b>Salas</b>
@@ -219,10 +201,7 @@
 
                 <div class="mock-dashboard">
                   <div class="mock-panel">
-                    <div class="mock-section-title">
-                      Próximas reservas
-                      <span>Ver mais →</span>
-                    </div>
+                    <div class="mock-section-title">Próximas reservas</div>
 
                     <div class="mock-res">
                       <span class="mock-res-icon"><img src="/assets/icons/classroom.png" alt=""></span>
@@ -234,9 +213,9 @@
                     </div>
 
                     <div class="mock-res">
-                      <span class="mock-res-icon"><img src="/assets/icons/shopping-cart.png" alt=""></span>
+                      <span class="mock-res-icon"><img src="/assets/icons/computer.png" alt=""></span>
                       <div>
-                        <b>Gabinete de Notebook A</b>
+                        <b>Laboratório 1</b>
                         <small><span data-data-offset="3"></span> · 10:00 às 12:00</small>
                       </div>
                       <span class="badge badge-green">Aprovada</span>
@@ -256,40 +235,20 @@
                     <div class="mock-cal">
                       <div class="mock-cal-head">
                         Calendário
-                        <span id="mockCalLabel">Novembro 2026</span>
+                        <!-- O landing.js troca pelo mês e ano atuais. -->
+                        <span id="mockCalLabel">Mês atual</span>
                       </div>
                       <div class="mock-cal-grid" id="mockCalGrid" aria-hidden="true"></div>
                     </div>
 
                     <div class="mock-notice">
-                      <b><img src="/assets/icons/warning.png" alt="">Aviso importante</b>
-                      <p>Laboratório 2 indisponível para manutenção nesta sexta-feira.</p>
+                      <b><img src="/assets/icons/warning.png" alt="">Avisos</b>
+                      <p>Comunicados publicados pela coordenação aparecem na página inicial.</p>
                     </div>
                   </div>
                 </div>
               </div>
             </div>
-          </div>
-
-          <div class="float-card float-ok" aria-hidden="true">
-            <span class="float-icon">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"
-                   stroke-linecap="round" stroke-linejoin="round">
-                <path d="M20 6L9 17l-5-5"></path>
-              </svg>
-            </span>
-            <span>Reserva aprovada<small>Sala C11 · hoje</small></span>
-          </div>
-
-          <div class="float-card float-wait" aria-hidden="true">
-            <span class="float-icon float-icon-wait">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                   stroke-linecap="round" stroke-linejoin="round">
-                <circle cx="12" cy="12" r="9"></circle>
-                <path d="M12 7v5l3 2"></path>
-              </svg>
-            </span>
-            <span>Aguardando aprovação<small>Coordenação</small></span>
           </div>
         </div>
       </div>
@@ -304,9 +263,8 @@
           <span class="eyebrow">Recursos</span>
           <h2>Um catálogo para cada tipo de espaço.</h2>
           <p>
-            Salas, laboratórios e gabinetes ficam no mesmo cadastro de recursos.
-            Cada um tem setor, equipamentos, descrição, disponibilidade e a opção
-            de aparecer ou não nas telas de reserva.
+            Salas, laboratórios e gabinetes ficam no mesmo cadastro. A categoria
+            aparece nas telas de reserva, junto com os dados que ajudam a escolher.
           </p>
         </div>
 
@@ -321,7 +279,6 @@
               <span class="chip">Setor</span>
               <span class="chip">Quantidade de alunos</span>
               <span class="chip">Equipamentos</span>
-              <span class="chip">Disponibilidade</span>
             </div>
           </article>
 
@@ -333,9 +290,8 @@
             <p>Laboratórios de informática, automação, mecânica e outras especialidades.</p>
             <div class="chip-row">
               <span class="chip">Setor</span>
-              <span class="chip">Quantidade de alunos</span>
-              <span class="chip">Equipamentos</span>
               <span class="chip">Descrição</span>
+              <span class="chip">Equipamentos</span>
             </div>
           </article>
 
@@ -344,35 +300,33 @@
               <img src="/assets/icons/shopping-cart.png" alt="" width="26" height="26">
             </span>
             <h3>Gabinetes de notebooks</h3>
-            <p>Gabinetes de notebooks e equipamentos móveis para levar até a sala de aula.</p>
+            <p>Gabinetes e equipamentos móveis para levar até a sala de aula.</p>
             <div class="chip-row">
-              <span class="chip">Setor</span>
-              <span class="chip">Equipamentos</span>
+              <span class="chip">Nome cadastrado</span>
               <span class="chip">Descrição</span>
-              <span class="chip">Aparece na reserva</span>
             </div>
           </article>
         </div>
 
         <p class="resource-note">
-          <strong>Importante:</strong> um recurso indisponível continua visível, mas aparece
-          marcado como <em>Indisponível</em> e não pode ser selecionado. Já o campo
-          <em>Aparece na reserva</em> decide se ele é listado nas telas de reserva.
+          Um recurso indisponível continua visível, mas não pode ser selecionado.
+          O campo <strong>Aparece na reserva</strong> define se ele é listado nas
+          telas de reserva.
         </p>
       </div>
     </section>
 
     <!-- ============================================================
-         SISTEMA COMPLETO
+         MÓDULOS POR PERFIL — copiados do menu real do servidor
          ============================================================ -->
     <section class="section" id="sistema">
       <div class="wrap">
         <div class="section-head">
           <span class="eyebrow">Base do sistema</span>
-          <h2>Todos os módulos, separados por perfil.</h2>
+          <h2>Os módulos certos para cada perfil.</h2>
           <p>
             O menu é montado no servidor a partir do cargo do usuário. O professor
-            não recebe link de administração, e o coordenador recebe as ferramentas
+            não recebe link de administração; o coordenador recebe as ferramentas
             de gestão.
           </p>
         </div>
@@ -400,7 +354,7 @@
               </li>
               <li class="module-item">
                 <img src="/assets/icons/history.png" alt="">
-                <span><b>Minhas Reservas</b><small>Status e cancelamento das suas solicitações.</small></span>
+                <span><b>Minhas Reservas</b><small>Status e cancelamento das próprias solicitações.</small></span>
               </li>
               <li class="module-item">
                 <img src="/assets/icons/calendar.png" alt="">
@@ -408,19 +362,19 @@
               </li>
               <li class="module-item">
                 <img src="/assets/icons/notification.png" alt="">
-                <span><b>Notificações</b><small>Criação, edição e cancelamento de reservas.</small></span>
+                <span><b>Notificações</b><small>Alertas de criação, aprovação, recusa e cancelamento.</small></span>
               </li>
               <li class="module-item">
                 <img src="/assets/icons/warning.png" alt="">
-                <span><b>Avisos</b><small>Comunicados publicados na página inicial.</small></span>
+                <span><b>Avisos</b><small>Acompanhe e publique comunicados.</small></span>
               </li>
               <li class="module-item">
                 <img src="/assets/icons/gear.png" alt="">
-                <span><b>Configurações</b><small>Dados do perfil e preferências de notificação.</small></span>
+                <span><b>Configurações</b><small>Nome e e-mail do perfil.</small></span>
               </li>
               <li class="module-item">
                 <img src="/assets/icons/interrogation.png" alt="">
-                <span><b>Ajuda</b><small>Perguntas frequentes e canais de atendimento.</small></span>
+                <span><b>Ajuda</b><small>Perguntas frequentes e atendimento.</small></span>
               </li>
             </ul>
           </article>
@@ -432,7 +386,7 @@
               </span>
               <div>
                 <h3>Coordenador</h3>
-                <p>Reserva, aprova pedidos e gerencia recursos e usuários.</p>
+                <p>Reserva, decide pedidos e gerencia o sistema.</p>
               </div>
             </div>
 
@@ -470,12 +424,16 @@
                 <span><b>Usuários</b><small>Cadastrar professores e coordenadores.</small></span>
               </li>
               <li class="module-item">
+                <img src="/assets/icons/warning.png" alt="">
+                <span><b>Pedidos de Senha</b><small>Analisar trocas de senha solicitadas no login.</small></span>
+              </li>
+              <li class="module-item">
                 <img src="/assets/icons/gear.png" alt="">
-                <span><b>Configurações</b><small>Dados do perfil e preferências.</small></span>
+                <span><b>Configurações</b><small>Nome, e-mail e cargo.</small></span>
               </li>
               <li class="module-item">
                 <img src="/assets/icons/interrogation.png" alt="">
-                <span><b>Ajuda</b><small>Perguntas frequentes e canais de atendimento.</small></span>
+                <span><b>Ajuda</b><small>Perguntas frequentes e atendimento.</small></span>
               </li>
             </ul>
           </article>
@@ -490,10 +448,10 @@
       <div class="wrap">
         <div class="section-head">
           <span class="eyebrow">Como funciona</span>
-          <h2>Do pedido à sala liberada em quatro etapas.</h2>
+          <h2>Quatro momentos, do pedido ao acompanhamento.</h2>
           <p>
             O pedido nasce como <strong>Aguardando</strong> e só muda de status quando a
-            coordenação aprova ou recusa — ou quando o professor cancela.
+            coordenação decide ou quando o próprio professor cancela.
           </p>
         </div>
 
@@ -501,7 +459,7 @@
           <li class="step">
             <span class="step-num">01</span>
             <h3>Escolha o recurso</h3>
-            <p>Sala de aula, laboratório ou gabinete. Recursos indisponíveis aparecem marcados e não avançam.</p>
+            <p>Sala, laboratório ou gabinete. Indisponíveis aparecem marcados e não avançam.</p>
           </li>
           <li class="step">
             <span class="step-num">02</span>
@@ -511,16 +469,21 @@
           <li class="step">
             <span class="step-num">03</span>
             <h3>Aguarde a decisão</h3>
-            <p>A coordenação vê o pedido na fila de aprovação e escolhe entre aprovar e recusar.</p>
+            <p>A coordenação vê o pedido na fila e escolhe entre aprovar e recusar, com confirmação.</p>
           </li>
           <li class="step">
             <span class="step-num">04</span>
             <h3>Acompanhe</h3>
-            <p>Veja o status em Minhas Reservas e no calendário. Se o plano mudar, cancele a reserva.</p>
+            <p>Veja o status em Minhas Reservas e no calendário. Se o plano mudar, cancele e faça um novo pedido.</p>
           </li>
         </ol>
 
-        <div class="status-legend" aria-label="Status possíveis de uma reserva">
+        <p class="resource-note">
+          O formulário de reserva tem 3 telas. A decisão da coordenação e o
+          acompanhamento do status acontecem depois do envio.
+        </p>
+
+        <div class="status-legend" role="group" aria-label="Status possíveis de uma reserva">
           <span class="status-pill status-aguardando">Aguardando</span>
           <span class="status-pill status-aprovada">Aprovada</span>
           <span class="status-pill status-recusada">Recusada</span>
@@ -536,66 +499,59 @@
       <div class="wrap split">
         <div>
           <span class="eyebrow">Gestão de recursos</span>
-          <h2>Cadastre, disponibilize e acompanhe.</h2>
+          <h2>Cadastre e mantenha o catálogo atualizado.</h2>
           <p>
-            A coordenação mantém o catálogo atualizado. O cadastro separa salas,
-            laboratórios e gabinetes, e cada recurso guarda os dados que aparecem
-            no cartão de reserva.
+            A coordenação usa o mesmo cadastro para salas, laboratórios e
+            gabinetes. Os campos variam conforme a categoria; o que importa é
+            que a reserva mostre as informações certas.
           </p>
           <ul class="check-list">
-            <li>Nome, setor, quantidade de alunos, equipamentos e descrição</li>
+            <li>Nome, setor, equipamentos e descrição conforme a categoria</li>
+            <li>Quantidade de alunos para salas e laboratórios</li>
             <li>Disponibilidade e opção “Aparece na reserva”</li>
             <li>Edição e exclusão de recursos</li>
             <li>Exclusão bloqueada quando há reservas registradas</li>
           </ul>
         </div>
 
-        <div class="panel" aria-label="Prévia da tela de gerenciamento de recursos">
-          <div class="panel-head">
-            <h3>Gerenciar recursos</h3>
-            <span class="btn-mini">+ Novo recurso</span>
-          </div>
-
-          <div class="panel-tabs" aria-hidden="true">
-            <span class="panel-tab active">Salas</span>
-            <span class="panel-tab">Laboratórios</span>
-            <span class="panel-tab">Gabinetes</span>
-          </div>
-
-          <div class="panel-body">
-            <div class="panel-row">
-              <span class="row-icon"><img src="/assets/icons/classroom.png" alt=""></span>
-              <div><b>Sala C11</b><small>Sala de aula · 40 alunos · Setor A</small></div>
-              <span class="badge badge-green">Disponível</span>
+        <div class="panel" role="img"
+             aria-label="Ilustração da tela de gerenciamento de recursos, com salas, laboratórios e gabinetes cadastrados.">
+          <div class="panel-content" aria-hidden="true">
+            <div class="panel-head">
+              <h3>Gerenciar recursos</h3>
             </div>
 
-            <div class="panel-row">
-              <span class="row-icon"><img src="/assets/icons/computer.png" alt=""></span>
-              <div><b>Laboratório 2</b><small>Informática · 30 alunos · Setor B</small></div>
-              <span class="badge badge-green">Disponível</span>
+            <div class="panel-tabs">
+              <span class="panel-label active">Salas</span>
+              <span class="panel-label">Laboratórios</span>
+              <span class="panel-label">Gabinetes</span>
             </div>
 
-            <div class="panel-row">
-              <span class="row-icon"><img src="/assets/icons/shopping-cart.png" alt=""></span>
-              <div><b>Gabinete de Notebook A</b><small>20 notebooks · 1 carrinho</small></div>
-              <span class="badge badge-red">Indisponível</span>
+            <div class="panel-body">
+              <div class="panel-row">
+                <span class="row-icon"><img src="/assets/icons/classroom.png" alt=""></span>
+                <div><b>Sala C11</b><small>Sala de aula · 40 alunos · Setor A</small></div>
+                <span class="badge badge-green">Disponível</span>
+              </div>
+
+              <div class="panel-row">
+                <span class="row-icon"><img src="/assets/icons/computer.png" alt=""></span>
+                <div><b>Laboratório 2</b><small>Informática · 30 alunos · Setor B</small></div>
+                <span class="badge badge-green">Disponível</span>
+              </div>
+
+              <div class="panel-row">
+                <span class="row-icon"><img src="/assets/icons/shopping-cart.png" alt=""></span>
+                <div><b>Gabinete de Notebook C</b><small>20 notebooks · 1 carrinho</small></div>
+                <span class="badge badge-red">Indisponível</span>
+              </div>
             </div>
-          </div>
 
-          <div class="field-grid" aria-hidden="true">
-            <span class="field">Nome</span>
-            <span class="field">Setor</span>
-            <span class="field">Qtd. de alunos</span>
-            <span class="field">Equipamentos</span>
-            <span class="field">Descrição</span>
-            <span class="field">Disponibilidade</span>
-            <span class="field">Aparece na reserva</span>
+            <p class="panel-note">
+              Um recurso indisponível não pode ser selecionado na reserva.
+              A exclusão é recusada quando existem reservas vinculadas.
+            </p>
           </div>
-
-          <p class="panel-note">
-            O recurso indisponível não pode ser selecionado na reserva. A exclusão
-            é recusada pelo banco quando existem reservas vinculadas.
-          </p>
         </div>
       </div>
     </section>
@@ -610,75 +566,63 @@
           <h2>O coordenador decide. O professor acompanha.</h2>
           <p>
             A tela de aprovação lista os pedidos e separa por status. Apenas as
-            reservas com status <strong>Aguardando</strong> exibem os botões de
-            aprovar e recusar.
+            reservas com status <strong>Aguardando</strong> exibem as opções de
+            decidir, com confirmação antes de aplicar.
           </p>
           <ul class="check-list">
             <li>Filtros: Aguardando, Aprovadas, Recusadas e Canceladas</li>
-            <li>Aprovação e recusa em um clique</li>
-            <li>O professor vê o status em Minhas Reservas</li>
-            <li>O próprio professor pode cancelar a reserva</li>
+            <li>Aprovar ou recusar com confirmação</li>
+            <li>O professor vê o resultado em Minhas Reservas</li>
+            <li>O dono pode cancelar a própria reserva</li>
           </ul>
         </div>
 
-        <div class="panel" aria-label="Prévia da tela de aprovação de reservas">
-          <div class="panel-head">
-            <h3>Aprovar reservas</h3>
-            <span class="badge badge-yellow">3 pendentes</span>
-          </div>
-
-          <div class="panel-tabs" aria-hidden="true">
-            <span class="panel-tab active">Aguardando</span>
-            <span class="panel-tab">Aprovadas</span>
-            <span class="panel-tab">Recusadas</span>
-            <span class="panel-tab">Canceladas</span>
-          </div>
-
-          <div class="panel-body">
-            <div class="panel-row">
-              <span class="row-icon"><img src="/assets/icons/classroom.png" alt=""></span>
-              <div>
-                <b>Sala C13 · Prof. Gabriel</b>
-                <small><span data-data-offset="2"></span> · 16:00 às 17:30</small>
-              </div>
-              <span class="panel-actions">
-                <span class="pill-action pill-approve">Aprovar</span>
-                <span class="pill-action pill-reject">Recusar</span>
-              </span>
+        <div class="panel" role="img"
+             aria-label="Ilustração da fila de aprovação, com dois pedidos aguardando decisão.">
+          <div class="panel-content" aria-hidden="true">
+            <div class="panel-head">
+              <h3>Aprovar reservas</h3>
+              <span class="badge badge-yellow">2 pendentes</span>
             </div>
 
-            <div class="panel-row">
-              <span class="row-icon"><img src="/assets/icons/computer.png" alt=""></span>
-              <div>
-                <b>Laboratório 2 · Prof. João</b>
-                <small><span data-data-offset="4"></span> · 08:00 às 10:00</small>
-              </div>
-              <span class="panel-actions">
-                <span class="pill-action pill-approve">Aprovar</span>
-                <span class="pill-action pill-reject">Recusar</span>
-              </span>
+            <div class="panel-tabs">
+              <span class="panel-label active">Aguardando</span>
+              <span class="panel-label">Aprovadas</span>
+              <span class="panel-label">Recusadas</span>
+              <span class="panel-label">Canceladas</span>
             </div>
 
-            <div class="panel-row">
-              <span class="row-icon"><img src="/assets/icons/shopping-cart.png" alt=""></span>
-              <div>
-                <b>Gabinete A · Prof. Guilherme</b>
-                <small><span data-data-offset="6"></span> · 10:00 às 12:00</small>
+            <div class="panel-body">
+              <div class="panel-row">
+                <span class="row-icon"><img src="/assets/icons/classroom.png" alt=""></span>
+                <div>
+                  <b>Sala C13</b>
+                  <small><span data-data-offset="2"></span> · 16:00 às 17:30</small>
+                </div>
+                <span class="panel-estado">Aguardando decisão</span>
               </div>
-              <span class="badge badge-green">Aprovada</span>
+
+              <div class="panel-row">
+                <span class="row-icon"><img src="/assets/icons/computer.png" alt=""></span>
+                <div>
+                  <b>Laboratório 1</b>
+                  <small><span data-data-offset="4"></span> · 08:00 às 10:00</small>
+                </div>
+                <span class="panel-estado">Aguardando decisão</span>
+              </div>
             </div>
+
+            <p class="panel-note">
+              Na fila, só pedidos <strong>Aguardando</strong> mostram as opções de
+              decisão. Fora da fila, o dono ainda pode cancelar a reserva.
+            </p>
           </div>
-
-          <p class="panel-note">
-            O botão de decisão só aparece enquanto o status é <strong>Aguardando</strong>.
-            Depois disso, a reserva passa a ser somente leitura.
-          </p>
         </div>
       </div>
     </section>
 
     <!-- ============================================================
-         CALENDÁRIO
+         CALENDÁRIO — exemplo claramente identificado
          ============================================================ -->
     <section class="section" id="calendario">
       <div class="wrap">
@@ -687,15 +631,17 @@
           <h2>Cada dia mostra o que está reservado.</h2>
           <p>
             O calendário do sistema marca os dias com reservas e abre um painel
-            com horário, recurso, motivo e situação. A prévia abaixo usa dados de
-            exemplo; entre para ver as reservas reais.
+            com horário, recurso, motivo e situação. O professor vê só as próprias;
+            a coordenação vê todas.
           </p>
         </div>
 
         <div class="calendar-demo">
           <div class="calendar-demo-card">
+            <p class="demo-aviso">Exemplo ilustrativo — não são reservas reais.</p>
             <div class="calendar-demo-head">
-              <h3 id="demoMonthLabel">Novembro 2026</h3>
+              <!-- Texto neutro até o landing.js calcular o mês atual. -->
+              <h3 id="demoMonthLabel">Mês atual</h3>
               <div class="calendar-nav">
                 <button type="button" id="demoPrev" aria-label="Mês anterior">
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
@@ -718,21 +664,22 @@
             </div>
 
             <div class="calendar-demo-grid" id="demoCalGrid" role="group"
-                 aria-label="Calendário de exemplo"></div>
+                 aria-labelledby="demoMonthLabel"></div>
           </div>
 
-          <aside class="calendar-demo-panel">
+          <aside class="calendar-demo-panel" aria-label="Reservas do dia selecionado">
+            <p class="demo-aviso">Dados de exemplo</p>
             <h3 id="demoDayTitle">Reservas - Dia --</h3>
-            <p class="day-sub" id="demoDaySubtitle">Selecione um dia no calendário.</p>
+            <!-- Uma única região viva anuncia a data e a quantidade. -->
+            <p class="day-sub" id="demoDaySubtitle" aria-live="polite">Selecione um dia no calendário.</p>
             <div id="demoDayList" class="demo-day-list"></div>
-            <a class="btn btn-ghost btn-sm demo-enter" href="/login">Entrar para reservar</a>
           </aside>
         </div>
 
-        <p class="demo-note">
-          Prévia ilustrativa da tela de calendário. As reservas reais aparecem
-          depois do login, filtradas pelo seu perfil.
-        </p>
+        <noscript>
+          <p class="demo-note">O calendário de exemplo precisa de JavaScript para mostrar os dias.</p>
+        </noscript>
+        <p class="demo-note">Para consultar as reservas reais, entre no sistema.</p>
       </div>
     </section>
 
@@ -743,16 +690,15 @@
       <div class="wrap split">
         <div>
           <span class="eyebrow">Avisos e notificações</span>
-          <h2>O comunicado chega antes da reserva.</h2>
+          <h2>Avisos e reservas no mesmo lugar.</h2>
           <p>
-            Avisos importantes aparecem na página inicial com título, descrição e
-            data opcional. As notificações acompanham a criação, a edição e o
-            cancelamento das reservas.
+            Comunicados aparecem na página inicial com título, descrição e data
+            opcional. As notificações acompanham o que acontece com as reservas.
           </p>
           <ul class="check-list">
-            <li>Avisos publicados na página inicial</li>
-            <li>Notificações de reservas criadas, editadas ou canceladas</li>
-            <li>Notificações do navegador opcionais, com lembrete 1 hora antes das reservas aprovadas</li>
+            <li>Avisos publicados na página inicial por usuários logados</li>
+            <li>Alertas de criação, aprovação, recusa e cancelamento de reservas</li>
+            <li>Notificações do navegador opcionais, com lembrete de 1 hora antes das reservas aprovadas quando ativadas e com a página aberta</li>
             <li>Badge de notificações no menu e no cabeçalho</li>
           </ul>
         </div>
@@ -763,9 +709,9 @@
               <img src="/assets/icons/warning.png" alt="" width="20" height="20">
             </span>
             <div>
-              <h3>Aviso importante</h3>
-              <p>Laboratório 2 indisponível para manutenção nesta sexta-feira.</p>
-              <span class="notice-demo-date">Publicado hoje</span>
+              <h3>Aviso da coordenação</h3>
+              <p>Comunicados importantes ficam visíveis na página inicial de quem entra no sistema.</p>
+              <span class="demo-tag">Exemplo de aviso</span>
             </div>
           </article>
 
@@ -775,8 +721,8 @@
             </span>
             <div>
               <h3>Reserva criada — Sala C13</h3>
-              <p>Professor: Gabriel · Data: <span data-data-offset="2"></span> · Horário: 16:00 às 17:30 · Status: Aguardando.</p>
-              <span class="notification-demo-time">agora</span>
+              <p><span data-data-offset="2"></span> · 16:00 às 17:30 · Status: Aguardando.</p>
+              <span class="demo-tag">Exemplo de notificação</span>
             </div>
           </article>
         </div>
@@ -790,8 +736,8 @@
       <div class="wrap">
         <div class="section-head">
           <span class="eyebrow">Dúvidas frequentes</span>
-          <h2>O que o sistema faz — e o que não faz.</h2>
-          <p>Respostas curtas sobre o fluxo real de reserva, aprovação e acesso.</p>
+          <h2>Perguntas frequentes sobre o uso.</h2>
+          <p>Respostas curtas sobre reserva, aprovação e acesso.</p>
         </div>
 
         <div class="faq-list">
@@ -809,8 +755,16 @@
             <summary>Quem aprova a reserva?</summary>
             <p>
               A coordenação. Ela vê os pedidos em <strong>Aprovar Reservas</strong> e
-              escolhe entre aprovar e recusar. O professor acompanha o resultado em
-              <strong>Minhas Reservas</strong> e no calendário.
+              escolhe entre aprovar e recusar, com confirmação. O professor
+              acompanha o resultado em <strong>Minhas Reservas</strong> e no calendário.
+            </p>
+          </details>
+
+          <details>
+            <summary>Posso editar uma reserva depois de enviada?</summary>
+            <p>
+              Não. Não há edição de reserva. Se o plano mudar, cancele o pedido em
+              <strong>Minhas Reservas</strong> e faça uma nova solicitação.
             </p>
           </details>
 
@@ -832,21 +786,12 @@
           </details>
 
           <details>
-            <summary>O que significa “Indisponível”?</summary>
-            <p>
-              O recurso continua cadastrado, mas aparece com o selo
-              <strong>Indisponível</strong> e não pode ser selecionado para uma nova
-              reserva. Já o campo <strong>Aparece na reserva</strong> decide se ele
-              é listado nas telas de reserva.
-            </p>
-          </details>
-
-          <details>
             <summary>Esqueci minha senha. O que faço?</summary>
             <p>
-              Na tela de login, clique em <strong>Esqueci minha senha</strong> e informe
-              seu e-mail. O sistema gera um ID de redefinição; com esse ID, procure a
-              coordenação para redefinir a senha. Não existe autocadastro: as contas
+              Na tela de login, clique em <strong>Esqueci minha senha</strong>, informe
+              seu e-mail, a nova senha e a confirmação. Você recebe o número do pedido;
+              a nova senha só é aplicada depois que o coordenador aprovar em
+              <strong>Pedidos de Senha</strong>. Não existe autocadastro: as contas
               são criadas pelo coordenador em <strong>Usuários</strong>.
             </p>
           </details>
@@ -854,10 +799,9 @@
           <details>
             <summary>O que o coordenador gerencia?</summary>
             <p>
-              Reservas (aprovar ou recusar), recursos (salas, laboratórios e
-              gabinetes), usuários (professores e coordenadores), avisos,
-              calendário, notificações e configurações. O professor vê apenas as
-              próprias reservas; o coordenador vê todas.
+              Reservas (aprovar ou recusar), recursos, usuários, pedidos de troca de
+              senha, avisos, calendário, notificações e configurações. O professor
+              vê apenas as próprias reservas; o coordenador vê todas.
             </p>
           </details>
         </div>
@@ -870,14 +814,13 @@
     <section class="final">
       <div class="wrap">
         <span class="eyebrow eyebrow-light">Acesso ao sistema</span>
-        <h2>Pronto para reservar?</h2>
+        <h2>Já tem conta? Entre para reservar.</h2>
         <p>
-          Entre com seu e-mail e senha para solicitar uma sala, laboratório ou
-          gabinete — ou para aprovar os pedidos da coordenação.
+          O mesmo login serve para professor e coordenador. Contas e trocas de
+          senha são aprovadas pela coordenação.
         </p>
         <div class="cta cta-center">
           <a class="btn btn-light" href="/login">Entrar no sistema</a>
-          <a class="btn btn-outline-light" href="/esqueceu_senha">Esqueci minha senha</a>
         </div>
       </div>
     </section>
@@ -895,35 +838,34 @@
           </a>
           <p>
             Sistema de reserva de salas, laboratórios e gabinetes do SENAI.
-            Solicite, acompanhe e aprove em um só lugar.
+            Solicite, acompanhe e deixe a decisão com a coordenação.
           </p>
         </div>
 
         <div class="footer-col">
-          <h4>Sistema</h4>
+          <h4>Navegação</h4>
           <a href="#recursos">Recursos</a>
           <a href="#sistema">Módulos</a>
-          <a href="#gestao">Gestão</a>
-          <a href="#aprovacao">Aprovação</a>
+          <a href="#fluxo">Como funciona</a>
           <a href="#calendario">Calendário</a>
         </div>
 
         <div class="footer-col">
           <h4>Acesso</h4>
           <a href="/login">Entrar</a>
-          <a href="/esqueceu_senha">Esqueci minha senha</a>
           <a href="#faq">Dúvidas frequentes</a>
           <a href="#topo">Voltar ao topo</a>
         </div>
       </div>
 
       <div class="footer-bottom">
-        <span>© 2026 SENAI · Gestão de salas e equipamentos</span>
-        <span>Projeto de TCC · Desenvolvimento de Sistemas</span>
+        <!-- O ano é preenchido pelo landing.js para não ficar datado. -->
+        <span>Sistema demonstrativo · Projeto de TCC · SENAI</span>
+        <span>© <span data-ano-atual>2026</span> · Gestão de salas e equipamentos</span>
       </div>
     </div>
   </footer>
 
-  <script src="/js/landing.js?v=1" defer></script>
+  <script src="/js/landing.js?v=3" defer></script>
 </body>
 </html>
