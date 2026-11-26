@@ -580,7 +580,16 @@
         botao.type = 'button';
         botao.className = 'calendar-day';
         botao.dataset.iso = celula.iso;
-        botao.setAttribute('aria-label', rotuloAcessivel(celula.ano, celula.mes, celula.dia, reservas.length));
+
+        // O nome acessível começa pelo texto que aparece no botão
+        // (número do dia e, quando há, contador de reservas). Sem
+        // isso, o leitor de tela anunciava só a data por extenso e
+        // o nome não continha o que está visível na tela.
+        var textoVisivel = String(celula.dia) +
+          (reservas.length ? ' ' + reservas.length : '');
+
+        botao.setAttribute('aria-label', textoVisivel + ' — ' +
+          rotuloAcessivel(celula.ano, celula.mes, celula.dia, reservas.length));
 
         numero.textContent = celula.dia;
         botao.appendChild(numero);
@@ -598,7 +607,10 @@
 
           var contador = document.createElement('span');
           contador.className = 'calendar-day-count';
-          contador.textContent = reservas.length;
+          // O número é pintado por ::after. Assim ele continua visível
+          // sem virar um segundo texto dentro do botão — o leitor de
+          // tela já recebe a quantidade no aria-label completo.
+          contador.dataset.count = String(reservas.length);
           botao.appendChild(contador);
         }
 
