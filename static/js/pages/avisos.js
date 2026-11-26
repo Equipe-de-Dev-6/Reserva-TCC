@@ -3,17 +3,11 @@
 // ======================================================
 
 document.addEventListener('DOMContentLoaded', () => {
-// ======================================================
-  // DROPDOWN DO USUÁRIO
-  // ======================================================
-
-  // ======================================================
-  // MENU MOBILE
-  // ======================================================
 
   // ======================================================
   // ABRIR / FECHAR FORMULÁRIO DE NOVO AVISO
   // ======================================================
+  // Dropdown do perfil e menu mobile ficam em app.js (base.html).
   const btnCriarAviso = document.getElementById('btnCriarAviso');
   const avisoFormCard = document.getElementById('avisoFormCard');
   const avisoForm = document.getElementById('avisoForm');
@@ -131,12 +125,13 @@ document.addEventListener('DOMContentLoaded', () => {
       .replace(/'/g, '&#39;');
   }
 
-  // ======================================================
-  // BUSCA
-  // ======================================================
+  // A busca é feita pelo app.js global no campo #search-input; depois
+  // de redesenhar a lista, basta avisar que o conteúdo mudou.
+  const campoBusca = document.getElementById('search-input');
 
-
-
+  if (campoBusca && campoBusca.value.trim()) {
+    campoBusca.dispatchEvent(new Event('input'));
+  }
 
   // ======================================================
   // ATUALIZAÇÃO AUTOMÁTICA DA LISTA
