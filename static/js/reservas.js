@@ -149,23 +149,6 @@ const ReservasApp = (() => {
   }
 
 
-  // Um id pode chegar do banco como número (bigint do Postgres) ou dos
-  // atributos data-* das telas como texto. Comparar com === faz o botão
-  // "Cancelar Reserva" não encontrar a reserva, então toda comparação
-  // de id passa por aqui.
-  function _mesmoId(a, b) {
-
-    if (a === null || a === undefined || b === null || b === undefined) {
-
-      return false;
-
-    }
-
-    return String(a) === String(b);
-
-  }
-
-
   function _lerRascunho() {
 
     try {
@@ -484,7 +467,7 @@ const ReservasApp = (() => {
 
     _gravar(
       CHAVE_PENDENTES,
-      _pendentes().filter((r) => !_mesmoId(r.id, id))
+      _pendentes().filter((r) => r.id !== id)
     );
 
   }
@@ -572,9 +555,7 @@ const ReservasApp = (() => {
 
     }
 
-    const lista = getReservas().map(
-      (r) => (_mesmoId(r.id, id) ? nova : r)
-    );
+    const lista = getReservas().map((r) => (r.id === id ? nova : r));
 
     _salvarReservas(lista);
 
@@ -738,6 +719,11 @@ const ReservasApp = (() => {
 
         }
 
+        // Depois do aviso, volta para a tela "Reservar" do perfil. Sem
+        // isso a pessoa ficava na tela de "solicitação enviada com
+        // sucesso" de uma reserva que o servidor recusou.
+        _voltarParaReservar();
+
         return false;
 
       }
@@ -753,18 +739,38 @@ const ReservasApp = (() => {
   }
 
 
+  // Rota da tela "Reservar" do perfil logado. O servidor grava o
+  // destino na tela de confirmação (data-rota-reservar): o Coordenador
+  // volta para /reservar_admin e o Professor para /reservar.
+  function _voltarParaReservar() {
+
+    if (typeof document === 'undefined' || typeof window === 'undefined') {
+
+      return;
+
+    }
+
+    const marca = document.querySelector('[data-rota-reservar]');
+
+    const destino = (marca && marca.getAttribute('data-rota-reservar')) || '/reservar';
+
+    window.location.href = destino;
+
+  }
+
+
   // Remove da lista local a reserva que o servidor recusou, junto
   // com a notificação de "reserva criada" que já tinha sido gravada.
   function _descartarReservaRecusada(reserva) {
 
     _salvarReservas(
-      (reservas || []).filter((r) => !_mesmoId(r.id, reserva.id))
+      (reservas || []).filter((r) => r.id !== reserva.id)
     );
 
     _limparPendente(reserva.id);
 
     notificacoes = getNotificacoes().filter(
-      (n) => !(n.reserva && _mesmoId(n.reserva.id, reserva.id))
+      (n) => !(n.reserva && n.reserva.id === reserva.id)
     );
 
     _gravar(CHAVE_NOTIFICACOES, notificacoes);
@@ -789,7 +795,7 @@ const ReservasApp = (() => {
 
     const lista = getReservas();
 
-    const alvo = lista.find((r) => _mesmoId(r.id, id));
+    const alvo = lista.find((r) => r.id === id);
 
     if (!alvo || alvo.status === STATUS_CANCELADA) {
 
@@ -799,9 +805,7 @@ const ReservasApp = (() => {
 
     const atualizada = { ...alvo, status: status };
 
-    _salvarReservas(
-      lista.map((r) => (_mesmoId(r.id, id) ? atualizada : r))
-    );
+    _salvarReservas(lista.map((r) => (r.id === id ? atualizada : r)));
 
     _registrarNotificacao('cancelar', atualizada);
 
@@ -830,13 +834,13 @@ const ReservasApp = (() => {
 
     const lista = getReservas();
 
-    if (!lista.some((r) => _mesmoId(r.id, id))) {
+    if (!lista.some((r) => r.id === id)) {
 
       return false;
 
     }
 
-    _salvarReservas(lista.filter((r) => !_mesmoId(r.id, id)));
+    _salvarReservas(lista.filter((r) => r.id !== id));
 
     // Se a reserva nunca chegou ao banco, também sai da fila de
     // envio: ela não existe em lugar nenhum agora.
@@ -1049,7 +1053,7 @@ const ReservasApp = (() => {
 
   function deleteNotificacao(id) {
 
-    notificacoes = getNotificacoes().filter((n) => !_mesmoId(n.id, id));
+    notificacoes = getNotificacoes().filter((n) => n.id !== id);
 
     _gravar(CHAVE_NOTIFICACOES, notificacoes);
 
