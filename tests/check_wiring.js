@@ -41,7 +41,10 @@ for (const arq of varrerHtml('templates')) {
   console.log(`  ${arq}: pede ${pedidos.length} -> ${faltando.length ? 'FALTAM ' + faltando.join(', ') : 'tudo existe'}`);
   if (faltando.length) problemas++;
 }
-for (const arq of ['static/js/cadastro.js','static/js/salas.js']) {
+// A lista era fixa (cadastro.js e salas.js), então um módulo novo que
+// importasse uma função inexistente passava despercebido. Percorre todos
+// os módulos, inclusive os de static/js/pages.
+for (const arq of varrer('static/js')) {
   const src = fs.readFileSync(arq,'utf8');
   const m = src.match(/import\s*\{([^}]*)\}\s*from\s*['"][^'"]*api\.js['"]/);
   if (!m) continue;
