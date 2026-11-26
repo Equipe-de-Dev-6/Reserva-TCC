@@ -157,11 +157,11 @@ console.log('\n[5] Landing pública — conteúdo verídico e contrato de UI');
   const cssLanding = ler('static/css/landing.css');
   const jsLanding = ler('static/js/landing.js');
 
-  // A landing foi reescrita; v=3 força o navegador a buscar as
-  // versões novas de CSS e JS em vez de usar o cache antigo.
-  check('landing usa CSS e JS v=3',
-        /\/css\/landing\.css\?v=3/.test(landing) &&
-        /\/js\/landing\.js\?v=3/.test(landing));
+  // A revisão visual mudou CSS e JS; v=4 força o navegador a buscar
+  // as versões novas em vez de usar o cache da rodada anterior.
+  check('landing usa CSS e JS v=4',
+        /\/css\/landing\.css\?v=4/.test(landing) &&
+        /\/js\/landing\.js\?v=4/.test(landing));
 
   // Prévia de tela: tem que estar identificada como ilustração e
   // não pode simular um domínio público que não existe.
@@ -252,6 +252,38 @@ console.log('\n[5] Landing pública — conteúdo verídico e contrato de UI');
         /menuAberto\(\) && window\.scrollY > 8/.test(jsLanding));
   check('botão de tema mantém nome acessível estável',
         !/botaoTema\.setAttribute\(['"]aria-label/.test(jsLanding));
+
+  // Revisão visual: o Lighthouse apontou dois problemas que não
+  // aparecem só lendo o HTML — hierarquia de títulos e nome
+  // acessível diferente do texto visível.
+  check('rodapé não pula de h2 para h4',
+        !/<h4>/.test(landing) &&
+        /<h3>Navegação<\/h3>/.test(landing) &&
+        /<h3>Acesso<\/h3>/.test(landing));
+  const cabecalho = landing.slice(landing.indexOf('<header'), landing.indexOf('</header>'));
+  const logoCabecalho = cabecalho.match(/<a class="brand" href="\/"[^>]*>/) || [''];
+  check('logo do cabeçalho usa o próprio texto como nome acessível',
+        /<a class="brand" href="\/">/.test(cabecalho) &&
+        !/aria-label/.test(logoCabecalho[0]));
+  check('rótulo do dia nomeia semana e quantidade',
+        /var textoVisivel = String\(celula\.dia\)/.test(jsLanding) &&
+        /textoVisivel \+ ' — ' \+/.test(jsLanding));
+  check('contador do calendário é visual, não texto duplicado',
+        /contador\.dataset\.count = String\(reservas\.length\)/.test(jsLanding) &&
+        !/contador\.textContent/.test(jsLanding) &&
+        /\.calendar-day-count::after\s*\{\s*content:\s*attr\(data-count\)/.test(cssLanding));
+
+  // Decoração que atrapalha no celular e ajustes de tema.
+  check('prévia decorativa some no celular',
+        /@media \(max-width: 640px\)[\s\S]*?\.hero-visual\s*\{\s*display:\s*none/.test(cssLanding));
+  check('logo da prévia tem fundo branco',
+        /\.mock-logo\s*\{[\s\S]*?background:\s*#fff/.test(cssLanding));
+  const blocoTablet = cssLanding.slice(
+    cssLanding.indexOf('@media (max-width: 1024px)'),
+    cssLanding.indexOf('@media (max-width: 820px)'));
+  check('módulos não colapsam no tablet',
+        /@media \(max-width: 640px\)[\s\S]*?\.module-list\s*\{\s*grid-template-columns:\s*1fr/.test(cssLanding) &&
+        !/\.module-list\s*\{\s*grid-template-columns:\s*1fr/.test(blocoTablet));
 }
 
 console.log(`\n${ok} passaram, ${falhas} falharam`);
