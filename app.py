@@ -1807,6 +1807,33 @@ def criar_reserva(reserva: Reserva, request: Request):
             detail="Não foi possível registrar a reserva"
         )
 
+    # Avisa os coordenadores de que há uma nova solicitação de reserva.
+    # O professor que fez o pedido não recebe notificação para si mesmo.
+    try:
+        coordenadores = (
+            supabase
+            .table('usuarios')
+            .select('id')
+            .eq('cargo', CARGO_COORDENADOR)
+            .execute()
+        )
+        item = reserva.item or 'recurso'
+        data_txt = reserva.data
+        hora_txt = reserva.horaEntrada
+        for coord in (coordenadores.data or []):
+            if coord.get('id') == usuario['id']:
+                continue
+            _criar_notificacao(
+                coord.get('id'),
+                'Nova solicitação de reserva',
+                (
+                    f'{reserva.professor or "Professor"} solicitou reserva de '
+                    f'{item} em {data_txt} às {hora_txt}.'
+                )
+            )
+    except Exception:  # noqa: BLE001
+        pass
+
     return reserva_para_json(resposta.data[0])
 
 
@@ -1898,7 +1925,32 @@ def decidir_reserva(
             detail="Reserva não encontrada"
         )
 
-    return reserva_para_json(resposta.data[0])
+    # Quando o Coordenador aprova ou recusa, avisa o professor dono da
+    # reserva. Cancelamento feito pelo próprio professor não gera aviso.
+    reserva_atualizada = resposta.data[0]
+    if (
+        eh_coordenador(request)
+        and decisao in (STATUS_APROVADA, STATUS_NEGADA)
+    ):
+        professor_id = reserva_atualizada.get('usuario_id')
+        if professor_id is not None and professor_id != usuario['id']:
+            item = reserva_atualizada.get('item') or 'recurso'
+            inicio = str(reserva_atualizada.get('data_inicio') or '')
+            data_txt = inicio[:10]
+            hora_txt = inicio[11:16]
+            if decisao == STATUS_APROVADA:
+                titulo = 'Reserva aprovada'
+                verbo = 'aprovada'
+            else:
+                titulo = 'Reserva recusada'
+                verbo = 'recusada'
+            _criar_notificacao(
+                professor_id,
+                titulo,
+                f'Sua reserva de {item} em {data_txt} às {hora_txt} foi {verbo} pelo coordenador.'
+            )
+
+    return reserva_para_json(reserva_atualizada)
 
 
 # ============================================================
@@ -2182,6 +2234,29 @@ def excluir_aviso(aviso_id: int, request: Request):
 # ============================================================
 # NOTIFICACOES
 # ============================================================
+
+
+def _criar_notificacao(usuario_id, titulo, mensagem):
+    """Grava uma notificação interna para o usuário informado.
+
+    Usada pelos fluxos de reserva: o professor cria uma reserva (avisa o
+    coordenador) e o coordenador decide (avisa o professor). Passa pelo
+    banco direto, sem o limite de taxa da rota pública, porque é uma
+    consequência de uma ação legítima e não um envio manual.
+    """
+    if usuario_id is None:
+        return
+
+    try:
+        supabase.table('notificacoes').insert({
+            'usuario_id': usuario_id,
+            'titulo': str(titulo)[:200],
+            'mensagem': str(mensagem)[:1000],
+        }).execute()
+    except Exception:  # noqa: BLE001
+        # Notificação é efeito colateral: não pode derrubar a reserva.
+        return
+
 
 @app.get('/api/notificacoes')
 def listar_notificacoes(request: Request):

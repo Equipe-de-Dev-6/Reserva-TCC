@@ -476,7 +476,7 @@ def main():
     r = c.post("/reservas", json=dados)
     check("cria a reserva", r.status_code == 201, r.text)
 
-    insert = banco.registros[-1]
+    insert = [r for r in banco.registros if r["operacao"] == "insert" and r["tabela"] == "reservas"][-1]
     check("dono vem da sessão", insert["dados"]["usuario_id"] == 10, str(insert["dados"]))
     check("nascendo como aguardando", insert["dados"]["status"] == "aguardando")
     check("sala_id gravado", insert["dados"].get("sala_id") == 1, str(insert["dados"].get("sala_id")))
@@ -487,7 +487,7 @@ def main():
     banco.respostas.append([{**RESERVA, "sala_id": None}])
     r = c.post("/reservas", json={**dados, "salaId": None, "item": "Gabinete de Notebook - A"})
     check("reserva sem sala cadastrada funciona", r.status_code == 201, r.text)
-    check("sala_id fica fora do insert", "sala_id" not in banco.registros[-1]["dados"])
+    check("sala_id fica fora do insert", "sala_id" not in [r for r in banco.registros if r["operacao"] == "insert" and r["tabela"] == "reservas"][-1]["dados"])
 
     # SalaId que não existe: só a busca da sala acontece.
     banco.respostas.clear()
