@@ -1,353 +1,260 @@
 /* ============================================================
  * Estilo de reservasprof.css.
- *
- * O esqueleto comum a todas as telas com menu esta em
- * base.css; aqui fica so o que e desta tela.
  * ============================================================ */
 
-  .nav-item {
-  transition: all 0.2s;
-  }
+.reserva-card {
+  background: #ffffff;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 20px;
+  box-shadow: var(--shadow-sm);
+}
 
-  .btn-logout {
-  transition: 0.2s;
-  }
-
-  .sidebar-overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(17, 24, 39, 0.45);
-  z-index: 150;
-  }
-
-  /* Tamanho e borda ficam no base.css (42px); aqui so o que ele nao define. */
-  .menu-toggle {
-  align-items: center;
-  justify-content: center;
-  color: var(--text-dark);
-  flex-shrink: 0;
-  }
-
-  .reservas-section {
-  display: flex;
-  flex-direction: column;
-  flex: 1;
-  min-height: 0;
-  }
-
-  .reservas-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 12px;
-  margin-bottom: 16px;
-  }
-
-  .reservas-header h2 {
-  font-size: 16px;
+.reserva-card h3 {
+  margin: 0 0 10px;
+  font-size: 18px;
   font-weight: 700;
-  }
+}
 
-  .filter-tabs {
+.reserva-card p {
+  margin: 0 0 12px;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.reserva-card .chip {
+  padding: 3px 8px;
+  font-size: 10px;
+}
+
+.reserva-card .chip-row {
+  margin-top: 10px;
+}
+
+.reserva-card .chip-row .chip:not(:last-child) {
+  margin-right: 6px;
+}
+
+.filter-tabs {
   display: flex;
-  gap: 6px;
-  background-color: var(--white);
-  border: 1px solid var(--border-color);
-  border-radius: 10px;
-  padding: 4px;
-  }
+  gap: 8px;
+  margin-bottom: 16px;
+  overflow-x: auto;
+}
 
-  .filter-tab {
-  border: none;
-  background: transparent;
-  padding: 7px 14px;
-  border-radius: 8px;
+.filter-tab {
+  padding: 8px 16px;
+  border: 1px solid var(--line);
+  border-radius: 20px;
   font-size: 12px;
   font-weight: 600;
-  color: var(--text-gray);
+  color: var(--muted);
   cursor: pointer;
-  transition: 0.2s;
-  white-space: nowrap;
-  }
+  transition: all 0.2s;
+}
 
-  .filter-tab:hover {
-  color: var(--text-dark);
-  }
+.filter-tab.active {
+  background: var(--accent-soft);
+  color: var(--accent);
+  border-color: var(--accent);
+}
 
-  .filter-tab.active {
-  background-color: var(--senai-red);
-  color: var(--white);
-  }
+.reserva-list {
+  display: grid;
+  gap: 16px;
+}
 
-  .reservas-list {
-  display: flex;
-  flex-direction: column;
+.reserva-item {
+  display: grid;
+  grid-template-columns: 1fr auto;
   gap: 12px;
-  padding-bottom: 12px;
-  }
-
-  .reserva-card {
-  background-color: var(--white);
-  border: 1px solid var(--border-color);
-  border-radius: 12px;
-  padding: 16px 20px;
-  display: flex;
-  flex-direction: row;
   align-items: center;
-  justify-content: space-between;
-  gap: 16px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
-  animation: fadeInUp 0.25s ease;
-  }
+  padding: 16px 0;
+  border-bottom: 1px solid var(--line);
+}
 
-  from {
-  opacity: 0;
-  transform: translateY(8px);
-  }
+.reserva-item:last-child {
+  border-bottom: 0;
+}
 
-  to {
-  opacity: 1;
-  transform: translateY(0);
-  }
-
-  .reserva-left {
+.reserva-left {
   display: flex;
   align-items: center;
-  gap: 16px;
-  min-width: 0;
-  flex: 1;
-  }
+  gap: 8px;
+}
 
-  .reserva-icon {
-  flex-shrink: 0;
-  width: 48px;
-  height: 48px;
-  background-color: var(--senai-red);
-  border-radius: 10px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  }
-
-  .reserva-icon img {
-  width: 24px;
-  height: 24px;
-  object-fit: contain;
-  filter: brightness(0) invert(1);
-  }
-
-  /* O icone de sala e mais detalhado que os de laboratorio e gabinete:
-     em 24px ele fica apagado no fundo vermelho. */
-  .reserva-icon img[src*="classroom.png"] {
-  width: 30px;
-  height: 30px;
-  }
-
-  .reserva-info {
-  min-width: 0;
-  flex: 1;
-  }
-
-  .reserva-info h4 {
-  font-size: 14px;
-  font-weight: 700;
-  margin: 0 0 4px 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  max-width: 100%;
-  }
-
-  .reserva-info p {
-  font-size: 12px;
-  color: var(--text-gray);
-  line-height: 1.4;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  max-width: 100%;
-  margin: 0;
-  }
-
-  .reserva-info .reserva-meta {
-  display: flex;
-  gap: 10px;
-  flex-wrap: wrap;
-  margin-top: 6px;
-  font-size: 11px;
-  color: var(--text-gray);
-  }
-
-  .reserva-comentario {
-  margin-top: 8px;
-  padding: 8px 12px;
-  background-color: #F3F4F6;
+.reserva-icon {
+  width: 32px;
+  height: 32px;
   border-radius: 8px;
-  font-size: 12px;
-  color: var(--text-dark);
-  }
+  background: var(--accent-soft);
+  display: grid;
+  place-items: center;
+}
 
-  .reserva-comentario-label {
-  font-weight: 700;
-  color: var(--text-secondary, #6b7280);
-  margin-right: 6px;
-  font-size: 11px;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  }
+.reserva-icon img {
+  width: 20px;
+  height: 20px;
+}
 
-  .reserva-right {
+.reserva-right {
+  flex: 1;
+}
+
+.reserva-status {
   display: flex;
-  align-items: center;
-  gap: 10px;
-  flex-shrink: 0;
-  }
-
-  .badge-green, .badge-yellow, .badge-red {
-  padding: 5px 10px;
-  border-radius: 12px;
+  gap: 6px;
   font-size: 11px;
-  font-weight: 700;
-  white-space: nowrap;
-  display: inline-flex;
-  align-items: center;
-  }
+  font-weight: 600;
+}
 
-  .badge-green {
-  background-color: var(--green-bg);
+.reserva-status.aprovada {
   color: var(--green-text);
-  }
+}
 
-  .badge-yellow {
-  background-color: var(--yellow-bg);
+.reserva-status.recusada {
+  color: var(--danger-text);
+}
+
+.reserva-status.aguardando {
   color: var(--yellow-text);
-  }
+}
 
-  .badge-red {
-  background-color: var(--red-bg);
-  color: var(--red-text);
-  }
-
-  .btn-cancelar-reserva {
-  border: 1px solid var(--red-text);
-  background-color: var(--white);
-  color: var(--red-text);
-  font-size: 12px;
-  font-weight: 700;
-  padding: 7px 14px;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: 0.2s;
-  white-space: nowrap;
-  }
-
-  .btn-cancelar-reserva:hover {
-  background-color: var(--red-text);
-  color: var(--white);
-  }
-
-  .btn-excluir-reserva {
-  border: 1px solid #d1d5db;
-  background-color: var(--white);
-  color: #374151;
-  font-size: 12px;
-  font-weight: 700;
-  padding: 7px 14px;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: 0.2s;
-  white-space: nowrap;
-  }
-
-  .btn-excluir-reserva:hover {
-  background-color: #374151;
-  border-color: #374151;
-  color: var(--white);
-  }
-
-  .reservas-empty {
-  background-color: var(--white);
-  border: 1px dashed var(--border-color);
-  border-radius: 12px;
-  padding: 48px 24px;
-  text-align: center;
-  color: var(--text-gray);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 14px;
-  }
-
-  .reservas-empty img {
-  width: 56px;
-  opacity: 0.6;
-  }
-
-  .reservas-empty p {
-  font-size: 14px;
-  max-width: 320px;
-  }
-
-  .reservas-empty .btn-nova-reserva {
-  background-color: var(--senai-red);
-  color: var(--white);
-  padding: 10px 20px;
-  border-radius: 8px;
-  font-size: 13px;
-  font-weight: 700;
-  transition: 0.2s;
-  }
-
-  .reservas-empty .btn-nova-reserva:hover {
-  background-color: #CC0000;
-  }
-
-@media (max-width: 600px) {
+.greeting {
+  margin-bottom: 24px;
+}
 
 .greeting h1 {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 800;
+}
+
+.greeting p {
+  margin: 8px 0 0;
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  background: var(--accent-soft);
+  display: grid;
+  place-items: center;
+}
+
+.avatar img {
+  width: 32px;
+  height: 32px;
+}
+
+.reserva-empty {
+  text-align: center;
+  padding: 40px 20px;
+  color: var(--muted);
+}
+
+.reserva-empty .icon {
+  width: 64px;
+  height: 64px;
+  margin: 0 auto 16px;
+  background: var(--surface-2);
+  border-radius: 16px;
+  display: grid;
+  place-items: center;
+}
+
+.reserva-empty .icon svg {
+  width: 32px;
+  height: 32px;
+  color: var(--muted-2);
+}
+
+.reserva-empty p {
+  font-size: 14px;
+}
+
+@media (max-width: 1024px) {
+
+  .greeting h1 {
   font-size: 20px;
   }
 
-.greeting p {
+  .filter-tab {
+  padding: 6px 12px;
+  font-size: 11px;
+  }
+}
+
+@media (max-width: 860px) {
+
+  .greeting h1 {
+  font-size: 18px;
+  }
+
+  .reserva-item {
+  grid-template-columns: 1fr;
+  }
+
+  .reserva-left {
+  flex-direction: column;
+  align-items: flex-start;
+  }
+
+  .reserva-icon {
+  margin-bottom: 8px;
+  }
+}
+
+@media (max-width: 600px) {
+
+  .greeting h1 {
+  font-size: 16px;
+  }
+
+  .greeting p {
   font-size: 12px;
   }
 
-.avatar {
+  .avatar {
   width: 40px;
   height: 40px;
   }
 
-.reservas-header h2 {
-  font-size: 14px;
+  .reserva-card .chip-row .chip:not(:last-child) {
+  margin-right: 0;
+  margin-bottom: 6px;
+  display: block;
   }
 
-.filter-tabs {
-  width: 100%;
-  overflow-x: auto;
+  .reserva-status {
+  font-size: 10px;
   }
 
-.reserva-card {
-  flex-wrap: wrap;
+  .reserva-empty .icon {
+  width: 48px;
+  height: 48px;
   }
 
-.reserva-right {
-  width: 100%;
-  justify-content: space-between;
+  .reserva-empty .icon svg {
+  width: 24px;
+  height: 24px;
   }
 
-.reserva-info h4, .reserva-info p {
-  white-space: normal;
+  .reserva-empty p {
+  font-size: 13px;
   }
 }
 
 @media (max-width: 380px) {
 
-.greeting h1 {
-  font-size: 18px;
+  .greeting h1 {
+  font-size: 15px;
   }
 
-.user-dropdown {
-  width: 160px;
+  .user-dropdown {
+  width: 140px;
   }
 }

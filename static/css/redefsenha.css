@@ -99,6 +99,49 @@
   margin: 0;
   }
 
+@media (max-width: 1024px) {
+  .form-container h2 {
+  font-size: 20px;
+  }
+
+  .input-container {
+  height: 56px;
+  padding: 0 20px;
+  gap: 12px;
+  }
+
+  .input-container input {
+  font-size: 15px;
+  }
+
+  button[type="submit"] {
+  min-height: 56px;
+  padding: 16px 16px;
+  font-size: 16px;
+  }
+}
+
+@media (max-width: 860px) {
+  .form-container h2 {
+  font-size: 18px;
+  }
+
+  .input-container {
+  padding: 0 16px;
+  gap: 8px;
+  }
+
+  .input-container input {
+  font-size: 14px;
+  }
+
+  button[type="submit"] {
+  min-height: 52px;
+  padding: 12px 12px;
+  font-size: 14px;
+  }
+}
+
 @media (max-width: 600px) {
   .form-container h2 {
   font-size: 16px;
@@ -114,18 +157,9 @@
   font-size: 13px;
   }
 
-  .links p {
-  font-size: 12px;
-  font-weight: 600;
-  }
-
-  .divider {
-  font-size: 13px;
-  font-weight: 700;
-  margin: 16px 0;
-  }
-
-  .divider::before, .divider::after {
-  height: 2px;
+  button[type="submit"] {
+  min-height: 52px;
+  padding: 14px 14px;
+  font-size: 15px;
   }
 }

@@ -309,6 +309,13 @@
   max-width: 320px;
   }
 
+@media (max-width: 1024px) {
+
+.form-row {
+  grid-template-columns: 1fr;
+  }
+}
+
 @media (max-width: 860px) {
 
 .form-row {
