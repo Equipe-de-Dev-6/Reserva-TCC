@@ -151,5 +151,140 @@ console.log('\n[4] Fluxos corrigidos');
         !/href="\/home"/.test(confirmacao));
 }
 
+console.log('\n[5] Landing pública — conteúdo verídico e contrato de UI');
+{
+  const landing = ler('templates/landing.html');
+  const cssLanding = ler('static/css/landing.css');
+  const jsLanding = ler('static/js/landing.js');
+
+  // A revisão visual mudou CSS e JS; v=4 força o navegador a buscar
+  // as versões novas em vez de usar o cache da rodada anterior.
+  check('landing usa CSS e JS v=4',
+        /\/css\/landing\.css\?v=4/.test(landing) &&
+        /\/js\/landing\.js\?v=4/.test(landing));
+
+  // Prévia de tela: tem que estar identificada como ilustração e
+  // não pode simular um domínio público que não existe.
+  check('prévia marcada como ilustração', /Ilustração · dados fictícios/.test(landing));
+  check('URL da prévia é local',
+        /localhost:8000\/home/.test(landing) && !/reserva\.senai\.br/.test(landing));
+
+  // Classes removidas na reescrita: contadores falsos, cards
+  // flutuantes e abas que não existiam no sistema real.
+  const classesMortas = [
+    'hero-stats', 'hero-bullets', 'float-card', 'btn-mini',
+    'field-grid', 'demo-enter', 'notice-demo-date', 'panel-tab'
+  ];
+  const classesAindaUsadas = classesMortas.filter((c) =>
+    new RegExp('class="[^"]*\\b' + c + '\\b').test(landing));
+  check('sem elementos decorativos removidos', classesAindaUsadas.length === 0,
+        classesAindaUsadas.join(', '));
+
+  // Afirmações que contradizem o sistema: edição de reserva não
+  // existe, decisão passa por confirmação e não há "somente leitura".
+  check('FAQ esclarece que não há edição',
+        !/\bEditar reserva\b/i.test(landing) && /Não há edição de reserva/.test(landing));
+  check('sem aprovação "em um clique"', !/em um clique/i.test(landing));
+  check('sem estado "somente leitura"', !/somente leitura/i.test(landing));
+  check('sem preferências que não persistem',
+        !/preferências de notificação/i.test(landing));
+  check('sem CTA de senha duplicado',
+        !/href="\/redefinir_senha"/.test(landing) && !/href="[^"]*esqueci/i.test(landing));
+  check('sem detalhe técnico de hash no FAQ', !/<strong>hash<\/strong>/i.test(landing));
+  check('fila de aprovação com duas pendências',
+        /badge badge-yellow">2 pendentes/.test(landing) && !/3 pendentes/.test(landing));
+
+  // O calendário de exemplo não pode parecer dado real.
+  check('calendário avisa que é exemplo',
+        /Exemplo ilustrativo — não são reservas reais/.test(landing) &&
+        /Dados de exemplo/.test(landing));
+  check('escopo real das reservas está descrito',
+        /coordenação vê todas/i.test(landing) &&
+        /próprias reservas/i.test(landing));
+
+  // Uma única região viva evita que leitores de tela anunciem a
+  // lista inteira duas vezes a cada seleção de dia.
+  const regioesVivas = (landing.match(/aria-live=/g) || []).length;
+  check('uma única região aria-live', regioesVivas === 1, String(regioesVivas));
+  check('aria-live só no subtítulo do dia',
+        /id="demoDaySubtitle"[^>]*aria-live="polite"/.test(landing));
+
+  // CSS: classes novas precisam existir e as mortas precisam sair,
+  // senão a folha continua grande e com regras que nunca aplicam.
+  const classesNovasCss = ['.mock-badge', '.demo-aviso', '.demo-tag',
+                           '.panel-label', '.panel-estado', '.panel-content'];
+  const faltandoCss = classesNovasCss.filter((c) => !cssLanding.includes(c));
+  check('CSS cobre as classes novas', faltandoCss.length === 0, faltandoCss.join(', '));
+
+  const seletoresMortosCss = ['.hero-stats', '.hero-bullets', '.float-card',
+                              '.btn-mini', '.field-grid', '.demo-enter',
+                              '.notice-demo-date'];
+  const seletoresAindaNoCss = seletoresMortosCss.filter((c) => cssLanding.includes(c));
+  check('CSS sem seletores mortos', seletoresAindaNoCss.length === 0,
+        seletoresAindaNoCss.join(', '));
+
+  // JS e CSS têm que concordar no breakpoint do menu mobile.
+  check('menu usa o mesmo limite do CSS',
+        /@media \(max-width: 1024px\)/.test(cssLanding) &&
+        /LIMITE_MOBILE = 1024/.test(jsLanding));
+
+  // Calendário acessível: aria-current no dia selecionado, setas
+  // para navegar e rótulo com dia da semana e quantidade.
+  check('calendário não usa aria-pressed',
+        !/botao\.setAttribute\(['"]aria-pressed/.test(jsLanding));
+  check('dia selecionado usa aria-current',
+        /setAttribute\(['"]aria-current['"],\s*['"]date/.test(jsLanding));
+  check('matriz do calendário é variável',
+        !/i < 42/.test(jsLanding) &&
+        /Math\.ceil\(\(primeiro\.getDay\(\) \+ diasNoMes/.test(jsLanding));
+  check('rótulo do dia traz semana e quantidade',
+        /DIAS_SEMANA\[dataLocal/.test(jsLanding) && / reservas?/.test(jsLanding));
+  check('setas e Home/End navegam pelo calendário',
+        /ArrowLeft/.test(jsLanding) && /ArrowRight/.test(jsLanding) &&
+        /'Home'/.test(jsLanding) && /'End'/.test(jsLanding));
+
+  // O painel real não mostra professor; o menu devolve o foco ao
+  // destino da âncora e o botão de tema mantém nome estável.
+  check('exemplos do calendário sem professor',
+        !/professor:/.test(jsLanding) && !/Prof\. /.test(jsLanding));
+  check('menu devolve foco ao destino da âncora', /focarDestino\(/.test(jsLanding));
+  check('menu fecha ao rolar',
+        /menuAberto\(\) && window\.scrollY > 8/.test(jsLanding));
+  check('botão de tema mantém nome acessível estável',
+        !/botaoTema\.setAttribute\(['"]aria-label/.test(jsLanding));
+
+  // Revisão visual: o Lighthouse apontou dois problemas que não
+  // aparecem só lendo o HTML — hierarquia de títulos e nome
+  // acessível diferente do texto visível.
+  check('rodapé não pula de h2 para h4',
+        !/<h4>/.test(landing) &&
+        /<h3>Navegação<\/h3>/.test(landing) &&
+        /<h3>Acesso<\/h3>/.test(landing));
+  const cabecalho = landing.slice(landing.indexOf('<header'), landing.indexOf('</header>'));
+  const logoCabecalho = cabecalho.match(/<a class="brand" href="\/"[^>]*>/) || [''];
+  check('logo do cabeçalho usa o próprio texto como nome acessível',
+        /<a class="brand" href="\/">/.test(cabecalho) &&
+        !/aria-label/.test(logoCabecalho[0]));
+  check('rótulo do dia nomeia semana e quantidade',
+        /var textoVisivel = String\(celula\.dia\)/.test(jsLanding) &&
+        /textoVisivel \+ ' — ' \+/.test(jsLanding));
+  check('contador do calendário é visual, não texto duplicado',
+        /contador\.dataset\.count = String\(reservas\.length\)/.test(jsLanding) &&
+        !/contador\.textContent/.test(jsLanding) &&
+        /\.calendar-day-count::after\s*\{\s*content:\s*attr\(data-count\)/.test(cssLanding));
+
+  // Decoração que atrapalha no celular e ajustes de tema.
+  check('prévia decorativa some no celular',
+        /@media \(max-width: 640px\)[\s\S]*?\.hero-visual\s*\{\s*display:\s*none/.test(cssLanding));
+  check('logo da prévia tem fundo branco',
+        /\.mock-logo\s*\{[\s\S]*?background:\s*#fff/.test(cssLanding));
+  const blocoTablet = cssLanding.slice(
+    cssLanding.indexOf('@media (max-width: 1024px)'),
+    cssLanding.indexOf('@media (max-width: 820px)'));
+  check('módulos não colapsam no tablet',
+        /@media \(max-width: 640px\)[\s\S]*?\.module-list\s*\{\s*grid-template-columns:\s*1fr/.test(cssLanding) &&
+        !/\.module-list\s*\{\s*grid-template-columns:\s*1fr/.test(blocoTablet));
+}
+
 console.log(`\n${ok} passaram, ${falhas} falharam`);
 process.exit(falhas === 0 ? 0 : 1);

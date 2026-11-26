@@ -6,7 +6,10 @@
    ativação imediata e clique em notificações.
 
    Pedido de permissão e aviso de instalação ficam em
-   /js/notificacoes-push.js, que roda na página.
+   /js/notificacoes-push.js, que roda na página. O código
+   removido daqui chamava Notification.requestPermission e
+   atribuía um handler direto na notificação dentro do worker,
+   o que quebrava o registro do listener de clique.
    ========================================================= */
 
 self.addEventListener('install', () => {
@@ -19,59 +22,28 @@ self.addEventListener('activate', (event) => {
   event.waitUntil(self.clients.claim());
 });
 
-// Verificar se o navegador suporta Service Worker e PWA
-const isPWA = self.matchMedia ? self.matchMedia('(display-mode: standalone)').matches : false;
-
-// Mostrar notificação de instalação se não for PWA
-function showInstallNotification() {
-  if (!('serviceWorker' in self)) return;
-
-  // Verificar se já está instalado como PWA
-  if (isPWA) return;
-
-  // Não guardamos em localStorage para que a notificação
-  // sempre apareça para usuários que ainda não instalaram
-
-  // Solicitar permissão e mostrar notificação
-  self.registration.ready.then((registration) => {
-    Notification.requestPermission().then((permission) => {
-      if (permission === 'granted') {
-        const notification = registration.showNotification(
-          'Reserva SENAI',
-          {
-            body: 'Instale o aplicativo para ter acesso rápido na tela inicial',
-            icon: '/static/assets/img/logo-pwa.png',
-            badge: '/static/assets/img/logo-pwa.png',
-            vibrate: [200, 100, 200],
-            data: {
-              url: '/home'
-            }
-          }
-        );
-
-        // Quando o usuário clicar na notificação
-        notification.onclick = (event) => {
-          event.notification.close();
-          event.waitUntil(
-            clients.openWindow(notification.data.url)
-          );
-        };
-      }
-    });
-  });
-}
-
-// Executar quando o service worker ativar
-if ('serviceWorker' in self) {
-  // Aguarda o controle dos clientes antes de mostrar a notificação
-  self.clients.matchAll().then(() => {
-    showInstallNotification();
-  });
-}
-
 self.addEventListener('notificationclick', (event) => {
   event.notification.close();
+
+  // A URL vem dos dados da notificação criada na página. Se não
+  // houver, a home do perfil é um destino seguro.
+  const destino =
+    (event.notification.data && event.notification.data.url) || '/home';
+
   event.waitUntil(
-    clients.openWindow(event.notification.data.url || '/home')
+    self.clients
+      .matchAll({ type: 'window', includeUncontrolled: true })
+      .then((janelas) => {
+        // Reaproveita uma aba já aberta em vez de abrir outra.
+        for (const janela of janelas) {
+          if ('focus' in janela) {
+            if ('navigate' in janela) {
+              return janela.navigate(destino).then((alvo) => (alvo || janela).focus());
+            }
+            return janela.focus();
+          }
+        }
+        return self.clients.openWindow(destino);
+      })
   );
 });

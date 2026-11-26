@@ -1,31 +1,34 @@
 /* ============================================================
- * landing.js
+ * landing.js — comportamentos da página pública
  *
- * Comportamentos da página pública (landing page):
+ *  1. tema claro/escuro (gravado em localStorage);
+ *  2. menu do celular, com foco e fechamento previsíveis;
+ *  3. sombra do cabeçalho ao rolar;
+ *  4. datas relativas nos cards de exemplo;
+ *  5. calendário reduzido do mockup do hero;
+ *  6. calendário de exemplo da seção "Calendário".
  *
- *   1. tema claro/escuro (gravado em localStorage)
- *   2. menu do celular
- *   3. sombra do cabeçalho ao rolar
- *   4. calendário reduzido do mockup do hero
- *   5. calendário de exemplo da seção "Calendário"
- *   6. datas futuras nos cards de exemplo
- *
- * A página não carrega o app.js nem o reservas.js do sistema:
- * ela é pública, sem sessão e sem menu lateral. Por isso este
- * arquivo é independente e usa apenas DOM e Intl.
+ * A landing não carrega app.js nem os módulos do sistema: é uma
+ * página pública, sem sessão. Toda a interação é feita só com DOM,
+ * sem bibliotecas. Os dados do calendário são fictícios e estão
+ * identificados como tal no HTML.
  * ============================================================ */
 
 (function () {
   'use strict';
 
   var CHAVE_TEMA = 'reserva-tema';
+  var LIMITE_MOBILE = 1024;
 
   var MESES = [
     'Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
     'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'
   ];
 
-  var DIAS_SEMANA = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
+  var DIAS_SEMANA = [
+    'Domingo', 'Segunda-feira', 'Terça-feira', 'Quarta-feira',
+    'Quinta-feira', 'Sexta-feira', 'Sábado'
+  ];
 
   var STATUS = {
     aprovada: { rotulo: 'Aprovada', classe: 'badge-green' },
@@ -47,8 +50,8 @@
   }
 
   function dataLocal(ano, mes, dia) {
-    // Meio-dia evita que o fuso horário empurre a data para o dia
-    // anterior ou seguinte quando o horário de verão muda.
+    // Meio-dia evita que mudanças de fuso empurrem a data para o
+    // dia anterior ou seguinte.
     return new Date(ano, mes, dia, 12, 0, 0);
   }
 
@@ -59,12 +62,13 @@
       month: 'short'
     });
 
-    // "qua., 18 de nov." -> "Qua., 18 de nov."
     return texto.charAt(0).toUpperCase() + texto.slice(1);
   }
 
   function formatarDataLonga(ano, mes, dia) {
-    return dia + ' de ' + MESES[mes] + ' de ' + ano;
+    // Mês minúsculo em texto corrido; MESES mantém a inicial
+    // maiúscula apenas para os títulos "Novembro 2026".
+    return dia + ' de ' + MESES[mes].toLowerCase() + ' de ' + ano;
   }
 
   function diasNoMes(ano, mes) {
@@ -72,17 +76,19 @@
   }
 
   /**
-   * Matriz de 6 semanas começando no domingo. Cada célula sabe a
-   * que mês pertence, para o calendário poder navegar ao clicar
-   * em um dia das bordas.
+   * Matriz começando no domingo. O número de semanas é calculado:
+   * fevereiro que começa no domingo usa 4 semanas, outros meses
+   * usam 5 ou 6. A grade fixa de 42 células criava linhas vazias
+   * e atrapalhava a navegação por teclado no fim do mês.
    */
   function construirMatriz(ano, mes) {
-    var primeiro = new Date(ano, mes, 1, 12, 0, 0);
-    var inicio = new Date(ano, mes, 1 - primeiro.getDay(), 12, 0, 0);
+    var primeiro = dataLocal(ano, mes, 1);
+    var inicio = dataLocal(ano, mes, 1 - primeiro.getDay());
+    var total = Math.ceil((primeiro.getDay() + diasNoMes(ano, mes)) / 7) * 7;
     var celulas = [];
 
-    for (var i = 0; i < 42; i += 1) {
-      var data = new Date(inicio.getFullYear(), inicio.getMonth(), inicio.getDate() + i, 12, 0, 0);
+    for (var i = 0; i < total; i += 1) {
+      var data = dataLocal(inicio.getFullYear(), inicio.getMonth(), inicio.getDate() + i);
 
       celulas.push({
         data: data,
@@ -123,13 +129,17 @@
 
   function aplicarTema(tema, persistir) {
     var escuro = tema === 'dark';
+    var acao = escuro ? 'Ativar modo claro' : 'Ativar modo escuro';
 
     document.documentElement.setAttribute('data-theme', escuro ? 'dark' : 'light');
 
     if (botaoTema) {
+      // O nome acessível permanece "Alternar tema" (definido no
+      // HTML). Só o title e o estado pressionado mudam: trocar o
+      // aria-label a cada clique deixa o botão imprevisível para
+      // quem usa leitor de tela.
       botaoTema.setAttribute('aria-pressed', escuro ? 'true' : 'false');
-      botaoTema.setAttribute('aria-label', escuro ? 'Ativar modo claro' : 'Ativar modo escuro');
-      botaoTema.setAttribute('title', escuro ? 'Ativar modo claro' : 'Ativar modo escuro');
+      botaoTema.setAttribute('title', acao);
     }
 
     if (metaTema) {
@@ -151,8 +161,8 @@
     });
   }
 
-  // Se a pessoa nunca escolheu um tema, acompanha a preferência do
-  // sistema operacional enquanto a página estiver aberta.
+  // Sem escolha explícita, o tema acompanha o sistema enquanto a
+  // página estiver aberta.
   if (window.matchMedia) {
     var consultaEscuro = window.matchMedia('(prefers-color-scheme: dark)');
 
@@ -181,7 +191,7 @@
   }
 
   function fecharMenu() {
-    if (!menuMovel || !botaoMenu) {
+    if (!menuMovel || !botaoMenu || !menuAberto()) {
       return;
     }
 
@@ -191,13 +201,41 @@
   }
 
   function abrirMenu() {
-    if (!menuMovel || !botaoMenu) {
+    if (!menuMovel || !botaoMenu || menuAberto()) {
       return;
     }
 
     menuMovel.removeAttribute('hidden');
     botaoMenu.setAttribute('aria-expanded', 'true');
     botaoMenu.setAttribute('aria-label', 'Fechar menu');
+  }
+
+  // Depois de seguir uma âncora do menu, o foco precisa ir para o
+  // destino. Sem isso, o teclado continuaria no botão de menu já
+  // fechado. preventScroll evita que o foco interrompa a rolagem
+  // suave disparada pelo href.
+  function focarDestino(link) {
+    var href = link.getAttribute('href');
+
+    if (!href || href.charAt(0) !== '#') {
+      return;
+    }
+
+    var destino = document.querySelector(href);
+
+    if (!destino) {
+      return;
+    }
+
+    if (!destino.hasAttribute('tabindex')) {
+      destino.setAttribute('tabindex', '-1');
+    }
+
+    try {
+      destino.focus({ preventScroll: true });
+    } catch (erro) {
+      destino.focus();
+    }
   }
 
   if (botaoMenu && menuMovel) {
@@ -210,9 +248,14 @@
     });
 
     menuMovel.addEventListener('click', function (evento) {
-      if (evento.target.closest('a')) {
-        fecharMenu();
+      var link = evento.target.closest('a');
+
+      if (!link) {
+        return;
       }
+
+      focarDestino(link);
+      fecharMenu();
     });
 
     document.addEventListener('keydown', function (evento) {
@@ -223,7 +266,7 @@
     });
 
     window.addEventListener('resize', function () {
-      if (window.innerWidth > 920) {
+      if (window.innerWidth > LIMITE_MOBILE) {
         fecharMenu();
       }
     });
@@ -236,21 +279,23 @@
   var cabecalho = document.querySelector('.site-header');
 
   function atualizarCabecalho() {
-    if (!cabecalho) {
-      return;
+    if (cabecalho) {
+      if (window.scrollY > 8) {
+        cabecalho.classList.add('scrolled');
+      } else {
+        cabecalho.classList.remove('scrolled');
+      }
     }
 
-    if (window.scrollY > 8) {
-      cabecalho.classList.add('scrolled');
-    } else {
-      cabecalho.classList.remove('scrolled');
+    // Rolar com o menu aberto esconde a navegação, mas mantém o
+    // usuário no ponto da página que ele estava lendo.
+    if (menuAberto() && window.scrollY > 8) {
+      fecharMenu();
     }
   }
 
-  if (cabecalho) {
-    atualizarCabecalho();
-    window.addEventListener('scroll', atualizarCabecalho, { passive: true });
-  }
+  atualizarCabecalho();
+  window.addEventListener('scroll', atualizarCabecalho, { passive: true });
 
   /* ------------------------------------------------------------
    * DATAS DOS CARTÕES DE EXEMPLO
@@ -268,8 +313,7 @@
         deslocamento = 0;
       }
 
-      var data = new Date(hoje.getFullYear(), hoje.getMonth(), hoje.getDate() + deslocamento, 12, 0, 0);
-
+      var data = dataLocal(hoje.getFullYear(), hoje.getMonth(), hoje.getDate() + deslocamento);
       alvos[i].textContent = formatarDataCurta(data);
     }
   }
@@ -279,77 +323,20 @@
   /* ------------------------------------------------------------
    * RESERVAS DE EXEMPLO
    *
-   * Dados fictícios, só para a prévia do calendário. O próprio
-   * texto da seção avisa que as reservas reais aparecem depois
-   * do login. Os dias mudam um pouco de um mês para o outro para
-   * a navegação não parecer congelada.
+   * O calendário real do sistema mostra horário, recurso, motivo
+   * e situação — sem nome do professor. Os exemplos abaixo seguem
+   * exatamente esses campos e mudam de dia conforme o mês.
    * ------------------------------------------------------------ */
 
   var MODELOS = [
-    {
-      dia: 4,
-      hora: '08:00 às 10:00',
-      recurso: 'Laboratório 2',
-      professor: 'Prof. João',
-      motivo: 'Aula prática de Automação',
-      status: 'aprovada'
-    },
-    {
-      dia: 7,
-      hora: '10:00 às 12:00',
-      recurso: 'Sala C11',
-      professor: 'Prof. Gabriel',
-      motivo: 'Aula de Matemática Aplicada',
-      status: 'aprovada'
-    },
-    {
-      dia: 11,
-      hora: '13:30 às 15:30',
-      recurso: 'Gabinete de Notebook A',
-      professor: 'Prof. Guilherme',
-      motivo: 'Projeto integrador',
-      status: 'aguardando'
-    },
-    {
-      dia: 14,
-      hora: '16:00 às 17:30',
-      recurso: 'Sala C13',
-      professor: 'Prof. Gabriel',
-      motivo: 'Reunião de equipe',
-      status: 'aguardando'
-    },
-    {
-      dia: 18,
-      hora: '08:00 às 09:30',
-      recurso: 'Laboratório 1',
-      professor: 'Prof. João',
-      motivo: 'Aula de Redes',
-      status: 'negada'
-    },
-    {
-      dia: 21,
-      hora: '19:00 às 21:00',
-      recurso: 'Sala C12',
-      professor: 'Prof. Guilherme',
-      motivo: 'Aula noturna de Programação',
-      status: 'aprovada'
-    },
-    {
-      dia: 25,
-      hora: '14:00 às 16:00',
-      recurso: 'Gabinete de Notebook B',
-      professor: 'Prof. Gabriel',
-      motivo: 'Oficina de manutenção',
-      status: 'cancelada'
-    },
-    {
-      dia: 28,
-      hora: '10:00 às 11:30',
-      recurso: 'Laboratório 3',
-      professor: 'Prof. João',
-      motivo: 'Avaliação prática',
-      status: 'aguardando'
-    }
+    { dia: 4, hora: '08:00 às 10:00', recurso: 'Laboratório 2', motivo: 'Aula prática de Automação', status: 'aprovada' },
+    { dia: 7, hora: '10:00 às 12:00', recurso: 'Sala C11', motivo: 'Aula de Matemática Aplicada', status: 'aprovada' },
+    { dia: 11, hora: '13:30 às 15:30', recurso: 'Gabinete de Notebook A', motivo: 'Projeto integrador', status: 'aguardando' },
+    { dia: 14, hora: '16:00 às 17:30', recurso: 'Sala C13', motivo: 'Reunião de equipe', status: 'aguardando' },
+    { dia: 18, hora: '08:00 às 09:30', recurso: 'Laboratório 1', motivo: 'Aula de Redes', status: 'negada' },
+    { dia: 21, hora: '19:00 às 21:00', recurso: 'Sala C12', motivo: 'Aula noturna de Programação', status: 'aprovada' },
+    { dia: 25, hora: '14:00 às 16:00', recurso: 'Gabinete de Notebook B', motivo: 'Oficina de manutenção', status: 'cancelada' },
+    { dia: 28, hora: '10:00 às 11:30', recurso: 'Laboratório 3', motivo: 'Avaliação prática', status: 'aguardando' }
   ];
 
   var cacheReservas = {};
@@ -378,7 +365,6 @@
       lista.push({
         hora: modelo.hora,
         recurso: modelo.recurso,
-        professor: modelo.professor,
         motivo: modelo.motivo,
         status: modelo.status
       });
@@ -402,24 +388,23 @@
 
     var ano = hoje.getFullYear();
     var mes = hoje.getMonth();
-
-    rotulo.textContent = MESES[mes] + ' ' + ano;
-
     var porDia = reservasDoMes(ano, mes);
     var celulas = construirMatriz(ano, mes);
     var fragmento = document.createDocumentFragment();
+    var isoHoje = isoDe(ano, mes, hoje.getDate());
+    var i;
 
-    for (var i = 0; i < DIAS_SEMANA.length; i += 1) {
+    rotulo.textContent = MESES[mes] + ' ' + ano;
+
+    for (i = 0; i < DIAS_SEMANA.length; i += 1) {
       var semana = document.createElement('span');
       semana.className = 'cal-week';
       semana.textContent = DIAS_SEMANA[i].charAt(0);
       fragmento.appendChild(semana);
     }
 
-    var isoHoje = isoDe(hoje.getFullYear(), hoje.getMonth(), hoje.getDate());
-
-    for (var j = 0; j < celulas.length; j += 1) {
-      var celula = celulas[j];
+    for (i = 0; i < celulas.length; i += 1) {
+      var celula = celulas[i];
       var dia = document.createElement('span');
 
       dia.className = 'cal-day';
@@ -440,7 +425,7 @@
       fragmento.appendChild(dia);
     }
 
-    grade.innerHTML = '';
+    grade.textContent = '';
     grade.appendChild(fragmento);
   }
 
@@ -461,17 +446,15 @@
   if (gradeDemo && rotuloDemo) {
     var demoAno = hoje.getFullYear();
     var demoMes = hoje.getMonth();
-
-    var porDiaAtual = reservasDoMes(demoAno, demoMes);
     var isoHoje = isoDe(hoje.getFullYear(), hoje.getMonth(), hoje.getDate());
+    var porDiaInicial = reservasDoMes(demoAno, demoMes);
 
-    // Começa no dia de hoje quando ele tem reservas; senão, no
-    // primeiro dia com reservas do mês; senão, no dia 1.
+    // Começa em hoje quando há reservas; senão, no primeiro dia
+    // com reservas; senão, no dia 1.
     var demoSelecionado = isoHoje;
 
-    if (!porDiaAtual[demoSelecionado]) {
-      var diasComReserva = Object.keys(porDiaAtual).sort();
-
+    if (!porDiaInicial[demoSelecionado]) {
+      var diasComReserva = Object.keys(porDiaInicial).sort();
       demoSelecionado = diasComReserva.length ? diasComReserva[0] : isoDe(demoAno, demoMes, 1);
     }
 
@@ -485,18 +468,40 @@
       return badge;
     }
 
+    // Rótulo do botão: dia da semana + data + quantidade. Assim,
+    // quem navega por teclado sabe o que esperar antes de ativar.
+    function rotuloAcessivel(ano, mes, dia, quantidade) {
+      var texto = DIAS_SEMANA[dataLocal(ano, mes, dia).getDay()] + ', ' +
+                  formatarDataLonga(ano, mes, dia);
+
+      if (quantidade === 0) {
+        return texto + ', sem reservas';
+      }
+
+      return texto + ', ' + quantidade + (quantidade === 1 ? ' reserva' : ' reservas');
+    }
+
     function renderizarPainel() {
+      if (!tituloDia || !subtituloDia || !listaDia) {
+        return;
+      }
+
       var partes = demoSelecionado.split('-');
       var ano = parseInt(partes[0], 10);
       var mes = parseInt(partes[1], 10) - 1;
       var dia = parseInt(partes[2], 10);
-
-      tituloDia.textContent = 'Reservas - Dia ' + doisDigitos(dia);
-      subtituloDia.textContent = formatarDataLonga(ano, mes, dia);
-
       var reservas = reservasDoMes(ano, mes)[demoSelecionado] || [];
 
-      listaDia.innerHTML = '';
+      tituloDia.textContent = 'Reservas - Dia ' + doisDigitos(dia);
+
+      // Única região aria-live da landing: anuncia data e
+      // quantidade sem repetir o conteúdo de cada cartão.
+      subtituloDia.textContent = formatarDataLonga(ano, mes, dia) + ' · ' +
+        (reservas.length ? reservas.length + (reservas.length === 1 ? ' reserva' : ' reservas') : 'nenhuma reserva');
+
+      while (listaDia.firstChild) {
+        listaDia.removeChild(listaDia.firstChild);
+      }
 
       if (!reservas.length) {
         var vazio = document.createElement('p');
@@ -508,7 +513,6 @@
 
       for (var i = 0; i < reservas.length; i += 1) {
         var reserva = reservas[i];
-
         var cartao = document.createElement('div');
         cartao.className = 'demo-res';
 
@@ -528,32 +532,67 @@
 
         var detalhe = document.createElement('p');
         detalhe.className = 'demo-res-sub';
-        detalhe.textContent = reserva.professor + ' - ' + reserva.motivo;
+        detalhe.textContent = 'Motivo: ' + reserva.motivo;
 
         cartao.appendChild(cabecalho);
         cartao.appendChild(titulo);
         cartao.appendChild(detalhe);
-
         listaDia.appendChild(cartao);
       }
     }
 
-    function renderizarCalendarioDemo() {
+    // Roving tabindex: apenas o dia selecionado entra na ordem de
+    // Tab. As setas movem o foco entre os dias, em vez de exigir
+    // uma parada por célula.
+    function atualizarSelecaoNoGrid() {
+      var botoes = gradeDemo.querySelectorAll('.calendar-day');
+
+      for (var i = 0; i < botoes.length; i += 1) {
+        var botao = botoes[i];
+        var selecionado = botao.dataset.iso === demoSelecionado;
+
+        botao.tabIndex = selecionado ? 0 : -1;
+
+        if (selecionado) {
+          botao.className += ' selected';
+          botao.setAttribute('aria-current', 'date');
+        } else {
+          botao.className = botao.className.replace(/\s+selected/g, '');
+          botao.removeAttribute('aria-current');
+        }
+      }
+    }
+
+    function renderizarCalendarioDemo(isoParaFocar) {
       rotuloDemo.textContent = MESES[demoMes] + ' ' + demoAno;
 
       var porDia = reservasDoMes(demoAno, demoMes);
       var celulas = construirMatriz(demoAno, demoMes);
       var fragmento = document.createDocumentFragment();
+      var i;
 
-      for (var i = 0; i < celulas.length; i += 1) {
+      for (i = 0; i < celulas.length; i += 1) {
         var celula = celulas[i];
         var botao = document.createElement('button');
+        var reservas = porDia[celula.iso] || [];
+        var numero = document.createElement('span');
 
         botao.type = 'button';
         botao.className = 'calendar-day';
-        botao.setAttribute('aria-pressed', celula.iso === demoSelecionado ? 'true' : 'false');
-        botao.setAttribute('aria-label', formatarDataLonga(celula.ano, celula.mes, celula.dia));
         botao.dataset.iso = celula.iso;
+
+        // O nome acessível começa pelo texto que aparece no botão
+        // (número do dia e, quando há, contador de reservas). Sem
+        // isso, o leitor de tela anunciava só a data por extenso e
+        // o nome não continha o que está visível na tela.
+        var textoVisivel = String(celula.dia) +
+          (reservas.length ? ' ' + reservas.length : '');
+
+        botao.setAttribute('aria-label', textoVisivel + ' — ' +
+          rotuloAcessivel(celula.ano, celula.mes, celula.dia, reservas.length));
+
+        numero.textContent = celula.dia;
+        botao.appendChild(numero);
 
         if (!celula.mesAtual) {
           botao.className += ' muted';
@@ -563,82 +602,144 @@
           botao.className += ' today';
         }
 
-        if (celula.iso === demoSelecionado) {
-          botao.className += ' selected';
-        }
-
-        var numero = document.createElement('span');
-        numero.textContent = celula.dia;
-        botao.appendChild(numero);
-
-        var reservas = porDia[celula.iso];
-
-        if (reservas && reservas.length) {
+        if (reservas.length) {
           botao.className += ' has';
 
           var contador = document.createElement('span');
           contador.className = 'calendar-day-count';
-          contador.textContent = reservas.length;
+          // O número é pintado por ::after. Assim ele continua visível
+          // sem virar um segundo texto dentro do botão — o leitor de
+          // tela já recebe a quantidade no aria-label completo.
+          contador.dataset.count = String(reservas.length);
           botao.appendChild(contador);
         }
 
         fragmento.appendChild(botao);
       }
 
-      gradeDemo.innerHTML = '';
+      while (gradeDemo.firstChild) {
+        gradeDemo.removeChild(gradeDemo.firstChild);
+      }
+
       gradeDemo.appendChild(fragmento);
+      atualizarSelecaoNoGrid();
       renderizarPainel();
+
+      if (isoParaFocar) {
+        var alvo = gradeDemo.querySelector('.calendar-day[data-iso="' + isoParaFocar + '"]');
+
+        if (alvo) {
+          alvo.focus();
+        }
+      }
+    }
+
+    function selecionarDia(iso, focar) {
+      var partes = iso.split('-');
+      var ano = parseInt(partes[0], 10);
+      var mes = parseInt(partes[1], 10) - 1;
+      var mudouDeMes = ano !== demoAno || mes !== demoMes;
+
+      demoAno = ano;
+      demoMes = mes;
+      demoSelecionado = iso;
+
+      if (mudouDeMes) {
+        renderizarCalendarioDemo(focar ? iso : null);
+        return;
+      }
+
+      atualizarSelecaoNoGrid();
+      renderizarPainel();
+
+      if (focar) {
+        var alvo = gradeDemo.querySelector('.calendar-day[data-iso="' + iso + '"]');
+
+        if (alvo) {
+          alvo.focus();
+        }
+      }
+    }
+
+    function mudarMes(deslocamento, focar) {
+      var dia = parseInt(demoSelecionado.split('-')[2], 10);
+
+      demoMes += deslocamento;
+
+      while (demoMes < 0) {
+        demoMes += 12;
+        demoAno -= 1;
+      }
+
+      while (demoMes > 11) {
+        demoMes -= 12;
+        demoAno += 1;
+      }
+
+      demoSelecionado = isoDe(demoAno, demoMes, Math.min(dia, diasNoMes(demoAno, demoMes)));
+      renderizarCalendarioDemo(focar ? demoSelecionado : null);
     }
 
     gradeDemo.addEventListener('click', function (evento) {
       var botao = evento.target.closest('.calendar-day');
 
-      if (!botao) {
+      if (botao) {
+        selecionarDia(botao.dataset.iso, false);
+      }
+    });
+
+    gradeDemo.addEventListener('keydown', function (evento) {
+      var deslocamentos = {
+        ArrowLeft: -1,
+        ArrowRight: 1,
+        ArrowUp: -7,
+        ArrowDown: 7
+      };
+      var botoes = gradeDemo.querySelectorAll('.calendar-day');
+      var indice = Array.prototype.indexOf.call(botoes, document.activeElement);
+      var alvo;
+      var passo;
+
+      if (indice < 0) {
         return;
       }
 
-      var partes = botao.dataset.iso.split('-');
-      var ano = parseInt(partes[0], 10);
-      var mes = parseInt(partes[1], 10) - 1;
+      if (Object.prototype.hasOwnProperty.call(deslocamentos, evento.key)) {
+        evento.preventDefault();
+        passo = indice + deslocamentos[evento.key];
+        alvo = botoes[passo];
 
-      demoAno = ano;
-      demoMes = mes;
-      demoSelecionado = botao.dataset.iso;
+        if (alvo && passo >= 0) {
+          selecionarDia(alvo.dataset.iso, true);
+        }
+        return;
+      }
 
-      renderizarCalendarioDemo();
+      if (evento.key === 'Home' || evento.key === 'End') {
+        evento.preventDefault();
+        alvo = evento.key === 'Home' ? botoes[0] : botoes[botoes.length - 1];
+
+        if (alvo) {
+          selecionarDia(alvo.dataset.iso, true);
+        }
+        return;
+      }
+
+      if (evento.key === 'PageUp' || evento.key === 'PageDown') {
+        evento.preventDefault();
+        mudarMes(evento.key === 'PageUp' ? -1 : 1, true);
+      }
     });
 
     if (botaoAnterior) {
       botaoAnterior.addEventListener('click', function () {
-        demoMes -= 1;
-
-        if (demoMes < 0) {
-          demoMes = 11;
-          demoAno -= 1;
-        }
-
-        var dia = parseInt(demoSelecionado.split('-')[2], 10);
-        var limite = diasNoMes(demoAno, demoMes);
-
-        demoSelecionado = isoDe(demoAno, demoMes, Math.min(dia, limite));
-        renderizarCalendarioDemo();
+        mudarMes(-1, false);
       });
     }
 
     if (botaoProximo) {
       botaoProximo.addEventListener('click', function () {
-        demoMes += 1;
-
-        if (demoMes > 11) {
-          demoMes = 0;
-          demoAno += 1;
-        }
-
-        var dia = parseInt(demoSelecionado.split('-')[2], 10);
-        var limite = diasNoMes(demoAno, demoMes);
-
-        demoSelecionado = isoDe(demoAno, demoMes, Math.min(dia, limite));
-        renderizarCalendarioDemo();
+        mudarMes(1, false);
       });
     }
 
