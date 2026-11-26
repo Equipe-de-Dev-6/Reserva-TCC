@@ -1,14 +1,4 @@
-"""Conexão com o Supabase.
-
-Este módulo inicializa o cliente do Supabase que será usado por toda a
-aplicação (app.py e consulta_salas.py).
-
-As variáveis de ambiente são lidas do .env (via python-dotenv). Se
-alguma delas faltar, a aplicação não sobe — é melhor falhar cedo do que
-seguir sem banco.
-"""
-
-import os
+"""Cliente único do Supabase usado pelo app e pelos scripts de consulta.
 
 A configuração é lida do arquivo .env (via python-dotenv) e validada na
 importação: se a URL ou a chave estiverem faltando, o processo falha logo
