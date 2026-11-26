@@ -62,7 +62,8 @@
     avisos: 'avisosVistos',
     reservas: 'reservasEstado',
     lembretes: 'lembretesEnviados',
-    iniciado: 'primeiraExecucao'
+    iniciado: 'primeiraExecucao',
+    notificacoesServidor: 'notificacoesServidorVistas'
   };
 
   const memoria = {};
@@ -101,32 +102,6 @@
     return permissao() === 'granted';
   }
 
-  // Aviso de instalação da PWA. Antes este código ficava dentro do
-  // service worker e usava window/navigator, que não existem lá: a
-  // exceção impedia até o registro do notificationclick. Aqui ele roda
-  // na página, onde esses objetos existem.
-  async function mostrarAvisoInstalacao(registro) {
-    if (!registro || !suportado) return;
-
-    const emPWA = window.matchMedia('(display-mode: standalone)').matches;
-
-    if (emPWA) return;
-
-    try {
-      await registro.showNotification('Reserva SENAI', {
-        body: 'Instale o aplicativo para acessar rápido pela tela inicial',
-        icon: CONFIG.icone,
-        badge: CONFIG.badge,
-        vibrate: [200, 100, 200],
-        // O clique é tratado pelo listener notificationclick do sw.js.
-        // showNotification devolve Promise<void>: não há onclick aqui.
-        data: { url: '/home' }
-      });
-    } catch (e) {
-      console.warn('[notificacoes] aviso de instalação indisponível:', e.message);
-    }
-  }
-
   async function registrarSW() {
 
     if (!('serviceWorker' in navigator)) {
@@ -136,7 +111,6 @@
     try {
       registroSW = await navigator.serviceWorker.register(CONFIG.swPath);
       await navigator.serviceWorker.ready;
-      await mostrarAvisoInstalacao(registroSW);
       return registroSW;
     } catch (e) {
       console.warn('[notificacoes] service worker indisponível:', e.message);
@@ -551,6 +525,51 @@
 
 
   /* ======================================================
+     3b. NOTIFICAÇÕES DO SERVIDOR (aba de notificações)
+     ------------------------------------------------------
+     Toda notificação gravada na aba de notificações do site
+     também é exibida como notificação do sistema (Windows,
+     Android, etc.), para que o usuário não precise abrir o
+     site para saber que algo aconteceu.
+     ====================================================== */
+  async function checarNotificacoesServidor(silencioso) {
+    if (!suportado) return;
+
+    let lista = [];
+    try {
+      const r = await fetch('/api/notificacoes');
+      if (!r.ok) return;
+      lista = await r.json();
+    } catch (e) {
+      return;
+    }
+
+    if (!Array.isArray(lista)) return;
+
+    const vistos = ler(KEYS.notificacoesServidor, []);
+    const novos = lista.filter((n) => !vistos.includes(String(n.id)));
+    const ids = lista.map((n) => String(n.id));
+    salvar(KEYS.notificacoesServidor, ids.slice(-500));
+
+    if (silencioso) return;
+
+    novos.forEach((n) => {
+      if (n.lida) return;
+
+      const url = window.location.pathname.includes('admin')
+        ? '/notificacoes_adm'
+        : '/notificacoes_prof';
+
+      notificar({
+        titulo: n.titulo || 'Notificação',
+        corpo: n.mensagem || '',
+        tag: `notif-servidor-${n.id}`,
+        url: url
+      });
+    });
+  }
+
+  /* ======================================================
      4. LEMBRETE 1 HORA ANTES (reservas aprovadas)
      ====================================================== */
 
@@ -609,6 +628,7 @@
     await checarAvisos(false);
     checarReservas(false);
     checarLembretes();
+    await checarNotificacoesServidor(false);
   }
 
   // O retrato inicial ("primeira execucao") é tirado de
@@ -660,6 +680,7 @@
     if (primeira) {
       await checarAvisos(true);
       checarReservas(true);
+      await checarNotificacoesServidor(true);
       salvar(KEYS.iniciado, true);
     }
 
@@ -689,6 +710,7 @@
     // subscribe() acima; nas demais abas a consulta abaixo, feita ao
     // voltar para a aba, mantém o painel atualizado.
     setInterval(checarLembretes, CONFIG.intervaloChecagem);
+    setInterval(() => { checarNotificacoesServidor(false); }, CONFIG.intervaloChecagem);
 
     document.addEventListener('visibilitychange', () => {
       if (!document.hidden) {
