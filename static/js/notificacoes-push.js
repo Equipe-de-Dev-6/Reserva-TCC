@@ -50,8 +50,9 @@
     statusNegado: ['negada'],
     statusCancelado: ['cancelada'],
 
-    // Notificar também quando o coordenador APROVAR?
-    notificarAprovacao: false
+    // Notificar também quando o coordenador APROVAR? Habilitado para
+    // que a demonstração mostre o aviso no navegador do professor.
+    notificarAprovacao: true
   };
 
   // As chaves continuam sendo usadas internamente, mas o dado
@@ -100,6 +101,32 @@
     return permissao() === 'granted';
   }
 
+  // Aviso de instalação da PWA. Antes este código ficava dentro do
+  // service worker e usava window/navigator, que não existem lá: a
+  // exceção impedia até o registro do notificationclick. Aqui ele roda
+  // na página, onde esses objetos existem.
+  async function mostrarAvisoInstalacao(registro) {
+    if (!registro || !suportado) return;
+
+    const emPWA = window.matchMedia('(display-mode: standalone)').matches;
+
+    if (emPWA) return;
+
+    try {
+      await registro.showNotification('Reserva SENAI', {
+        body: 'Instale o aplicativo para acessar rápido pela tela inicial',
+        icon: CONFIG.icone,
+        badge: CONFIG.badge,
+        vibrate: [200, 100, 200],
+        // O clique é tratado pelo listener notificationclick do sw.js.
+        // showNotification devolve Promise<void>: não há onclick aqui.
+        data: { url: '/home' }
+      });
+    } catch (e) {
+      console.warn('[notificacoes] aviso de instalação indisponível:', e.message);
+    }
+  }
+
   async function registrarSW() {
 
     if (!('serviceWorker' in navigator)) {
@@ -109,6 +136,7 @@
     try {
       registroSW = await navigator.serviceWorker.register(CONFIG.swPath);
       await navigator.serviceWorker.ready;
+      await mostrarAvisoInstalacao(registroSW);
       return registroSW;
     } catch (e) {
       console.warn('[notificacoes] service worker indisponível:', e.message);
@@ -656,19 +684,15 @@
       });
     }
 
-    // Mudanças vindas de outra aba (ex.: coordenador em outra janela)
-    window.addEventListener('storage', async () => {
-      await checarAvisos(false);
-      checarReservas(false);
-      checarLembretes();
-    });
-
-    // Relógio dos lembretes
+    // As fontes de dados mudaram: o estado agora fica em memória, então
+    // o evento 'storage' nunca disparava. As telas avisam pelo
+    // subscribe() acima; nas demais abas a consulta abaixo, feita ao
+    // voltar para a aba, mantém o painel atualizado.
     setInterval(checarLembretes, CONFIG.intervaloChecagem);
 
-    // Ao voltar para a aba, checa na hora
     document.addEventListener('visibilitychange', () => {
       if (!document.hidden) {
+        checarReservas(false);
         checarLembretes();
       }
     });
