@@ -67,6 +67,7 @@ MENU_COORDENADOR = [
     {"rota": "/notificacoes_adm", "icone": "notification", "rotulo": "Notificações"},
     {"rota": "/calendario_adm", "icone": "calendar", "rotulo": "Calendário"},
     {"rota": "/professores_adm", "icone": "user (3)", "rotulo": "Usuários"},
+    {"rota": "/pendencias_adm", "icone": "warning", "rotulo": "Pedidos de Senha"},
     {"rota": "/configuracoes_adm", "icone": "gear", "rotulo": "Configurações"},
     {"rota": "/ajuda", "icone": "interrogation", "rotulo": "Ajuda"},
 ]
@@ -109,6 +110,7 @@ ROTA_ATIVA = {
     "/notificacoes_adm": "/notificacoes_adm",
     "/calendario_adm": "/calendario_adm",
     "/professores_adm": "/professores_adm",
+    "/pendencias_adm": "/pendencias_adm",
     "/configuracoes_adm": "/configuracoes_adm",
     "/gerenciar_recursos": "/gerenciar_recursos",
     "/reservar_admin": "/reservar_admin",
@@ -512,6 +514,11 @@ def renderizar(request: Request, nome_do_arquivo: str, **contexto):
             "menu": MENU_COORDENADOR if eh_admin else MENU_PROFESSOR,
             "rota_inicio": (
                 INICIO_COORDENADOR if eh_admin else INICIO_PROFESSOR
+            ),
+            # A tela de confirmação de reserva é compartilhada: sem este
+            # destino, o coordenador era mandado para /reservas_prof.
+            "rota_reservas": (
+                "/reservas_admin" if eh_admin else "/reservas_prof"
             ),
             "rota_atual": ROTA_ATIVA.get(request.url.path),
             "reserva_inicio": INICIO_COORDENADOR if eh_admin else INICIO_PROFESSOR,
@@ -1036,6 +1043,10 @@ PAGINAS_DO_COORDENADOR = {
         "admin/professores.html",
         "Buscar professor por nome ou e-mail..."
     ),
+    "/pendencias_adm": (
+        "admin/pendencias.html",
+        "Buscar pedido por id..."
+    ),
     "/configuracoes_adm": (
         "admin/configuracoes.html",
         "Buscar uma configuração..."
@@ -1259,25 +1270,11 @@ def cadastrar_usuario(usuario: Usuario, request: Request):
 # ATUALIZAR USUÁRIO
 # ------------------------------------------------------------
 
-@app.put("/usuarios/{usuario_id}")
-def atualizar_usuario(
-    usuario_id: int,
-    alteracao: UsuarioAtualizacao,
-    request: Request
-):
-    """Edita nome, e-mail e/ou cargo; senha é tratada em outra rota."""
-
-    exigir_coordenador(request)
-
-    dados = alteracao.toJson()
-
-    if not dados:
-        raise HTTPException(
-            status_code=400,
-            detail="Nenhum campo para atualizar"
-        )
-
+def _atualizar_dados_usuario(usuario_id: int, dados: dict) -> dict:
+    """Aplica nome/e-mail/cargo ao banco. Autorização é feita pela rota."""
     if "email" in dados:
+        # O login normaliza o e-mail; gravar em minúsculas evita duas
+        # contas que só diferem por caixa.
         dados["email"] = dados["email"].strip().lower()
 
         repetido = (
@@ -1304,7 +1301,6 @@ def atualizar_usuario(
     )
 
     if not resposta.data:
-
         raise HTTPException(
             status_code=404,
             detail="Usuário não encontrado"
@@ -1316,6 +1312,59 @@ def atualizar_usuario(
         "email": dados.get("email", resposta.data[0].get("email")),
         "cargo": dados.get("cargo", resposta.data[0].get("cargo"))
     }
+
+
+@app.put("/usuarios/me")
+def atualizar_me(alteracao: UsuarioAtualizacao, request: Request):
+    """Permite que o professor edite o próprio nome e e-mail.
+
+    A tela de configurações do professor não pode chamar
+    PUT /usuarios/{id}: essa rota é exclusiva do coordenador. Aqui a
+    identidade vem da sessão e o cargo é removido do corpo, para que
+    ninguém promova a si mesmo a coordenador.
+    """
+    usuario = exigir_sessao(request)
+
+    dados = alteracao.toJson()
+    dados.pop("cargo", None)
+
+    if not dados:
+        raise HTTPException(
+            status_code=400,
+            detail="Nenhum campo para atualizar"
+        )
+
+    resultado = _atualizar_dados_usuario(usuario["id"], dados)
+
+    # O cookie guarda nome e e-mail: sem atualizá-los, o cabeçalho
+    # continuaria mostrando o valor antigo até o próximo login.
+    if "nome" in dados:
+        request.session["usuario_nome"] = resultado["nome"]
+    if "email" in dados:
+        request.session["usuario_email"] = resultado["email"]
+
+    return resultado
+
+
+@app.put("/usuarios/{usuario_id}")
+def atualizar_usuario(
+    usuario_id: int,
+    alteracao: UsuarioAtualizacao,
+    request: Request
+):
+    """Edita qualquer usuário; apenas o coordenador pode usar."""
+
+    exigir_coordenador(request)
+
+    dados = alteracao.toJson()
+
+    if not dados:
+        raise HTTPException(
+            status_code=400,
+            detail="Nenhum campo para atualizar"
+        )
+
+    return _atualizar_dados_usuario(usuario_id, dados)
 
 
 # ------------------------------------------------------------
@@ -1905,7 +1954,7 @@ async def listar_pendencias(request: Request):
     consulta = (
         supabase
         .table('pendencias_senhas')
-        .select('id, usuario_id, status')
+        .select('id, usuario_id, status, solicitado_em')
         .eq('status', 'pendente')
         .execute()
     )
