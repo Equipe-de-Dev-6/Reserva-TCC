@@ -444,6 +444,34 @@ async function main() {
       typeof ctx.window.ReservasApp.getReservas === 'function' && typeof ctx.window.ReservasApp.subscribe === 'function');
   }
 
+  console.log('\n[10] Cancelar pelo id vindo do botão (string)');
+  {
+    // As telas leem data-cancel-id, que o DOM devolve sempre como texto,
+    // enquanto o id que vem da API é number (bigint do Postgres).
+    const remoto = [
+      { id: 42, data: '2026-11-30', horaEntrada: '08:00', horaSaida: '10:00', status: 'aprovada', item: 'Sala A01' },
+      { id: 43, data: '2026-12-01', horaEntrada: '10:00', horaSaida: '12:00', status: 'aguardando', item: 'Sala A02' },
+    ];
+    const ctx = criarContexto({ reservasRemotas: remoto, falhaApi: false });
+    const app = carregarReservasJs(ctx);
+
+    await app.sincronizacao;
+
+    check('cancelar com id em texto retorna true', app.cancelReserva('42') === true);
+    check('status da reserva 42 virou cancelada',
+      app.getReservas().find((r) => r.id === 42).status === 'cancelada');
+
+    await new Promise((r) => setTimeout(r, 10));
+
+    const patches = ctx.__chamadas.filter((c) => c.metodo === 'PATCH');
+    check('PATCH /reservas/42/decisao disparado',
+      patches.length === 1 && patches[0].url === '/reservas/42/decisao',
+      JSON.stringify(ctx.__chamadas.map((c) => c.metodo + ' ' + c.url)));
+
+    check('excluir com id em texto remove', app.deleteReserva('43') === true);
+    check('reserva 43 removida', app.getReservas().every((r) => r.id !== 43));
+  }
+
   console.log(`\n${passou} passaram, ${falhou} falharam\n`);
   process.exit(falhou === 0 ? 0 : 1);
 }
