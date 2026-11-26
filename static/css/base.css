@@ -180,6 +180,8 @@
   padding: 12px 32px;
   flex-shrink: 0;
   width: 100%;
+  box-shadow: 0 1px 0 var(--border-color, #e5e7eb);
+  backdrop-filter: blur(8px);
   }
 
   /* O conteudo abaixo do cabecalho mantem o padding horizontal
@@ -389,6 +391,21 @@
      #E30613. O arquivo em si nao foi recolorido, senao sumiria dos
      quatro lugares que o usam sobre fundo vermelho. */
   --senai-filtro-branco: brightness(0) invert(15%) sepia(100%) saturate(6000%) hue-rotate(352deg) brightness(88%) contrast(104%);
+
+  /* Aliases de design usados por telas avulsas (ajuda, reservas, etc.).
+     Evita que var(--muted) etc. caiam no valor inicial do navegador. */
+  --bg: var(--bg-color, #F4F5F7);
+  --surface: var(--white, #FFFFFF);
+  --surface-2: #F8F9FB;
+  --ink: var(--text-dark, #1F2937);
+  --muted: var(--text-gray, #6B7280);
+  --accent: var(--senai-red, #E30613);
+  --accent-soft: #FEE2E2;
+  --line: var(--border-color, #E5E7EB);
+  --line-strong: #D1D5DB;
+  --radius: 16px;
+  --radius-sm: 10px;
+  --shadow-sm: 0 2px 8px rgba(16, 24, 40, 0.07);
   }
 
 * {
@@ -522,5 +539,11 @@ img {
   .main-content {
   padding: 16px;
   }
+}
+
+/* Foco visivel para navegacao por teclado. */
+:focus-visible {
+  outline: 2px solid var(--senai-blue, #3B82F6);
+  outline-offset: 2px;
 }
 

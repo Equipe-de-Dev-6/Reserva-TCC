@@ -1,280 +1,315 @@
-.adm-section {
-      padding: 24px;
-    }
-
-    .adm-page-header {
-      display: flex;
-      align-items: flex-end;
-      justify-content: space-between;
-      gap: 16px;
-      margin-bottom: 20px;
-    }
-
-    .adm-page-header h2 {
-      font-size: 20px;
-      font-weight: 700;
-    }
-
-    .adm-page-header p {
-      color: var(--text-secondary, #6b7280);
-      font-size: 14px;
-      margin-top: 4px;
-    }
-
-    .adm-list {
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-    }
-
-    .adm-card {
-      background: var(--card-bg, #fff);
-      border: 1px solid var(--border-color, #e5e7eb);
-      border-radius: 12px;
-      padding: 16px 18px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 16px;
-    }
-
-    .adm-card h4 {
-      font-size: 15px;
-      font-weight: 700;
-    }
-
-    .adm-card p {
-      color: var(--text-secondary, #6b7280);
-      font-size: 13px;
-      margin-top: 2px;
-    }
-
-    .adm-card-actions {
-      display: flex;
-      gap: 8px;
-      flex-shrink: 0;
-    }
-
-    .adm-btn {
-      border: none;
-      border-radius: 8x;
-      cursor: pointer;
-      font-family: inherit;
-      font-size: 13px;
-      font-weight: 600;
-      padding: 8px 14px;
-    }
-
-    .adm-btn-aprovar {
-      background: var(--primary-color, #b91c1c);
-      color: #fff;
-    }
-
-    .adm-btn-recusar {
-      background: transparent;
-      border: 1px solid var(--border-color, #e5e7eb);
-      color: var(--text-secondary, #6b7280);
-    }
-
-    /* Filtros de status */
-
-    .adm-filtros {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 6px;
-    }
-
-    .adm-filtro {
-      background: transparent;
-      border: 1px solid var(--border-color, #e5e7eb);
-      border-radius: 999px;
-      color: var(--text-secondary, #6b7280);
-      cursor: pointer;
-      font-family: inherit;
-      font-size: 12px;
-      font-weight: 600;
-      padding: 6px 12px;
-    }
-
-    .adm-filtro.ativo {
-      background: var(--primary-color, #b91c1c);
-      border-color: var(--primary-color, #b91c1c);
-      color: #fff;
-    }
-
-    /* Detalhes do card */
-
-    .adm-card-topo {
-      align-items: flex-start;
-      display: flex;
-      gap: 12px;
-      justify-content: space-between;
-    }
-
-    .adm-selo {
-      border-radius: 999px;
-      flex-shrink: 0;
-      font-size: 11px;
-      font-weight: 700;
-      padding: 4px 10px;
-    }
-
-    .adm-selo-aguardando {
-      background: #fef3c7;
-      color: #92400e;
-    }
-
-    .adm-selo-aprovada {
-      background: #dcfce7;
-      color: #166534;
-    }
-
-    .adm-selo-negada {
-      background: #fee2e2;
-      color: #991b1b;
-    }
-
-    .adm-selo-cancelada {
-      background: #f3f4f6;
-      color: #4b5563;
-    }
-
-    .adm-detalhes {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 6px 14px;
-      margin-top: 8px;
-    }
-
-    .adm-detalhe {
-      color: var(--text-secondary, #6b7280);
-      font-size: 12px;
-    }
-
-    .adm-motivo {
-      border-left: 3px solid var(--border-color, #e5e7eb);
-      color: var(--text-secondary, #6b7280);
-      font-size: 12px;
-      font-style: italic;
-      margin-top: 10px;
-      padding-left: 10px;
-    }
-
-    .adm-comentario {
-      margin-top: 8px;
-      padding: 8px 12px;
-      background-color: #F3F4F6;
-      border-radius: 8x;
-      font-size: 12px;
-      color: var(--text-dark);
-    }
-
-    .adm-comentario-label {
-      font-weight: 700;
-      color: var(--text-secondary, #6b7280);
-      margin-right: 6x;
-      font-size: 11x;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-    }
-
-    .adm-btn:disabled {
-      cursor: not-allowed;
-      opacity: 0.55;
-    }
-
-    .adm-empty {
-      align-items: center;
-      background: var(--card-bg, #fff);
-      border: 1px dashed var(--border-color, #e5e7eb);
-      border-radius: 12x;
-      color: var(--text-secondary, #6b7280);
-      display: none;
-      flex-direction: column;
-      gap: 10px;
-      padding: 40px 20px;
-      text-align: center;
-    }
-
 /* ============================================================
- * RESPONSIVIDADE
+ * Aprovar reservas — coordenação.
  * ============================================================ */
 
+.adm-section {
+  padding: 24px 0 32px;
+}
+
+.adm-page-header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 20px;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+}
+
+.adm-page-header h2 {
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  color: var(--text-dark, #1f2937);
+}
+
+.adm-page-header p {
+  color: var(--text-secondary, #6b7280);
+  font-size: 14px;
+  margin-top: 6px;
+  line-height: 1.5;
+}
+
+.adm-filtros {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 4px;
+  background: var(--surface-2, #f3f4f6);
+  border: 1px solid var(--border-color, #e5e7eb);
+  border-radius: 999px;
+}
+
+.adm-filtro {
+  background: transparent;
+  border: none;
+  border-radius: 999px;
+  color: var(--text-secondary, #6b7280);
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 8px 16px;
+  transition: background-color 0.18s ease, color 0.18s ease, box-shadow 0.18s ease;
+}
+
+.adm-filtro:hover {
+  color: var(--text-dark, #1f2937);
+}
+
+.adm-filtro.ativo {
+  background: var(--white, #fff);
+  color: var(--senai-red, #e30613);
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.08);
+}
+
+.adm-list {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.adm-card {
+  background: var(--card-bg, #fff);
+  border: 1px solid var(--border-color, #e5e7eb);
+  border-radius: 14px;
+  padding: 18px 20px;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 18px;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+  transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+}
+
+.adm-card:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 18px rgba(15, 23, 42, 0.08);
+  border-color: var(--senai-red, #e30613);
+}
+
+.adm-card-topo {
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.adm-card-body {
+  flex: 1;
+  min-width: 0;
+}
+
+.adm-card h4 {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text-dark, #1f2937);
+  margin: 0 0 6px;
+  line-height: 1.3;
+}
+
+.adm-card p {
+  color: var(--text-secondary, #6b7280);
+  font-size: 13px;
+  margin-top: 2px;
+}
+
+.adm-detalhes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 16px;
+  margin-top: 8px;
+}
+
+.adm-detalhe {
+  color: var(--text-secondary, #6b7280);
+  font-size: 12px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.adm-comentario {
+  margin-top: 10px;
+  padding: 10px 14px;
+  background-color: var(--surface-2, #f3f4f6);
+  border-radius: 10px;
+  font-size: 12px;
+  color: var(--text-dark, #1f2937);
+  line-height: 1.5;
+}
+
+.adm-comentario-label {
+  font-weight: 700;
+  color: var(--text-secondary, #6b7280);
+  margin-right: 6px;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.adm-selo {
+  border-radius: 999px;
+  flex-shrink: 0;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 5px 12px;
+  white-space: nowrap;
+}
+
+.adm-selo-aguardando {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.adm-selo-aprovada {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.adm-selo-negada {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.adm-selo-cancelada {
+  background: #f3f4f6;
+  color: #4b5563;
+}
+
+.adm-card-actions {
+  display: flex;
+  gap: 8px;
+  flex-shrink: 0;
+  align-items: center;
+}
+
+.adm-btn {
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  padding: 9px 16px;
+  transition: background-color 0.18s ease, transform 0.12s ease, box-shadow 0.18s ease;
+}
+
+.adm-btn:hover {
+  transform: translateY(-1px);
+}
+
+.adm-btn:active {
+  transform: translateY(0);
+}
+
+.adm-btn-aprovar {
+  background: #16a34a;
+  color: #fff;
+  box-shadow: 0 2px 6px rgba(22, 163, 74, 0.25);
+}
+
+.adm-btn-aprovar:hover {
+  background: #15803d;
+}
+
+.adm-btn-recusar {
+  background: transparent;
+  border: 1px solid var(--border-color, #e5e7eb);
+  color: var(--text-secondary, #6b7280);
+}
+
+.adm-btn-recusar:hover {
+  background: #fee2e2;
+  border-color: #fecaca;
+  color: #991b1b;
+}
+
+.adm-btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+  transform: none;
+}
+
+.adm-empty {
+  align-items: center;
+  background: var(--card-bg, #fff);
+  border: 1px dashed var(--border-color, #e5e7eb);
+  border-radius: 14px;
+  color: var(--text-secondary, #6b7280);
+  display: none;
+  flex-direction: column;
+  gap: 12px;
+  padding: 48px 24px;
+  text-align: center;
+}
+
+.adm-empty img {
+  opacity: 0.7;
+}
+
+.adm-empty p {
+  font-size: 14px;
+  line-height: 1.5;
+  max-width: 360px;
+}
+
+/* Responsividade */
 @media (max-width: 1024px) {
-  .adm-page-header {
-    flex-direction: column;
-    gap: 12px;
-  }
   .adm-page-header h2 {
-    font-size: 18px;
+    font-size: 20px;
   }
-  .adm-list {
-    gap: 10px;
-  }
+
   .adm-card {
-    padding: 14px 16px;
+    padding: 16px 18px;
   }
+
   .adm-card h4 {
-    font-size: 14px;
-  }
-  .adm-card p {
-    font-size: 12px;
+    font-size: 15px;
   }
 }
 
 @media (max-width: 860px) {
   .adm-filtros {
+    width: 100%;
     justify-content: center;
   }
-  .adm-filtro {
-    font-size: 11px;
-    padding: 5px 10px;
+
+  .adm-card-topo {
+    flex-direction: column;
+    gap: 10px;
   }
-  .adm-page-header {
-    gap: 8px;
+
+  .adm-card-actions {
+    width: 100%;
   }
-  .adm-page-header h2 {
-    font-size: 16px;
+
+  .adm-btn {
+    flex: 1;
   }
 }
 
 @media (max-width: 600px) {
   .adm-section {
-    padding: 16px;
+    padding: 16px 0 24px;
   }
-  .adm-page-header {
-    gap: 6px;
-  }
+
   .adm-page-header h2 {
+    font-size: 18px;
+  }
+
+  .adm-card {
+    padding: 14px 16px;
+  }
+
+  .adm-card h4 {
     font-size: 14px;
   }
-  .adm-list {
-    gap: 8px;
-  }
-  .adm-card {
-    padding: 12px 10px;
-  }
-  .adm-card h4 {
-    font-size: 13px;
-  }
-  .adm-card p {
-    font-size: 11px;
-  }
-  .adm-filtros {
-    flex-direction: column;
-    align-items: stretch;
-  }
-  .adm-filtro {
-    width: 100%;
-    justify-content: flex-start;
-  }
+
   .adm-btn-aprovar,
-    .adm-btn-recusar {
+  .adm-btn-recusar {
     width: 100%;
     padding: 10px;
     font-size: 12px;
-  }
-  .adm-empty {
-    padding: 32px 16px;
   }
 }
