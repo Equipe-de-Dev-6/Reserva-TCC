@@ -171,3 +171,25 @@ dublê que registra as consultas, e o navegador por equivalentes em `vm`.
   aponta conflito: o PR para `main` pode ser aberto sem conflitos.
 - `General-Review` está à frente de `origin/General-Review`; o push ainda
   não foi feito. Para a apresentação, use esta árvore local.
+
+---
+
+## 5. Ajustes na landing (branch `deploy`)
+
+- **Fluxo de senha**: a FAQ deixou de falar em “ID de redefinição” e agora
+  descreve o fluxo implementado: e-mail + nova senha + confirmação, pedido
+  registrado com hash e aprovação do coordenador em **Pedidos de Senha**.
+- **Vitrine do coordenador**: o módulo **Pedidos de Senha**, que já existe no
+  menu real, passou a aparecer também na lista da página inicial.
+- **Datas**: os rótulos fixos “Novembro 2026” saíram do HTML e viraram texto
+  neutro até o `landing.js` calcular o mês atual; o rodapé recebe o ano corrente.
+- **Acesso offline**: removido o carregamento de Google Fonts. A pilha usa
+  Inter local quando disponível e cai para a fonte do sistema.
+- **Acessibilidade/UX**: a lista de reservas do calendário de exemplo ficou
+  `aria-live="polite"`, o menu mobile fecha ao clicar fora e o painel do
+  calendário só é montado quando todos os seus elementos existem.
+- **Cache**: CSS e JS da landing passaram para `?v=2`.
+- **Testes**: `check_frontend.js` ganhou 7 checagens de regressão da landing;
+  `python tests/run.py` continua terminando em “tudo certo”. Também foi feita
+  uma abertura real da página: sem erros de console e todos os assets 200.
+- Nenhum `push` foi feito; os commits desta rodada ficaram na `deploy`.
