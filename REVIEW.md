@@ -162,8 +162,12 @@ dublê que registra as consultas, e o navegador por equivalentes em `vm`.
 - Branch local: `General-Review`, com os commits de revisão (padrão
   `docs(<arquivo>): adiciona comentários explicativos`, um commit por arquivo).
 - Nenhum `push` foi feito.
-- O remoto diverge: `origin/main` contém um merge da revisão, um revert e uma
-  revisão posterior que reaplica o revert; `origin/General-Review` também
-  tem um merge que não está no histórico local. Antes de integrar, alinhe
-  as branches com cuidado para não perder as correções locais.
-  Para a apresentação, use esta árvore local.
+- O remoto teve um merge da revisão seguido de revert. Ao mesclar `main`
+  na `General-Review`, os conflitos apareceram em `app.py`,
+  `tests/test_api.py` e `wiring_output.txt`, e a mesclagem também traria
+  de volta o revert nos demais arquivos. A resolução manteve o conteúdo
+  revisado da `General-Review` em todos eles e registrou o merge local
+  (`36b9da8`). `git merge-tree --write-tree main General-Review` agora não
+  aponta conflito: o PR para `main` pode ser aberto sem conflitos.
+- `General-Review` está à frente de `origin/General-Review`; o push ainda
+  não foi feito. Para a apresentação, use esta árvore local.
