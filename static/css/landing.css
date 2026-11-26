@@ -3,8 +3,12 @@
  *
  * Página pública de apresentação do sistema de reservas.
  * Fica fora do base.html de propósito: é a única tela sem menu
- * lateral e sem sessão. As cores, a fonte e os componentes
- * seguem o restante do projeto (--senai-red, cards, badges).
+ * lateral e sem sessão. As cores e os componentes seguem o restante
+ * do projeto (--senai-red, cards, badges).
+ *
+ * A fonte não é baixada de terceiros: a pilha abaixo usa Inter apenas
+ * se ela já estiver instalada e cai para a fonte do sistema. Isso evita
+ * depender de internet na apresentação.
  *
  * Tema claro e escuro são controlados por [data-theme] no <html>.
  * O botão da landing grava a escolha em localStorage.
@@ -63,6 +67,7 @@
   --radius-lg: 22px;
   --max: 1180px;
 
+  /* Inter local -> fonte nativa do sistema (sem request externo). */
   --font: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
 }
 
