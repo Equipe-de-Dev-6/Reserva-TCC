@@ -1,223 +1,236 @@
 /* ============================================================
- * Estilo de ajuda.css.
- * 
- * O esqueleto comum a todas as telas com menu esta em
- * base.css; aqui fica so o que e desta tela.
+ * ajuda.css
+ * Página de ajuda do sistema.
  * ============================================================ */
 
-  :root {
-  --senai-red: #E30613;
-  --bg-color: #F4F5F7;
-  --white: #FFFFFF;
-  --text-dark: #1F2937;
-  --text-gray: #6B7280;
-  --border-color: #E5E7EB;
-  --green-bg: #D1FAE5;
-  --green-text: #059669;
-  --red-bg: #FEE2E2;
-  --red-text: #DC2626;
-  --yellow-bg: #FEF3C7;
-  --yellow-text: #B45309;
-  }
+.help-content {
+  max-width: 840px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
 
-  .nav-item {
-  transition: all 0.2s;
-  }
-
-  .btn-logout {
-  transition: 0.2s;
-  }
-
-  .sidebar-overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(17, 24, 39, 0.45);
-  z-index: 150;
-  }
-
-  /* Tamanho e borda ficam no base.css (42px); aqui so o que ele nao define. */
-  .menu-toggle {
-  align-items: center;
-  justify-content: center;
-  color: var(--text-dark);
-  flex-shrink: 0;
-  }
-
-  .help-banner {
-  background-color: var(--senai-red);
-  border-radius: 16px;
-  padding: 28px 32px;
-  color: var(--white);
-  margin-bottom: 28px;
-  flex-shrink: 0;
-  }
-
-  .help-banner h2 {
-  font-size: 20px;
-  font-weight: 800;
-  margin-bottom: 6px;
-  }
-
-  .help-banner p {
-  font-size: 13px;
-  font-weight: 400;
-  opacity: 0.92;
-  line-height: 1.4;
-  }
-
-  .help-split {
+.help-split {
   display: grid;
-  grid-template-columns: 1fr 1.2fr;
-  gap: 28px;
-  align-items: start;
-  }
+  grid-template-columns: 1fr 1fr;
+  gap: 32px;
+  margin-top: 32px;
+}
 
-  .help-split h2 {
-  font-size: 16px;
-  font-weight: 700;
-  margin-bottom: 14px;
-  }
-
-  .channels-list {
+.help-split .left-section {
   display: flex;
   flex-direction: column;
-  gap: 14px;
-  }
+  gap: 24px;
+}
 
-  .channel-card {
-  background-color: var(--white);
-  border-radius: 12px;
-  padding: 18px 20px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+.help-split .right-section {
   display: flex;
-  align-items: flex-start;
-  gap: 14px;
-  transition: transform 0.2s;
-  }
+  flex-direction: column;
+  gap: 24px;
+}
 
-  .channel-card:hover {
-  transform: translateY(-2px);
-  }
+.help-section {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 24px;
+}
 
-  .channel-icon {
-  width: 22px;
-  height: 22px;
-  color: var(--senai-red);
-  flex-shrink: 0;
-  margin-top: 2px;
-  }
+.help-section h2 {
+  margin: 0 0 16px;
+  font-size: 20px;
+  font-weight: 700;
+}
 
-  .channel-icon svg {
-  width: 100%;
-  height: 100%;
-  }
-
-  .channel-text h3 {
+.help-section p {
+  margin: 0;
+  color: var(--muted);
   font-size: 14px;
-  font-weight: 700;
-  margin-bottom: 4px;
-  }
-
-  .channel-text p {
-  font-size: 12px;
-  color: var(--text-gray);
-  line-height: 1.4;
-  }
-
-  .faq-list {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  }
-
-  .faq-item {
-  background-color: var(--white);
-  border-radius: 12px;
-  padding: 16px 20px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
-  }
-
-  .faq-question {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  cursor: pointer;
-  user-select: none;
-  }
-
-  .faq-question span {
-  font-size: 13px;
-  font-weight: 700;
-  }
-
-  .faq-chevron {
-  width: 16px;
-  height: 16px;
-  color: var(--text-gray);
-  flex-shrink: 0;
-  transition: transform 0.2s;
-  }
-
-  .faq-item.open .faq-chevron {
-  transform: rotate(180deg);
-  }
-
-  .faq-answer {
-  font-size: 12px;
-  color: var(--text-gray);
   line-height: 1.5;
-  margin-top: 10px;
-  display: none;
-  }
+}
 
-  .faq-item.open .faq-answer {
-  display: block;
-  }
+.help-section ul {
+  margin: 0 0 16px;
+  padding: 0 0 0 20px;
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1.5;
+}
 
-  .submit-email {
+.help-section li {
+  margin-bottom: 8px;
+}
+
+.help-section strong {
+  color: var(--ink);
+}
+
+.help-example {
+  margin: 24px 0;
+  padding: 16px;
+  background: var(--surface-2);
+  border-radius: var(--radius);
+  border: 1px solid var(--line);
+}
+
+.help-example pre {
+  margin: 0;
+  padding: 12px;
+  background: var(--bg);
+  border-radius: var(--radius-sm);
+  overflow-x: auto;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 13px;
+  color: var(--ink);
+  line-height: 1.5;
+}
+
+.help-example code {
+  color: var(--accent);
+}
+
+.help-banner {
+  background: var(--accent-soft);
+  border-left: 4px solid var(--accent);
+  padding: 20px 24px;
+  margin: -24px -24px 24px;
+}
+
+.help-banner h2 {
+  margin: 0;
+  font-size: 19px;
+  color: var(--accent);
+}
+
+.greeting h1 {
+  margin: 0 0 8px;
+  font-size: 24px;
+  font-weight: 800;
+}
+
+.greeting p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 15px;
+}
+
+.avatar {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: var(--accent-soft);
+  display: grid;
+  place-items: center;
+}
+
+.avatar img {
+  width: 40px;
+  height: 40px;
+}
+
+.submit-email {
   color: var(--red-text);
   display: flex;
-  }
+  align-items: center;
+  gap: 8px;
+  margin-top: 24px;
+  font-size: 14px;
+}
+
+.submit-email svg {
+  width: 20px;
+  height: 20px;
+  color: var(--red-text);
+}
+
+/* ============================================================
+ * RESPONSIVIDADE
+ * ============================================================ */
 
 @media (max-width: 1024px) {
 
-.help-split {
-  grid-template-columns: 1fr;
+  .help-split {
+    grid-template-columns: 1fr;
+  }
+  .help-split .right-section {
+    order: -1;
+  }
+}
+
+@media (max-width: 860px) {
+  .help-banner {
+    padding: 16px 20px;
+  }
+  .help-banner h2 {
+    font-size: 17px;
+  }
+  .greeting h1 {
+    font-size: 22px;
+  }
+  .greeting p {
+    font-size: 14px;
+  }
+  .avatar {
+    width: 50px;
+    height: 50px;
+  }
+  .avatar img {
+    width: 32px;
+    height: 32px;
   }
 }
 
 @media (max-width: 600px) {
-
-.greeting h1 {
-  font-size: 20px;
+  .help-content {
+    padding: 0 16px;
   }
-
-.greeting p {
-  font-size: 12px;
+  .help-split {
+    gap: 20px;
   }
-
-.avatar {
-  width: 40px;
-  height: 40px;
+  .help-section {
+    padding: 16px;
   }
-
-.help-banner {
-  padding: 20px;
+  .help-section h2 {
+    font-size: 18px;
   }
-
-.help-banner h2 {
-  font-size: 17px;
+  .help-section p {
+    font-size: 13px;
+  }
+  .help-section ul {
+    padding: 0 0 0 16px;
+    font-size: 13px;
+  }
+  .help-example pre {
+    padding: 8px;
+    font-size: 12px;
+  }
+  .help-banner h2 {
+    font-size: 15px;
+  }
+  .greeting h1 {
+    font-size: 20px;
+  }
+  .greeting p {
+    font-size: 12px;
+  }
+  .avatar {
+    width: 40px;
+    height: 40px;
+  }
+  .avatar img {
+    width: 28px;
+    height: 28px;
+  }
+  .submit-email {
+    font-size: 13px;
+    margin-top: 16px;
   }
 }
 
 @media (max-width: 380px) {
-
-.greeting h1 {
-  font-size: 18px;
+  .greeting h1 {
+    font-size: 18px;
   }
-
-.user-dropdown {
-  width: 160px;
+  .user-dropdown {
+    width: 140px;
   }
 }

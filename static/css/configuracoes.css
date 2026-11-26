@@ -1,219 +1,219 @@
 /* ============================================================
- * Estilo de configruacoes.css.
+ * Estilo de configuracoes.css.
  * 
  * O esqueleto comum a todas as telas com menu esta em
  * base.css; aqui fica so o que e desta tela.
  * ============================================================ */
 
-  :root {
-  --senai-red: #E30613;
-  --bg-color: #F4F5F7;
-  --white: #FFFFFF;
-  --text-dark: #1F2937;
-  --text-gray: #6B7280;
-  --border-color: #E5E7EB;
-  --green-bg: #D1FAE5;
-  --green-text: #059669;
-  --red-bg: #FEE2E2;
-  --red-text: #DC2626;
-  --yellow-bg: #FEF3C7;
-  --yellow-text: #B45309;
-  }
+:root {
+--senai-red: #E30613;
+--bg-color: #F4F5F7;
+--white: #FFFFFF;
+--text-dark: #1F2937;
+--text-gray: #6B7280;
+--border-color: #E5E7EB;
+--green-bg: #D1FAE5;
+--green-text: #059669;
+--red-bg: #FEE2E2;
+--red-text: #DC2626;
+--yellow-bg: #FEF3C7;
+--yellow-text: #B45309;
+}
 
-  .quick-actions-section {
-  margin-bottom: 24px;
-  }
+.quick-actions-section {
+margin-bottom: 24px;
+}
 
-  .quick-actions-section h2 {
-  font-size: 16px;
-  font-weight: 700;
-  margin-bottom: 12px;
-  }
+.quick-actions-section h2 {
+font-size: 16px;
+font-weight: 700;
+margin-bottom: 12px;
+}
 
-  .settings-section {
-  width: 100%;
-  }
+.settings-section {
+width: 100%;
+}
 
-  .settings-section > h2 {
-  font-size: 24px;
-  font-weight: 700;
-  margin-bottom: 20px;
-  }
+.settings-section > h2 {
+font-size: 24px;
+font-weight: 700;
+margin-bottom: 20px;
+}
 
-  .settings-card {
-  background: #ffffff;
-  border-radius: 12px;
-  padding: 35px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
-  }
+.settings-card {
+background: #ffffff;
+border-radius: 12px;
+padding: 35px;
+box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
 
-  .settings-header h3 {
-  font-size: 19px;
-  font-weight: 700;
-  margin-bottom: 8px;
-  }
+.settings-header h3 {
+font-size: 19px;
+font-weight: 700;
+margin-bottom: 8px;
+}
 
-  .settings-header p {
-  color: #6B7280;
-  font-size: 13px;
-  }
+.settings-header p {
+color: #6B7280;
+font-size: 13px;
+}
 
-  .settings-divider {
-  height: 1px;
-  width: 100%;
-  background: #E5E7EB;
-  margin: 28px 0;
-  }
+.settings-divider {
+height: 1px;
+width: 100%;
+background: #E5E7EB;
+margin: 28px 0;
+}
 
-  .profile-form {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 22px 35px;
-  }
+.profile-form {
+display: grid;
+grid-template-columns: 1fr 1fr;
+gap: 22px 35px;
+}
 
-  .form-group {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  }
+.form-group {
+display: flex;
+flex-direction: column;
+gap: 8px;
+}
 
-  .form-group label {
-  font-size: 13px;
-  font-weight: 600;
-  color: #374151;
-  }
+.form-group label {
+font-size: 13px;
+font-weight: 600;
+color: #374151;
+}
 
-  .input-container input {
-  width: 100%;
-  height: 42px;
-  border: 1px solid #D1D5DB;
-  border-radius: 6px;
-  outline: none;
-  padding: 0 12px;
-  font-size: 13px;
-  }
+.input-container input {
+width: 100%;
+height: 42px;
+border: 1px solid #D1D5DB;
+border-radius: 6px;
+outline: none;
+padding: 0 12px;
+font-size: 13px;
+}
 
-  .input-container input:focus {
-  border-color: #ED1C24;
-  }
+.input-container input:focus {
+border-color: #ED1C24;
+}
 
-  .notifications-section h3 {
-  font-size: 17px;
-  font-weight: 700;
-  margin-bottom: 20px;
-  }
+.notifications-section h3 {
+font-size: 17px;
+font-weight: 700;
+margin-bottom: 20px;
+}
 
-  .notification-option {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 22px;
-  }
+.notification-option {
+display: flex;
+align-items: center;
+justify-content: space-between;
+margin-bottom: 22px;
+}
 
-  .notification-option strong {
-  display: block;
-  font-size: 14px;
-  margin-bottom: 5px;
-  }
+.notification-option strong {
+display: block;
+font-size: 14px;
+margin-bottom: 5px;
+}
 
-  .notification-option p {
-  font-size: 12px;
-  color: #6B7280;
-  }
+.notification-option p {
+font-size: 12px;
+color: #6B7280;
+}
 
-  .switch {
-  position: relative;
-  width: 44px;
-  height: 24px;
-  flex-shrink: 0;
-  }
+.switch {
+position: relative;
+width: 44px;
+height: 24px;
+flex-shrink: 0;
+}
 
-  .switch input {
-  opacity: 0;
-  width: 0;
-  height: 0;
-  }
+.switch input {
+opacity: 0;
+width: 0;
+height: 0;
+}
 
-  .slider {
-  position: absolute;
-  cursor: pointer;
-  inset: 0;
-  background: #D1D5DB;
-  border-radius: 20px;
-  transition: 0.2s;
-  }
+.slider {
+position: absolute;
+cursor: pointer;
+inset: 0;
+background: #D1D5DB;
+border-radius: 20px;
+transition: 0.2s;
+}
 
-  .slider::before {
-  content: "";
-  position: absolute;
-  width: 18px;
-  height: 18px;
-  left: 3px;
-  top: 3px;
-  background: #ffffff;
-  border-radius: 50%;
-  transition: 0.2s;
-  }
+.slider::before {
+content: "";
+position: absolute;
+width: 18px;
+height: 18px;
+left: 3px;
+top: 3px;
+background: #ffffff;
+border-radius: 50%;
+transition: 0.2s;
+}
 
-  .switch input:checked + .slider {
-  background: #ED1C24;
-  }
+.switch input:checked + .slider {
+background: #ED1C24;
+}
 
-  .switch input:checked + .slider::before {
-  transform: translateX(20px);
-  }
+.switch input:checked + .slider::before {
+transform: translateX(20px);
+}
 
-  .settings-buttons {
-  display: flex;
-  justify-content: flex-end;
-  gap: 12px;
-  }
+.settings-buttons {
+display: flex;
+justify-content: flex-end;
+gap: 12px;
+}
 
-  .btn-cancelar, .btn-salvar {
-  min-height: 42px;
-  padding: 0 20px;
-  border-radius: 6px;
-  font-size: 13px;
-  font-weight: 600;
-  cursor: pointer;
-  }
+.btn-cancelar, .btn-salvar {
+min-height: 42px;
+padding: 0 20px;
+border-radius: 6px;
+font-size: 13px;
+font-weight: 600;
+cursor: pointer;
+}
 
-  .btn-cancelar {
-  background: #ffffff;
-  border: 1px solid #D1D5DB;
-  color: #374151;
-  }
+.btn-cancelar {
+background: #ffffff;
+border: 1px solid #D1D5DB;
+color: #374151;
+}
 
-  .btn-cancelar:hover {
-  background: #F9FAFB;
-  }
+.btn-cancelar:hover {
+background: #F9FAFB;
+}
 
-  .btn-salvar {
-  background: #ED1C24;
-  border: 1px solid #ED1C24;
-  color: #ffffff;
-  }
+.btn-salvar {
+background: #ED1C24;
+border: 1px solid #ED1C24;
+color: #ffffff;
+}
 
-  .btn-salvar:hover {
-  background: #C91A21;
-  }
+.btn-salvar:hover {
+background: #C91A21;
+}
 
-@media (max-width: 1000px) {
+@media (max-width: 1024px) {
 
   .profile-form {
   grid-template-columns: 1fr;}
-}
+  }
 
-@media (max-width: 700px) {
+@media (max-width: 860px) {
 
   .settings-card {
   padding: 20px;}
-}
+  }
 
-@media (max-width: 500px) {
+@media (max-width: 600px) {
 
   .settings-buttons {
   flex-direction: column;}
   .btn-cancelar, .btn-salvar {
   width: 100%;}
-}
+  }

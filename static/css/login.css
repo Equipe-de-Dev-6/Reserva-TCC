@@ -83,6 +83,85 @@ button[type="submit"]:focus-visible {
  * RESPONSIVIDADE
  * ============================================================ */
 
+@media (max-width: 1024px) {
+    .form-container h2 {
+        font-size: 20px;
+    }
+
+    .input-container {
+        height: 56px;
+        padding: 0 20px;
+        gap: 12px;
+    }
+
+    .input-container input {
+        font-size: 15px;
+    }
+
+    button[type="submit"] {
+        min-height: 56px;
+        margin-top: 10px;
+        padding: 16px 20px;
+        font-size: 16px;
+        border-radius: 12px;
+    }
+
+    .links p {
+        font-size: 14px;
+        font-weight: 600;
+    }
+
+    .divider {
+        font-size: 15px;
+        font-weight: 700;
+        margin: 20px 0;
+    }
+
+    .divider::before,
+    .divider::after {
+        height: 3px;
+    }
+}
+
+@media (max-width: 860px) {
+    .form-container h2 {
+        font-size: 18px;
+    }
+
+    .input-container {
+        padding: 0 16px;
+        gap: 8px;
+    }
+
+    .input-container input {
+        font-size: 14px;
+    }
+
+    button[type="submit"] {
+        min-height: 52px;
+        margin-top: 6px;
+        padding: 12px 14px;
+        font-size: 14px;
+        border-radius: 10px;
+    }
+
+    .links p {
+        font-size: 13px;
+        font-weight: 600;
+    }
+
+    .divider {
+        font-size: 14px;
+        font-weight: 700;
+        margin: 16px 0;
+    }
+
+    .divider::before,
+    .divider::after {
+        height: 2px;
+    }
+}
+
 @media (max-width: 600px) {
     .form-container h2 {
         font-size: 16px;
