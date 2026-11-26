@@ -603,13 +603,19 @@ h1 em {
   background: var(--surface-2);
 }
 
+/* O arquivo do logo tem fundo branco. Sem este "cartão" ele aparece
+ * como um retângulo solto dentro da barra escura no tema noturno. */
 .mock-logo {
-  display: block;
-  padding: 0 5px 12px;
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px;
+  padding: 5px 6px;
+  border-radius: 7px;
+  background: #fff;
 }
 
 .mock-logo img {
-  width: 86px;
+  width: 82px;
   height: auto;
 }
 
@@ -1557,9 +1563,16 @@ h1 em {
 }
 
 .calendar-day-count {
-  font-size: 8px;
+  font-size: 9px;
   font-weight: 800;
   line-height: 1;
+}
+
+/* O contador é gerado aqui e não como texto filho do botão: o
+ * aria-label já descreve a quantidade, e repetir o número no DOM
+ * fazia o nome acessível divergir do texto visível. */
+.calendar-day-count::after {
+  content: attr(data-count);
 }
 
 .day-sub {
@@ -1822,7 +1835,7 @@ footer {
   line-height: 1.6;
 }
 
-.footer-col h4 {
+.footer-col h3 {
   margin-bottom: 12px;
   color: var(--muted-2);
   font-size: 10px;
@@ -1890,10 +1903,9 @@ footer {
     order: 0;
   }
 
-  .module-list {
-    grid-template-columns: 1fr;
-  }
-
+  /* A lista de módulos continua em duas colunas aqui: cada card
+   * ainda tem largura para isso. Colapsar já em 1024px deixava a
+   * seção com o dobro da altura necessária no tablet. */
   .steps {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
@@ -1948,6 +1960,13 @@ footer {
     padding: 44px 0 64px;
   }
 
+  /* A prévia do sistema é decorativa e seus textos são menores que
+   * 9px. No celular ela ocupava quase uma tela inteira sem acrescentar
+   * informação útil: some e deixa o conteúdo real chegar primeiro. */
+  .hero-visual {
+    display: none;
+  }
+
   h1 {
     font-size: clamp(32px, 9vw, 44px);
   }
@@ -1984,8 +2003,7 @@ footer {
     grid-template-columns: 1fr;
   }
 
-  .module-list,
-  .panel-row {
+  .module-list {
     grid-template-columns: 1fr;
   }
 
