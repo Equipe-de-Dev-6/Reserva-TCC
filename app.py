@@ -288,7 +288,10 @@ app.add_middleware(
 # era grande o suficiente para não proteger contra força bruta.
 TENTATIVAS_POR_ENDERECO = 8
 JANELA_DE_TENTATIVAS = timedelta(minutes=5)
-NOTIFICACOES_POR_ENDERECO = {}
+# Um mesmo IP pode ser usado por vários professores na rede do campus,
+# então a chave inclui o usuário: sem isso, uma única notificação
+# bloquearia todos os colegas atrás do mesmo roteador por 5 minutos.
+NOTIFICACOES_POR_USUARIO = {}
 
 # Janela de rate limiting para criação de notificações (5 minutos)
 JANELA_NOTIFICACOES = timedelta(minutes=5)
@@ -308,13 +311,15 @@ def _limpar_notificacoes_antigas():
         return
 
     agora = datetime.now()
+    # As chaves são tuplas (endereço, id do usuário); só o tempo importa
+    # para decidir se a entrada já pode sair do dicionário.
     expirados = [
-        ip
-        for ip, ultimo in NOTIFICACOES_POR_ENDERECO.items()
+        chave
+        for chave, ultimo in NOTIFICACOES_POR_USUARIO.items()
         if agora - ultimo >= JANELA_NOTIFICACOES
     ]
-    for ip in expirados:
-        del NOTIFICACOES_POR_ENDERECO[ip]
+    for chave in expirados:
+        del NOTIFICACOES_POR_USUARIO[chave]
 
 
 def _janela_de_tentativas() -> str:
@@ -2083,11 +2088,13 @@ async def criar_notificacao(request: Request):
             detail='Corpo da requisição deve ser um objeto JSON'
         )
 
-    # Rate limiting por IP para evitar spam de notificações
+    # Rate limiting por endereço + usuário: evita spam sem punir quem
+    # divide a mesma rede (caso comum no campus).
     ip = request.client.host if request.client else 'desconhecido'
+    chave = (ip, usuario['id'])
     agora = datetime.now()
-    ultima_criacao = NOTIFICACOES_POR_ENDERECO.get(ip)
-    
+    ultima_criacao = NOTIFICACOES_POR_USUARIO.get(chave)
+
     if ultima_criacao:
         tempo_passado = agora - ultima_criacao
         if tempo_passado < JANELA_NOTIFICACOES:
@@ -2095,7 +2102,7 @@ async def criar_notificacao(request: Request):
                 status_code=429,
                 detail='Muitas notificações. Aguarde alguns minutos e tente novamente.'
             )
-    
+
     # Limpeza ocasional de entradas vencidas
     _limpar_notificacoes_antigas()
     
@@ -2145,8 +2152,8 @@ async def criar_notificacao(request: Request):
         'mensagem': mensagem,
     }
     
-    # Atualizar timestamp do rate limiting
-    NOTIFICACOES_POR_ENDERECO[ip] = agora
+    # Atualizar timestamp do rate limiting desta conta neste endereço
+    NOTIFICACOES_POR_USUARIO[chave] = agora
     
     resposta = (
         supabase
